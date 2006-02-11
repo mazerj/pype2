@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>HappyDoc Source Documentation</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">HappyDoc Source Documentation</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>HappyDoc Documentation Extraction Tool</h3>
+<p>  HappyDoc is a tool for extracting documentation from Python source
+  code.  It differs from other such applications by the fact that it
+  uses the parse tree for a module to derive the information used in
+  its output, rather that importing the module directly.  This allows
+  the user to generate documentation for modules which need special
+  context to be imported.</p>
+<h3>Download</h3>
+<p>  Download the latest version of
+  <a href="http://sourceforge.net/projects/happydoc/">HappyDoc</a> from
+  <a href="http://sourceforge.net">SourceForge</a> .</p>
+<p>  Thanks to <A href="http://sourceforge.net"> <IMG
+  src="http://sourceforge.net/sflogo.php?group_id=9678" width="88"
+  height="31" border="0" alt="SourceForge"></A> for hosting
+  HappyDoc development.</p>
+<h3>Installation</h3>
+<p>  HappyDoc uses the Distutils package for installation.  Unpack the
+  tarball downloaded from SourceForge in a temporary directory.  Then
+  run:
+<pre>
+    % python ./setup.py install
+</pre>
+</p>
+<p>  to install the package in a central location.  Alternatively,
+  HappyDoc can be run directly from its unpacked distribution archive.
+  Use this method if you do not have write access to the
+  <code>site-packages</code> directory for your Python installation.</p>
+<h4>  For the Impatient</h4>
+<p>    After installation, the HappyDoc command-line application should
+    be in your path.  Simply run <code>happydoc</code> with appropriate
+    arguments.  The default behavior for HappyDoc is to read the files
+    and directories specified as arguments and generate HTML output to
+    the directory <code>./doc</code>.  <em>Give it a whirl!</em></p>
+<h3>General Information</h3>
+<p>  HappyDoc uses the Python parser to extract information from
+  <code>__doc__</code> strings.  It also examines the signatures of functions and
+  methods to include function prototypes in the output.  </p>
+<p>  To use HappyDoc, simply run it against your source files or
+  directory.  Use the <code>-h</code> or <code>--help</code> arguments to learn about the
+  arguments and options accepted.  See below for more detailed
+  directions about configuring your source for documentation purposes.</p>
+<h4>  Controlling the Output</h4>
+<p>    HappyDoc uses two different pluggable classes for controlling
+    output.  A <strong>formatter</strong> class is responsible for producing the
+    syntax of the actual output (e.g. HTML, XML, SGML, or PDF).  A
+    <strong>docset</strong> class is responsible for controlling the formatter and
+    managing the logical flow of the information (e.g., writing to
+    multiple files or a single file, putting class documentation in a
+    different file from the module, etc.).  Formatters and DocSets
+    should be implemented so that any two can be combined.  It will
+    not always be desirable to do this, but it should be possible.</p>
+<h4>  Documentation not in Doc-strings</h4>
+<p>    It is not always desirable to put all documentation in <code>__doc__</code>
+    strings.  Sometimes, notably when working with
+    <a href="http://www.zope.org">Zope</a> , special meaning is attached to the
+    presence of <code>__doc__</code> strings.  For this reason, and to support
+    existing code which might not have <code>__doc__</code> strings, HappyDoc
+    will find and extract documentation in Python comments.  </p>
+<p>    Comment documentation can contain all of the same formatting as
+    <code>__doc__</code> strings.  The preceding comment marker will be stripped
+    off and the lines will be assembled and treated as a block of text
+    in the same way that the <code>__doc__</code> strings are treated.</p>
+<p>    To use this feature, it is important to place the comments
+    <strong>before</strong> the named object which they describe.  In this example:
+<pre>
+      #
+      # Class documentation goes here
+      #
+      class ClassWithNoDocStrings:
+         "Using __doc__ strings overrides comment documentation."
+
+         def method1(self, params):
+             "This method uses a __doc__ string."
+             pass
+
+         #
+         # Method2 does not use a __doc__ string.
+         #
+         def method2(self):
+             pass
+</pre>
+</p>
+<p>    The output would include the <code>__doc__</code> strings for the class and
+    for <code>method1</code>.  It would also make it appear that <code>method2</code> had a
+    <code>__doc__</code> string with the contents <code>"Method2 does not use a
+    __doc__ string."</code></p>
+<h3>Flexible Behavior</h3>
+<p>  HappyDoc provides several different abstractions to allow the same
+  engine to process different types of inputs and convert them to
+  different types of output.</p>
+<h4>  Docstring Converters</h4>
+<p>    <em>How does an author write documentation so that it will be marked
+    up and look fancy?</em> This is a perennial question for
+    <a href="http://www.python.org">Python</a> users, and seems to have introduced
+    a roadblock into the development of more robust and useful
+    documentation tools.  HappyDoc stands firmly on the fence and does
+    not attempt to resolve the issue.  </p>
+<p>    <em>Refer to the <code>happydoclib.docset</code> package for more details.</em></p>
+<h4>  Formatters</h4>
+<p>    Formatters are responsible for tranlating the higher level docset
+    concepts into specific structures for an output type.  For
+    example, the specific way a descriptive list might be rendered in
+    HTML could vary between different HTML formatters.  The API for a
+    formatter depends on the docset types which is is meant to
+    support.</p>
+<p>    <em>Refer to the <code>happydoclib.formatter</code> package for more details.</em></p>
+<h4>  DocSet types</h4>
+<p>    The docset, or <em>documentation set</em>, defines the structure of the
+    collected documentation being generated.  All aspects of the
+    structure are left up to the docset.  Whether to use multiple or a
+    single file, a file or a database, and what specific metadata to
+    include in the output is left up to the docset.  The docset drives
+    the documentation generation using controls available from the
+    formatter.</p>
+<p>    <em>Refer to the <code>happydoclib.docset</code> package for more details.</em></p>
+<h3>Using HappyDoc</h3>
+<h4>  Command Line Options</h4>
+<p>    HappyDoc uses standard <code>getopt</code> style command line processing.
+    For the complete reference of argument syntax, call the command
+    line program with the <code>-h</code> or <code>--help</code> options.  The specific
+    options supported are not documented here since they change over
+    time.</p>
+<h4>  Parser, DocSet and Formatter Parameters</h4>
+<p>    Many DocSets and Formatters will take parameters.  The Parser also
+    accepts global options using this method (see below for another
+    way to control the parser).  To pass parameters past the command
+    line argument processing of HappyDoc and in to the Parser, DocSet
+    or Formatter being used, the variable is passed as an argument
+    rather than option (no dashes) to HappyDoc.</p>
+<p>    To allow the Parser, DocSets and Formatters to share variable
+    namespace, the options passed are prefixed with a value indicating
+    whether the variable is for the <code>parser_</code>, <code>docset_</code> or
+    <code>formatter_</code>.</p>
+<p>    For example:
+<pre>
+      % ./happydoc -d MySources/doc MySources \
+                formatter_bgcolor1='#ffccaa'
+</pre>
+</p>
+<p>    Or on Windows:
+<pre>
+      &gt; .\happydocwin.py -d MySources\doc MySources \
+                formatter_bgcolor1="#ffccaa"
+</pre>
+</p>
+<p>    Use the <code>--help</code> command line option to get a complete list of the
+    options available for each Parser, DocSets, and Formatter.</p>
+<h4>  File-specific Parser Configuration Values</h4>
+<p>    Parameters to the HappyDoc Parser can also be embedded within the
+    first comment block of the module.  The parameter values
+    recognized and their meanings are listed below.</p>
+<p>    To provide file-specific parser configuration settings, any Python
+    code can be embedded in the comments of the file.  For example:
+<pre>
+      #!/usr/bin/env python
+      #
+      # HappyDoc:# These variables should be discovered.
+      # HappyDoc:TestInt=1
+      # HappyDoc:TestString="String"
+      # HappyDoc:TestStringModule=string.strip(' this has spaces in front and back ')
+      # HappyDoc:url=urlencode({'a':'A', 'b':'B'})
+      # HappyDoc:docStringFormat='StructuredText'
+</pre>
+</p>
+<p>    All lines beginning with the pattern "'# HappyDoc:'" will be
+    concatenated (separated by newlines) and <code>execed</code>.  The local
+    namespace resulting from the execution of the code will be
+    examined for variables of interest to the parser.  The incoming
+    global namespace for the configuration code will have a few
+    pre-populated names for convenience.</p>
+<p>    <em>Refer to the happydoclib.parseinfo module for more details.</em></p>
+<h4>  Input Types</h4>
+<p>    HappyDoc accepts 3 basic input types for documentation.  </p>
+
+<ol>
+<li><p> Any <strong>file name</strong> passed will be treated as a Python source file.
+       The file will be parsed (but not imported) and the
+       documentation text will be extracted from the resulting parse
+       tree.</p></li>
+<li><p> Any <strong>directory</strong> passed will be interpreted to mean to document
+       all of the files in that directory, so HappyDoc will recurse
+       into the directory to find files.</p></li>
+<li><p> A <strong>single, regular, text file</strong> can be passed as the "package
+       description file."  This file, defaulting to <code>README.txt</code>, will
+       be interepreted as appropriate and included in the place of a
+       <code>__doc__</code> string in the generated <code>index.html</code> file.</p></li>
+
+</ol>
+<h3>Examples of HappyDoc Documentation</h3>
+<p>  Two example output documentation sets are available.</p>
+
+<ul>
+<li><p><strong>HappyDoc</strong><p>    Of course HappyDoc is used to produce its own documentation.  The
+    most current version is available on the 
+    <a href="http://happydoc.sourceforge.net">HappyDoc home page</a>.</p>
+</p></li>
+<li><p><strong>Zope</strong><p>    Download a set of <a href="http://www.zope.org/Documentation/Developer/ZopeSrcDocs">Zope source
+    documentation</a>
+    based on a recent CVS checkout or most stable release of Zope on
+    <a href="http://www.zope.org">Zope.org</a>.</p>
+<p>    Browse the <a href="Zope-2-CVS-srcdocs">Zope CVS Source</a> documentation on
+    the HappyDoc site.</p>
+</p></li>
+
+</ul>
+<h3>Who else is using HappyDoc?</h3>
+
+<ul>
+<li><p><strong>Biopython</strong> <p>    The <a href="http://www.biopython.org">Biopython project</a> uses HappyDoc to
+    generate the documentation for their
+    <a href="http://www.biopython.org/wiki/html/BioPython/BiopythonCode.html">libraries</a></p>
+</p></li>
+<li><p><strong>Numerical Python</strong> <p>    <a href="http://numpy.sourceforge.net">Numerical Python</a> adds a fast,
+    compact multidimensional array language facility to Python.</p>
+</p></li>
+<li><p><strong>CDAT</strong> <p>    <a href="http://cdat.sourceforge.net">Climate Data Analysis Tool</a> is a
+    Python-based, easily extendible system for accessing and analyzing
+    climate data. It contains a generally useful system for scientific
+    graphics.</p>
+</p></li>
+<li><p><strong>NOAA SEC</strong><p>    The NOAA <a href="http://www.sec.noaa.gov/sxi">Space Environment Center</a>
+    group responsible for supporting the effort to forecast solar
+    activity having a direct impact on earth-orbiting satellites and
+    other earth-based systems.</p>
+</p></li>
+<li><p><strong>ZOD</strong><p>    The <a href="http://demo.iuveno-net.de/iuveno/Products/ZOnlineDocu">Zope Online
+    Documentation</a>
+    tools use the HappyDoc parsing engine to extract information about
+    source code.</p>
+</p></li>
+
+</ul>
+<h3>Bugs</h3>
+<p>  Please use the <a href="http://sourceforge.net/bugs/?group_id=9678">bug tracker</a> on the
+  SourceForge project page for HappyDoc to report bugs and the 
+  <a href="http://sourceforge.net/tracker/?group_id=9678&atid=359678">feature tracker</a>
+  to request new features.</p>
+<h3>Support</h3>
+<p>  There are also <a href="http://sourceforge.net/forum/?group_id=9678">public forums</a> 
+  and <a href="http://sourceforge.net/mail/?group_id=9678">mailing lists</a> available on 
+  SourceForge for questions regarding the use of HappyDoc, or plans for its
+  future.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Modules and Packages">Modules and Packages</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h4>HappyDoc-r2_1/</h4>
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="HappyDoc-r2_1/CHANGES.txt.html">CHANGES.txt.html</a></p></td><td valign="top" align="left">
+<p>HappyDoc Change History</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="HappyDoc-r2_1/LICENSE.txt.html">LICENSE.txt.html</a></p></td><td valign="top" align="left">
+<p>Copyright 2000 Doug Hellmann</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="HappyDoc-r2_1/README.txt.html">README.txt.html</a></p></td><td valign="top" align="left">
+<p>HappyDoc Documentation Extraction Tool</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="HappyDoc-r2_1/happydoclib/index.html">happydoclib</a></p></td><td valign="top" align="left">
+<p>HappyDoc Components</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="home/dhellmann/Personal/Devel/HappyDoc/dist/HappyDoc-r2_1/srcdocs/happydocwin.html">happydocwin</a></p></td><td valign="top" align="left">
+<p>HappyDoc command-line app for Windows.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="home/dhellmann/Personal/Devel/HappyDoc/dist/HappyDoc-r2_1/srcdocs/setup.html">setup</a></p></td><td valign="top" align="left">
+<p>Distutils setup file for HappyDoc</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="home/dhellmann/Personal/Devel/HappyDoc/dist/HappyDoc-r2_1/srcdocs/test_happydoc.html">test_happydoc</a></p></td><td valign="top" align="left">
+<p>Driver for unit tests for HappyDoc.</p>
+</td></tr>
+</table>
+
+<h4>HappyDoc-r2_1/misc/</h4>
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="HappyDoc-r2_1/misc/ANNOUNCE.txt.html">ANNOUNCE.txt.html</a></p></td><td valign="top" align="left">
+<p>Announcing the latest version of HappyDoc, a Python documentation extraction tool.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="home/dhellmann/Personal/Devel/HappyDoc/dist/HappyDoc-r2_1/srcdocs/debug_happydoc.html">debug_happydoc</a></p></td><td valign="top" align="left">
+<p>Run HappyDoc in the debugger.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="home/dhellmann/Personal/Devel/HappyDoc/dist/HappyDoc-r2_1/srcdocs/guitest_happydoc.html">guitest_happydoc</a></p></td><td valign="top" align="left">
+<p>GUI App for testing HappyDoc.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="home/dhellmann/Personal/Devel/HappyDoc/dist/HappyDoc-r2_1/srcdocs/profile_happydoc.html">profile_happydoc</a></p></td><td valign="top" align="left">
+<p>Run the Python profiler against HappyDoc.</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:23 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

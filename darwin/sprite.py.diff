@@ -1,0 +1,27 @@
+--- sprite.py.orig	2005-07-14 11:27:21.000000000 -0700
++++ sprite.py	2005-07-14 11:37:58.000000000 -0700
+@@ -1623,11 +1623,24 @@
+ 		x = fb.hw + x - (self.w / 2)
+ 		y = fb.hh - y - (self.h / 2)
+ 
++		# 14-jul-2005 willmore
++		# it shouldn't be possible to blit while a surface is locked, and 
++		# it shouldn't be possible to unlock while self.alpha (or self.array)
++		# exist.  i think we're just lucky this works in standard pype; it
++		# doesn't work on darwin.  strategy here: delete self.alpha and 
++		# recreate it after the blit.  this is likely too slow for rig machines
++		# but it doesn't matter since the macq has no dacq anyway.
++		# if blitting ever stops working on linux, here's the reason...
++		del self.alpha
++		self.im.unlock()
++
+ 		# blit and optional page flip..
+ 		fb.screen.blit(self.im, (x, y))
+ 		if flip:
+ 			fb.flip()
+ 
++		self.alpha = pygame.surfarray.pixels_alpha(self.im)
++
+ 		# if moving sprite, move to next position..
+ 		self.x = self.x + self.dx
+ 		self.y = self.y + self.dy

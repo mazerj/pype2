@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.objdoc.DocMap</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.objdoc-module.html">Module&nbsp;objdoc</a> ::
+        Class&nbsp;DocMap
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.objdoc.DocMap-class.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.objdoc.DocMap-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class DocMap</h2>
+
+<pre class="base-tree">
+<a href="UserDict.UserDict-class.html"><code>UserDict</code></a> --+
+           |
+          <b>DocMap</b>
+</pre><br />
+
+<hr/>
+
+A dictionary mapping each object to the object's documentation. 
+Typically, modules or classes are added to the <code>DocMap</code> using 
+<code>add</code>, which adds an object and everything it contains. For 
+example, the following code constructs a documentation map, adds the 
+module &quot;epydoc.epytext&quot; to it, and looks up the documentation 
+for &quot;epydoc.epytext.parse&quot;:
+<pre class="doctestblock">
+<span class="py-src"><span class="py-prompt">&gt;&gt;&gt; </span>docmap = DocMap()               <span class="py-comment"># Construct a docmap</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>docmap.add(epydoc.epytext)      <span class="py-comment"># Add epytext to it</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>docmap[epydoc.epytext.parse]    <span class="py-comment"># Look up epytext.parse</span></span>
+<span class="py-output">&lt;FuncDoc: epydoc.epytext.parse (3 parameters; 1 exceptions)&gt;</span></pre>
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.DocMap-class.html#__init__" class="summary-sig-name"><code>__init__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>verbosity</span>,
+          <span class=summary-sig-arg>document_bases</span>,
+          <span class=summary-sig-arg>document_autogen_vars</span>,
+          <span class=summary-sig-arg>inheritance_groups</span>,
+          <span class=summary-sig-arg>inherit_groups</span>)</span></code>
+<br />
+Create a new empty documentation map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>ObjDoc</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.DocMap-class.html#__getitem__" class="summary-sig-name"><code>__getitem__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>key</span>)</span></code>
+<br />
+Return the documentation for the given object; or the object identified by 
+<code>key</code>, if <code>key</code> is a <a 
+href="epydoc.uid.UID-class.html" class="link"><code>UID</code></a>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__repr__"></a><span class="summary-sig"><span class="summary-sig-name">__repr__</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.DocMap-class.html#add" class="summary-sig-name"><code>add</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>obj</span>)</span></code>
+<br />
+Add the documentation for an object, and everything contained by that 
+object, to this documentation map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.DocMap-class.html#add_one" class="summary-sig-name"><code>add_one</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>objID</span>)</span></code>
+<br />
+Add an object's documentation to this documentation map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.objdoc.ObjDoc-class.html" 
+        class="link"><code>ObjDoc</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.DocMap-class.html#documented_ancestor" class="summary-sig-name"><code>documented_ancestor</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>method_uid</span>)</span></code>
+<br />
+Returns the documentation for the closest ancestor of 
+<code>method_uid</code> that defines a docstring.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="sorted_keys"></a><span class="summary-sig"><span class="summary-sig-name">sorted_keys</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.DocMap-class.html#top" class="summary-sig-name"><code>top</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the list of top-level objects documented by this documentation 
+map.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="UserDict.UserDict-class.html"><code>UserDict</code></a>:</b>
+      <a href="UserDict.UserDict-class.html#__cmp__"><code>__cmp__</code></a>, 
+      <a href="UserDict.UserDict-class.html#__contains__"><code>__contains__</code></a>, 
+      <a href="UserDict.UserDict-class.html#__delitem__"><code>__delitem__</code></a>, 
+      <a href="UserDict.UserDict-class.html#__len__"><code>__len__</code></a>, 
+      <a href="UserDict.UserDict-class.html#__setitem__"><code>__setitem__</code></a>, 
+      <a href="UserDict.UserDict-class.html#clear"><code>clear</code></a>, 
+      <a href="UserDict.UserDict-class.html#copy"><code>copy</code></a>, 
+      <a href="UserDict.UserDict-class.html#get"><code>get</code></a>, 
+      <a href="UserDict.UserDict-class.html#has_key"><code>has_key</code></a>, 
+      <a href="UserDict.UserDict-class.html#items"><code>items</code></a>, 
+      <a href="UserDict.UserDict-class.html#iteritems"><code>iteritems</code></a>, 
+      <a href="UserDict.UserDict-class.html#iterkeys"><code>iterkeys</code></a>, 
+      <a href="UserDict.UserDict-class.html#itervalues"><code>itervalues</code></a>, 
+      <a href="UserDict.UserDict-class.html#keys"><code>keys</code></a>, 
+      <a href="UserDict.UserDict-class.html#popitem"><code>popitem</code></a>, 
+      <a href="UserDict.UserDict-class.html#setdefault"><code>setdefault</code></a>, 
+      <a href="UserDict.UserDict-class.html#update"><code>update</code></a>, 
+      <a href="UserDict.UserDict-class.html#values"><code>values</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="__init__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__init__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>verbosity</span>=<span class=sig-default>0</span>,
+          <span class=sig-arg>document_bases</span>=<span class=sig-default>1</span>,
+          <span class=sig-arg>document_autogen_vars</span>=<span class=sig-default>1</span>,
+          <span class=sig-arg>inheritance_groups</span>=<span class=sig-default>0</span>,
+          <span class=sig-arg>inherit_groups</span>=<span class=sig-default>1</span>)</span>
+    <br /><i>(Constructor)</i>
+  </h3>
+  Create a new empty documentation map.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>verbosity</b></code> -
+         The verbosity of output produced when creating documentation 
+        for objects. More positive numbers produce more verbose output; 
+        negative numbers supress warnings and errors.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>document_bases</b></code> -
+         Whether or not documentation should automatically be built for 
+        the bases of classes that are added to the documentation map.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      <dd><code><b>inheritance_groups</b></code> -
+         If true, then create a group for each base ancestor, 
+        containing the members that are inherited from that base. These 
+        groups have names of the form <code>'Inherited from <i 
+        class="math">base</i>'</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      <dd><code><b>inherit_groups</b></code> -
+         If true, then inherit groups from the base ancestors.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="UserDict.UserDict-class.html#__init__"><code>UserDict.UserDict.__init__</code></a></dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="__getitem__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__getitem__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>key</span>)</span>
+    <br /><i>(Indexing operator)</i>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>key</b></code> -
+         The object whose documentation should be returned.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=any)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The documentation for the given object; or the object 
+        identified by <code>key</code>, if <code>key</code> is a <a 
+        href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>ObjDoc</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Raises:</b></dt>
+      <dd><code><b>KeyError</b></code> -
+        If the documentation for the object identified by 
+        <code>key</code> is not contained in this documentation map.
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="UserDict.UserDict-class.html#__getitem__"><code>UserDict.UserDict.__getitem__</code></a></dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="add"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">add</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>obj</span>)</span>
+  </h3>
+  Add the documentation for an object, and everything contained by 
+  that object, to this documentation map.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>obj</b></code> -
+         The object whose documentation should be added to this 
+        documentation map.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=any)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="add_one"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">add_one</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>objID</span>)</span>
+  </h3>
+  Add an object's documentation to this documentation map. If you also 
+  want to include the objects contained by <code>obj</code>, then use <a 
+  href="epydoc.objdoc.DocMap-class.html#add" 
+  class="link"><code>add</code></a>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>objID</b></code> -
+         The UID of the object whose documentation should be added to 
+        this documentation map.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="documented_ancestor"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">documented_ancestor</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>method_uid</span>)</span>
+  </h3>
+  Returns the documentation for the closest ancestor of 
+  <code>method_uid</code> that defines a docstring. In particular, search 
+  through the set of methods that <code>method_uid</code> overrides 
+  (starting with <code>method_uid</code> itself), and return the first 
+  method that:
+  <ul>
+    <li>
+      defines a docstring
+    </li>
+    <li>
+      matches the signature of <code>method_uid</code>
+    </li>
+  </ul>
+  If no such method is found, or if <code>method_uid</code> itself is 
+  not documented by this docmap, then this function returns 
+  <code>None</code>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>method_uid</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <a href="epydoc.objdoc.ObjDoc-class.html" 
+        class="link"><code>ObjDoc</code></a> or <code>None</code>
+      </dd>
+    </dl>
+    <dl><dt><b>Raises:</b></dt>
+      <dd><code><b>ValueError</b></code> -
+        If <code>method_uid</code> is not the UID for a method.
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="top"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">top</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The list of top-level objects documented by this documentation 
+        map. The top-level objects are those that are not contained (as 
+        sub-packages, module contents, class contents, etc) by any other 
+        objects in the documentation map.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:19 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

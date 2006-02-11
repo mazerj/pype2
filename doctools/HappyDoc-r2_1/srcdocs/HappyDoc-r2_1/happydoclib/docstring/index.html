@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>HappyDoc Source Documentation: happydoclib.docstring</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">HappyDoc Source Documentation: happydoclib.docstring</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>Python docstring converter plugins.</h3>
+<p>    <em>How does an author write documentation so that it will be marked
+    up and look fancy?</em> This is a perennial question for
+    <a href="http://www.python.org">Python</a> users, and seems to have introduced
+    a roadblock into the development of more robust and useful
+    documentation tools.  HappyDoc stands firmly on the fence and does
+    not attempt to resolve the issue.</p>
+<p>    By separating the docstring converter and formatter classes from
+    the docset classes, HappyDoc allows a user to create their own
+    converter and formatter to interpret comments in any way they see
+    fit.</p>
+<p>    The docstring converter plugins are responsible for translating
+    text from the input markup syntax to the output format.  This
+    translation is formatter independent, so that the same HTML
+    conversion might be used by mutliple HTML formatters.  It is,
+    however, <em>format</em> dependent, so that HTML output should not be
+    used by a plain text formatter.</p>
+<p>    The default for the <code>HTMLTableFormatter</code> (the default formatter
+    for HappyDoc) is to treat <code>__doc__</code> strings as
+    <a href="http://www.zope.org//Members/jim/StructuredTextWiki/StructuredTextNGRules">StructuredTextNG</a>.
+    This is the "Next Generation" version of the original
+    <a href="http://www.python.org/sigs/doc-sig/stext.html">StructuredText</a>
+    markup syntax.  See also the <code>StructuredText</code> package for a
+    description of the rules for using StructuredText.</p>
+<p>    <em>Don't like StructuredText?</em> Write your own docstring converter
+    that uses something different and drop it into place.  Refer to
+    the <code>happydocstring.py</code> module for the base class and APIs
+    required of a docstring converter.  If a defacto (or otherwise)
+    standard structured markup for Python <code>__doc__</code> strings emerges,
+    HappyDoc will be updated to use that format by default.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Modules and Packages">Modules and Packages</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h4>HappyDoc-r2_1/happydoclib/docstring/</h4>
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="MML.html">MML</a></p></td><td valign="top" align="left">
+<p>An MML StructuredText formatter.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="StructuredText/index.html">StructuredText</a></p></td><td valign="top" align="left">
+<p>StructuredText Processing Library</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="__init__.html">docstring</a></p></td><td valign="top" align="left">
+<p>Python docstring converter plugins.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="docstring_ClassicStructuredText.html">docstring_ClassicStructuredText</a></p></td><td valign="top" align="left">
+<p>Docstring converter for original StructuredText format.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="docstring_PlainText.html">docstring_PlainText</a></p></td><td valign="top" align="left">
+<p>Plan text format converter.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="docstring_RawText.html">docstring_RawText</a></p></td><td valign="top" align="left">
+<p>Raw (pass-through) docstring converter.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="docstring_StructuredText.html">docstring_StructuredText</a></p></td><td valign="top" align="left">
+<p>Docstring converter for StructuredText format.</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:29 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

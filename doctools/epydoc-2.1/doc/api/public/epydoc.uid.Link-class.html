@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.uid.Link</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.uid-module.html">Module&nbsp;uid</a> ::
+        Class&nbsp;Link
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.uid.Link-class.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.uid.Link-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class Link</h2>
+
+<hr/>
+
+A cross-reference link between documentation. A link consists of a 
+name and a target. The target is a <code>UID</code>, identifying the 
+object whose documentation is pointed to. The name specifies how the link 
+should appear in the source document. Usually, the name is just the 
+(short) name of the target. However, it doesn't have to be. For example, 
+consider the following code:
+<pre class="doctestblock">
+<span class="py-src"><span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">def</span> f(x): <span class="py-keyword">pass</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>g = f</span></pre>
+Links to g and f will have the same target (whose short name will be 
+<code>'f'</code>), but links to them will use different names 
+(<code>'f'</code> and <code>'g'</code>, respectively).
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.Link-class.html#__init__" class="summary-sig-name"><code>__init__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>name</span>,
+          <span class=summary-sig-arg>target</span>)</span></code>
+<br />
+Create a new cross-reference link, with the given name and target.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__cmp__"></a><span class="summary-sig"><span class="summary-sig-name">__cmp__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>other</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.Link-class.html#__repr__" class="summary-sig-name"><code>__repr__</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a string representation of this <code>Link</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.Link-class.html#is_private" class="summary-sig-name"><code>is_private</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this link points to a private object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.Link-class.html#is_public" class="summary-sig-name"><code>is_public</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this link points to a public object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.Link-class.html#name" class="summary-sig-name"><code>name</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return this link's name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.Link-class.html#target" class="summary-sig-name"><code>target</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return this link's target.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="__init__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__init__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>name</span>,
+          <span class=sig-arg>target</span>)</span>
+    <br /><i>(Constructor)</i>
+  </h3>
+  Create a new cross-reference link, with the given name and 
+  target.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>name</b></code> -
+         A string specifying how the link should appear in the source 
+        document.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>target</b></code> -
+         The object that is pointed to by the new 
+        <code>Link</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="__repr__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__repr__</span>(<span class=sig-arg>self</span>)</span>
+    <br /><i>(Representation operator)</i>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string representation of this <code>Link</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_private"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_private</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this link points to a private object. This is 
+        equivalant to <code>self.target().is_private()</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_public"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_public</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this link points to a public object. This is 
+        equivalant to <code>self.target().is_public()</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="name"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">name</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        This link's name. This string specifies how the link should 
+        appear in the source document.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="target"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">target</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        This link's target. This UID specifies what object is pointed 
+        to by this link.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:12 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

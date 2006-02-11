@@ -1,0 +1,743 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.uid.UID</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.uid-module.html">Module&nbsp;uid</a> ::
+        Class&nbsp;UID
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.uid.UID-class.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.uid.UID-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class UID</h2>
+
+<dl><dt><b>Known Subclasses:</b></dt>
+<dd>
+    <a href="epydoc.uid.ObjectUID-class.html"><code>ObjectUID</code></a>,
+    <a href="epydoc.uid.RelativeUID-class.html"><code>RelativeUID</code></a></dd></dl>
+
+<hr/>
+
+<p>A globally unique identifier.</p>
+UID is an abstract base class. The base class defines 
+<code>shortname</code>, <code>is_private</code>, <code>__str__</code>, 
+and <code>__repr__</code>; all other methods must be defined by derived 
+classes.
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__init__"></a><span class="summary-sig"><span class="summary-sig-name">__init__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>name</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>int</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#__cmp__" class="summary-sig-name"><code>__cmp__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>other</span>)</span></code>
+<br />
+Compare <code>self</code> and <code>other</code>, based on their 
+globally unique names.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__eq__"></a><span class="summary-sig"><span class="summary-sig-name">__eq__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>other</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__hash__"></a><span class="summary-sig"><span class="summary-sig-name">__hash__</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#__repr__" class="summary-sig-name"><code>__repr__</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a string representation of this UID.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#__str__" class="summary-sig-name"><code>__str__</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the globally unique name for this identifier.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#cls" class="summary-sig-name"><code>cls</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the class that contains the object identified by this UID; 
+or <code>None</code> if the object identified by this UID is not part of 
+a class.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#descendant_of" class="summary-sig-name"><code>descendant_of</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>ancestor</span>)</span></code>
+<br />
+Return true if the object identified by this UID is a descendant of 
+<code>ancestor</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_any_function" class="summary-sig-name"><code>is_any_function</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a function or a builtin function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_any_method" class="summary-sig-name"><code>is_any_method</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a method or a builtin method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_builtin_function" class="summary-sig-name"><code>is_builtin_function</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a builtin function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_builtin_method" class="summary-sig-name"><code>is_builtin_method</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a builtin method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_class" class="summary-sig-name"><code>is_class</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a class or a type.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_function" class="summary-sig-name"><code>is_function</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_method" class="summary-sig-name"><code>is_method</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_module" class="summary-sig-name"><code>is_module</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a module or a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_package" class="summary-sig-name"><code>is_package</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_private" class="summary-sig-name"><code>is_private</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is a private object, or if any of its ancestors are 
+private objects.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_property" class="summary-sig-name"><code>is_property</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a property.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_public" class="summary-sig-name"><code>is_public</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this object and all of its ancestor objects are public.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_routine" class="summary-sig-name"><code>is_routine</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a function, a method, a builtin function, 
+or a builtin method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_type" class="summary-sig-name"><code>is_type</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a type.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#is_variable" class="summary-sig-name"><code>is_variable</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a variable.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#module" class="summary-sig-name"><code>module</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the module that contains the object identified by this UID; 
+or <code>None</code> if the object identified by this UID is a module or 
+a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#name" class="summary-sig-name"><code>name</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the globally unique name for this identifier.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#package" class="summary-sig-name"><code>package</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the package that contains the object identified by this 
+UID; or <code>None</code> if the object identified by this UID is not 
+part of a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#parent" class="summary-sig-name"><code>parent</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the object that contains the object identified by this UID; 
+or <code>None</code> if the object identified by this UID is not 
+contained by any other object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#shortname" class="summary-sig-name"><code>shortname</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the short name for this UID.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        any
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.UID-class.html#value" class="summary-sig-name"><code>value</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the value of the object or variable specified by this UID.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="__cmp__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__cmp__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>other</span>)</span>
+    <br /><i>(Comparison operator)</i>
+  </h3>
+  Compare <code>self</code> and <code>other</code>, based on their 
+  globally unique names.
+  <ul>
+    <li>
+      If they have the same name, then return 0.
+    </li>
+    <li>
+      If <code>self</code>'s name preceeds <code>other</code>'s name 
+      alphabetically, return -1.
+    </li>
+    <li>
+      If <code>self</code>'s name follows <code>other</code>'s name 
+      alphabetically, return +1.
+    </li>
+  </ul>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>int</code>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <code>name</code>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="__repr__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__repr__</span>(<span class=sig-arg>self</span>)</span>
+    <br /><i>(Representation operator)</i>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string representation of this UID. String representations of 
+        UIDs have the form:
+<pre class="literalblock">
+   &lt;UID: epydoc.uid.UID&gt;
+</pre>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="__str__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__str__</span>(<span class=sig-arg>self</span>)</span>
+    <br /><i>(Informal representation operator)</i>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The globally unique name for this identifier.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <a href="epydoc.uid.UID-class.html#name" 
+class="link"><code>name</code></a>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="cls"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">cls</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the class that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is not part of a class.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="descendant_of"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">descendant_of</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>ancestor</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>ancestor</b></code> -
+         The UID of the potential ancestor.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if the object identified by this UID is a descendant of 
+        <code>ancestor</code>. <i class="math">d</i> is a descendant of 
+        <i class="math">a</i> if <i class="math">d</i>=<i 
+        class="math">a</i>; or if <i class="math">d</i> is a descendent 
+        of an object contained by <i class="math">a</i>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_any_function"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_any_function</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a function or a builtin 
+        function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_any_method"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_any_method</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a method or a builtin method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_builtin_function"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_builtin_function</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a builtin function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_builtin_method"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_builtin_method</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a builtin method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_class"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_class</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a class or a type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_function"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_function</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_method"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_method</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_module"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_module</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a module or a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_package"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_package</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_private"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_private</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is a private object, or if any of its ancestors 
+        are private objects.
+        <ul>
+          <li>
+            An object whose parent is a module that defines the 
+            <code>__all__</code> variable is private if and only if it is 
+            not contained in <code>__all__</code>. If 
+            <code>__all__</code> is not a list, or if any error occurs 
+            while accessing <code>__all__</code>, then it is ignored.
+          </li>
+          <li>
+            All other objects are private if and only if their (short) 
+            name begins with a single underscore, but does not end with 
+            an underscore.
+          </li>
+        </ul>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_property"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_property</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a property.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_public"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_public</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this object and all of its ancestor objects are 
+        public.
+        <ul>
+          <li>
+            An object whose parent is a module that defines the 
+            <code>__all__</code> variable is public if and only if it is 
+            contained in <code>__all__</code>. If <code>__all__</code> is 
+            not a list, or if any error occurs while accessing 
+            <code>__all__</code>, then it is ignored.
+          </li>
+          <li>
+            All other objects are public if and only if their (short) 
+            name does not begins with a single underscore, or ends with 
+            an underscore.
+          </li>
+        </ul>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_routine"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_routine</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a function, a method, a builtin 
+        function, or a builtin method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_type"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_type</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_variable"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_variable</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a variable.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="module"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">module</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the module that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is a module or a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="name"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">name</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The globally unique name for this identifier. This name 
+        consists of several pieces, joined by periods, which indicate 
+        where the object is defined. For example, the UID for this class 
+        has the name <code>'epydoc.uid.UID'</code>, since it is named 
+        <code>UID</code>, and defined in the <code>uid</code> module of 
+        the <code>epydoc</code> package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="package"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">package</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the package that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is not part of a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="parent"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">parent</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the object that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is not contained by any other object. For methods, class 
+        variables, and instance variables, the parent is the containing 
+        class; for functions and classes, it is the containing module; 
+        and for modules, it is the containing package.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="shortname"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">shortname</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The short name for this UID. A UID's short name is the last 
+        piece of its globally unique name, as returned by <a 
+        href="epydoc.uid.UID-class.html#name" 
+        class="link"><code>name</code></a>. This is typically the name 
+        that was used when definining the object. For example, the UID 
+        for this class has the name <code>'UID'</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="value"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">value</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The value of the object or variable specified by this UID.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=any)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:12 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

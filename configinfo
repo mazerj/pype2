@@ -1,0 +1,120 @@
+#!/bin/sh
+
+if [ "$1" == "-csh" ]; then
+  cshmode='setenv '
+else
+  cshmode=''
+fi
+
+pyexe=$(./pydetect -e)
+echo ${cshmode}PYTHONEXE=$pyexe
+
+
+#############################################################
+# check for comedi
+#############################################################
+if [ -e /dev/comedi0 ]; then
+  echo "${cshmode}HAS_COMEDI=1"
+else
+  echo "${cshmode}HAS_COMEDI=0"
+fi
+
+#############################################################
+# check for comedi-lib
+#############################################################
+if [ -x /usr/sbin/comedi_config ]; then
+  echo "${cshmode}HAS_COMEDILIB=1"
+else
+  echo "${cshmode}HAS_COMEDILIB=0"
+fi
+
+#############################################################
+# check for SDL
+#############################################################
+
+sdl=$(which sdl-config 2> /dev/null)
+if [ "$sdl" = "" ]; then
+  echo "${cshmode}HAS_SDL=0"
+else
+  echo ${cshmode}HAS_SDL=1
+  echo ${cshmode}SDL_DIR=$($sdl --prefix)
+  echo ${cshmode}SDL_VERSION=$($sdl --version)
+fi
+
+#############################################################
+# check for pygame
+#############################################################
+
+$pyexe <<EOF
+try:
+	import pygame
+	print "${cshmode}HAS_PYGAME=1"
+	print "${cshmode}PYGAME_VERSION=%s" % pygame.__version__
+except ImportError:
+	print "${cshmode}HAS_PYGAME=0"
+EOF
+
+#############################################################
+# check for Numeric
+#############################################################
+
+$pyexe <<EOF
+try:
+	import Numeric
+	print "${cshmode}HAS_NUMERIC=1"
+	print "${cshmode}NUMERIC_VERSION=%s" % Numeric.__version__
+except ImportError:
+	print "${cshmode}HAS_NUMERIC=0"
+EOF
+
+#############################################################
+# check for PIL
+#############################################################
+
+$pyexe <<EOF
+try:
+	import PIL
+	print "${cshmode}HAS_PIL=1"
+except ImportError:
+	print "${cshmode}HAS_PIL=0"
+EOF
+
+#############################################################
+# check for biggles
+#############################################################
+
+$pyexe <<EOF
+try:
+	import biggles
+	print "${cshmode}HAS_BIGGLES=1"
+	print "${cshmode}BIGGLES_VERSION=%s" % biggles.__version__
+except ImportError:
+	print "${cshmode}HAS_BIGGLES=0"
+EOF
+
+#############################################################
+# check for grace
+#############################################################
+
+grace=$(rpm -q grace | grep 'not installed')
+if [ "$grace" = "" ]; then
+  echo ${cshmode}HAS_GRACE=1
+  echo ${cshmode}GRACE_VERSION=$grace
+else
+  echo ${cshmode}HAS_GRACE=0
+fi
+
+#############################################################
+# check for various RPMS (SDL and biggles related)
+#############################################################
+
+for x in SDL_ttf SDL_ttf-devel smpeg smpeg-devel plotutils; do
+  r=$(rpm -q $x)
+  tag=$(echo $x | tr '[a-z]' '[A-Z]' | tr -d '_' | tr '-' '_')
+  if rpm -q $x >/dev/null; then
+    echo ${cshmode}"$tag"_VERSION=$r
+    echo ${cshmode}HAS_$tag=1
+  else
+    echo ${cshmode}HAS_$tag=0
+  fi
+done

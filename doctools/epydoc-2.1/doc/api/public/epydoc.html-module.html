@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.html</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        Module&nbsp;html
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.html-module.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.html-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module epydoc.html</h2>
+
+Documentation to HTML converter. This module defines a single class, 
+<a href="epydoc.html.HTMLFormatter-class.html" 
+class="link"><code>HTMLFormatter</code></a>, which translates the API 
+documentation encoded in a <a href="epydoc.objdoc.DocMap-class.html" 
+class="link"><code>DocMap</code></a> into a set of HTML files.
+<hr/>
+<p><b>To Do:</b>
+<ul>
+  <li>either use StringIO more (if it's significantly faster), or don't use 
+it at all.
+</li>
+  <li>finish updating docstrings.
+
+  </li>
+</ul></p>
+
+<p><b>Question:</b> Should functions with no docstrings be listed in the details section? 
+Currently, they are not, with the reasoning being that there's nothing 
+else to say about them. But parameter defaults are listed in details, and 
+not in summary. C.f. properties, where properties without docstrings are 
+always listed in details (since we want to list their accessor 
+methods).
+</p>
+
+
+<!-- =========== START OF CLASSES =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Classes</th></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.html.HTMLFormatter-class.html"><code>HTMLFormatter</code></a></b></td>
+  <td>Documentation to HTML converter.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.html-module.html#FOOTER"><code>FOOTER</code></a></b>: The footer for standard documentation HTML pages.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.html-module.html#FRAMES_INDEX"><code>FRAMES_INDEX</code></a></b> = <span title="'&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Frameset//EN&quot;&gt;\n&lt;html&gt;\n&lt;head&gt;\n  &lt;title&gt; %s &lt;/title&gt;\n&lt;/head&gt;\n&lt;frameset cols=&quot;20%%,80%%&quot;&gt;\n  &lt;frameset rows=&quot;30%%,70%%&quot;&gt;\n    &lt;frame src=&quot;toc.html&quot; name=&quot;moduleListFrame&quot;&gt;\n    &lt;frame src=&quot;toc-everything.html&quot; name=&quot;moduleFrame&quot;&gt;\n  &lt;/frameset&gt;\n  &lt;frame src=&quot;%s&quot; name=&quot;mainFrame&quot;&gt;\n&lt;/frameset&gt;\n&lt;/html&gt;\n'"><code><span class="variable-quote">'</span>&lt;!DOCTYPE&nbsp;HTML&nbsp;PUBLIC&nbsp;&quot;-//W3C//DTD&nbsp;HTML&nbsp;<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.html-module.html#HEADER"><code>HEADER</code></a></b>: The header for standard documentation HTML pages.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.html-module.html#REDIRECT_INDEX"><code>REDIRECT_INDEX</code></a></b>: The contents of redirect index page.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>dict</code></font></td>
+<td><b><a href="epydoc.html-module.html#SPECIAL_METHODS"><code>SPECIAL_METHODS</code></a></b>: A dictionary providing names for the special methods that a class can 
+define.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="FOOTER"></a>
+<h3>FOOTER</h3>
+The footer for standard documentation HTML pages.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'\n&lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; width=&quot;100%%&quot;&gt;\n  &lt;tr&gt;\n    &lt;td align=&quot;left&quot;&gt;&lt;font size=&quot;-2&quot;&gt;Generated by Epydoc %s on %s&lt;/font&gt;&lt;/td&gt;\n    &lt;td align=&quot;right&quot;&gt;&lt;a href=&quot;http://epydoc.sourceforge.net&quot;\n                      &gt;&lt;font size=&quot;-2&quot;&gt;http://epydoc.sf.net&lt;/font&gt;&lt;/a&gt;&lt;/td&gt;\n  &lt;/tr&gt;\n&lt;/table&gt;\n&lt;/body&gt;\n&lt;/html&gt;\n'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'''</span>
+&lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; width=&quot;100%%&quot;&gt;
+  &lt;tr&gt;
+    &lt;td align=&quot;left&quot;&gt;&lt;font size=&quot;-2&quot;&gt;Generated by Epydoc %s on %s&lt;/fon<span class="variable-linewrap">\</span>
+t&gt;&lt;/td&gt;
+    &lt;td align=&quot;right&quot;&gt;&lt;a href=&quot;http://epydoc.sourceforge.net&quot;
+                      &gt;&lt;font size=&quot;-2&quot;&gt;http://epydoc.sf.net&lt;/font&gt;&lt;/a&gt;<span class="variable-linewrap">\</span>
+&lt;/td&gt;
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="FRAMES_INDEX"></a>
+<h3>FRAMES_INDEX</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Frameset//EN&quot;&gt;\n&lt;html&gt;\n&lt;head&gt;\n  &lt;title&gt; %s &lt;/title&gt;\n&lt;/head&gt;\n&lt;frameset cols=&quot;20%%,80%%&quot;&gt;\n  &lt;frameset rows=&quot;30%%,70%%&quot;&gt;\n    &lt;frame src=&quot;toc.html&quot; name=&quot;moduleListFrame&quot;&gt;\n    &lt;frame src=&quot;toc-everything.html&quot; name=&quot;moduleFrame&quot;&gt;\n  &lt;/frameset&gt;\n  &lt;frame src=&quot;%s&quot; name=&quot;mainFrame&quot;&gt;\n&lt;/frameset&gt;\n&lt;/html&gt;\n'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'''</span>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Frameset//EN&quot;&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt; %s &lt;/title&gt;
+&lt;/head&gt;
+&lt;frameset cols=&quot;20%%,80%%&quot;&gt;
+  &lt;frameset rows=&quot;30%%,70%%&quot;&gt;
+    &lt;frame src=&quot;toc.html&quot; name=&quot;moduleListFrame&quot;&gt;
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="HEADER"></a>
+<h3>HEADER</h3>
+The header for standard documentation HTML pages.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'&lt;?xml version=&quot;1.0&quot; encoding=&quot;iso-8859-1&quot;?&gt;\n&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;\n          &quot;DTD/xhtml1-transitional.dtd&quot;&gt;\n&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;en&quot; lang=&quot;en&quot;&gt;\n&lt;head&gt;\n  &lt;title&gt;%s&lt;/title&gt;\n  &lt;link rel=&quot;stylesheet&quot; href=&quot;epydoc.css&quot; type=&quot;text/css&quot;&gt;&lt;/link&gt;\n&lt;/head&gt;\n&lt;body bgcolor=&quot;white&quot; text=&quot;black&quot; link=&quot;blue&quot; vlink=&quot;#204080&quot;\n      alink=&quot;#204080&quot;&gt;\n'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'''</span>&lt;?xml version=&quot;1.0&quot; encoding=&quot;iso-8859-1&quot;?&gt;
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot;
+          &quot;DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;en&quot; lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;title&gt;%s&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;epydoc.css&quot; type=&quot;text/css&quot;&gt;&lt;/link&gt;
+&lt;/head&gt;
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="REDIRECT_INDEX"></a>
+<h3>REDIRECT_INDEX</h3>
+The contents of redirect index page. This page is only used if the 
+supplied top page is external.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Frameset//EN&quot;&gt;\n&lt;html&gt;\n&lt;head&gt;\n  &lt;title&gt; Redirect &lt;/title&gt;\n  &lt;meta http-equiv=&quot;refresh&quot; content=&quot;1;url=%s&quot;&gt;\n  &lt;link rel=&quot;stylesheet&quot; href=&quot;epydoc.css&quot; type=&quot;text/css&quot;&gt;&lt;/link&gt;\n&lt;/head&gt;\n&lt;body&gt;\n  Redirecting to the API documentation for &lt;a href=&quot;%s&quot;&gt;%s&lt;/a&gt;...\n&lt;/body&gt;\n&lt;/html&gt;\n'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'''</span>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Frameset//EN&quot;&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt; Redirect &lt;/title&gt;
+  &lt;meta http-equiv=&quot;refresh&quot; content=&quot;1;url=%s&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;epydoc.css&quot; type=&quot;text/css&quot;&gt;&lt;/link&gt;
+&lt;/head&gt;
+&lt;body&gt;
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="SPECIAL_METHODS"></a>
+<h3>SPECIAL_METHODS</h3>
+A dictionary providing names for the special methods that a class can 
+define.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>dict</code>
+
+      </dd>
+<span title="{'__getslice__': 'Slicling operator', '__del__': 'Destructor', '__str__': 'Informal representation operator', '__radd__': 'Right-side addition operator', '__hash__': 'Hashing function', '__setitem__': 'Index assignment operator', '__or__': 'Or operator', '__add__': 'Addition operator', '__gt__': 'Greater-than operator', '__and__': 'And operator', '__lt__': 'Less-than operator', '__eq__': 'Equality operator', '__init__': 'Constructor', '__delitem__': 'Index deletion operator', '__delslice__': 'Slice deletion operator', '__nonzero__': 'Boolean test operator', '__getitem__': 'Indexing operator...">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+{'__add__': 'Addition operator',
+ '__and__': 'And operator',
+ '__call__': 'Call operator',
+ '__cmp__': 'Comparison operator',
+ '__contains__': 'In operator',
+ '__del__': 'Destructor',
+ '__delitem__': 'Index deletion operator',
+ '__delslice__': 'Slice deletion operator',
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:19 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

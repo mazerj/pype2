@@ -1,0 +1,742 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Class: DocumentClass</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Class: DocumentClass</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/docstring/StructuredText/DocumentClass.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>Class instance calls [ex.=&gt; x()] require a structured text
+    structure. Doc will then parse each paragraph in the structure
+    and will find the special structures within each paragraph.
+    Each special structure will be stored as an instance. Special
+    structures within another special structure are stored within
+    the <code>top</code> structure
+    EX : <code>-underline this-</code> =&gt; would be turned into an underline
+    instance. '-underline <strong>this</strong>' would be stored as an underline
+    instance with a strong instance stored in its string</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Methods">Methods</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+
+            <table border="0" cellspacing="2" cellpadding="2" width="100%">
+              <tr>
+            <td align="LEFT" valign="TOP">
+<a href="#__call__">__call__</a><br>
+<a href="#color_paragraphs">color_paragraphs</a><br>
+<a href="#color_text">color_text</a><br>
+<a href="#doc_bullet">doc_bullet</a><br>
+<a href="#doc_description">doc_description</a><br>
+<a href="#doc_emphasize">doc_emphasize</a><br>
+<a href="#doc_header">doc_header</a><br>
+<a href="#doc_href">doc_href</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#doc_href1">doc_href1</a><br>
+<a href="#doc_href2">doc_href2</a><br>
+<a href="#doc_inner_link">doc_inner_link</a><br>
+<a href="#doc_literal">doc_literal</a><br>
+<a href="#doc_named_link">doc_named_link</a><br>
+<a href="#doc_numbered">doc_numbered</a><br>
+<a href="#doc_sgml">doc_sgml</a><br>
+<a href="#doc_strong">doc_strong</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#doc_table">doc_table</a><br>
+<a href="#doc_underline">doc_underline</a><br>
+<a href="#doc_xref">doc_xref</a><br>
+<a href="#parse">parse</a><br>
+</td>
+</tr>
+            </table>
+            
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="__call__"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">__call__&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+__call__ ( self,  doc )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="color_paragraphs"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">color_paragraphs&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+color_paragraphs (
+        self,
+        raw_paragraphs,
+        type=type,
+        sequence_types=(type([] ), type(() ) ),
+        st=type( '' ),
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="color_text"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">color_text&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+color_text (
+        self,
+        str,
+        types=None,
+        )
+
+</pre></font>
+
+<p>Search the paragraph for each special structure</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_bullet"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_bullet&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_bullet (
+        self,
+        paragraph,
+        expr=re.compile( r'\s*[-*o]\s+' ).match,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_description"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_description&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_description (
+        self,
+        paragraph,
+        delim=re.compile( r'\s+--\s+' ).search,
+        nb=re.compile( r'[^\000- ]' ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_emphasize"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_emphasize&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_emphasize (
+        self,
+        s,
+        expr=re.compile(r'\*([%s%s%s\s]+?)\*' %( letters, digits, strongem_punc ) ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_header"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_header&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_header ( self,  paragraph )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_href"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_href&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_href (
+        self,
+        s,
+        expr,
+        punctuation=re.compile( r&quot;[\,\.\?\!\;]+&quot; ).match,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_href1"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_href1&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_href1 (
+        self,
+        s,
+        expr=re.compile( _DQUOTEDTEXT + &quot;(:)&quot; + _ABS_AND_RELATIVE_URL + _SPACES ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_href2"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_href2&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_href2 (
+        self,
+        s,
+        expr=re.compile( _DQUOTEDTEXT + r'(\,\s+)' + _ABSOLUTE_URL + _SPACES ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_inner_link"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_inner_link&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_inner_link (
+        self,
+        s,
+        expr1=re.compile( r&quot;\.\.\s*&quot; ).search,
+        expr2=re.compile(r&quot;\[[%s%s]+\]&quot; %( letters, digits ) ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_literal"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_literal&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_literal (
+        self,
+        s,
+        expr=re.compile(r&quot;(\W+|^)'([%s%s%s\s]+)'([%s]+|$)&quot; %( letters, digits, literal_punc, phrase_delimiters ) ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_named_link"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_named_link&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_named_link (
+        self,
+        s,
+        expr=re.compile( r&quot;(\.\.\s)(\[[%s0-9]+\])&quot; % letters ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_numbered"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_numbered&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_numbered (
+        self,
+        paragraph,
+        expr=re.compile( r'(\s*[%s]\.)|(\s*[0-9]+\.)|(\s*[0-9]+\s+)' % letters ).match,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_sgml"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_sgml&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_sgml (
+        self,
+        s,
+        expr=re.compile( r&quot;\&lt;[%s0-9\.\=\'\&quot;\:\/\-\#\+\s\*]+\&gt;&quot; % letters ).search,
+        )
+
+</pre></font>
+
+<p>SGML text is ignored and outputed as-is</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_strong"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_strong&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_strong (
+        self,
+        s,
+        expr=re.compile(r'\*\*([%s%s%s\s]+?)\*\*' %( letters, digits, strongem_punc ) ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_table"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_table&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_table (
+        self,
+        paragraph,
+        expr=re.compile( r'\s*\|[-]+\|' ).match,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_underline"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_underline&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_underline (
+        self,
+        s,
+        expr=re.compile(r'_([%s%s%s\s]+)_[\s%s]' %( letters, digits, under_punc, phrase_delimiters ) ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="doc_xref"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">doc_xref&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+doc_xref (
+        self,
+        s,
+        expr=re.compile( '\[([%s0-9\-.:/;,\n\r\~]+)\]' % letters ).search,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="parse"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">parse&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+parse (
+        self,
+        raw_string,
+        text_type,
+        type=type,
+        st=type( '' ),
+        lt=type([] ),
+        )
+
+</pre></font>
+
+<p>Parse accepts a raw_string, an expr to test the raw_string,
+       and the raw_string's subparagraphs.<p>       Parse will continue to search through raw_string until 
+       all instances of expr in raw_string are found. </p>
+<p>       If no instances of expr are found, raw_string is returned.
+       Otherwise a list of substrings and instances is returned</p>
+</p>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:29 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

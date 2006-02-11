@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.latex._LatexDocstringLinker</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.latex-module.html">Module&nbsp;latex</a> ::
+        Class&nbsp;_LatexDocstringLinker
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<b>show&nbsp;private</b>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="../private/epydoc.latex._LatexDocstringLinker-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class _LatexDocstringLinker</h2>
+
+<pre class="base-tree">
+<a href="epydoc.markup.DocstringLinker-class.html"><code>DocstringLinker</code></a> --+
+                  |
+                 <b>_LatexDocstringLinker</b>
+</pre><br />
+
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.latex._LatexDocstringLinker-class.html#translate_identifier_xref" class="summary-sig-name"><code>translate_identifier_xref</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>identifier</span>,
+          <span class=summary-sig-arg>label</span>)</span></code>
+<br />
+Translate a crossreference link to a Python identifier to the 
+appropriate output format.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.latex._LatexDocstringLinker-class.html#translate_indexterm" class="summary-sig-name"><code>translate_indexterm</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>indexterm</span>)</span></code>
+<br />
+Translate an index term to the appropriate output format.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="translate_identifier_xref"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">translate_identifier_xref</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>identifier</span>,
+          <span class=sig-arg>label</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Translate a crossreference link to a Python identifier to the 
+  appropriate output format. The output will typically include a 
+  reference or pointer to the crossreference target.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>identifier</b></code> -
+         The name of the Python identifier that should be linked 
+        to.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>label</b></code> -
+         The label that should be used for the identifier, if it's 
+        different from the name of the identifier.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code> or <code>None</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The translated crossreference link.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.DocstringLinker-class.html#translate_identifier_xref"><code>epydoc.markup.DocstringLinker.translate_identifier_xref</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="translate_indexterm"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">translate_indexterm</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>indexterm</span>)</span>
+  </h3>
+  Translate an index term to the appropriate output format. The output 
+  will typically include a crossreference anchor.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>indexterm</b></code> -
+         The index term to translate.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The translated index term.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.DocstringLinker-class.html#translate_indexterm"><code>epydoc.markup.DocstringLinker.translate_indexterm</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:14 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

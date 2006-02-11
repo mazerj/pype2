@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>HappyDoc Source Documentation</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">HappyDoc Source Documentation</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>Announcing the latest version of HappyDoc, a Python documentation extraction tool.</h3>
+<p>  HappyDoc is a tool for extracting documentation from Python source
+  code.  It differs from other such applications by the fact that it
+  uses the parse tree for a module to derive the information used in
+  its output, rather that importing the module directly.  This allows
+  the user to generate documentation for modules which need special
+  context to be imported.</p>
+<p>  More details are available on the HappyDoc home page at
+  http://happydoc.sourceforge.net.</p>
+<h4>  !!! NOTICE !!!</h4>
+<p>    Before installing HappyDoc 2.0+, any version earlier than 2.0 must
+    be removed.  This includes the file <code>happydoc.pth</code> and directory
+    <code>happydoc</code> in site-packages, as well as the executable <code>happydoc</code>
+    in the <code>bin</code> directory.</p>
+<dl>
+<dt>  Version 2.1</dt>
+<dd><p>    The primary reason for this release is to resolve the infamous <em>-d
+    bug</em>.</p>
+
+<ul>
+<li><p><strong>New Features</strong>
+<ul>
+<li><p>#514237 - The PluginLoader no longer requires a <code>.py</code>
+        extension on plugins.  This should allow plugins to be written
+        in any language for which Python can load a module, and as
+        long as the file is named with the right convention they will
+        be picked up and loaded.  (The source of this change request
+        was the maintainers of the PLD Linux Distribution.)</p></li>
+
+</ul>
+</p></li>
+<li><p><strong>Bug Fixes</strong>
+<ul>
+<li><p>Resolved defect #513850, where output was written to the wrong
+        place when the -d option was used.  <p>        <strong>NOTE</strong> <em>The solution to this problem resulted in changes to
+        the file names being used for output.  It is recommended that
+        a new directory be used to generate documentation for existing
+        code, rather than trying to write over the top of existing
+        files.</em></p>
+</p></li>
+<li><p>Resolved defect #510447, a problem with escaping special
+        characters in HTML output.  Text enclosed in single quotes
+        is now not escaped in output so that HTML text can be 
+        passed directly to the output file.</p></li>
+<li><p>Fixed a problem with Windows installation using <code>setup.py</code>.</p></li>
+
+</ul>
+</p></li>
+<li><p><strong>Other Changes</strong>
+<ul>
+<li><p>Minor tweaks to the build and test tools.</p></li>
+
+</ul>
+</p></li>
+
+</ul>
+</dd>
+</dl>
+<h3>Download</h3>
+<p>  Download the latest version of HappyDoc from the home page on
+  SourceForge:<p>     http://sourceforge.net/projects/happydoc</p>
+</p>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:23 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

@@ -1,0 +1,103 @@
+-----------------------------------------------------------------------
+Tue Jan  6 14:16:50 2004 mazer 
+-----------------------------------------------------------------------
+  At the moment this is the standard, fully supported version
+  of pype for the gallant lab. This version of pype runs best
+  under redhat-8 or redhat-9, but will work under old redhat-7.2
+  installations provided python2.1 is installed (in addition
+  to the python1.5 that comes with redhat-7.2)
+
+  To get a new machine on line, you need to do a full redhat
+  install (ALL PACKAGES), get everything running the way you
+  want, independent of pype and the build a new kernel (we use
+  2.4.22 right now) changing the jiffy timer resolution from
+  10ms to 1ms (this enables more frequent task switching and
+  signficantly improves the near-real-time performance of pype).
+
+  Once this is done, you can follow the instructions in the
+  'INSTALL' file in this directory to install pype and all
+  the required ancillary tools, libraries and programs (including
+  the p2m matlab tools).
+
+  Note this version of pype (and all others from now on) uses
+  the comedi/comedilib kit to access the DACQ card in a portable
+  device independ way. You must have a comedi-supported card.
+  See http://www.comedi.org/hardware.php for more information.
+
+-----------------------------------------------------------------------
+Mon Jul  18 00:00:00 2002 mazer
+-----------------------------------------------------------------------
+
+This is "pype2".  A newer, cleaner, gentler version of pype.
+This version attempts to simplify and consolidate the codebase
+to make it easier to use, read and understand.  Basically, I've
+moved as much C/swig as possible into native python, keeping
+only C/swig stuff from near-RT parts (namely data acquisition).
+
+**********************  IMPORTANT  **************************
+   The SUPPORTED platform for running pype is now officially
+ redhat 7.2, with everything installed (most important is that
+   python2.1 be installed).  Things should still run fine on
+ other versions, but the install process should be completely
+      automatically on a fully installed redhat 7.2 box.
+********************************** **************************
+
+In addition:
+  1. The src directory has been reorganized to simplify things.
+     Almost all of the code modules live in src/pype, including
+     sprite.py (the pygame/sdl/framebuffer interface).  src/dacq2
+     contains C/swig code needed for data acquisition and src/wrapper
+     contains the suid-root bootloader needed to access DGA mode
+     and raw i/o ports.  The bootloading system has been dramatically
+     simplified and is now essentially 100% python, save for the root
+     wrapper program.  src/sh/pype is just a shell script that
+     runs: "exec pypeboot pyperun ..."; similarly, src/sh/pypenv runs
+     the command "exec pypeboot pyperun -s ...", which tells pype to
+     enter scripting mode..
+
+  2. The build process should now be pretty much painless.  You should
+     be able to pretty much do a "make build" and then a "make install"
+     to get things up and running.  This includes all the rpm's and
+     external packages pype needs needs (biggles, Numeric etc). Note
+     that a custom version of SDL will also be installed!
+
+     At least part of this will need to be done as root.  You can
+     set the installation target by setting the PYPEDIR environment
+     before you start compiling, eg:
+	env PYPEDIR=`pwd` make build
+	env PYPEDIR=`pwd` make install
+     Will build and install in the current directory, then you just
+     need to have `pwd`/bin on your path and you're ready to go.
+
+/jamie/18-jul-2002
+
+---------------------------------------------------------------------
+Sun Sep 15 23:39:22 2002 mazer
+-----------------------------------------------------------------------
+
+HARDWARE SETUP NOTES
+
+DAS-1602/12 (ISA) and DAS-08 (ISA) Pinouts/connections
+
+D/A 0		analog eye-x possiton
+D/A 1		analog eye-y possiton
+D/A 2		photodiode signal
+D/A 3		spike level detection signal
+D/A 4		user defined
+D/A 5		user defined
+D/A 6		user defined
+D/A 7		user defined
+
+DigIN 0		monkey bar/button
+DigIN 1		juice switch
+DigIN 3		<unused>
+DigIN 4		<unused>
+
+DigOUT 0	juice driver or pump control
+DigOUT 1	Plexon PSTH alignment marker
+DigOUT 3	Plexon eXternal trigger (gate)
+DigOUT 4	<unused>
+
+A/D 0		user defined (not implemented)
+A/D 1		user defined (not implemented)
+-----------------------------------------------------------------------

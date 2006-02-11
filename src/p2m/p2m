@@ -1,0 +1,50 @@
+#!/bin/csh -f
+
+if ("$1" == "") then
+  echo "Usage: `basename $0` pypefile1 pypefile2 ... pypefileN"
+  echo "  Converts pypefiles to matlab 'p2m' files using pype"
+  echo "  and matlab tools.  Leaves p2m files in same directory"
+  echo "  as the original pype files."
+  exit 1
+endif
+
+
+foreach i ($*)
+  set root="$i:r"
+
+  if ("$root:e" == "gz") then
+    set dst="$root:r".p2m
+  else
+    set dst="$root.p2m"
+  endif
+
+  echo "====================================================="
+  echo "  INFILE: $i"
+  echo " OUTFILE: $dst"
+  echo "====================================================="
+  if !(-e $i) then
+    echo "`basename $0`: $i does not exist."
+    exit 1
+  endif
+  set ec=/tmp/$$.exit
+  /bin/rm -f $ec
+  if ($?DISPLAY) then
+    unsetenv DISPLAY
+  endif
+  if (-e $dst) then
+    echo $dst already exists, skipping
+  else if (-e $dst.gz) then
+    echo $dst.gz already exists, skipping
+  else
+    echo "p2mBatch('$i', 1, 1);" | matlab -nodisplay -nojvm
+    if (-e $ec) then
+      set s = `cat $ec`
+      /bin/rm -f $ec
+    else
+      set s = 0
+    endif
+    if ("$s") then
+      exit $s
+    endif
+  endif
+end

@@ -1,0 +1,16 @@
+# BW Feb 2006
+
+To build on Mac OS X:
+
+Dependencies:
+ Install Fink (http://fink.sourceforge.net)
+ fink install pygame-py24 biggles-py24 opengl-py24 grace
+
+You can't compile the DACQ drivers on OS X.  Instead:
+ ./build install-nodacq wrapper clean
+
+In OpenGL mode, everything works fine.
+
+In pygame mode, you may have problems with surface unlocking, 
+in which case apply something like the patch in this directory to 
+/usr/local/pype2/lib/sprite.py.

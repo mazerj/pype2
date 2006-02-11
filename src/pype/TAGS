@@ -1,0 +1,1054 @@
+
+PlexHeaders.py,17
+class Plex:4,83
+
+PlexNet.py,262
+class PlexNet:12,187
+	def __init__(13,202
+	def __del__(44,1131
+	def __put(51,1250
+	def __get(59,1492
+	def start_data(66,1647
+	def stop_data(69,1726
+	def pump(72,1803
+	def run(125,3359
+	def drain(142,3776
+	def neuronlist(152,4061
+	def status(161,4258
+
+about.py,90
+class AboutPype:20,389
+	def __init__(28,529
+	def _withdraw(57,1347
+def splash(60,1396
+
+beep.py,81
+def nobeep(33,702
+def beep_init(42,922
+def beep(70,1470
+def wavbeep(120,2837
+
+blt.py,1869
+def _loadblt(46,1172
+def busy(59,1446
+class _BLT(69,1637
+	def __init__(76,1721
+	def _loadblt(80,1840
+	def _down(93,2131
+	def _up(97,2256
+	def _reset(112,2666
+	def bindzoom(124,3003
+	def crosshairs_configure(131,3236
+	def crosshairs_toggle(136,3389
+	def crosshairs_on(139,3468
+	def crosshairs_off(142,3539
+	def element_activate(145,3612
+	def element_closest(149,3738
+	def element_configure(153,3893
+	def element_create(158,4048
+	def element_deactivate(163,4198
+	def element_delete(167,4324
+	def element_names(171,4442
+	def element_show(174,4534
+	def invtransform(177,4635
+	def legend_activate(180,4746
+	def legend_configure(183,4858
+	def legend_deactivate(188,5000
+	def legend_get(191,5067
+	def postscript(194,5127
+	def psconfigure(203,5423
+	def psget(208,5558
+	def tag_after(213,5691
+	def tag_before(216,5791
+	def tag_configure(219,5893
+	def tag_coords(224,6041
+	def tag_create(227,6145
+	def tag_delete(230,6237
+	def tag_ids(234,6347
+	def tag_type(238,6458
+	def transform(241,6533
+	def axis_configure(244,6605
+	def axis_limits(249,6746
+	def image_create(252,6838
+	def marker_create(257,6983
+class Graph(262,7133
+	def __init__(267,7181
+class Barchart(272,7317
+	def __init__(277,7371
+class Histogram(282,7510
+	def __init__(283,7533
+	def __repr__(300,7888
+	def add(304,8000
+	def clear(323,8443
+	def display(326,8479
+	def stats(348,8937
+class _Quick:363,9252
+	def __init__(364,9266
+	def wait(368,9365
+class QuickGraph(376,9477
+	def __init__(377,9503
+class QuickGraphXYE(423,10660
+	def __init__(424,10689
+class QuickGraphXYZ(456,11651
+	def __init__(457,11680
+	def _uniq(505,13114
+	def _cmap(512,13205
+	def _cmap2(526,13555
+	def _cmap1(540,13906
+	def _cmap0(549,14054
+class QuickHist(558,14268
+	def __init__(559,14293
+	def demo1(577,14741
+	def demo2(603,15442
+		def quit(608,15496
+	def demo3(646,16433
+
+config.py,132
+class Config:23,391
+	def __init__(24,405
+	def get(27,465
+	def iget(33,563
+	def fget(42,721
+	def set(51,883
+	def load(56,1016
+
+error.py,0
+
+events.py,120
+def iscorrect(38,919
+def isabort(44,1003
+def isui(50,1074
+def ismaxrt_exceeded(56,1154
+def isearly_release(62,1243
+
+filebox.py,746
+def _comparedatafiles(28,487
+class FileDialog:58,1379
+    def __init__(83,2192
+    def go(151,5089
+    def quit(175,6048
+    def dirs_double_event(179,6157
+    def dirs_select_event(182,6228
+    def files_double_event(188,6450
+    def files_select_event(191,6518
+    def ok_event(195,6633
+    def ok_command(198,6691
+    def filter_command(201,6758
+    def get_filter(232,7759
+    def get_selection(239,8008
+    def cancel_command(244,8134
+    def set_filter(247,8197
+    def set_selection(259,8596
+class LoadFileDialog(266,8812
+    def ok_command(272,8944
+class SaveFileDialog_noapp(281,9143
+    def ok_command(287,9292
+class SaveFileDialog(310,10004
+    def ok_command(316,10147
+def Open(342,11000
+def SaveAs(353,11382
+
+gracePlot.py,857
+class gracePlot:76,3007
+    def __init__(78,3029
+    def _send(86,3258
+    def _flush(90,3344
+    def __del__(94,3427
+    def exit(100,3675
+    def redraw(104,3799
+    def multi(109,3914
+    def save(127,4682
+    def focus(153,5791
+    def resize(167,6365
+    def __getitem__(176,6735
+class graceGraph:187,7239
+    def __init__(189,7262
+    def _send(197,7448
+    def _flush(202,7566
+    def _send_2(206,7641
+    def _send_3(214,7894
+    def hold(224,8198
+    def title(239,8705
+    def subtitle(245,8904
+    def redraw(251,9112
+    def xlabel(255,9203
+    def ylabel(261,9398
+    def xlimit(267,9593
+    def ylimit(271,9755
+    def _limHelper(275,9913
+    def kill(283,10212
+    def clear(291,10419
+    def legend(299,10666
+    def histoPlot(314,11330
+    def _errPlot(405,15008
+    def plot(469,17706
+def _test(544,20597
+
+grace_np.py,258
+class Error(81,3393
+class Disconnected(85,3499
+class GraceProcess:105,4223
+    def __init__(108,4292
+    def command(192,7753
+    def flush(212,8393
+    def __call__(225,8751
+    def __del__(232,8926
+    def is_open(254,9832
+    def exit(261,10084
+
+griddata.py,96
+def __crossproduct(23,579
+def __project(32,880
+def griddata(49,1319
+def surfinterp(100,3060
+
+guitools.py,687
+class Container(28,579
+	def __init__(33,699
+	def hide(55,1224
+	def show(60,1311
+	def toggle(68,1469
+class DockWindow(75,1548
+	def __init__(81,1710
+	def _hide(112,2445
+	def _show(119,2587
+	def toggle(127,2745
+class TaskNotebook(133,2825
+	def __init__(134,2857
+	def add(142,3078
+	def lift(145,3142
+class Info:149,3196
+	def __init__(150,3208
+	def write(169,3694
+	def writenl(183,4069
+	def clear(186,4153
+	def update(191,4269
+class EventQueue:198,4348
+	def __init__(199,4366
+	def _push(203,4461
+	def pop(206,4522
+	def flush(214,4664
+def warn(217,4702
+def __done(276,6189
+def beepwarn(278,6216
+def ask(330,7490
+def undermouse(340,7705
+def screencenter(354,8102
+
+handmap.py,493
+def _bool(56,1457
+class _Probe:63,1525
+	def __init__(64,1539
+	def __del__(106,2310
+	def save(110,2376
+	def load(139,2976
+	def pp(178,3831
+	def clear(216,5366
+	def reset(228,5632
+	def color(234,5740
+	def nextcolor(276,6911
+	def showprobe(279,6983
+	def draw(283,7109
+def _incr(425,11092
+def _key_handler(432,11176
+def _hmap_idlefn(576,14103
+def hmap_set_dlist(592,14467
+def hmap_show(595,14529
+def hmap_hide(600,14625
+def hmap_install(605,14721
+def hmap_uninstall(612,14927
+
+iplot.py,481
+def graceplot(30,692
+def detach(54,1350
+def attach(65,1557
+def close(82,1913
+def figure(96,2302
+def grid(116,2792
+def _fixup(139,3424
+def plot(148,3678
+def polar(183,4582
+def hist(240,6010
+def title(256,6472
+def subtitle(265,6609
+def xlabel(274,6752
+def ylabel(283,6878
+def xrange(292,7000
+def yrange(299,7124
+def clf(306,7248
+def hold_on(313,7349
+def hold_off(320,7458
+def drawnow(327,7567
+def subplot(334,7679
+def rawplot(352,8176
+def _parsestyle(363,8407
+
+movie.py,181
+class Movie:31,890
+	def __init__(32,903
+	def nth_frame(104,2760
+	def render(109,2846
+def _readindex(112,2889
+class Movie2:150,3780
+	def __init__(151,3794
+	def blit(189,4739
+
+mplot.py,408
+def parsestyle(57,1403
+def gettable(101,2680
+def subplot(107,2821
+def hold_on(120,3140
+def hold_off(124,3221
+def clf(129,3304
+def drawnow(135,3446
+def xlabel(143,3652
+def ylabel(148,3762
+def xrange(153,3864
+def yrange(158,3972
+def title(163,4080
+def plot(169,4181
+def imagesc(211,5092
+def legend(258,6289
+def errorbar(263,6372
+def errorbar2(297,7140
+def hist(332,7969
+def psprint(381,9213
+
+pbar.py,175
+class ProgressBar:21,527
+	def __init__(27,661
+	def __del__(77,2224
+	def set(82,2312
+	def update(88,2426
+class DanceBar(115,3162
+	def set(120,3310
+	def update(124,3377
+
+pstat.py,1019
+def abut 183,6792
+def simpleabut 230,8950
+def colex 266,10463
+def collapse 294,11611
+     def collmean 311,12578
+def dm 372,14655
+def flat(387,15175
+def linexand 401,15449
+def linexor 427,16463
+def linedelimited 457,17761
+def lineincols 474,18206
+def lineincustcols 495,18787
+def list2string 521,19582
+def makelol(533,19889
+def makestr 547,20227
+def printcc 553,20308
+def printincols 591,21652
+def pl 604,21934
+def printl(619,22189
+def replace 625,22271
+def recode 640,22651
+def remap 671,23719
+def roundlist 685,24172
+def sortby(703,24681
+def unique 722,25143
+def duplicates(737,25531
+def nonrepeats(750,25802
+ def aabut 784,27296
+ def acolex 813,28335
+ def acollapse 831,28904
+    def acollmean 843,29509
+ def adm 898,31321
+ def isstring(914,31738
+ def alinexand 921,31830
+ def alinexor 944,32713
+ def areplace 974,33940
+ def arecode 984,34158
+ def arowcompare(1015,35336
+ def arowsame(1031,35871
+ def asortrows(1043,36199
+ def aunique(1063,36741
+ def aduplicates(1104,38652
+
+psycho.py,74
+class PsychoFrameBuffer(33,728
+	def __init__(34,766
+	def close(46,1206
+
+ptable.py,759
+def is_dir(36,879
+def is_file(49,1063
+def is_newfile(62,1261
+def is_any(75,1463
+def is_boolean(84,1597
+def is_int(118,2138
+def is_posint(133,2353
+def is_negint(150,2584
+def is_gteq_zero(167,2815
+def is_lteq_zero(185,3060
+def is_color(203,3302
+def is_rgb(230,3816
+def is_rgba(254,4235
+def is_gray(279,4806
+def is_float(297,5077
+def is_percent(311,5282
+def is_angle_degree(329,5568
+def is_param(347,5869
+def is_iparam(365,6197
+def is_cdf(382,6463
+def _unpack_slot(420,7339
+class ParamTable:438,7730
+	def __init__(439,7748
+	def get(531,10276
+	def query(568,11307
+	def queryv(575,11452
+	def set(597,12119
+	def save(600,12187
+	def load(615,12504
+	def _load(651,13486
+	def view(682,14217
+	def check(695,14568
+	def runlock(707,14847
+
+pype.py,3828
+class PypeApp:168,5277
+	def __init__(188,6133
+	def _keyboard(1009,35666
+	def set_state(1015,35817
+	def isrunning(1027,36118
+	def ispaused(1030,36163
+	def tally(1033,36206
+	def testad(1051,36617
+	def getcommon(1061,36787
+	def make_taskmenu(1073,37141
+	def add_tasks(1097,37852
+	def unloadtask(1122,38491
+	def newloadtask(1130,38630
+	def set_canvashook(1206,40514
+			def hookfn(1210,40679
+	def udpy_note(1228,41229
+	def eyeset(1231,41278
+	def init_framebuffer(1270,42514
+	def _statefile(1299,43390
+	def _savestate(1303,43487
+	def _readstate(1325,43955
+	def trial_clear(1335,44129
+	def trial_new(1342,44413
+	def trial_correct(1346,44532
+	def trial_ui(1353,44776
+	def new_cell(1362,45102
+	def set_fxfy(1370,45311
+	def set_startfn(1374,45443
+	def _start(1383,45687
+	def _starttmp(1430,46861
+	def shutdown(1433,46908
+	def ts(1448,47320
+	def status(1455,47465
+	def eyepos(1462,47648
+	def looking_at(1470,47877
+	def eyeshift(1482,48216
+	def eyeadjust(1510,49272
+	def drain(1517,49507
+	def idlefn(1522,49643
+	def history(1651,53164
+	def alarm(1669,53740
+	def warn_run_start(1677,53908
+	def warn_run_stop(1688,54081
+	def warn_trial_start(1697,54214
+	def start_tone(1702,54399
+	def warn_trial_correct(1708,54563
+	def warn_trial_incorrect(1714,54710
+	def led(1724,54948
+	def nreps(1735,55219
+	def notdone(1742,55391
+	def runstate(1750,55569
+	def dropsize(1763,55825
+	def dropvar(1770,55999
+	def reward(1777,56179
+	def __reward2(1825,57582
+	def juice_on(1836,57912
+	def juice_off(1842,57994
+	def juice_drip(1848,58074
+	def hide(1854,58189
+	def lshiftdown(1862,58361
+	def rshiftdown(1871,58572
+	def barchanges(1880,58784
+	def bar_genint(1895,59273
+	def int_handler(1915,59869
+	def debug_handler(1964,61322
+	def bardown(1971,61559
+	def barup(1982,61740
+	def sw1(1985,61787
+	def sw2(2000,62077
+	def close(2014,62365
+	def repinfo(2064,63562
+	def taskname(2067,63630
+	def _recfile(2083,64070
+	def set_userbutton(2098,64502
+	def taskbutton(2109,64899
+	def record_start(2120,65279
+	def record_stop(2147,66133
+	def plexnet_query(2167,66579
+	def plexon_state(2176,66805
+	def plexon_psth_trigger(2186,67087
+	def eyetrace(2191,67256
+	def encode(2209,67747
+	def get_spikes(2229,68241
+	def get_spikes_now(2236,68388
+	def get_eyepos_now(2258,69061
+	def get_photo_now(2279,69644
+	def get_events_now(2293,69880
+	def record_write(2300,70071
+	def record_note(2445,74527
+	def _guess(2455,74744
+	def record_done(2484,75440
+	def record_selectfile(2490,75552
+	def idlefb(2527,76494
+	def synctest(2542,76875
+	def plotEyetracesRange(2633,79106
+	def plotEyetraces(2637,79229
+def npypes(2701,80798
+def find_ttl(2722,81431
+class EyeGraph_dummy:2751,82178
+	def __init__(2770,82787
+	def show(2774,82847
+def safeLookup(2782,83145
+def subject(2795,83372
+def subjectrc(2805,83570
+def pyperc(2817,83920
+def pypedir(2825,84047
+def libdir(2833,84165
+def gethostname(2841,84290
+class FixWin:2853,84572
+	def __init__(2854,84586
+	def __del__(2860,84715
+	def genint(2866,84845
+	def set(2876,85116
+	def reset(2881,85205
+	def on(2884,85249
+	def off(2888,85359
+	def inside(2892,85454
+	def broke(2898,85618
+	def break_time(2904,85800
+	def draw(2908,85892
+	def clear(2917,86192
+class Timer:2925,86353
+	def __init__(2926,86366
+	def reset(2929,86403
+	def ms(2932,86451
+	def us(2935,86503
+class GenericTask:2939,86634
+	def __init__(2940,86653
+	def run(2943,86697
+	def cleanup(2946,86721
+class Holder:2949,86749
+class DancingBear:2953,86842
+	def __init__(2955,86871
+	def dance(2958,86924
+def dance(2970,87212
+def debug(2973,87255
+def loadwarn(2986,87475
+def now(3001,87923
+def candy1(3017,88298
+def candy2(3082,89557
+def appbusy(3151,90957
+class PyIcon:3160,91175
+	def __init__(3170,91504
+	def image(3178,91691
+def get_plexon_events(3181,91729
+
+pype_aux.py,867
+def tic(27,466
+def toc(36,600
+def nextfile(52,895
+def lastfile(66,1202
+class Timestamp:81,1484
+	def __init__(82,1501
+	def __repr__(92,1853
+class Logfile:101,2104
+	def __init__(102,2119
+	def write(120,2502
+def frange(126,2609
+def vrandint(137,2817
+def pickints(145,3042
+def uniform(161,3317
+def normal(173,3624
+def from_discrete_dist(186,3970
+def fuzzy(209,4574
+def permute(223,4979
+def pick_one(234,5201
+def navailable(266,6092
+def pick_n(279,6408
+def pick_n_replace(292,6714
+def param_expand(309,7160
+def open_dumpfile(383,8978
+def labeled_dump(404,9377
+def labeled_load(414,9604
+def pp_encode(427,9850
+def con(445,10160
+def info(467,10605
+def showparams(490,11078
+def log(511,11502
+def ppdict(514,11566
+def ppevents(520,11687
+def find_events(526,11837
+def find_events2(542,12131
+def align_events(559,12448
+def dir2ori(568,12619
+
+pypedata.py,687
+class PypedataTimeError(97,3113
+class Note:106,3318
+	def __init__(107,3330
+class PypeRecord:111,3398
+	def __init__(113,3439
+	def __repr__(174,5537
+	def printevents(177,5605
+	def pp(187,5818
+	def debugprint(190,5882
+	def compute(255,7755
+class PypeFile:349,10599
+	def __init__(350,10615
+	def backload(395,11996
+	def _backload2(399,12089
+	def __repr__(430,12906
+	def close(433,12995
+	def _next(443,13200
+	def nth(542,16743
+	def freenth(562,17130
+	def last(566,17210
+def count_spikes(581,17542
+def extract_spikes(588,17674
+def fixvel(599,17971
+def pix2deg(619,18535
+def deg2pix(626,18733
+def find_saccades(633,18931
+def findfix(801,24004
+def parseargs(857,25748
+
+pypedebug.py,93
+def keyboard(15,287
+def get_traceback(41,1002
+def reporterror(73,1944
+def ppDict(94,2665
+
+pypeerrors.py,282
+class FatalPypeError(16,337
+class MonkError(17,375
+class MonkNoStart(18,408
+class TimeoutError(19,443
+class NoProblem(20,480
+class UserAbort(21,513
+class UserExit(22,546
+class TaskAbort(23,578
+class GuiOnlyFunction(24,611
+class BarTransition(25,650
+class FixBreak(26,687
+
+pyplex.py,361
+def readbytes(63,1701
+class Header:86,2202
+	def __init__(91,2336
+class PlexonRecord:113,3112
+	def __init__(114,3132
+class Plexondata:130,3695
+	def __init__(136,3789
+	def __repr__(139,3849
+	def print_spikes(157,4246
+	def load_plx(163,4432
+	def save(198,5349
+def LoadPlexonFile(203,5448
+def LoadTimestampFile(212,5592
+def FindTimestampFile(225,5844
+
+rootperm.py,65
+def _realuid(20,375
+def root_take(33,698
+def root_drop(43,925
+
+sprite.py,2756
+class PygameIncompleteError(63,1316
+class SpriteError(64,1361
+def _got_root(66,1397
+def genaxes(71,1493
+def gend(103,2686
+def genrad(114,3047
+def gentheta(127,3417
+class FrameBuffer:148,4118
+	def __init__(149,4137
+	def __del__(361,11095
+	def calcfps(370,11321
+	def set_gamma(431,12831
+	def cursor(456,13592
+	def close(465,13799
+	def _xy(481,14210
+	def hide(512,15081
+	def show(521,15280
+	def sync(530,15498
+	def sync_toggle(545,15784
+	def clear(557,16043
+	def flip(579,16637
+	def string(604,17614
+	def clearkey(658,19146
+	def getkey(669,19452
+	def ungetkey(709,20527
+	def snapshot(719,20820
+	def rectangle(743,21638
+	def line(766,22403
+	def circle(788,22976
+def zoomdown(804,23410
+class _ImageBase:841,24577
+	def __init__(860,25173
+	def XY(863,25269
+	def X(869,25390
+	def Y(875,25479
+class Sprite(882,25569
+	def __init__(914,26707
+		class draws 924,27122
+	def __del__(1016,29786
+	def __repr__(1025,30007
+	def __getitem__(1033,30240
+	def __setitem__(1050,30642
+	def asPhotoImage(1065,31052
+	def set_alpha(1088,31718
+	def line(1100,31968
+	def clear(1123,32533
+	def fill(1136,32829
+	def noise(1148,33086
+	def circlefill(1169,33696
+	def circle(1202,34379
+	def rect(1245,35401
+	def pix(1267,35917
+	def pix_octr(1283,36342
+	def pix_rc(1302,36839
+	def axisflip(1325,37404
+	def rotate(1345,37944
+	def scale(1383,39033
+	def circmask(1412,39871
+	def alpha_aperture(1419,40092
+	def alpha_gradient(1438,40684
+	def alpha_gradient2(1459,41394
+	def dim(1489,42278
+	def thresh(1510,42919
+	def as_array(1523,43244
+	def on(1540,43764
+	def off(1547,43849
+	def toggle(1554,43969
+	def state(1565,44134
+	def moveto(1572,44253
+	def rmove(1583,44430
+	def saveunder(1595,44683
+	def unblit(1598,44772
+	def blit(1601,44841
+	def fastblit(1655,46195
+	def render(1674,46802
+	def unrender(1686,47150
+	def subimage(1696,47321
+	def clone(1724,47966
+	def setdir(1749,48479
+	def save(1763,48814
+	def save_alpha(1768,48930
+	def fix(1773,49052
+	def invert(1778,49181
+	def trim(1783,49284
+	def roll(1788,49386
+	def old_subimage(1797,49605
+class MpegMovie(1807,49861
+	def __init__(1816,50183
+	def getlength(1845,50903
+	def showframe(1861,51334
+class PolySprite:1884,51859
+	def __init__(1893,52104
+	def blit(1927,52941
+	def on(1943,53268
+	def off(1948,53329
+class DisplayList:1953,53392
+	def __init__(1974,54147
+	def __del__(1989,54532
+	def add(2000,54851
+	def delete(2014,55133
+	def clear(2031,55513
+	def delete_all(2038,55628
+	def update(2045,55741
+	def _print(2068,56191
+def _is_seq(2074,56310
+def barsprite(2084,56474
+def fixsprite(2103,56971
+def fixsprite2(2135,57764
+def _C(2176,58668
+def color24(2213,59722
+def grey24(2218,59831
+def gray24(2223,59945
+def quickinit(2228,60059
+
+spritetools.py,385
+def g2rgb(33,987
+def pixelize(40,1166
+def singrat(59,1741
+def cosgrat(69,2191
+def polargrat(79,2641
+def logpolargrat(96,3278
+def hypergrat(103,3545
+def alphaGaussian(115,4061
+def alphaGaussian2(125,4353
+def Make_2D_Sine(144,5119
+def Make_2D_Cnc_Rdl(172,5817
+def Make_2D_Hyperbolic(217,6786
+def gaussianEnvelope(240,7354
+def image_circmask(253,7805
+def surfinfo(262,8113
+
+stats.py,4232
+class Dispatch:356,14449
+    def __init__(366,14872
+    def __call__(375,15206
+def lgeometricmean 391,15814
+def lharmonicmean 405,16152
+def lmean 418,16447
+def lmedian 431,16733
+def lmedianscore 453,17702
+def lmode(472,18298
+def lmoment(505,19131
+def lvariation(524,19623
+def lskew(534,19845
+def lkurtosis(544,20095
+def ldescribe(554,20353
+def litemfreq(574,20841
+def lscoreatpercentile 590,21274
+def lpercentileofscore 610,21894
+def lhistogram 625,22465
+def lcumfreq(664,24379
+def lrelfreq(676,24778
+def lobrientransform(693,25309
+def lsamplevar 729,26297
+def lsamplestdev 744,26647
+def lvar 754,26892
+def lstdev 769,27260
+def lsterr(779,27485
+def lsem 789,27737
+def lz 801,27978
+def lzs 812,28255
+def ltrimboth 828,28587
+def ltrim1 844,29138
+def lpaired(867,29922
+def lpearsonr(931,32501
+def lspearmanr(957,33331
+def lpointbiserialr(981,34162
+def lkendalltau(1013,35417
+def llinregress(1048,36377
+def lttest_1samp(1080,37426
+def lttest_ind 1107,38372
+def lttest_rel 1138,39421
+def lchisquare(1174,40600
+def lks_2samp 1192,41278
+def lmannwhitneyu(1231,42168
+def ltiecorrect(1260,43298
+def lranksums(1285,43988
+def lwilcoxont(1307,44544
+def lkruskalwallish(1340,45428
+def lfriedmanchisquare(1375,46466
+def lchisqprob(1405,47483
+    def ex(1413,47709
+def lerfcc(1465,48870
+def lzprob(1481,49341
+def lksprob(1523,50818
+def lfprob 1544,51354
+def lbetacf(1556,51729
+def lgammln(1590,52523
+def lbetai(1611,53034
+def lF_oneway(1640,53884
+def lF_value 1677,54969
+def writecc 1694,55552
+def lincr(1734,57024
+def lsum 1751,57642
+def lcumsum 1763,57815
+def lss(1776,58096
+def lsummult 1789,58311
+def lsumdiffsquared(1805,58728
+def lsquare_of_sums(1819,59042
+def lshellsort(1831,59265
+def lrankdata(1857,60096
+def outputpairedstats(1882,60802
+def lfindwithin 1939,62705
+ def ageometricmean 2087,69852
+ def aharmonicmean 2130,71565
+ def amean 2184,73719
+ def amedian 2226,75352
+ def amedianscore 2250,76562
+ def amode(2275,77574
+ def atmean(2303,78589
+ def atvar(2335,80016
+ def atmin(2371,81650
+ def atmax(2391,82367
+ def atstdev(2411,83094
+ def atsem(2424,83605
+ def amoment(2460,85207
+ def avariation(2482,85893
+ def askew(2494,86287
+ def akurtosis(2513,87027
+ def adescribe(2532,87797
+ def askewtest(2557,88651
+ def akurtosistest(2582,89487
+ def anormaltest(2614,90758
+ def aitemfreq(2637,91472
+ def ascoreatpercentile 2653,91966
+ def apercentileofscore 2669,92481
+ def ahistogram 2684,93043
+ def acumfreq(2723,94846
+ def arelfreq(2737,95337
+ def aobrientransform(2755,95946
+ def asamplevar 2793,97176
+ def asamplestdev 2821,98097
+ def asignaltonoise(2834,98602
+ def avar 2849,99083
+ def astdev 2874,99893
+ def asterr 2887,100390
+ def asem 2903,101002
+ def az 2926,101754
+ def azs 2938,102021
+ def azmap 2951,102275
+ def around(2968,102767
+     def ar(2975,102950
+ def athreshold(2999,103553
+ def atrimboth 3016,104151
+ def atrim1 3033,104727
+ def acovariance(3056,105544
+ def acorrelation(3070,105908
+ def apaired(3082,106169
+ def apearsonr(3146,108816
+ def aspearmanr(3167,109493
+ def apointbiserialr(3189,110198
+ def akendalltau(3219,111350
+ def alinregress(3254,112310
+ def attest_1samp(3295,113662
+ def attest_ind 3325,114732
+ def attest_rel 3376,116642
+ def achisquare(3426,118598
+ def aks_2samp 3444,119207
+ def amannwhitneyu(3484,120346
+ def atiecorrect(3512,121477
+ def aranksums(3538,122183
+ def awilcoxont(3559,122716
+ def akruskalwallish(3590,123641
+ def afriedmanchisquare(3626,124808
+ def achisqprob(3655,125864
+    def ex(3664,126180
+ def aerfcc(3737,128572
+ def azprob(3751,129060
+    def yfunc(3762,129440
+    def wfunc(3773,129943
+ def aksprob(3790,130603
+ def afprob 3831,132087
+ def abetacf(3845,132601
+ def agammln(3897,134034
+ def abetai(3918,134606
+ def aglm(3963,136106
+ def aF_oneway(3997,137213
+ def aF_value 4032,138218
+ def outputfstats(4043,138642
+ def F_value_multivariate(4061,139288
+ def asign(4083,140139
+ def asum 4095,140445
+ def acumsum 4133,141804
+ def ass(4156,142521
+ def asummult 4174,143181
+ def asquare_of_sums(4191,143810
+ def asumdiffsquared(4212,144546
+ def ashellsort(4229,145132
+ def arankdata(4255,145966
+ def afindwithin(4280,146696
+
+stimlib.py,0
+
+tario.py,20
+def tarfile(17,298
+
+userdpy.py,1380
+class UserDisplay:44,980
+	def __init__(45,999
+	def hide(226,6602
+	def note(229,6645
+	def _placenote(252,7369
+	def help(263,7696
+	def deltags(281,8184
+	def eye_clear(286,8279
+	def eye_at(294,8478
+	def showsprites(318,9181
+	def fb2can(323,9337
+	def can2fb(329,9487
+	def _drawaxis(335,9650
+	def clearbox(396,11400
+	def setbox(399,11447
+	def drawbox(410,11772
+	def _key(437,12589
+	def addpoint(487,13903
+	def deletepoint(495,14204
+	def querypoint(516,14726
+	def clearpoints(535,15165
+	def savepoints(542,15329
+	def loadpoints(555,15686
+	def loadpoints_ascii(583,16357
+	def getpoints(621,17160
+	def _phototoggle(632,17404
+	def _mouse_motion(635,17477
+	def _mouse_enter(643,17697
+	def _mouse_leave(646,17754
+	def display(649,17791
+	def icon(693,19050
+	def texticon(722,19868
+	def _showfidmarks(735,20253
+	def fidinfo(758,20876
+	def loadfidmarks(822,22575
+	def savefidmarks(847,23235
+	def _redrawfidmarks(867,23741
+	def _putfidmark(876,23927
+	def _clearfidmarks(895,24511
+	def _clearfidmark(898,24567
+	def _movefidmarks(934,25404
+	def _scalefidmarks(943,25611
+	def _fixset(958,25997
+	def _fixzero(979,26546
+	def _fixxy(982,26602
+	def set_taskpopup(993,26888
+	def do_taskpopup(1001,27136
+	def do_popup(1007,27278
+	def bind_but3(1013,27408
+	def invoke_but3(1017,27492
+class FID:1022,27583
+	def __init__(1023,27594
+	def _load(1033,27791
+
+userparams.py,95
+class Config:23,417
+	def __init__(24,431
+	def get(27,491
+	def set(33,589
+	def load(38,722
+
+vectorops.py,235
+def find(29,516
+def mean(38,761
+def std(44,911
+def sem(53,1158
+def zeros(62,1338
+def diff(68,1504
+def diff2(74,1647
+def smooth1(80,1779
+def smooth(91,2060
+def decimate(107,2367
+def sparseness(113,2536
+def nanround(124,2829
+
+viewmat.py,336
+def save_ppm(36,786
+def array2ppm(51,1093
+def _preprocess(71,1813
+def tk_root(107,2958
+class PILImage(117,3163
+    def __init__(118,3194
+class PPMImage(133,3823
+    def __init__(134,3854
+class _ThreadedTk(144,4273
+    def __init__(145,4300
+    def done(149,4410
+    def run(152,4454
+def view(166,5048
+def cleanup(192,5672

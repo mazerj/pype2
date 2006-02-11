@@ -1,0 +1,168 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>HappyDoc Source Documentation: happydoclib.parseinfo</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">HappyDoc Source Documentation: happydoclib.parseinfo</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>Extract information from a Python code parse tree.</h3>
+<p>    This module is based on the Demos/parser/example.py module
+    distributed with the Python source distribution.</p>
+<h4>  File-specific Parser Configuration Values</h4>
+<p>    Parameters to the HappyDoc Parser can also be embedded within the
+    first comment block of the module.  The parameter values
+    recognized and their meanings are listed below.</p>
+<p>    To provide file-specific parser configuration settings, any Python
+    code can be embedded in the comments of the file.  For example:
+<pre>
+      #!/usr/bin/env python
+      #
+      # HappyDoc:# These variables should be discovered.
+      # HappyDoc:TestInt=1
+      # HappyDoc:TestString="String"
+      # HappyDoc:TestStringModule=string.strip(' this has spaces in front and back ')
+      # HappyDoc:url=urlencode({'a':'A', 'b':'B'})
+      # HappyDoc:docStringFormat='StructuredText'
+</pre>
+</p>
+<p>    All lines beginning with the pattern "'# HappyDoc:'" will be
+    concatenated (separated by newlines) and <code>execed</code>.  The local
+    namespace resulting from the execution of the code will be
+    examined for variables of interest to the parser.  The incoming
+    global namespace for the configuration code will have a few
+    pre-populated names for convenience.</p>
+<h5>    Pre-defined Globals</h5>
+<table border="1" cellpadding="2">
+<tr>
+<th colspan="1" align="left" valign="middle"><p> Name             </p>
+</th>
+<th colspan="1" align="left" valign="middle"><p>  Description                                   </p>
+</th>
+</tr>
+<tr>
+<td colspan="1" align="left" valign="middle"><p> string           </p>
+</td>
+<td colspan="1" align="left" valign="middle"><p>  The <code>string</code> module.                          </p>
+</td>
+</tr>
+<tr>
+<td colspan="1" align="left" valign="middle"><p> urlquote         </p>
+</td>
+<td colspan="1" align="left" valign="middle"><p>  Same as <code>urllib.quote</code> function.              </p>
+</td>
+</tr>
+<tr>
+<td colspan="1" align="left" valign="middle"><p> urlencode        </p>
+</td>
+<td colspan="1" align="left" valign="middle"><p>  Same as <code>urllib.urlencode</code> function.          </p>
+</td>
+</tr>
+</table>
+<h5>    Recognized Parser Configuration Variables</h5>
+<table border="1" cellpadding="2">
+<tr>
+<th colspan="1" align="left" valign="middle"><p> Parameter        </p>
+</th>
+<th colspan="1" align="left" valign="middle"><p>  Description                                   </p>
+</th>
+</tr>
+<tr>
+<td colspan="1" align="left" valign="top"><p> docStringFormat  </p>
+</td>
+<td colspan="1" align="left" valign="middle"><p>  The name of the format for the <code>__doc__</code>      
+  strings in the module.  This value is used    
+  to determine the docstring converter which    
+  will know how to translate the docstrings in  
+  the module.                                   </p>
+</td>
+</tr>
+</table>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Modules and Packages">Modules and Packages</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h4>HappyDoc-r2_1/happydoclib/parseinfo/</h4>
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="__init__.html">parseinfo</a></p></td><td valign="top" align="left">
+<p>Extract information from a Python code parse tree.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="classinfo.html">classinfo</a></p></td><td valign="top" align="left">
+<p>Gather information about a Python class from its parse tree.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="functioninfo.html">functioninfo</a></p></td><td valign="top" align="left">
+<p>Gather information about a function or method definition.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="imports.html">imports</a></p></td><td valign="top" align="left">
+<p>Collects info about imports for a module.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="moduleinfo.html">moduleinfo</a></p></td><td valign="top" align="left">
+<p>Information gatherer for source code modules.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="suite.html">suite</a></p></td><td valign="top" align="left">
+<p>Base class for information gathering classes.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="utils.html">utils</a></p></td><td valign="top" align="left">
+<p>Utility functions for parseinfo package.</p>
+</td></tr>
+</table>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:40 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

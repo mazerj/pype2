@@ -1,0 +1,1348 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Class: HappyFormatterBase</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Class: HappyFormatterBase</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/happyformatter.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>Base class for HappyDoc formatters.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Methods">Methods</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+
+            <table border="0" cellspacing="2" cellpadding="2" width="100%">
+              <tr>
+            <td align="LEFT" valign="TOP">
+<a href="#__init__">__init__</a><br>
+<a href="#_popListContext">_popListContext</a><br>
+<a href="#_pushListContext">_pushListContext</a><br>
+<a href="#_requiredOfSubclass">_requiredOfSubclass</a><br>
+<a href="#_unquoteString">_unquoteString</a><br>
+<a href="#closeOutput">closeOutput</a><br>
+<a href="#comment">comment</a><br>
+<a href="#descriptiveListFooter">descriptiveListFooter</a><br>
+<a href="#descriptiveListHeader">descriptiveListHeader</a><br>
+<a href="#descriptiveListItem">descriptiveListItem</a><br>
+<a href="#dividingLine">dividingLine</a><br>
+<a href="#fileFooter">fileFooter</a><br>
+<a href="#fileHeader">fileHeader</a><br>
+<a href="#fixUpOutputFilename">fixUpOutputFilename</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#formatCode">formatCode</a><br>
+<a href="#formatKeyword">formatKeyword</a><br>
+<a href="#getFullOutputNameForObject">getFullOutputNameForObject</a><br>
+<a href="#getInternalReference">getInternalReference</a><br>
+<a href="#getNameForInfoSource">getNameForInfoSource</a><br>
+<a href="#getNamedReference">getNamedReference</a><br>
+<a href="#getOutputNameForFile">getOutputNameForFile</a><br>
+<a href="#getOutputNameForObject">getOutputNameForObject</a><br>
+<a href="#getPythonReference">getPythonReference</a><br>
+<a href="#getReference">getReference</a><br>
+<a href="#itemFooter">itemFooter</a><br>
+<a href="#itemHeader">itemHeader</a><br>
+<a href="#listFooter">listFooter</a><br>
+<a href="#listHeader">listHeader</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#listItem">listItem</a><br>
+<a href="#openOutput">openOutput</a><br>
+<a href="#popSectionLevel">popSectionLevel</a><br>
+<a href="#pushSectionLevel">pushSectionLevel</a><br>
+<a href="#sectionFooter">sectionFooter</a><br>
+<a href="#sectionHeader">sectionHeader</a><br>
+<a href="#supportedOptions">supportedOptions</a><br>
+<a href="#writeCode">writeCode</a><br>
+<a href="#writeRaw">writeRaw</a><br>
+<a href="#writeText">writeText</a><br>
+</td>
+</tr>
+            </table>
+            
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="__init__"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">__init__&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+__init__ (
+        self,
+        docSet,
+        pythonLibDoc='http://www.python.org/doc/current/lib',
+        **extraNamedParameters,
+        )
+
+</pre></font>
+
+<h3>Initialize the output formatter.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>            <code>docSet</code></dt>
+<dd>documentation set controlling this formatter</dd>
+<dt>            <code>pythonLibDoc</code></dt>
+<dd>Base of URL for Python library
+            documentation.  Defaults to
+            <code>http://www.python.org/doc/current/lib</code>.</dd>
+<dt>            <code>extraNamedParameters</code></dt>
+<dd>Parameters specified by name
+            which were not interpreted by a subclass initialization.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_popListContext"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_popListContext&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_popListContext ( self )
+
+</pre></font>
+
+<p>Remove context from the list context stack.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_pushListContext"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_pushListContext&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_pushListContext ( self,  resetCurrentContext )
+
+</pre></font>
+
+<p>Add to the list context for nested lists.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_requiredOfSubclass"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_requiredOfSubclass&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_requiredOfSubclass ( self,  name )
+
+</pre></font>
+
+<p>Convenient way to raise a consistent exception.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Exceptions">Exceptions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+AttributeError( '%s is not implemented for this class.' % name, self.__class__.__name__ )<br>
+
+</td></tr>
+</table>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_unquoteString"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_unquoteString&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_unquoteString ( self,  str )
+
+</pre></font>
+
+<p>Remove surrounding quotes from a string.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="closeOutput"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">closeOutput&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+closeOutput ( self,  output )
+
+</pre></font>
+
+<p>Close the output handle.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="comment"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">comment&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+comment (
+        self,
+        text,
+        output,
+        )
+
+</pre></font>
+
+<p>Output text as a comment, if the output format supports comments.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="descriptiveListFooter"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">descriptiveListFooter&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+descriptiveListFooter ( self,  output )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="descriptiveListHeader"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">descriptiveListHeader&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+descriptiveListHeader (
+        self,
+        output,
+        title,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="descriptiveListItem"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">descriptiveListItem&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+descriptiveListItem (
+        self,
+        output,
+        item,
+        description,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="dividingLine"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">dividingLine&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+dividingLine (
+        self,
+        output,
+        fill='-',
+        span=80,
+        )
+
+</pre></font>
+
+<h3>Output a sectional dividing line.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>            output</dt>
+<dd>destination for written output</dd>
+<dt>            fill=&quot;-&quot;</dt>
+<dd>character to use to draw the line</dd>
+<dt>            span=80</dt>
+<dd>horizontal width of line to draw</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="fileFooter"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">fileFooter&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+fileFooter ( self,  output )
+
+</pre></font>
+
+<p>Write the file footer to the output stream.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="fileHeader"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">fileHeader&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+fileHeader (
+        self,
+        title1,
+        title2=None,
+        output=None,
+        )
+
+</pre></font>
+
+<p>Write the title and subtitle header to an open file.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="fixUpOutputFilename"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">fixUpOutputFilename&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+fixUpOutputFilename ( self,  filename )
+
+</pre></font>
+
+<h3>Tweak the filename to meet formatter-specific requirements.</h3>
+<p>        The default behavior is to return the same value.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="formatCode"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">formatCode&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+formatCode (
+        self,
+        text,
+        textFormat,
+        )
+
+</pre></font>
+
+<p>Format <code>text</code> as source code and return the new string.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="formatKeyword"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">formatKeyword&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+formatKeyword ( self,  text )
+
+</pre></font>
+
+<p>Format <code>text</code> as a keyword and return the new string.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getFullOutputNameForObject"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getFullOutputNameForObject&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getFullOutputNameForObject ( self,  infoObject )
+
+</pre></font>
+
+<p>Get the full name, including path, to the object being output.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getInternalReference"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getInternalReference&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getInternalReference ( self,  infoSource )
+
+</pre></font>
+
+<h3>Return a reference to infoSource within an open documentation node.</h3>
+<p>        Return a string containing a reference which points to the
+        documentation for an object from the current node.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getNameForInfoSource"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getNameForInfoSource&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getNameForInfoSource ( self,  infoSource )
+
+</pre></font>
+
+<p>Return the name for an infoSource.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getNamedReference"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getNamedReference&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getNamedReference (
+        self,
+        infoSource,
+        name,
+        relativeSource,
+        )
+
+</pre></font>
+
+<h3>Return a reference from relativeSource to name within infoSource.</h3>
+<p>        Return a string containing a reference which points to the
+        documentation for <code>name</code> from the node located at
+        <code>relativeSource</code>.  The <code>relativeSource</code> parameter is a string
+        naming a node from which the reference should work.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getOutputNameForFile"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getOutputNameForFile&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getOutputNameForFile ( self,  filename )
+
+</pre></font>
+
+<p>Return the base name of the thing to which output should be
+        written for a file.  This is usually a file name, but could be
+        anything understood by the formatter as a name.  If infoObject
+        is None, return the name for a root node for this formatter.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getOutputNameForObject"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getOutputNameForObject&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getOutputNameForObject ( self,  infoObject )
+
+</pre></font>
+
+<p>Return the base name of the thing to which output should be written
+        for an info source.  This is usually a file name, but could
+        be anything understood by the formatter as a name.  If
+        infoObject is None, return the name for a root node for this
+        formatter.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getPythonReference"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getPythonReference&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getPythonReference ( self,  moduleName )
+
+</pre></font>
+
+<h3>Return a reference pointing to Python.org.</h3>
+<p>        Return a reference to the standard documentation for a
+        standard Python library module on http://www.python.org.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getReference"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getReference&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getReference (
+        self,
+        infoSource,
+        relativeSource,
+        name=None,
+        )
+
+</pre></font>
+
+<h3>Return a reference from relativeSource to infoSource.</h3>
+<p>        Return a string containing a reference which points to the
+        documentation for an object from the node located at
+        relativeSource.  The relativeSource parameter is a string
+        naming a node from which the reference should work.</p>
+<h4>        Parameters</h4>
+<dl>
+<dt>          infoSource</dt>
+<dd>Documentation, target of reference.</dd>
+<dt>          relativeSource</dt>
+<dd>Start point of reference</dd>
+<dt>          name=None</dt>
+<dd>Name to use in the reference, if supported and
+                       supplied.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="itemFooter"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">itemFooter&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+itemFooter ( self,  output )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="itemHeader"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">itemHeader&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+itemHeader (
+        self,
+        output,
+        title,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="listFooter"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">listFooter&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+listFooter ( self,  output )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="listHeader"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">listHeader&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+listHeader (
+        self,
+        output,
+        title,
+        allowMultiColumn=1,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="listItem"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">listItem&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+listItem (
+        self,
+        output,
+        text,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="openOutput"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">openOutput&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+openOutput (
+        self,
+        name,
+        title1,
+        title2=None,
+        )
+
+</pre></font>
+
+<p>Open the named output destination and give a title and subtitle.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="popSectionLevel"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">popSectionLevel&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+popSectionLevel ( self,  output )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="pushSectionLevel"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">pushSectionLevel&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+pushSectionLevel ( self,  output )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="sectionFooter"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">sectionFooter&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+sectionFooter ( self,  output )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="sectionHeader"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">sectionHeader&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+sectionHeader (
+        self,
+        output,
+        title,
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="supportedOptions"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">supportedOptions&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+supportedOptions ( self )
+
+</pre></font>
+
+<p>Returns a dictionary of option names and descriptions.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="writeCode"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">writeCode&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+writeCode (
+        self,
+        text,
+        textFormat,
+        output,
+        )
+
+</pre></font>
+
+<p>Write the text to the output formatted as source code.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="writeRaw"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">writeRaw&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+writeRaw (
+        self,
+        text,
+        output,
+        )
+
+</pre></font>
+
+<p>Write the unaltered text to the output destination.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="writeText"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">writeText&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+writeText (
+        self,
+        text,
+        output,
+        textFormat,
+        quote=1,
+        )
+
+</pre></font>
+
+<h3>Write the text to the output destination.</h3>
+<h4>        Arguments</h4>
+<dl>
+<dt>            <code>text</code></dt>
+<dd>text to output</dd>
+<dt>            <code>output</code></dt>
+<dd>output file object</dd>
+<dt>            <code>textFormat</code></dt>
+<dd>String identifying the format of <code>text</code> so
+            the formatter can use a docstring converter to convert the
+            body of <code>text</code> to the appropriate output format.</dd>
+<dt>            <code>quote=1</code></dt>
+<dd>Boolean option to control whether the text
+            should be quoted to escape special characters.</dd>
+</dl>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:23 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

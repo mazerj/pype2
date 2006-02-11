@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.uid.ObjectUID</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.uid-module.html">Module&nbsp;uid</a> ::
+        Class&nbsp;ObjectUID
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.uid.ObjectUID-class.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.uid.ObjectUID-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class ObjectUID</h2>
+
+<pre class="base-tree">
+<a href="epydoc.uid.UID-class.html"><code>UID</code></a> --+
+      |
+     <b>ObjectUID</b>
+</pre><br />
+
+<hr/>
+
+A globally unique identifier used to refer to a Python object.
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__init__"></a><span class="summary-sig"><span class="summary-sig-name">__init__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>object</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__eq__"></a><span class="summary-sig"><span class="summary-sig-name">__eq__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>other</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__hash__"></a><span class="summary-sig"><span class="summary-sig-name">__hash__</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#cls" class="summary-sig-name"><code>cls</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the class that contains the object identified by this UID; 
+or <code>None</code> if the object identified by this UID is not part of 
+a class.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#descendant_of" class="summary-sig-name"><code>descendant_of</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>ancestor</span>)</span></code>
+<br />
+Return true if the object identified by this UID is a descendant of 
+<code>ancestor</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>int</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#id" class="summary-sig-name"><code>id</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the Python internal identifier for this UID's object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_builtin_function" class="summary-sig-name"><code>is_builtin_function</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a builtin function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_builtin_method" class="summary-sig-name"><code>is_builtin_method</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a builtin method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_class" class="summary-sig-name"><code>is_class</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a class or a type.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="is_classmethod"></a><span class="summary-sig"><span class="summary-sig-name">is_classmethod</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_function" class="summary-sig-name"><code>is_function</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_method" class="summary-sig-name"><code>is_method</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_module" class="summary-sig-name"><code>is_module</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a module or a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_package" class="summary-sig-name"><code>is_package</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_property" class="summary-sig-name"><code>is_property</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a property.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_routine" class="summary-sig-name"><code>is_routine</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a function, a method, a builtin function, 
+or a builtin method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="is_staticmethod"></a><span class="summary-sig"><span class="summary-sig-name">is_staticmethod</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_type" class="summary-sig-name"><code>is_type</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a type.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#is_variable" class="summary-sig-name"><code>is_variable</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is the UID for a variable.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#module" class="summary-sig-name"><code>module</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the module that contains the object identified by this UID; 
+or <code>None</code> if the object identified by this UID is a module or 
+a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#name" class="summary-sig-name"><code>name</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the globally unique name for this identifier.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#package" class="summary-sig-name"><code>package</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the package that contains the object identified by this 
+UID; or <code>None</code> if the object identified by this UID is not 
+part of a package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#parent" class="summary-sig-name"><code>parent</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the object that contains the object identified by this UID; 
+or <code>None</code> if the object identified by this UID is not 
+contained by any other object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#shortname" class="summary-sig-name"><code>shortname</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the short name for this UID.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        any
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid.ObjectUID-class.html#value" class="summary-sig-name"><code>value</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the value of the object or variable specified by this UID.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_findname"></a><span class="summary-sig"><span class="summary-sig-name">_findname</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.uid.UID-class.html"><code>UID</code></a>:</b>
+      <a href="epydoc.uid.UID-class.html#__cmp__"><code>__cmp__</code></a>, 
+      <a href="epydoc.uid.UID-class.html#__repr__"><code>__repr__</code></a>, 
+      <a href="epydoc.uid.UID-class.html#__str__"><code>__str__</code></a>, 
+      <a href="epydoc.uid.UID-class.html#is_any_function"><code>is_any_function</code></a>, 
+      <a href="epydoc.uid.UID-class.html#is_any_method"><code>is_any_method</code></a>, 
+      <a href="epydoc.uid.UID-class.html#is_private"><code>is_private</code></a>, 
+      <a href="epydoc.uid.UID-class.html#is_public"><code>is_public</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Instance Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.uid.ObjectUID-class.html#_id"><code>_id</code></a></b>: The python identifier of the object (or of its underlying function for 
+methods).</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.uid.UID-class.html"><code>UID</code></a>:</b>
+      <a href="../private/epydoc.uid.UID-class.html#_name"><code>_name</code></a>, 
+      <a href="../private/epydoc.uid.UID-class.html#_public"><code>_public</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Class Variable Summary</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.uid.UID-class.html"><code>UID</code></a>:</b>
+      <a href="../private/epydoc.uid.UID-class.html#_ids"><code>_ids</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="cls"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">cls</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the class that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is not part of a class.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#cls"><code>epydoc.uid.UID.cls</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="descendant_of"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">descendant_of</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>ancestor</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>ancestor</b></code> -
+         The UID of the potential ancestor.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if the object identified by this UID is a descendant of 
+        <code>ancestor</code>. <i class="math">d</i> is a descendant of 
+        <i class="math">a</i> if <i class="math">d</i>=<i 
+        class="math">a</i>; or if <i class="math">d</i> is a descendent 
+        of an object contained by <i class="math">a</i>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#descendant_of"><code>epydoc.uid.UID.descendant_of</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="id"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">id</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        the Python internal identifier for this UID's object.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_builtin_function"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_builtin_function</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a builtin function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_builtin_function"><code>epydoc.uid.UID.is_builtin_function</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_builtin_method"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_builtin_method</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a builtin method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_builtin_method"><code>epydoc.uid.UID.is_builtin_method</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_class"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_class</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a class or a type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_class"><code>epydoc.uid.UID.is_class</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_function"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_function</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_function"><code>epydoc.uid.UID.is_function</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_method"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_method</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_method"><code>epydoc.uid.UID.is_method</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_module"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_module</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a module or a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_module"><code>epydoc.uid.UID.is_module</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_package"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_package</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_package"><code>epydoc.uid.UID.is_package</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_property"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_property</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a property.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_property"><code>epydoc.uid.UID.is_property</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_routine"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_routine</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a function, a method, a builtin 
+        function, or a builtin method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_routine"><code>epydoc.uid.UID.is_routine</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_type"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_type</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_type"><code>epydoc.uid.UID.is_type</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_variable"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_variable</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this is the UID for a variable.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#is_variable"><code>epydoc.uid.UID.is_variable</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="module"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">module</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the module that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is a module or a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#module"><code>epydoc.uid.UID.module</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="name"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">name</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The globally unique name for this identifier. This name 
+        consists of several pieces, joined by periods, which indicate 
+        where the object is defined. For example, the UID for this class 
+        has the name <code>'epydoc.uid.UID'</code>, since it is named 
+        <code>UID</code>, and defined in the <code>uid</code> module of 
+        the <code>epydoc</code> package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#name"><code>epydoc.uid.UID.name</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="package"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">package</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the package that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is not part of a package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#package"><code>epydoc.uid.UID.package</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="parent"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">parent</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID of the object that contains the object identified by 
+        this UID; or <code>None</code> if the object identified by this 
+        UID is not contained by any other object. For methods, class 
+        variables, and instance variables, the parent is the containing 
+        class; for functions and classes, it is the containing module; 
+        and for modules, it is the containing package.
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#parent"><code>epydoc.uid.UID.parent</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="shortname"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">shortname</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The short name for this UID. A UID's short name is the last 
+        piece of its globally unique name, as returned by <a 
+        href="epydoc.uid.UID-class.html#name" 
+        class="link"><code>name</code></a>. This is typically the name 
+        that was used when definining the object. For example, the UID 
+        for this class has the name <code>'UID'</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#shortname"><code>epydoc.uid.UID.shortname</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="value"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">value</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The value of the object or variable specified by this UID.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=any)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.uid.UID-class.html#value"><code>epydoc.uid.UID.value</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_id"></a>
+<h3>_id</h3>
+The python identifier of the object (or of its underlying function for 
+methods). This is used for hashing.
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:17 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

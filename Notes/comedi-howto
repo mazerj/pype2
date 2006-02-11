@@ -1,0 +1,47 @@
+; 1. build the comedi device drivers
+
+% cd External
+
+% cd comedi-0.7.67/
+% make config
+% ./configure
+% make
+% sudo make install
+% sudo make dev
+% make distclean
+
+; 2. build the comedi libraries
+
+% cd ../comedilib-0.7.21/
+% ./configure --prefix=/usr
+% make
+; NOTE: this generates errors building the docs, ok to ignore!!
+% sudo make install
+; NOTE: this generates installing the docs, ok to ignore!!
+% sudo cp include/*.h /usr/include
+% make distclean
+% sudo depmod -a
+
+; 3. install the driver load script & add to rc.local
+
+% cd ../..
+% sudo cp load_cb_pcidas /usr/sbin
+% sudo sh -c 'echo "/usr/sbin/load_cb_pcidas" >> /etc/rc.d/rc.local'
+% sudo ./load_cb_pcidas
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+notes on loading the comedi device drivers for PCI and ISA cards
+
+ISA CARD:
+  sudo modprobe /dev/comedi0 das16
+  sudo /usr/sbin/comedi_config /dev/comedi0 cio-das1602/12 0x260
+
+
+PCI CARD:
+  sudo modprobe /dev/comedi0 cb_pcidas
+  sudo /usr/sbin/comedi_config /dev/comedi0 cb_pcidas <bus,dev>
+
+  note: get <bus,dev> from cat /proc/pci

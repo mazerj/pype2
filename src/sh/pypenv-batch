@@ -1,0 +1,7 @@
+#!/bin/csh -f
+
+set cmd=$1 ; shift
+
+foreach f ($*)
+  pypenv $cmd $f
+end

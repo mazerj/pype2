@@ -1,0 +1,54 @@
+                                                      -*- indented-text -*-
++=========================================================================+
+|                          DEVELOPMENT HISTORY                            |
+`========================================================================='
+
+                  Project: `ezV24'
+                   Author: Joerg Desch
+          Current Release: 0.0.3-pre
+		  Licence: LGPL
+
+           Used Libraries: POSIX
+                 Compiler: ANSI-C
+
++=========================================================================+
+|            Copyright   (c) Jörg Desch <jd@die-deschs.de>                |
+`========================================================================='
+
+
+15.11.2001 jd
+
+	* ezV24.h: include stdlib.h to get the definition of size_t.
+	* Add some rudimentary support for the Cygwin 1.3.x toolchain. I know
+	  it could be much better, but I'm no windoze-guy.
+
+13.11.2001 jd
+
+	* Makefile: add support to build static libraries.
+
+18.10.2001 jd
+
+	* test-v24.c: minor fixes
+	* ezV24.c: v24Gets() miss the `end of string', if there are following
+	  characters! In this case, the read() fetch the `end of string' and
+	  it isn't the last char in the buffer.
+	* Makefile: the install-rule detect existing links now.
+
+25.9.2001 jd
+
+	* Release 0.0.2
+	* finished the documentation using DOC++ (http://docpp.sourceforge.net)
+
+18.9.2001 jd
+
+	* start documenting the header.
+	* minor typo's fixed.
+
+20.8.2001 jd
+
+	* Release 0.0.1: first release to some testers
+
+
++=========================================================================+
+| END OF FILE                                                             |
+`========================================================================='

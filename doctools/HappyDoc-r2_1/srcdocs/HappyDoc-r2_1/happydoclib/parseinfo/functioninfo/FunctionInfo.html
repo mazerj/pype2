@@ -1,0 +1,520 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Class: FunctionInfo</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Class: FunctionInfo</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/parseinfo/functioninfo.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>Gather information about a function or method definition.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Base Classes">Base Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+SuiteInfoBase<br>
+<a href="SuiteFuncInfo.html">SuiteFuncInfo</a><br>
+
+</td></tr>
+</table>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Methods">Methods</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+
+            <table border="0" cellspacing="2" cellpadding="2" width="100%">
+              <tr>
+            <td align="LEFT" valign="TOP">
+<a href="#__init__">__init__</a><br>
+<a href="#_constructParameterInfo">_constructParameterInfo</a><br>
+<a href="#_extractFunctionParameters">_extractFunctionParameters</a><br>
+<a href="#_extractThrownExceptions">_extractThrownExceptions</a><br>
+<a href="#_reconstructValueFromAtom">_reconstructValueFromAtom</a><br>
+<a href="#getExceptionInfo">getExceptionInfo</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#getExceptionNames">getExceptionNames</a><br>
+<a href="#getFullyQualifiedName">getFullyQualifiedName</a><br>
+<a href="#getParameterInfo">getParameterInfo</a><br>
+<a href="#getParameterNames">getParameterNames</a><br>
+<a href="#getReference">getReference</a><br>
+</td>
+</tr>
+            </table>
+            
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="__init__"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">__init__&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+__init__ (
+        self,
+        parent=None,
+        tree=None,
+        commentInfo={},
+        )
+
+</pre></font>
+
+<h3>Initialize the info extractor.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>            parent</dt>
+<dd>parent object for this object (e.g. Module or Function)</dd>
+<dt>            tree</dt>
+<dd>parse tree from which to extract information</dd>
+<dt>            commentInfo</dt>
+<dd>comments extracted from the source file holding
+            this module</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_constructParameterInfo"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_constructParameterInfo&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_constructParameterInfo ( self,  parameterData )
+
+</pre></font>
+
+<h3>Construct storable parameter data from a parameter list.</h3>
+<p>        Given the sequence of tuples extracted as a parameter list,
+        store the names (in order) in self._parameter_names and the
+        information about the parameter in self._parameter_info where
+        the keys are the parameter name and the info is a tuple containing:</p>
+<p>        (default_specified, default_value, default_value_type)</p>
+<h4>        Where:</h4>
+<dl>
+<dt>            default_specified</dt>
+<dd>boolean indicating whether a default value
+                                 was specified</dd>
+<dt>            default_value</dt>
+<dd>the default value given, if any</dd>
+<dt>            default_value_type</dt>
+<dd>the type of the default value (token.STRING,
+                                  token.NAME, None). A type of None means
+                                  unknown.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_extractFunctionParameters"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_extractFunctionParameters&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_extractFunctionParameters ( self,  tree )
+
+</pre></font>
+
+<p>Extract information about a function's parameters.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Exceptions">Exceptions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+'Unrecognized parse result %s in %s' %( parameters [ 1 ], parameters )<br>
+'Unrecognized parse result %s in %s' %( parameters [ 2 ], parameters )<br>
+
+</td></tr>
+</table>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_extractThrownExceptions"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_extractThrownExceptions&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_extractThrownExceptions ( self,  tree )
+
+</pre></font>
+
+<p>Return a dictionary of exception-&gt;exception_type values.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_reconstructValueFromAtom"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_reconstructValueFromAtom&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_reconstructValueFromAtom (
+        self,
+        atom,
+        trailer=[],
+        )
+
+</pre></font>
+
+<h3>Convert an atom portion of a parse tree into the value.</h3>
+<p>        If the atom represents a string, number or name</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getExceptionInfo"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getExceptionInfo&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getExceptionInfo ( self,  exceptionName )
+
+</pre></font>
+
+<h3>Returns a type value for an exception.</h3>
+<p>        The return value will be one of (token.NAME, token.STRING)
+        indicating whether the exception was thrown as a string
+        or a named object.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getExceptionNames"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getExceptionNames&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getExceptionNames ( self )
+
+</pre></font>
+
+<p>Return a list of the names of any exceptions raised by the function.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getFullyQualifiedName"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getFullyQualifiedName&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getFullyQualifiedName ( self )
+
+</pre></font>
+
+<p>Return a complete, unique, name representing this object.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getParameterInfo"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getParameterInfo&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getParameterInfo ( self,  paramName )
+
+</pre></font>
+
+<h3>Returns the info record for a parameter.</h3>
+<p>        The returned tuple consists of:</p>
+<p>        (default_specified, default_value, default_value_type)</p>
+<h4>        Where:</h4>
+<dl>
+<dt>            default_specified</dt>
+<dd>boolean indicating whether a default value
+                                 was specified</dd>
+<dt>            default_value</dt>
+<dd>the default value given, if any</dd>
+<dt>            default_value_type</dt>
+<dd>the type of the default value (token.STRING,
+                                  token.NAME, None). A type of None means
+                                  unknown.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getParameterNames"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getParameterNames&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getParameterNames ( self )
+
+</pre></font>
+
+<p>Returns a list of the names of all
+        parameters to the function, in order.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getReference"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getReference&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getReference (
+        self,
+        formatter,
+        sourceNode,
+        )
+
+</pre></font>
+
+<p>Return a reference to this function from sourceNode.</p>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:40 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

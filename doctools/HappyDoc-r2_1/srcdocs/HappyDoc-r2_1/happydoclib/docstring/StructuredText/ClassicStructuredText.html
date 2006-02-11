@@ -1,0 +1,612 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Module: ClassicStructuredText</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Module: ClassicStructuredText</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/docstring/StructuredText/ClassicStructuredText.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <p>Structured Text Manipulation</p>
+
+<p>Parse a structured text string into a form that can be used with 
+structured formats, like html.</p>
+
+<p>Structured text is text that uses indentation and simple
+symbology to indicate the structure of a document.  </p>
+
+<p>A structured string consists of a sequence of paragraphs separated by
+one or more blank lines.  Each paragraph has a level which is defined
+as the minimum indentation of the paragraph.  A paragraph is a
+sub-paragraph of another paragraph if the other paragraph is the last
+preceding paragraph that has a lower level.</p>
+
+<p>Special symbology is used to indicate special constructs:</p>
+
+<ul><li><p>A single-line paragraph whose immediately succeeding paragraphs are lower
+  level is treated as a header.</p>
+
+</li>
+<li><p>A paragraph that begins with a <code>-</code>, <code>*</code>, or <code>o</code> is treated as an
+  unordered list (bullet) element.</p>
+
+</li>
+<li><p>A paragraph that begins with a sequence of digits followed by a
+  white-space character is treated as an ordered list element.</p>
+
+</li>
+<li><p>A paragraph that begins with a sequence of sequences, where each
+  sequence is a sequence of digits or a sequence of letters followed
+  by a period, is treated as an ordered list element.</p>
+
+</li>
+<li><p>A paragraph with a first line that contains some text, followed by
+  some white-space and <code>--</code> is treated as
+  a descriptive list element. The leading text is treated as the
+  element title.</p>
+
+</li>
+<li><p>Sub-paragraphs of a paragraph that ends in the word <code>example</code> or the
+  word <code>examples</code>, or <code>::</code> is treated as example code and is output as is.</p>
+
+</li>
+<li><p>Text enclosed single quotes (with white-space to the left of the
+  first quote and whitespace or punctuation to the right of the second quote)
+  is treated as example code.</p>
+
+</li>
+<li><p>Text surrounded by <code>*</code> characters (with white-space to the left of the
+  first <code>*</code> and whitespace or punctuation to the right of the second <code>*</code>)
+  is emphasized.</p>
+
+</li>
+<li><p>Text surrounded by <code>**</code> characters (with white-space to the left of the
+  first <code>**</code> and whitespace or punctuation to the right of the second <code>**</code>)
+  is made strong.</p>
+
+</li>
+<li><p>Text surrounded by <code>_</code> underscore characters (with whitespace to the left 
+  and whitespace or punctuation to the right) is made underlined.</p>
+
+</li>
+<li><p>Text encloded by double quotes followed by a colon, a URL, and concluded
+  by punctuation plus white space, <em>or</em> just white space, is treated as a
+  hyper link. For example:</p>
+<p>    "Zope":http://www.zope.org/ is ...</p>
+
+<p>  Is interpreted as <code>&lt;a href=&quot;http://www.zope.org/&quot;&gt;Zope&lt;/a&gt; is ....</code>
+  Note: This works for relative as well as absolute URLs.</p>
+
+
+</li>
+<li><p>Text enclosed by double quotes followed by a comma, one or more spaces,
+  an absolute URL and concluded by punctuation plus white space, or just
+  white space, is treated as a hyper link. For example:</p>
+<p>    &quot;mail me&quot;, mailto:amos@digicool.com.</p>
+
+<p>  Is interpreted as <code>&lt;a href=&quot;mailto:amos@digicool.com&quot;&gt;mail me&lt;/a&gt;.</code> </p>
+
+
+</li>
+<li><p>Text enclosed in brackets which consists only of letters, digits,
+  underscores and dashes is treated as hyper links within the document.
+  For example:</p>
+<p>    As demonstrated by Smith <a href="#12">[12]</a> this technique is quite effective.</p>
+
+<p>  Is interpreted as <code>... by Smith &lt;a href=&quot;#12&quot;&gt;[12]&lt;/a&gt; this ...</code>. Together
+  with the next rule this allows easy coding of references or end notes.</p>
+
+
+</li>
+<li><p>Text enclosed in brackets which is preceded by the start of a line, two
+  periods and a space is treated as a named link. For example:</p>
+<p>    .. <a href="#12">[12]</a> &quot;Effective Techniques&quot; Smith, Joe ... </p>
+
+<p>  Is interpreted as <code>&lt;a name=&quot;12&quot;&gt;[12]&lt;/a&gt; &quot;Effective Techniques&quot; ...</code>.
+  Together with the previous rule this allows easy coding of references or
+  end notes. </p>
+
+
+</li>
+<li><p>A paragraph that has blocks of text enclosed in <code>||</code> is treated as a
+  table. The text blocks correspond to table cells and table rows are
+  denoted by newlines. By default the cells are center aligned. A cell
+  can span more than one column by preceding a block of text with an
+  equivalent number of cell separators <code>||</code>. Newlines and <code>|</code> cannot
+  be a part of the cell text. For example:</p>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+ <TR>
+  <TD ALIGN=CENTER COLSPAN=2> <strong>Ingredients</strong> </TD>
+ </TR>
+ <TR>
+  <TD ALIGN=CENTER COLSPAN=1> <em>Name</em> </TD>
+  <TD ALIGN=CENTER COLSPAN=1> <em>Amount</em> </TD>
+ </TR>
+ <TR>
+  <TD ALIGN=CENTER COLSPAN=1>Spam</TD>
+  <TD ALIGN=CENTER COLSPAN=1>10</TD>
+ </TR>
+ <TR>
+  <TD ALIGN=CENTER COLSPAN=1>Eggs</TD>
+  <TD ALIGN=CENTER COLSPAN=1>3</TD>
+ </TR>
+</TABLE></p>
+
+<p>  is interpreted as:</p>
+<PRE>
+    &amp;lt;TABLE BORDER=1 CELLPADDING=2&amp;gt;
+     &amp;lt;TR&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=2&amp;gt; &amp;lt;strong&amp;gt;Ingredients&amp;lt;/strong&amp;gt; &amp;lt;/TD&amp;gt;
+     &amp;lt;/TR&amp;gt;
+     &amp;lt;TR&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=1&amp;gt; &amp;lt;em&amp;gt;Name&amp;lt;/em&amp;gt; &amp;lt;/TD&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=1&amp;gt; &amp;lt;em&amp;gt;Amount&amp;lt;/em&amp;gt; &amp;lt;/TD&amp;gt;
+     &amp;lt;/TR&amp;gt;
+     &amp;lt;TR&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=1&amp;gt;Spam&amp;lt;/TD&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=1&amp;gt;10&amp;lt;/TD&amp;gt;
+     &amp;lt;/TR&amp;gt;
+     &amp;lt;TR&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=1&amp;gt;Eggs&amp;lt;/TD&amp;gt;
+      &amp;lt;TD ALIGN=CENTER COLSPAN=1&amp;gt;3&amp;lt;/TD&amp;gt;
+     &amp;lt;/TR&amp;gt;
+    &amp;lt;/TABLE&amp;gt;
+
+</PRE>
+
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+</li></ul>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Imported modules">Imported modules</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-re.html">re</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-regex.html">regex</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-string.html">string</a><br>
+<b>from</b> <a href="http://www.python.org/doc/current/lib/module-string.html">string</a> <b>import</b> split, join, strip, find<br>
+<b>import</b> <a href="ts_regex.html">ts_regex</a><br>
+<b>from</b> <a href="ts_regex.html">ts_regex</a> <b>import</b> gsub<br>
+
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Functions">Functions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+
+            <table border="0" cellspacing="2" cellpadding="2" width="100%">
+              <tr>
+            <td align="LEFT" valign="TOP">
+<a href="#ctag">ctag</a><br>
+<a href="#html_quote">html_quote</a><br>
+<a href="#html_with_references">html_with_references</a><br>
+<a href="#indent">indent</a><br>
+<a href="#indent_level">indent_level</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#main">main</a><br>
+<a href="#paragraphs">paragraphs</a><br>
+<a href="#reindent">reindent</a><br>
+<a href="#structure">structure</a><br>
+<a href="#untabify">untabify</a><br>
+</td>
+</tr>
+            </table>
+            
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="ctag"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">ctag&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+ctag (
+        s,
+        em=re.compile( ctag_prefix +(ctag_middle %(( &quot;*&quot;, ) * 6 ) ) + ctag_suffix ),
+        strong=re.compile( ctag_prefix +(ctag_middl2 %(( &quot;*&quot;, ) * 8 ) ) + ctag_suffix ),
+        under=re.compile( ctag_prefix +(ctag_middle %(( &quot;_&quot;, ) * 6 ) ) + ctag_suffix ),
+        code=re.compile( ctag_prefix +(ctag_middle %(( &quot;\'&quot;, ) * 6 ) ) + ctag_suffix ),
+        )
+
+</pre></font>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="html_quote"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">html_quote&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+html_quote ( v,  character_entities=(( re.compile( '&amp;' ), '&amp;amp;' ), ( re.compile( &quot;&lt;&quot; ), '&amp;lt;' ), ( re.compile( &quot;&gt;&quot; ), '&amp;gt;' ), ( re.compile( '&quot;' ), '&amp;quot;' ) ) )
+
+</pre></font>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="html_with_references"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">html_with_references&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+html_with_references ( text,  level=1 )
+
+</pre></font>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="indent"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">indent&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+indent ( aString,  indent=2 )
+
+</pre></font>
+<p>Indent a string the given number of spaces</p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="indent_level"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">indent_level&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+indent_level ( aString,  indent_space=ts_regex.compile( '\n\( *\)' ).search_group )
+
+</pre></font>
+<p>Find the minimum indentation for a string, not counting blank lines.</p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="main"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">main&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+main ()
+
+</pre></font>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="paragraphs"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">paragraphs&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+paragraphs ( list,  start )
+
+</pre></font>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="reindent"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">reindent&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+reindent (
+        aString,
+        indent=2,
+        already_untabified=0,
+        )
+
+</pre></font>
+<p>reindent a block of text, so that the minimum indent is as given</p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="structure"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">structure&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+structure ( list )
+
+</pre></font>
+<p>
+<TABLE BORDER=1 CELLPADDING=2>
+</TABLE></p>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="untabify"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">untabify&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+untabify ( aString,  indent_tab=ts_regex.compile( '\(\n\|^\)\( *\)\t' ).search_group )
+
+</pre></font>
+<p>Convert indentation tabs to spaces.</p>
+
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Classes">Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="ClassicStructuredText/HTML.html">HTML</a></p></td><td valign="top" align="left"><p>An HTML structured text formatter.</p>
+
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="ClassicStructuredText/StructuredText.html">StructuredText</a></p></td><td valign="top" align="left"><p>Model text as structured collection of paragraphs.</p>
+
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="ClassicStructuredText/Table.html">Table</a></p></td><td valign="top" align="left"></td></tr>
+</table>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:29 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

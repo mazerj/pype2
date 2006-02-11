@@ -1,0 +1,50 @@
+#!/bin/csh
+
+#
+# SDL (only if redhat version is < 9)
+#
+# This potientially installs the basic SDL libraries AND the SDL_image
+# package. Both of which are used by pype.
+#
+
+if (`../pydetect -r` == 'RH8.0') then
+  if (-e '/usr/lib/libSDL-1.2.so.0') then
+    echo SDL already installed. Skipping
+  else
+    echo Installing SDL...
+
+    set d=/tmp/$$.inst
+    mkdir $d
+    cat SDL.25-jan-2003.tgz | (cd $d; tar xfz -)
+
+    cd $d/SDL-*
+      # There's an old bug with the arts sound server that screws up
+      # pype (/tmp/mcop-USER error). If you have trouble, try using
+      # the following to build SDL:
+      #    ./configure --prefix=/usr --disable-audio
+      # otherwise, this is the right one:
+      cp /usr/share/automake-1.6/missing .
+      cp /usr/share/automake-1.6/depcomp .
+
+      ./configure --prefix=/usr
+      make
+      make install
+    cd ..
+  endif
+
+  if (-e '/usr/lib/libSDL_image-1.2.so.0') then
+    echo SDL_image already installed. Skipping
+  else
+    echo Installing SDL_image
+    cd SDL_image-*
+      ./configure --prefix=/usr
+      make
+    make install
+  endif
+  /bin/rm -rf $d
+else
+  echo "SDL install not required"
+endif
+
+exit 0
+

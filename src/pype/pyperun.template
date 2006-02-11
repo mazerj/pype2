@@ -1,0 +1,208 @@
+#!%%PYTHONEXE%%
+# -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
+
+"""
+Author
+-------------------
+James A. Mazer (mazer@socrates.berkeley.edu)
+
+Description
+-------------------
+
+Functions
+-------------------
+
+Classes
+-------------------
+
+Revision History
+-------------------
+Wed Dec 26 15:58:28 2001 mazer
+  Front end loader for "pype".  This is like the old pype shell
+  script, but it's pure python (execept that it needs root access
+  via pypeboot...
+
+  Usage:
+		pyperun [task]     -> run with gui & framebuffer
+        pyperun -s [args]  -> interactive shell (aka pypenv)
+"""
+
+import sys, posixpath, os, glob, string
+
+def pathprefix(d):
+    sys.path = [d] + sys.path
+    #debug: sys.stderr.write(' prefixed path: "%s"\n' % d)
+
+def pathpostfix(d):
+    sys.path = sys.path + [d]
+    sys.stderr.write('postfixed path: "%s"\n' % d)
+
+def script_runner(fullname):
+    """Run module as script -- script name SHOULD have .py extension!!"""
+    import imp
+
+    name = posixpath.basename(fullname)
+
+    # strip the .py off, if it's there..
+    if name[(len(name)-3):] == '.py':
+        name = name[:-3]
+
+    p = [string.join(fullname.split('/')[0:-1],'/')]
+	for path, fname in ((None, name), (None,name+'.py'),
+                        (p, name), (p,name+'.py')):
+        try:
+            if path is None:
+                fp, pathname, description = imp.find_module(fname)
+            else:
+                fp, pathname, description = imp.find_module(fname, path)
+        except ImportError:
+            continue
+
+		sys.argv[0] = pathname
+        try:
+            mod = imp.load_module('__main__', fp, pathname, description)
+        finally:
+            fp.close()
+        return 1
+    return 0
+	
+if not os.environ.has_key('HOME'):
+	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
+	sys.exit(1)
+
+# NOTE: the %% PYPEDIR %% gets expanded by the makefile...
+if not os.environ.has_key('PYPEDIR'):
+    os.environ['PYPEDIR'] = "%%PYPEDIR%%"
+    sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
+                     os.environ['PYPEDIR'])
+
+# rest of this section sets up the python search path to find
+# all the pype modules and tasks
+
+# setup the path as follows:
+#  <current directory>
+#  <.pyperc/Tasks>
+#  <.pyperc/Modules>
+#  <$PYPEDIR/Tasks>
+#  <$PYPEDIR/lib> (this used to be $PYPEDIR/Modules, but changed 14-jan-04)
+#  ...everything in original $PYTHONPATH...
+
+pd = os.environ['PYPEDIR']+'/'
+for d in ['.', pd+'Tasks', pd+'lib', pd+'Modules']:
+    pathprefix(d)
+
+
+# Fri Dec 13 17:12:22 2002 mazer
+#  -- add $PYPEDIR/lib onto LD_LIBRARY_PATH
+#     to make sure DACQ modules can pickup the
+#     eyelink shared library file..
+
+if os.environ.has_key('LD_LIBRARY_PATH'):
+    os.environ['LD_LIBRARY_PATH'] = os.environ['PYPEDIR'] + '/lib:' + \
+                                    os.environ['LD_LIBRARY_PATH']
+
+# check to see that Numeric and pygame are properly installed:
+
+from info import libinfo
+info = libinfo()
+
+if info['numeric'] is None:
+    sys.stderr.write("Error: Numeric not installed locally.\n")
+    sys.exit(1)
+
+if info['pygame'] is None:
+    sys.stderr.write("Error: pygame not installed locally.\n")
+    sys.exit(1)
+
+# now that $PYPEDIR is partially setup and pype is importable..
+
+try:
+	import pype
+except ImportError:
+    sys.stderr.write("""\
+Failed to 'import pype', $PYPEDIR is probably set incorrectly.
+If that's not the case, consider the following:
+ - new bug in pype.py
+ - some required external library (eg, Numeric or pygame) is not
+   installed properly
+   
+Note that if there's a real bug in pype.py, then you need to
+comment out the try/except clause near <import pype> in
+'pyperun.py' to unmask the error and see the error message!
+""")
+	#from pypedebug import get_traceback
+    #sys.stderr.write(" **** STACK TRACE FOLLOWS ****\n")
+    #sys.stderr.write(get_traceback())
+	sys.exit(1)
+
+
+# add the ~/.pyperc directories to the python search path
+for i in ['Tasks', 'Modules']:
+    pathprefix(pype.pyperc(i))
+
+for d in glob.glob(pype.pyperc('Tasks/*')):
+    if os.path.isdir(d):
+        pathprefix(d)
+
+# parse command line for subject info
+if len(sys.argv) > 1 and sys.argv[1][:2] == 's=':
+    try:
+        subj = string.split(sys.argv[1], '=')[1]
+    except:
+        sys.stderr.write('improper argument, try: s=<subject>\n')
+        sys.exit(1)
+
+    os.environ['SUBJECT'] = subj
+    
+    if not posixpath.exists(pype.subjectrc(None)):
+        sys.stderr.write('No subject directory for "%s".\n' % subj)
+        sys.stderr.write('Ok to make one (y or n)? ')
+        l = sys.stdin.readline()
+        if not (l[0] in 'yY'):
+            sys.exit(0)
+        os.mkdir(pype.subjectrc(None))
+        os.chown(pype.subjectrc(None), os.getuid(), os.getgid())
+
+    # consume the used argument..
+    sys.argv = sys.argv[0:1] + sys.argv[2:]
+
+if len(sys.argv) > 1 and sys.argv[1] == '-s':
+	# AHA!! We've been invoked as pypenv..
+	if len(sys.argv) == 2:
+		# interactive mode, drop into an interactive shell
+		import code
+		print "<<<<pypenv interactive python shell>>>>"
+		code.interact()
+		sys.exit(0)
+	else:
+		# clip the .../pyperun from the head of sys.argv and let
+		# script_runner() replace the -s with the module name..
+		sys.argv = sys.argv[2:]
+        #sys.stderr.write('running: %s\n' % (posixpath.basename(sys.argv[0])))
+        if script_runner(sys.argv[0]) == 0:
+            sys.stderr.write("Can't find module '%s'\n" % sys.argv[0])
+
+else:
+	# otherwise, we're in regular old pype mode:
+    #   import pype with *
+    #   then fire up the gui..
+	from pype import *
+
+	try:
+		app = PypeApp(framebuffer=1, gui=1)
+	except FatalPypeError:
+		sys.exit(1)
+
+    if len(sys.argv) > 1:
+        taskname = posixpath.splitext(sys.argv[1])[0]
+		try:
+			app.newloadtask(taskname)
+		except ImportError:
+			sys.stderr.write("%s: can't load task '%s'\n" % \
+							 (sys.argv[0], taskname))
+			sys.exit(1)
+
+    while not app.terminate:
+        app.idlefn(toplevel=1)
+	app.close()
+

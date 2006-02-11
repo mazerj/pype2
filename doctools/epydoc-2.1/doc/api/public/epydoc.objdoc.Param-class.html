@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.objdoc.Param</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.objdoc-module.html">Module&nbsp;objdoc</a> ::
+        Class&nbsp;Param
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.objdoc.Param-class.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.objdoc.Param-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class Param</h2>
+
+<hr/>
+
+The documentation for a function parameter. This documentation 
+consists of the following fields:
+<ul>
+  <li>
+    <a name="index-name"></a><i class="indexterm">name</i>: The name 
+    of the parameter
+  </li>
+  <li>
+    <a name="index-descr"></a><i class="indexterm">descr</i>: A 
+    description of the parameter
+  </li>
+  <li>
+    <a name="index-type"></a><i class="indexterm">type</i>: A 
+    description of the parameter's type
+  </li>
+  <li>
+    <a name="index-default"></a><i class="indexterm">default</i>: The 
+    parameter's default value
+  </li>
+</ul>
+<code>Param</code>s are used by <a 
+href="epydoc.objdoc.FuncDoc-class.html" 
+class="link"><code>FuncDoc</code></a> to document parameters.
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#__init__" class="summary-sig-name"><code>__init__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>name</span>,
+          <span class=summary-sig-arg>descr</span>,
+          <span class=summary-sig-arg>type</span>,
+          <span class=summary-sig-arg>default</span>)</span></code>
+<br />
+Construct the documentation for a parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__repr__"></a><span class="summary-sig"><span class="summary-sig-name">__repr__</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#default" class="summary-sig-name"><code>default</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a string representation of the parameter's default value; or 
+<code>None</code> if it has no default value.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#descr" class="summary-sig-name"><code>descr</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a description of this parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#name" class="summary-sig-name"><code>name</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the name of this parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#set_default" class="summary-sig-name"><code>set_default</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>default</span>)</span></code>
+<br />
+Set this parameter's default value.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#set_descr" class="summary-sig-name"><code>set_descr</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>descr</span>)</span></code>
+<br />
+Set this parameter's description.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#set_type" class="summary-sig-name"><code>set_type</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>type</span>)</span></code>
+<br />
+Set this parameter's type.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#type" class="summary-sig-name"><code>type</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a description of this parameter's type.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Shared Parameter Lists</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code> or <code>list</code> of <a 
+        href="epydoc.objdoc.Param-class.html" 
+        class="link"><code>Param</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#shared_descr_params" class="summary-sig-name"><code>shared_descr_params</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of <code>Param</code>s that share the description given by this 
+parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code> or <a href="epydoc.objdoc.Param-class.html" 
+        class="link"><code>Param</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#listed_under" class="summary-sig-name"><code>listed_under</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the parameter that this <code>Param</code> is listed under, if 
+any.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#set_shared_descr_params" class="summary-sig-name"><code>set_shared_descr_params</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>shared_descr_params</span>)</span></code>
+<br />
+Register a list of <code>Param</code>s that share the description 
+given by this parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.Param-class.html#remove_shared_descr_param" class="summary-sig-name"><code>remove_shared_descr_param</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>param</span>)</span></code>
+<br />
+Remove a parameter from the list of <code>Param</code>s that share the 
+description given by this parameter.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="shared_descr_params"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">shared_descr_params</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of <code>Param</code>s that share the description given 
+        by this parameter. This is used in cases where multiple 
+        parameters are descrubed in one <code>&#64;param</code> field, 
+        such as:
+<pre class="literalblock">
+   &#64;param *varargs, **kwargs: extra args for f.
+</pre>
+        <p>In this case, the description will be added to 
+        <code>varargs</code>'s <code>Param</code>; and 
+        <code>vararg</code>'s <code>Param</code> will list 
+        <code>kwargs</code> in its <code>shared_descr_params()</code> 
+        list.</p>
+        For parameters described by normal (single-parameter) 
+        <code>&#64;param</code> fields, <code>shared_descr_params</code> 
+        will return <code>None</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>None</code> or <code>list</code> of <a 
+        href="epydoc.objdoc.Param-class.html" 
+        class="link"><code>Param</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="listed_under"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">listed_under</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The parameter that this <code>Param</code> is listed under, if 
+        any. This parameter is listed under parameter <code><i 
+        class="math">p</i></code> if it contained in <code><i 
+        class="math">p</i>.shared_descr_params()</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>None</code> or <a href="epydoc.objdoc.Param-class.html" 
+        class="link"><code>Param</code></a>)</i>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <a href="epydoc.objdoc.Param-class.html#shared_descr_params" 
+class="link"><code>shared_descr_params</code></a>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="set_shared_descr_params"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">set_shared_descr_params</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>shared_descr_params</span>)</span>
+  </h3>
+  Register a list of <code>Param</code>s that share the description 
+  given by this parameter.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>shared_descr_params</b></code> -
+         The <code>Param</code>s that share the description given by 
+        this parameter
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a 
+              href="epydoc.objdoc.Param-class.html" 
+              class="link"><code>Param</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <a href="epydoc.objdoc.Param-class.html#set_shared_descr_params" 
+class="link"><code>shared_descr_params</code></a>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="remove_shared_descr_param"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">remove_shared_descr_param</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>param</span>)</span>
+  </h3>
+  Remove a parameter from the list of <code>Param</code>s that share 
+  the description given by this parameter.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>param</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.Param-class.html" 
+              class="link"><code>Param</code></a>)</i>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <a href="epydoc.objdoc.Param-class.html#shared_descr_params" 
+class="link"><code>shared_descr_params</code></a>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="__init__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__init__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>name</span>,
+          <span class=sig-arg>descr</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>type</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>default</span>=<span class=sig-default>None</span>)</span>
+    <br /><i>(Constructor)</i>
+  </h3>
+  Construct the documentation for a parameter.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>name</b></code> -
+         The name of the parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>descr</b></code> -
+         A description of this parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      <dd><code><b>type</b></code> -
+         A description of this parameter's type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      <dd><code><b>default</b></code> -
+         A string representation of the parameter's default value; or 
+        <code>None</code> if it has no default value.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="default"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">default</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string representation of the parameter's default value; or 
+        <code>None</code> if it has no default value.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="descr"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">descr</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A description of this parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="name"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">name</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The name of this parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="set_default"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">set_default</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>default</span>)</span>
+  </h3>
+  Set this parameter's default value.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>default</b></code> -
+         A string representation of the parameter's default value; or 
+        <code>None</code> if it has no default value.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code> or <code>None</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="set_descr"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">set_descr</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>descr</span>)</span>
+  </h3>
+  Set this parameter's description.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>descr</b></code> -
+         The new description of this parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="set_type"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">set_type</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>type</span>)</span>
+  </h3>
+  Set this parameter's type.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>type</b></code> -
+         The new description of this parmeter's type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="type"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">type</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A description of this parameter's type.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:12 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

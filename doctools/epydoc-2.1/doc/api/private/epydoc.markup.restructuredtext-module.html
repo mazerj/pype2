@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.markup.restructuredtext</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.markup-module.html">Package&nbsp;markup</a> ::
+        Module&nbsp;restructuredtext
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.markup.restructuredtext-module.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.markup.restructuredtext-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module epydoc.markup.restructuredtext</h2>
+
+<p>Epydoc parser for ReStructuredText strings. ReStructuredText is the 
+standard markup language used by the Docutils project. <a 
+href="epydoc.markup.restructuredtext-module.html#parse_docstring" 
+class="link"><code>parse_docstring()</code></a> provides the primary 
+interface to this module; it returns a <a 
+href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html" 
+class="link"><code>ParsedRstDocstring</code></a>, which supports all of 
+the methods defined by <a href="epydoc.markup.ParsedDocstring-class.html" 
+class="link"><code>ParsedDocstring</code></a>.</p>
+<a href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html" 
+class="link"><code>ParsedRstDocstring</code></a> is basically just a <a 
+href="epydoc.markup.ParsedDocstring-class.html" 
+class="link"><code>ParsedDocstring</code></a> wrapper for the 
+<code>docutils.nodes.document</code> class.
+<h1 class="heading">Creating <code>ParsedRstDocstring</code>s</h1>
+  <code>ParsedRstDocstring</code>s are created by the 
+  <code>parse_document</code> function, using the 
+  <code>docutils.core.publish_string()</code> method, with the following 
+  helpers:
+  <ul>
+    <li>
+      An <a 
+      href="../private/epydoc.markup.restructuredtext._EpydocReader-class.html" 
+      class="link"><code>_EpydocReader</code></a> is used to capture all 
+      error messages as it parses the docstring.
+    </li>
+    <li>
+      A <a 
+      href="../private/epydoc.markup.restructuredtext._DocumentPseudoWriter-class.html" 
+      class="link"><code>_DocumentPseudoWriter</code></a> is used to 
+      extract the document itself, without actually writing any output. 
+      The document is saved for further processing. The settings for the 
+      writer are copied from 
+      <code>docutils.writers.html4css1.Writer</code>, since those 
+      settings will be used when we actually write the docstring to 
+      html.
+    </li>
+  </ul>
+<h1 class="heading">Using <code>ParsedRstDocstring</code>s</h1>
+  <code>ParsedRstDocstring</code>s support all of the methods defined 
+  by <code>ParsedDocstring</code>; but only the following four methods 
+  have non-default behavior:
+  <ul>
+    <li>
+      <a 
+      href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html#to_html" 
+      class="link"><code>to_html()</code></a> uses an <a 
+      href="../private/epydoc.markup.restructuredtext._EpydocHTMLTranslator-class.html" 
+      class="link"><code>_EpydocHTMLTranslator</code></a> to translate 
+      the <code>ParsedRstDocstring</code>'s document into an HTML 
+      segment.
+    </li>
+    <li>
+      <a 
+      href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html#split_fields" 
+      class="link"><code>split_fields()</code></a> uses a <a 
+      href="../private/epydoc.markup.restructuredtext._SplitFieldsTranslator-class.html" 
+      class="link"><code>_SplitFieldsTranslator</code></a> to divide the 
+      <code>ParsedRstDocstring</code>'s document into its main body and 
+      its fields. Special handling is done to account for consolidated 
+      fields.
+    </li>
+    <li>
+      <a 
+      href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html#summary" 
+      class="link"><code>summary()</code></a> uses a <a 
+      href="../private/epydoc.markup.restructuredtext._SummaryExtractor-class.html" 
+      class="link"><code>_SummaryExtractor</code></a> to extract the 
+      first sentence from the <code>ParsedRstDocstring</code>'s 
+      document.
+    </li>
+    <li>
+      <a 
+      href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html#to_plaintext" 
+      class="link"><code>to_plaintext()</code></a> uses 
+      <code>document.astext()</code> to convert the 
+      <code>ParsedRstDocstring</code>'s document to plaintext.
+    </li>
+  </ul>
+<hr/>
+<p><b>To Do:</b> Add ParsedRstDocstring.to_latex()
+</p>
+
+
+<!-- =========== START OF CLASSES =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Classes</th></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.markup.restructuredtext.ParsedRstDocstring-class.html"><code>ParsedRstDocstring</code></a></b></td>
+  <td>An encoded version of a ReStructuredText docstring.</td></tr>
+<tr><td width="15%">
+  <b><a href="../private/epydoc.markup.restructuredtext._DocumentPseudoWriter-class.html"><code>_DocumentPseudoWriter</code></a></b></td>
+  <td>A pseudo-writer for the docutils framework, that can be used to access 
+the document itself.</td></tr>
+<tr><td width="15%">
+  <b><a href="../private/epydoc.markup.restructuredtext._EpydocHTMLTranslator-class.html"><code>_EpydocHTMLTranslator</code></a></b></td>
+  <td>&nbsp;</td></tr>
+<tr><td width="15%">
+  <b><a href="../private/epydoc.markup.restructuredtext._EpydocReader-class.html"><code>_EpydocReader</code></a></b></td>
+  <td>A reader that captures all errors that are generated by parsing, and 
+appends them to a list.</td></tr>
+<tr><td width="15%">
+  <b><a href="../private/epydoc.markup.restructuredtext._SplitFieldsTranslator-class.html"><code>_SplitFieldsTranslator</code></a></b></td>
+  <td>A docutils translator that removes all fields from a document, and 
+collects them into the instance variable <code>fields</code></td></tr>
+<tr><td width="15%">
+  <b><a href="../private/epydoc.markup.restructuredtext._SummaryExtractor-class.html"><code>_SummaryExtractor</code></a></b></td>
+  <td>A docutils node visitor that extracts the first sentence from the 
+first paragraph in a document.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>ParsedDocstring</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.restructuredtext-module.html#parse_docstring" class="summary-sig-name"><code>parse_docstring</code></a>(<span class=summary-sig-arg>docstring</span>,
+          <span class=summary-sig-arg>errors</span>,
+          <span class="summary-sig-kwarg">**options</span>)</span></code>
+<br />
+Parse the given docstring, which is formatted using ReStructuredText; 
+and return a <a href="epydoc.markup.ParsedDocstring-class.html" 
+class="link"><code>ParsedDocstring</code></a> representation of its 
+contents.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>dict</code></font></td>
+<td><b><a href="epydoc.markup.restructuredtext-module.html#CONSOLIDATED_FIELDS"><code>CONSOLIDATED_FIELDS</code></a></b>: A dictionary encoding the set of 'consolidated fields' that can be 
+used.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="parse_docstring"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">parse_docstring</span>(<span class=sig-arg>docstring</span>,
+          <span class=sig-arg>errors</span>,
+          <span class="sig-kwarg">**options</span>)</span>
+  </h3>
+  Parse the given docstring, which is formatted using 
+  ReStructuredText; and return a <a 
+  href="epydoc.markup.ParsedDocstring-class.html" 
+  class="link"><code>ParsedDocstring</code></a> representation of its 
+  contents.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docstring</b></code> -
+         The docstring to parse
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>errors</b></code> -
+         A list where any errors generated during parsing will be 
+        stored.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a 
+              href="epydoc.markup.ParseError-class.html" 
+              class="link"><code>ParseError</code></a>)</i>
+      <dd><code><b>options</b></code> -
+         Extra options. Unknown options are ignored. Currently, no 
+        extra options are defined.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>ParsedDocstring</code></a>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="CONSOLIDATED_FIELDS"></a>
+<h3>CONSOLIDATED_FIELDS</h3>
+A dictionary encoding the set of 'consolidated fields' that can be 
+used. Each consolidated field is marked by a single tag, and contains a 
+single bulleted list, where each list item starts with an identifier, 
+marked as interpreted text (<code>`...`</code>). This module 
+automatically splits these consolidated fields into individual fields. 
+The keys of <code>CONSOLIDATED_FIELDS</code> are the names of possible 
+consolidated fields; and the values are the names of the field tags that 
+should be used for individual entries in the list.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>dict</code>
+
+      </dd>
+<span title="{'groups': 'group', 'cvariables': 'cvar', 'arguments': 'arg', 'parameters': 'param', 'exceptions': 'except', 'types': 'type', 'variables': 'var', 'keywords': 'keyword', 'ivariables': 'ivar'}">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+{'arguments': 'arg',
+ 'cvariables': 'cvar',
+ 'exceptions': 'except',
+ 'groups': 'group',
+ 'ivariables': 'ivar',
+ 'keywords': 'keyword',
+ 'parameters': 'param',
+ 'types': 'type',
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:13 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

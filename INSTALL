@@ -1,0 +1,57 @@
+*************************************************************************
+* NOTE: the INSTALL file in ./External should do all this automatically *
+*************************************************************************
+
+Simple instructions for installing pype on a new machine
+with a started redhat (typically redhat-8 in the gallant
+lab, with ALL packages installed) machine. Just follow
+the steps in order..
+
+1. make a copy of this entire source tree...work there!
+2. make sure dacq card is installed
+3. build and install comedi device drivers and comedilib:
+     (NOTE: there's something wrong with the doc/html target in the
+     comedilib-0.7.21 release such that the html generation results
+     in errors that abort the build and install. I edited Makefile.in
+     to skip building the doc files for now, so there should be no
+     errors during this process and the *.h files SHOULD get installed
+     correctly -- JAM 06-jan-2004)
+
+	cd External
+	cd comedi-0.7.66
+	make
+        >>> this now goes through the config process, make sure
+        >>> you say 'M' for the DAS boards, you can/should say 'N' for
+        >>> everything else
+        ;XXX WARNING: don't use comedi-0.7.67, something's wrong..
+	;XXX cd comedi-0.7.67
+	;XXX ./configure
+	make
+	sudo make install
+	sudo make dev
+	make distclean
+	cd ../comedilib-0.7.21
+	./configure --prefix=/usr
+	# NOTE: NEXT TWO COMMANDS MIGHT GENERATE ERRORS ON DOCS, OK TO IGNORE!!
+	make
+	sudo make install
+	# sudo cp include/*.h /usr/include
+	make distclean
+	sudo depmod -a
+	cd ../..
+	sudo cp load_cb_pcidas /usr/sbin
+	sudo sh -c 'echo "/usr/sbin/load_cb_pcidas" >> /etc/rc.d/rc.local'
+	sudo ./load_cb_pcidas
+
+4. install missing bits pype will need (Numeric, biggles/libplot,
+   pygame, current SDL snapshot, PIL):
+	   % cd External
+	   % ./INSTALL
+	   ...wait..
+	   % ./CLEAN
+5. go back to pype2 toplevel dir (cd ..) and do a complete install:
+	   % sudo ./build install wrapper clean
+
+6. check to make sure pype works -- don't forget you need a
+   ~/.pyperc/Config.<hostname> for the new machine...
+

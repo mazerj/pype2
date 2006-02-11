@@ -1,0 +1,473 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Class: FileBasedFormatter</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Class: FileBasedFormatter</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/formatter/fileformatterbase.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>A base class for file-based formatters for HappyDoc.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Base Classes">Base Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+happydoclib.happyformatter.HappyFormatterBase<br>
+
+</td></tr>
+</table>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Methods">Methods</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+
+            <table border="0" cellspacing="2" cellpadding="2" width="100%">
+              <tr>
+            <td align="LEFT" valign="TOP">
+<a href="#__init__">__init__</a><br>
+<a href="#closeOutput">closeOutput</a><br>
+<a href="#fixUpOutputFilename">fixUpOutputFilename</a><br>
+<a href="#getFilenamePrefix">getFilenamePrefix</a><br>
+<a href="#getFullOutputNameForFile">getFullOutputNameForFile</a><br>
+<a href="#getFullOutputNameForObject">getFullOutputNameForObject</a><br>
+</td>
+<td align="LEFT" valign="TOP">
+<a href="#getLocalOutputNameForObject">getLocalOutputNameForObject</a><br>
+<a href="#getOutputNameForFile">getOutputNameForFile</a><br>
+<a href="#getOutputNameForObject">getOutputNameForObject</a><br>
+<a href="#getRootNodeName">getRootNodeName</a><br>
+<a href="#openOutput">openOutput</a><br>
+</td>
+</tr>
+            </table>
+            
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="__init__"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">__init__&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+__init__ (
+        self,
+        docSet,
+        filenamePrefix='',
+        **extraNamedParameters,
+        )
+
+</pre></font>
+
+<h3>Initialize a FileBasedFormatter.</h3>
+<h4>        Parameters</h4>
+<dl>
+<dt>          docSet</dt>
+<dd>The documentation set controlling the formatter.</dd>
+<dt>          filenamePrefix</dt>
+<dd>A prefix to append to the base names of
+          files and directories being created.  This is useful for
+          situations where the names which would be automatically
+          generated might cause a name clash or conflict.</dd>
+<dt>          extraNamedParameters</dt>
+<dd>Parameters specified by name which
+          were not supported by a subclass initialization.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="closeOutput"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">closeOutput&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+closeOutput ( self,  output )
+
+</pre></font>
+
+<p>Close the output handle.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="fixUpOutputFilename"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">fixUpOutputFilename&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+fixUpOutputFilename ( self,  filename )
+
+</pre></font>
+
+<p>Tweak the filename to remove relative references
+        and add the safe prefix.<p>        Returns a relative path, but without the ./ or ../ at the
+        front.  This path will then, usually, be tacked on the end of
+        the output path to create a full path.</p>
+</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getFilenamePrefix"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getFilenamePrefix&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getFilenamePrefix ( self )
+
+</pre></font>
+
+<p>Return the filename prefix value for this formatter instance.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getFullOutputNameForFile"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getFullOutputNameForFile&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getFullOutputNameForFile ( self,  filename )
+
+</pre></font>
+
+<p>Get the full name, including path, to the filename to convert.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getFullOutputNameForObject"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getFullOutputNameForObject&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getFullOutputNameForObject ( self,  infoObject )
+
+</pre></font>
+
+<h3>Get the full name, including path, to the object being output.</h3>
+<p>        The prefix of the return value should be the output path for
+        all documentation.  The rest of the return value will be based
+        on the path to the source for the object.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getLocalOutputNameForObject"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getLocalOutputNameForObject&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getLocalOutputNameForObject ( self,  infoObject )
+
+</pre></font>
+
+<p>Return a local reference to base name of the thing to which
+        output should be written for an info source.<p>        This is usually a file name, but could be anything understood
+        by the formatter as a name.  If infoObject is None, return the
+        name for a root node for this formatter.</p>
+</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getOutputNameForFile"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getOutputNameForFile&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getOutputNameForFile ( self,  filename )
+
+</pre></font>
+
+<p>Return the base name of the thing to which output should be
+        written for a file.<p>        This is usually a file name, but could be anything understood
+        by the formatter as a name.  If infoObject is None, return the
+        name for a root node for this formatter.</p>
+</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getOutputNameForObject"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getOutputNameForObject&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getOutputNameForObject ( self,  infoObject )
+
+</pre></font>
+
+<p>Return the base name of the thing to which output should be written
+        for an info source.<p>        This is usually a file name, but could be anything understood
+        by the formatter as a name.  If infoObject is None, return the
+        name for a root node for this formatter.</p>
+</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getRootNodeName"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getRootNodeName&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getRootNodeName ( self )
+
+</pre></font>
+
+<p>Return the name of the root node for the documentation tree.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="openOutput"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">openOutput&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+openOutput (
+        self,
+        name,
+        title1,
+        title2=None,
+        )
+
+</pre></font>
+
+<p>Open the named output destination and give the title.</p>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:36 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

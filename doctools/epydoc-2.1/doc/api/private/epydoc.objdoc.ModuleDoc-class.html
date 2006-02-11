@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.objdoc.ModuleDoc</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.objdoc-module.html">Module&nbsp;objdoc</a> ::
+        Class&nbsp;ModuleDoc
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.objdoc.ModuleDoc-class.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.objdoc.ModuleDoc-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class ModuleDoc</h2>
+
+<pre class="base-tree">
+<a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a> --+
+         |
+        <b>ModuleDoc</b>
+</pre><br />
+
+<hr/>
+
+The documentation for a module or package. This documentation consists 
+of standard pieces of documentation (as defined in <a 
+href="epydoc.objdoc.ObjDoc-class.html" 
+class="link"><code>ObjDoc</code></a>), and the following module-specific 
+pieces of documentation:
+<ul>
+  <li>
+    <a name="index-classes"></a><i class="indexterm">classes</i>: A 
+    list of all classes contained in the module/package.
+  </li>
+  <li>
+    <a name="index-functions"></a><i class="indexterm">functions</i>: 
+    A list of all functions contained in the module/package.
+  </li>
+  <li>
+    <a name="index-variables"></a><i class="indexterm">variables</i>: 
+    A list of all variables contained in the module/package.
+  </li>
+  <li>
+    <a name="index-modules"></a><i class="indexterm">modules</i>: A 
+    list of all modules contained in the package (packages only).
+  </li>
+  <li>
+    <a name="index-imported_objects"></a><i class="indexterm">imported 
+    objects</i>: Lists of imported objects, sorted by type.
+  </li>
+</ul>
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__init__"></a><span class="summary-sig"><span class="summary-sig-name">__init__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>verbosity</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__repr__"></a><span class="summary-sig"><span class="summary-sig-name">__repr__</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_sort"><code>_sort</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Accessors</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#functions" class="summary-sig-name"><code>functions</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all functions defined by the module/package documented by 
+this <code>ModuleDoc</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#classes" class="summary-sig-name"><code>classes</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all classes defined by the module/package documented by this 
+<code>ModuleDoc</code>, sorted by name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#variables" class="summary-sig-name"><code>variables</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all variables defined by the module/package documented by 
+this <code>ModuleDoc</code>, sorted by name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#imported_functions" class="summary-sig-name"><code>imported_functions</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all functions contained in the module/package documented by 
+this <code>ModuleDoc</code> that are not defined by that module/package, 
+sorted by name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#imported_classes" class="summary-sig-name"><code>imported_classes</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all classes contained in the module/package documented by 
+this <code>ModuleDoc</code> that are not defined by that module/package, 
+sorted by name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#package" class="summary-sig-name"><code>package</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the package that contains the module documented by this 
+<code>ModuleDoc</code>, or <code>None</code> if no package contains the 
+module.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#ispackage" class="summary-sig-name"><code>ispackage</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this <code>ModuleDoc</code> documents a package (not a 
+module).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#ismodule" class="summary-sig-name"><code>ismodule</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this <code>ModuleDoc</code> documents a module (not a 
+package).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#modules" class="summary-sig-name"><code>modules</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of the known modules and subpackages conained in the package 
+documented by this <code>ModuleDoc</code>, sorted by name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#imported_variables" class="summary-sig-name"><code>imported_variables</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all variables contained in the module/package documented by 
+this <code>ModuleDoc</code> that are not defined by that module/package, 
+sorted by name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#imported_modules" class="summary-sig-name"><code>imported_modules</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of all modules that are imported by the module/package 
+documented by this <code>ModuleDoc</code>, sorted by name.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="epydoc.objdoc.ObjDoc-class.html#by_group"><code>by_group</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#defines_groups"><code>defines_groups</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#descr"><code>descr</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#field_values"><code>field_values</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#fields"><code>fields</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#groups"><code>groups</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#has_docstring"><code>has_docstring</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#sortorder"><code>sortorder</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#summary"><code>summary</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#uid"><code>uid</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Modifiers</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="remove_autogenerated_variables"></a><span class="summary-sig"><span class="summary-sig-name">remove_autogenerated_variables</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.ModuleDoc-class.html#add_modules" class="summary-sig-name"><code>add_modules</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>modules</span>)</span></code>
+<br />
+Register submodules for the package doumented by this 
+<code>ModuleDoc</code>.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Import Detection</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_find_defined_vars" class="summary-sig-name"><code>_find_defined_vars</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>lhs_testlist</span>,
+          <span class=summary-sig-arg>defined_variables</span>)</span></code>
+<br />
+A helper function for <a 
+href="../private/epydoc.objdoc.ModuleDoc-class.html#_find_imported_variables" 
+class="link"><code>_find_imported_variables</code></a>: for every 
+variable <code><i class="math">v</i></code> set by the given 
+left-hand-side of an equation, set <code>defined_variables[<i 
+class="math">v</i>]=1</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_find_imported_variables" class="summary-sig-name"><code>_find_imported_variables</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+If possible, read the module's python documentation, and try to figure 
+out which variables were imported.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Error Handling</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_print_errors"><code>_print_errors</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_process_field" class="summary-sig-name"><code>_process_field</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>tag</span>,
+          <span class=summary-sig-arg>arg</span>,
+          <span class=summary-sig-arg>descr</span>,
+          <span class=summary-sig-arg>warnings</span>)</span></code>
+<br />
+Process a field from this object's docstring.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Instance Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code> of <a href="epydoc.uid.Link-class.html" 
+          class="link"><code>Link</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_classes"><code>_classes</code></a></b>: A list of all classes contained in the module/package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code> of <a href="epydoc.uid.Link-class.html" 
+          class="link"><code>Link</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_functions"><code>_functions</code></a></b>: A list of all functions contained in the module/package.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code> of <a href="epydoc.uid.Link-class.html" 
+          class="link"><code>Link</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_modules"><code>_modules</code></a></b>: A list of all modules conained in the package (package only).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_variables"><code>_variables</code></a></b>: A list of all variables defined by this module/package.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_uid"><code>_uid</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Error Handling</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_field_warnings"><code>_field_warnings</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_misc_warnings"><code>_misc_warnings</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_parse_errors"><code>_parse_errors</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_parse_warnings"><code>_parse_warnings</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_descr"><code>_descr</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_fields"><code>_fields</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Class Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_EXPR_STMT_PATTERN"><code>_EXPR_STMT_PATTERN</code></a></b> = <span title="(264, (265, (266, ['expr_stmt']), (4, '')))"><code>(264,&nbsp;(265,&nbsp;(266,&nbsp;['expr_stmt']),&nbsp;(<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="../private/epydoc.objdoc.ModuleDoc-class.html#_LHS_PATTERN"><code>_LHS_PATTERN</code></a></b> = <span title="(292, (293, (294, (295, (297, (298, (299, (300, (301, (302, (303, (304, ['lhs_atom']))))))))))))"><code>(292,&nbsp;(293,&nbsp;(294,&nbsp;(295,&nbsp;(297,&nbsp;(298,&nbsp;(299,<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="epydoc.objdoc.ObjDoc-class.html#STANDARD_FIELDS"><code>STANDARD_FIELDS</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="functions"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">functions</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all functions defined by the module/package 
+        documented by this <code>ModuleDoc</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="classes"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">classes</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all classes defined by the module/package documented 
+        by this <code>ModuleDoc</code>, sorted by name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="variables"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">variables</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all variables defined by the module/package 
+        documented by this <code>ModuleDoc</code>, sorted by name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="imported_functions"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">imported_functions</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all functions contained in the module/package 
+        documented by this <code>ModuleDoc</code> that are not defined by 
+        that module/package, sorted by name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="imported_classes"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">imported_classes</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all classes contained in the module/package 
+        documented by this <code>ModuleDoc</code> that are not defined by 
+        that module/package, sorted by name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="package"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">package</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The package that contains the module documented by this 
+        <code>ModuleDoc</code>, or <code>None</code> if no package 
+        contains the module.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="ispackage"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">ispackage</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this <code>ModuleDoc</code> documents a package (not a 
+        module).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="ismodule"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">ismodule</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if this <code>ModuleDoc</code> documents a module (not a 
+        package).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="modules"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">modules</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of the known modules and subpackages conained in the 
+        package documented by this <code>ModuleDoc</code>, sorted by 
+        name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Raises:</b></dt>
+      <dd><code><b>TypeError</b></code> -
+        If this <code>ModuleDoc</code> does not document a 
+        package.
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="imported_variables"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">imported_variables</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all variables contained in the module/package 
+        documented by this <code>ModuleDoc</code> that are not defined by 
+        that module/package, sorted by name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="imported_modules"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">imported_modules</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of all modules that are imported by the module/package 
+        documented by this <code>ModuleDoc</code>, sorted by name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="add_modules"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">add_modules</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>modules</span>)</span>
+  </h3>
+  Register submodules for the package doumented by this 
+  <code>ModuleDoc</code>. This must be done externally, since we can't 
+  determine the submodules of a package through introspection alone. This 
+  is automatically called by <a 
+  href="epydoc.objdoc.DocMap-class.html#add" 
+  class="link"><code>DocMap.add</code></a> when new modules are added to 
+  a <code>DocMap</code>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>modules</b></code> -
+         A list of modules or subpackages.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_defined_vars"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_defined_vars</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>lhs_testlist</span>,
+          <span class=sig-arg>defined_variables</span>)</span>
+  </h3>
+  A helper function for <a 
+  href="../private/epydoc.objdoc.ModuleDoc-class.html#_find_imported_variables" 
+  class="link"><code>_find_imported_variables</code></a>: for every 
+  variable <code><i class="math">v</i></code> set by the given 
+  left-hand-side of an equation, set <code>defined_variables[<i 
+  class="math">v</i>]=1</code>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>lhs_testlist</b></code> -
+         An AST tuple containing a <code>testlist</code> element from 
+        the left hand side of an equation.
+      <dd><code><b>defined_variables</b></code> -
+         The output dictionary.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_imported_variables"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_imported_variables</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  If possible, read the module's python documentation, and try to 
+  figure out which variables were imported. To decide which variables 
+  were imported, we use the following heuristic: if a variable isn't 
+  defined in the lhs of a top-level statement, then it's probably 
+  imported. Note that this isn't 100% effective. E.g., if someone uses 
+  <code>global</code>, uses a <code>try</code>/<code>except</code> block, 
+  or directly modifies their modules' <code>__dict__</code>, then we'll 
+  be fooled.
+  <dl><dt></dt><dd>
+<p><b>Bug:</b> If you define class C with method g, and then at the top level you say 
+'h=C.g', then this method will think that is an imported variable (since 
+the var's name is derived from its uid, and the uid will be C.g, not 
+h).
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="_process_field"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_process_field</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>tag</span>,
+          <span class=sig-arg>arg</span>,
+          <span class=sig-arg>descr</span>,
+          <span class=sig-arg>warnings</span>)</span>
+  </h3>
+  Process a field from this object's docstring. 
+  <code>ObjDoc._process_field</code> be overridden by child classes of 
+  <code>ObjDoc</code>, and called as the default case.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>tag</b></code> -
+         The field's tag name
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>arg</b></code> -
+         The field's optional argument (or <code>None</code> if no 
+        argument was specified).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>descr</b></code> -
+         The field's body.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      <dd><code><b>warnings</b></code> -
+         A list of warnings that have been encountered. If any new 
+        warnings are encountered, then they should be appended to this 
+        list.
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="../private/epydoc.objdoc.ObjDoc-class.html#_process_field"><code>epydoc.objdoc.ObjDoc._process_field</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_classes"></a>
+<h3>_classes</h3>
+A list of all classes contained in the module/package.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+          class="link"><code>Link</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_functions"></a>
+<h3>_functions</h3>
+A list of all functions contained in the module/package.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+          class="link"><code>Link</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_modules"></a>
+<h3>_modules</h3>
+A list of all modules conained in the package (package only).
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code> of <a href="epydoc.uid.Link-class.html" 
+          class="link"><code>Link</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_variables"></a>
+<h3>_variables</h3>
+A list of all variables defined by this module/package.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF CLASS VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Class Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_EXPR_STMT_PATTERN"></a>
+<h3>_EXPR_STMT_PATTERN</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="(264, (265, (266, ['expr_stmt']), (4, '')))">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+(264, (265, (266, ['expr_stmt']), (4, '')))                            </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_LHS_PATTERN"></a>
+<h3>_LHS_PATTERN</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="(292, (293, (294, (295, (297, (298, (299, (300, (301, (302, (303, (304, ['lhs_atom']))))))))))))">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+(292,
+ (293,
+  (294,
+   (295,
+    (297, (298, (299, (300, (301, (302, (303, (304, ['lhs_atom']))))))<span class="variable-linewrap">\</span>
+))))))                                                                 </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:10 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

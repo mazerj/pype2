@@ -1,0 +1,359 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Class: StructuredTextConverter</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Class: StructuredTextConverter</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/docstring/docstring_StructuredText.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>StructuredText format converter.</h3>
+<p>    This converter supports translating StructuredText (see
+    the StructuredText package) input to HTML output.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Base Classes">Base Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+happydoclib.happydocstring.HappyDocStringConverterBase<br>
+
+</td></tr>
+</table>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Methods">Methods</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<a href="#_cleanup">_cleanup</a><br>
+<a href="#_testOutputFormat">_testOutputFormat</a><br>
+<a href="#_unquoteExamplesInST">_unquoteExamplesInST</a><br>
+<a href="#_unquoteHTML">_unquoteHTML</a><br>
+<a href="#convert">convert</a><br>
+<a href="#quote">quote</a><br>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_cleanup"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_cleanup&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_cleanup (
+        self,
+        inputText,
+        extractBody=re.compile( '&lt;body&gt;(.*)&lt;/body&gt;', re.MULTILINE | re.DOTALL ),
+        )
+
+</pre></font>
+
+<p>Clean converted text and return new value.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_testOutputFormat"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_testOutputFormat&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_testOutputFormat ( self,  outputFormat )
+
+</pre></font>
+
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Exceptions">Exceptions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+ValueError('Unrecognized output format "%s" for %s.' %( outputFormat, self.__class__.__name__, ) )<br>
+
+</td></tr>
+</table>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_unquoteExamplesInST"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_unquoteExamplesInST&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_unquoteExamplesInST ( self,  st )
+
+</pre></font>
+
+<p>Unquote the characters in all example paragraphs in the ST tree.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="_unquoteHTML"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">_unquoteHTML&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+_unquoteHTML (
+        self,
+        text,
+        character_entities=(( re.compile( '&amp;amp;' ), '&amp;' ), ( re.compile( &quot;&amp;lt;&quot; ), '&lt;' ), ( re.compile( &quot;&amp;gt;&quot; ), '&gt;' ), ( re.compile( '&amp;quot;' ), '&quot;' ) ),
+        )
+
+</pre></font>
+
+<p>Reverse the quoting process for character entities.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="convert"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">convert&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+convert (
+        self,
+        inputText,
+        outputFormat,
+        level=3,
+        *args,
+        *namedArgs,
+        )
+
+</pre></font>
+
+<h3>Returns the <code>inputText</code> data translated into the <code>outputFormat</code>.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>          <code>inputText</code></dt>
+<dd>String or other sequence of characters to be
+          converted.  This string should be in the format advertised
+          by the docstring converter.</dd>
+<dt>          <code>outputFormat</code></dt>
+<dd>String defined by the docstring converter
+          class to represent a supported output scheme.  This value is
+          converter-specific, and not all converters will support the
+          same output formats.</dd>
+<dt>          <code>level=3</code></dt>
+<dd>Beginning indention level for the text.  This
+          controls what type of header elements are created among
+          other behaviors.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="quote"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">quote&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+quote (
+        self,
+        inputText,
+        outputFormat,
+        *args,
+        *namedArgs,
+        )
+
+</pre></font>
+
+<h3>Returns the <code>inputText</code> quoted in a way that special characters are escaped.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>          <code>inputText</code></dt>
+<dd>String or other sequence of characters to be
+          converted.  This string should be in the format advertised
+          by the docstring converter.</dd>
+<dt>          <code>outputFormat</code></dt>
+<dd>String defined by the docstring converter
+          class to represent a supported output scheme.  This value is
+          converter-specific, and not all converters will support the
+          same output formats.</dd>
+<dt>          <code>*args</code></dt>
+<dd>Additional, converter-specific, positional arguments.</dd>
+<dt>          <code>**namedArgs</code></dt>
+<dd>Additional, converter-specific, named arguments.</dd>
+</dl>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:29 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

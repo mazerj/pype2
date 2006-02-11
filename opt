@@ -1,0 +1,10 @@
+
+1.For i686: export CFLAGS=-O9 -funroll-loops -ffast-math -malign-double
+-mcpu=pentiumpro -march=pentiumpro -fomit-frame-pointer -fno-exceptions
+
+2.For i586: export CFLAGS=-O3 -march=pentium -mcpu=pentium -ffast-math
+-funroll-loops -fomit-frame-pointer -fforce-mem -fforce-addr -malign-double
+-fno-exceptions
+
+3.For i486: FLAGS=-O3 -funroll-all-loops -malign-double -mcpu=i486 -march=i486
+-fomit-frame-pointer -fno-exceptions

@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>docutils.readers.standalone.Reader</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        Package&nbsp;docutils ::
+        Package&nbsp;readers ::
+        Module&nbsp;standalone ::
+        Class&nbsp;Reader
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/docutils.readers.standalone.Reader-class.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="docutils.readers.standalone.Reader-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class Reader</h2>
+
+<pre class="base-tree">
+ <a href="docutils.SettingsSpec-class.html"><code>SettingsSpec</code></a> --+        
+                |        
+<a href="docutils.TransformSpec-class.html"><code>TransformSpec</code></a> --+        
+                |        
+        <a href="docutils.Component-class.html"><code>Component</code></a> --+    
+                    |    
+               <a href="docutils.readers.Reader-class.html"><code>Reader</code></a> --+
+                        |
+                       <b>Reader</b>
+</pre><br />
+
+<dl><dt><b>Known Subclasses:</b></dt>
+<dd>
+    <a href="../private/epydoc.markup.restructuredtext._EpydocReader-class.html"><code>_EpydocReader</code></a></dd></dl>
+
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="docutils.readers.Reader-class.html"><code>Reader</code></a>:</b>
+      <a href="docutils.readers.Reader-class.html#__init__"><code>__init__</code></a>, 
+      <a href="docutils.readers.Reader-class.html#new_document"><code>new_document</code></a>, 
+      <a href="docutils.readers.Reader-class.html#parse"><code>parse</code></a>, 
+      <a href="docutils.readers.Reader-class.html#read"><code>read</code></a>, 
+      <a href="docutils.readers.Reader-class.html#set_parser"><code>set_parser</code></a>
+      <br />
+    <b>Inherited from <a href="docutils.Component-class.html"><code>Component</code></a>:</b>
+      <a href="docutils.Component-class.html#supports"><code>supports</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Class Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="docutils.readers.standalone.Reader-class.html#default_transforms"><code>default_transforms</code></a></b> = <span title="(&lt;class docutils.transforms.references.Substitutions at 0x81afabc&gt;, &lt;class docutils.transforms.frontmatter.DocTitle at 0x81bbf54&gt;, &lt;class docutils.transforms.frontmatter.DocInfo at 0x81ba714&gt;, &lt;class docutils.transforms.references.ChainedTargets at 0x81c5604&gt;, &lt;class docutils.transforms.references.AnonymousHyperlinks at 0x81b8cac&gt;, &lt;class docutils.transforms.references.IndirectHyperlinks at 0x81b7c84&gt;, &lt;class docutils.transforms.references.Footnotes at 0x81afeec&gt;, &lt;class docutils.transforms.references.ExternalTargets at 0x81b5d8c&gt;, &lt;class docutils.transforms.references.InternalTargets at 0x..."><code>(&lt;class&nbsp;docutils.transforms.referen<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>NoneType</code></font></td>
+<td><b><a href="docutils.readers.standalone.Reader-class.html#document"><code>document</code></a></b> = <span title="None">None&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="docutils.readers.standalone.Reader-class.html#settings_spec"><code>settings_spec</code></a></b> = <span title="('Standalone Reader', None, (('Disable the promotion of a lone top-level section title to document title (and subsequent section title to document subtitle promotion; enabled by default).', ['--no-doc-title'], {'dest': 'doctitle_xform', 'action': 'store_false', 'default': 1}), ('Disable the bibliographic field list transform (enabled by default).', ['--no-doc-info'], {'dest': 'docinfo_xform', 'action': 'store_false', 'default': 1})))"><code>('Standalone&nbsp;Reader',&nbsp;None,&nbsp;(('Disable&nbsp;t<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="docutils.readers.standalone.Reader-class.html#supported"><code>supported</code></a></b> = <span title="('standalone',)"><code>('standalone',)                              </code>
+</span></td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="docutils.readers.Reader-class.html"><code>Reader</code></a>:</b>
+      <a href="docutils.readers.Reader-class.html#component_type"><code>component_type</code></a>
+      <br />
+    <b>Inherited from <a href="docutils.SettingsSpec-class.html"><code>SettingsSpec</code></a>:</b>
+      <a href="docutils.SettingsSpec-class.html#relative_path_settings"><code>relative_path_settings</code></a>, 
+      <a href="docutils.SettingsSpec-class.html#settings_default_overrides"><code>settings_default_overrides</code></a>, 
+      <a href="docutils.SettingsSpec-class.html#settings_defaults"><code>settings_defaults</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Class Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="default_transforms"></a>
+<h3>default_transforms</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="(&lt;class docutils.transforms.references.Substitutions at 0x81afabc&gt;, &lt;class docutils.transforms.frontmatter.DocTitle at 0x81bbf54&gt;, &lt;class docutils.transforms.frontmatter.DocInfo at 0x81ba714&gt;, &lt;class docutils.transforms.references.ChainedTargets at 0x81c5604&gt;, &lt;class docutils.transforms.references.AnonymousHyperlinks at 0x81b8cac&gt;, &lt;class docutils.transforms.references.IndirectHyperlinks at 0x81b7c84&gt;, &lt;class docutils.transforms.references.Footnotes at 0x81afeec&gt;, &lt;class docutils.transforms.references.ExternalTargets at 0x81b5d8c&gt;, &lt;class docutils.transforms.references.InternalTargets at 0x...">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+(&lt;class docutils.transforms.references.Substitutions at 0x81afabc&gt;,
+ &lt;class docutils.transforms.frontmatter.DocTitle at 0x81bbf54&gt;,
+ &lt;class docutils.transforms.frontmatter.DocInfo at 0x81ba714&gt;,
+ &lt;class docutils.transforms.references.ChainedTargets at 0x81c5604&gt;,
+ &lt;class docutils.transforms.references.AnonymousHyperlinks at 0x81b8ca<span class="variable-linewrap">\</span>
+c&gt;,
+ &lt;class docutils.transforms.references.IndirectHyperlinks at 0x81b7c84<span class="variable-linewrap">\</span>
+&gt;,
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="document"></a>
+<h3>document</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>NoneType</code>
+
+      </dd>
+<span title="None">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+None&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="settings_spec"></a>
+<h3>settings_spec</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="('Standalone Reader', None, (('Disable the promotion of a lone top-level section title to document title (and subsequent section title to document subtitle promotion; enabled by default).', ['--no-doc-title'], {'dest': 'doctitle_xform', 'action': 'store_false', 'default': 1}), ('Disable the bibliographic field list transform (enabled by default).', ['--no-doc-info'], {'dest': 'docinfo_xform', 'action': 'store_false', 'default': 1})))">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+('Standalone Reader',
+ None,
+ (('Disable the promotion of a lone top-level section title to documen<span class="variable-linewrap">\</span>
+t title (and subsequent section title to document subtitle promotion; <span class="variable-linewrap">\</span>
+enabled by default).',
+   ['--no-doc-title'],
+   {'dest': 'doctitle_xform', 'action': 'store_false', 'default': 1}),
+  ('Disable the bibliographic field list transform (enabled by default<span class="variable-linewrap">\</span>
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="supported"></a>
+<h3>supported</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="('standalone',)">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+('standalone',)                                                        </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:14 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

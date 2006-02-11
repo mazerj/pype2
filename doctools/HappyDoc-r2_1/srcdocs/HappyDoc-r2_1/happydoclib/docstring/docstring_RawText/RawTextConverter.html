@@ -1,0 +1,206 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Class: RawTextConverter</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Class: RawTextConverter</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/docstring/docstring_RawText.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<h3>Raw (pass-through) docstring converter.</h3>
+<p>    This is most useful for internal calls in a formatter.  For
+    instance, if a formatter calls self.writeText() and passes text
+    that it has produced, it can use &quot;RawText&quot; as the <code>textFormat</code>
+    argument.</p>
+<p>    This converter is not recommended for most uses.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Base Classes">Base Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+happydoclib.happydocstring.HappyDocStringConverterBase<br>
+
+</td></tr>
+</table>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Methods">Methods</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<a href="#convert">convert</a><br>
+<a href="#quote">quote</a><br>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="convert"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">convert&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+convert (
+        self,
+        inputText,
+        outputFormat,
+        *args,
+        *namedArgs,
+        )
+
+</pre></font>
+
+<h3>Returns the <code>inputText</code> data translated into the <code>outputFormat</code>.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>          <code>inputText</code></dt>
+<dd>String or other sequence of characters to be
+          converted.  This string should be in the format advertised
+          by the docstring converter.</dd>
+<dt>          <code>outputFormat</code></dt>
+<dd>String defined by the docstring converter
+          class to represent a supported output scheme.  This value is
+          converter-specific, and not all converters will support the
+          same output formats.</dd>
+</dl>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="quote"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">quote&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+quote (
+        self,
+        inputText,
+        outputFormat,
+        *args,
+        *namedArgs,
+        )
+
+</pre></font>
+
+<h3>Returns the <code>inputText</code> quoted in a way that special characters are escaped.</h3>
+<h4>        Parameters:</h4>
+<dl>
+<dt>          <code>inputText</code></dt>
+<dd>String or other sequence of characters to be
+          converted.  This string should be in the format advertised
+          by the docstring converter.</dd>
+<dt>          <code>outputFormat</code></dt>
+<dd>String defined by the docstring converter
+          class to represent a supported output scheme.  This value is
+          converter-specific, and not all converters will support the
+          same output formats.</dd>
+<dt>          <code>*args</code></dt>
+<dd>Additional, converter-specific, positional arguments.</dd>
+<dt>          <code>**namedArgs</code></dt>
+<dd>Additional, converter-specific, named arguments.</dd>
+</dl>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:29 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

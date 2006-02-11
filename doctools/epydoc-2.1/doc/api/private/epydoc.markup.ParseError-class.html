@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.markup.ParseError</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.markup-module.html">Package&nbsp;markup</a> ::
+        Class&nbsp;ParseError
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.markup.ParseError-class.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.markup.ParseError-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class ParseError</h2>
+
+<pre class="base-tree">
+<a href="exceptions.Exception-class.html"><code>Exception</code></a> --+
+            |
+           <b>ParseError</b>
+</pre><br />
+
+<dl><dt><b>Known Subclasses:</b></dt>
+<dd>
+    <a href="epydoc.markup.epytext.ColorizingError-class.html"><code>ColorizingError</code></a>,
+    <a href="epydoc.markup.epytext.StructuringError-class.html"><code>StructuringError</code></a>,
+    <a href="epydoc.markup.epytext.TokenizationError-class.html"><code>TokenizationError</code></a></dd></dl>
+
+<hr/>
+
+The base class for errors generated while parsing docstrings.
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#__init__" class="summary-sig-name"><code>__init__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>descr</span>,
+          <span class=summary-sig-arg>linenum</span>,
+          <span class=summary-sig-arg>is_fatal</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>int</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#__cmp__" class="summary-sig-name"><code>__cmp__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>other</span>)</span></code>
+<br />
+Compare two <code>ParseError</code>s, based on their line number.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#__repr__" class="summary-sig-name"><code>__repr__</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the formal representation of this <code>ParseError</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#__str__" class="summary-sig-name"><code>__str__</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a string representation of this <code>ParseError</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#is_fatal" class="summary-sig-name"><code>is_fatal</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if this is a fatal error.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>int</code> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#linenum" class="summary-sig-name"><code>linenum</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the line number on which the error occured (including any offset).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.ParseError-class.html#set_linenum_offset" class="summary-sig-name"><code>set_linenum_offset</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>offset</span>)</span></code>
+<br />
+Set the line number offset for this error.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="exceptions.Exception-class.html"><code>Exception</code></a>:</b>
+      <a href="exceptions.Exception-class.html#__getitem__"><code>__getitem__</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Instance Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>string</code></font></td>
+<td><b><a href="../private/epydoc.markup.ParseError-class.html#_descr"><code>_descr</code></a></b>: A description of the error.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>boolean</code></font></td>
+<td><b><a href="../private/epydoc.markup.ParseError-class.html#_fatal"><code>_fatal</code></a></b>: True if this is a fatal error.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>int</code></font></td>
+<td><b><a href="../private/epydoc.markup.ParseError-class.html#_linenum"><code>_linenum</code></a></b>: The line on which the error occured within the docstring.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>int</code></font></td>
+<td><b><a href="../private/epydoc.markup.ParseError-class.html#_offset"><code>_offset</code></a></b>: The line number where the docstring begins.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="__init__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__init__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>descr</span>,
+          <span class=sig-arg>linenum</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>is_fatal</span>=<span class=sig-default>1</span>)</span>
+    <br /><i>(Constructor)</i>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>descr</b></code> -
+         A description of the error.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>linenum</b></code> -
+         The line on which the error occured within the docstring. The 
+        linenum of the first line is 0.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>is_fatal</b></code> -
+         True if this is a fatal error.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="exceptions.Exception-class.html#__init__"><code>exceptions.Exception.__init__</code></a></dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="__cmp__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__cmp__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>other</span>)</span>
+    <br /><i>(Comparison operator)</i>
+  </h3>
+  Compare two <code>ParseError</code>s, based on their line 
+  number.
+  <ul>
+    <li>
+      Return -1 if <code>self.linenum&lt;other.linenum</code>
+    </li>
+    <li>
+      Return +1 if <code>self.linenum&gt;other.linenum</code>
+    </li>
+    <li>
+      Return 0 if <code>self.linenum==other.linenum</code>.
+    </li>
+  </ul>
+  The return value is undefined if <code>other</code> is not a 
+  ParseError.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>int</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="__repr__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__repr__</span>(<span class=sig-arg>self</span>)</span>
+    <br /><i>(Representation operator)</i>
+  </h3>
+  Return the formal representation of this <code>ParseError</code>. 
+  <code>ParseError</code>s have formal representations of the form:
+<pre class="literalblock">
+  &lt;ParseError on line 12&gt;
+</pre>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        the formal representation of this <code>ParseError</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="__str__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__str__</span>(<span class=sig-arg>self</span>)</span>
+    <br /><i>(Informal representation operator)</i>
+  </h3>
+  Return a string representation of this <code>ParseError</code>. This 
+  multi-line string contains a description of the error, and specifies 
+  where it occured.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        the informal representation of this 
+        <code>ParseError</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="exceptions.Exception-class.html#__str__"><code>exceptions.Exception.__str__</code></a></dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="is_fatal"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">is_fatal</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        true if this is a fatal error. If an error is fatal, then 
+        epydoc should ignore the output of the parser, and parse the 
+        docstring as plaintext.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="linenum"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">linenum</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The line number on which the error occured (including any 
+        offset). If the line number is unknown, then return 
+        <code>None</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="set_linenum_offset"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">set_linenum_offset</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>offset</span>)</span>
+  </h3>
+  Set the line number offset for this error. This offset is the line 
+  number where the docstring begins. This offset is added to 
+  <code>_linenum</code> when displaying the line number of the error.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>offset</b></code> -
+         The new line number offset.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_descr"></a>
+<h3>_descr</h3>
+A description of the error.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>string</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_fatal"></a>
+<h3>_fatal</h3>
+True if this is a fatal error.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>boolean</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_linenum"></a>
+<h3>_linenum</h3>
+The line on which the error occured within the docstring. The linenum 
+of the first line is 0.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>int</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_offset"></a>
+<h3>_offset</h3>
+The line number where the docstring begins. This offset is added to 
+<code>_linenum</code> when displaying the line number of the error. 
+Default value: 1.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>int</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:13 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

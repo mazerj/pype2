@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Module: test_happydoc</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../../../../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Module: test_happydoc</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/test_happydoc.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>Driver for unit tests for HappyDoc.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Imported modules">Imported modules</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<b>from</b> <a href="http://www.python.org/doc/current/lib/module-glob.html">glob</a> <b>import</b> glob<br>
+<b>import</b> <a href="../../../../../../../../happydoclib/index.html">happydoclib</a><br>
+<b>from</b> happydoclib.StreamFlushTest <b>import</b> StreamFlushTest, DEFAULT_OUTPUT_DIR, verboseLevel<br>
+<b>from</b> happydoclib.appclass <b>import</b> HappyDoc<br>
+<b>import</b> happydoclib.docset.docset_MultipleFile<br>
+<b>import</b> happydoclib.docstring<br>
+<b>import</b> happydoclib.docstring.docstring_ClassicStructuredText<br>
+<b>import</b> happydoclib.docstring.docstring_PlainText<br>
+<b>import</b> happydoclib.docstring.docstring_RawText<br>
+<b>import</b> happydoclib.docstring.docstring_StructuredText<br>
+<b>import</b> happydoclib.formatter.openoffice<br>
+<b>import</b> happydoclib.happydocset<br>
+<b>import</b> happydoclib.happydocstring<br>
+<b>import</b> happydoclib.parseinfo<br>
+<b>import</b> happydoclib.trace<br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-os.html">os</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-pprint.html">pprint</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-string.html">string</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-sys.html">sys</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-tempfile.html">tempfile</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-unittest.html">unittest</a><br>
+
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Functions">Functions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<a href="#ZopeTestFactory">ZopeTestFactory</a><br>
+<a href="#addAllTests">addAllTests</a><br>
+<a href="#debug">debug</a><br>
+<a href="#getBugTests">getBugTests</a><br>
+<a href="#getTestSuite">getTestSuite</a><br>
+<a href="#main">main</a><br>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="ZopeTestFactory"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">ZopeTestFactory&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+ZopeTestFactory ( **nargs )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="addAllTests"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">addAllTests&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+addAllTests ( test_loader,  actual_test_suite )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="debug"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">debug&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+debug ()
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getBugTests"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getBugTests&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getBugTests ( actual_test_suite,  output_dir )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="getTestSuite"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">getTestSuite&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+getTestSuite (
+        get_all_tests=1,
+        get_bug_tests=1,
+        output_dir='/dev/null',
+        progress_callback=None,
+        args=[],
+        )
+
+</pre></font>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="main"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">main&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+main ( argv=() )
+
+</pre></font>
+
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Classes">Classes</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<table border="0" cellpadding="3" cellspacing="0">
+<tr><td valign="top" align="left"><p><a href="test_happydoc/ExecuteHappyDocTest.html">ExecuteHappyDocTest</a></p></td><td valign="top" align="left">
+<p>Tests involving external executions of HappyDoc.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/ExternalTest.html">ExternalTest</a></p></td><td valign="top" align="left"></td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/HappyDocBugRegressionTest.html">HappyDocBugRegressionTest</a></p></td><td valign="top" align="left"></td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/HappyDocTestBase.html">HappyDocTestBase</a></p></td><td valign="top" align="left"></td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/HappyDocTestLoader.html">HappyDocTestLoader</a></p></td><td valign="top" align="left">
+<p>Special TestLoader for HappyDoc</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/OtherWorkingDirTest.html">OtherWorkingDirTest</a></p></td><td valign="top" align="left"></td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/TestCaseDriver.html">TestCaseDriver</a></p></td><td valign="top" align="left">
+<p>Drive the test cases for HappyDoc.</p>
+</td></tr>
+<tr><td valign="top" align="left"><p><a href="test_happydoc/ZopeTest.html">ZopeTest</a></p></td><td valign="top" align="left"></td></tr>
+</table>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../../../../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:23 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

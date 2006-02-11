@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>docutils.nodes.NodeVisitor</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        Package&nbsp;docutils ::
+        Module&nbsp;nodes ::
+        Class&nbsp;NodeVisitor
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/docutils.nodes.NodeVisitor-class.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="docutils.nodes.NodeVisitor-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class NodeVisitor</h2>
+
+<dl><dt><b>Known Subclasses:</b></dt>
+<dd>
+    <a href="docutils.writers.html4css1.HTMLTranslator-class.html"><code>HTMLTranslator</code></a></dd></dl>
+
+<hr/>
+
+<p>&quot;Visitor&quot; pattern <a class="citation-reference" href="#rst-gof95" id="id1" name="id1">[GoF95]</a> abstract superclass implementation for document
+tree traversals.</p>
+<p>Each node class has corresponding methods, doing nothing by default;
+override individual methods for specific and useful behaviour.  The
+&quot;<tt class="literal"><span class="pre">visit_</span></tt> + node class name&quot; method is called by <code>Node.walk()</code> upon
+entering a node.  <code>Node.walkabout()</code> also calls the &quot;<tt class="literal"><span class="pre">depart_</span></tt> + node
+class name&quot; method before exiting a node.</p>
+<p>This is a base class for visitors whose <tt class="literal"><span class="pre">visit_...</span></tt> &amp; <tt class="literal"><span class="pre">depart_...</span></tt>
+methods should be implemented for <em>all</em> node types encountered (such as
+for <a href="docutils.writers.Writer-class.html" class="link"><code>docutils.writers.Writer</code></a> subclasses).  Unimplemented methods will
+raise exceptions.</p>
+<p>For sparse traversals, where only certain node types are of interest,
+subclass <code>SparseNodeVisitor</code> instead.  When (mostly or entirely) uniform
+processing is desired, subclass <code>GenericNodeVisitor</code>.</p>
+<table class="citation" frame="void" id="gof95" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<col />
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1" name="gof95">[GoF95]</a></td><td>Gamma, Helm, Johnson, Vlissides. <em>Design Patterns: Elements of
+Reusable Object-Oriented Software</em>. Addison-Wesley, Reading, MA, USA,
+1995.</td></tr>
+</tbody>
+</table>
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__init__"></a><span class="summary-sig"><span class="summary-sig-name">__init__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>document</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="docutils.nodes.NodeVisitor-class.html#unknown_departure" class="summary-sig-name"><code>unknown_departure</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>node</span>)</span></code>
+<br />
+Called before exiting unknown <code>Node</code> types.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="docutils.nodes.NodeVisitor-class.html#unknown_visit" class="summary-sig-name"><code>unknown_visit</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>node</span>)</span></code>
+<br />
+Called when entering unknown <code>Node</code> types.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="unknown_departure"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">unknown_departure</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>node</span>)</span>
+  </h3>
+<p>Called before exiting unknown <code>Node</code> types.</p>
+<p>Raise exception unless overridden.</p>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="unknown_visit"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">unknown_visit</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>node</span>)</span>
+  </h3>
+<p>Called when entering unknown <code>Node</code> types.</p>
+<p>Raise an exception unless overridden.</p>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:17 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

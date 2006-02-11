@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.cli</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        Module&nbsp;cli
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.cli-module.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.cli-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module epydoc.cli</h2>
+
+<p>Command-line interface for epydoc.</p>
+Usage:
+<pre class="literalblock">
+epydoc [OPTIONS] MODULES...
+
+    MODULES...                The Python modules to document.
+    --html                    Generate HTML output (default).
+    --latex                   Generate LaTeX output.
+    --pdf                     Generate pdf output, via LaTeX.
+    --check                   Run documentation completeness checks.
+    -o DIR, --output DIR      The output directory.
+    -n NAME, --name NAME      The documented project's name.
+    -u URL, --url URL         The documented project's url.
+    -t PAGE, --top PAGE       The top page for the HTML documentation.
+    -c SHEET, --css SHEET     CSS stylesheet for HTML files.
+    --private-css SHEET       CSS stylesheet for private objects.
+    --inheritance STYLE       The format for showing inherited objects.
+    -V, --version             Print the version of epydoc.
+    -h, -?, --help, --usage   Display this usage message.
+    -h TOPIC, --help TOPIC    Display information about TOPIC (docformat,
+                              css, inheritance, usage, or version).
+
+See the epydoc(1) man page for a complete list of options.
+</pre>
+<hr/>
+
+<!-- =========== START OF CLASSES =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Classes</th></tr>
+<tr><td width="15%">
+  <b><a href="../private/epydoc.cli._Progress-class.html"><code>_Progress</code></a></b></td>
+  <td>The progress meter that is used by <code>cli</code> to report its 
+progress.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.cli-module.html#cli" class="summary-sig-name"><code>cli</code></a>()</span></code>
+<br />
+Command line interface for epydoc.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_check" class="summary-sig-name"><code>_check</code></a>(<span class=summary-sig-arg>docmap</span>,
+          <span class=summary-sig-arg>options</span>)</span></code>
+<br />
+Run completeness checks on the objects in the given documentation 
+map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_check_css" class="summary-sig-name"><code>_check_css</code></a>(<span class=summary-sig-arg>cssname</span>)</span></code>
+<br />
+If <code>cssname</code> is not valid, then issue an error and 
+exit.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_help" class="summary-sig-name"><code>_help</code></a>(<span class=summary-sig-arg>arg</span>)</span></code>
+<br />
+Display a speficied help message, and exit.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_html" class="summary-sig-name"><code>_html</code></a>(<span class=summary-sig-arg>docmap</span>,
+          <span class=summary-sig-arg>options</span>)</span></code>
+<br />
+Create the HTML documentation for the objects in the given 
+documentation map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <code>module</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_import" class="summary-sig-name"><code>_import</code></a>(<span class=summary-sig-arg>module_names</span>,
+          <span class=summary-sig-arg>verbosity</span>)</span></code>
+<br />
+Return a list of the modules contained in the given files.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_internal_error" class="summary-sig-name"><code>_internal_error</code></a>(<span class=summary-sig-arg>e</span>)</span></code>
+<br />
+Print a warning message about an internal error.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_latex" class="summary-sig-name"><code>_latex</code></a>(<span class=summary-sig-arg>docmap</span>,
+          <span class=summary-sig-arg>options</span>,
+          <span class=summary-sig-arg>format</span>)</span></code>
+<br />
+Create the LaTeX documentation for the objects in the given 
+documentation map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_make_docmap" class="summary-sig-name"><code>_make_docmap</code></a>(<span class=summary-sig-arg>modules</span>,
+          <span class=summary-sig-arg>options</span>)</span></code>
+<br />
+Construct the documentation map for the given modules.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_parse_args" class="summary-sig-name"><code>_parse_args</code></a>()</span></code>
+<br />
+Process the command line arguments; return a dictionary containing the 
+relevant info.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_run"></a><span class="summary-sig"><span class="summary-sig-name">_run</span>(<span class=summary-sig-arg>cmd</span>,
+          <span class=summary-sig-arg>options</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_usage" class="summary-sig-name"><code>_usage</code></a>(<span class=summary-sig-arg>exit_code</span>)</span></code>
+<br />
+Display a usage message.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_usage_error" class="summary-sig-name"><code>_usage_error</code></a>(<span class=summary-sig-arg>estr</span>,
+          <span class=summary-sig-arg>exit_code</span>)</span></code>
+<br />
+Issue an error message, and exit.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.cli-module.html#_version" class="summary-sig-name"><code>_version</code></a>()</span></code>
+<br />
+Display the version information, and exit.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.cli-module.html#DEBUG_LATEX_COMMAND"><code>DEBUG_LATEX_COMMAND</code></a></b> = <span title="'echo x | latex %(tex)s'"><code><span class="variable-quote">'</span>echo&nbsp;x&nbsp;|&nbsp;latex&nbsp;%(tex)s<span class="variable-quote">'</span>           </code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.cli-module.html#DVIPS_COMMAND"><code>DVIPS_COMMAND</code></a></b> = <span title="'dvips -q %(dvi)s -o %(ps)s -G0 -Ppdf'"><code><span class="variable-quote">'</span>dvips&nbsp;-q&nbsp;%(dvi)s&nbsp;-o&nbsp;%(ps)s&nbsp;-G0&nbsp;-Ppdf<span class="variable-quote">'</span>   </code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.cli-module.html#LATEX_COMMAND"><code>LATEX_COMMAND</code></a></b> = <span title="&quot;echo x | latex '\\batchmode\\input %(tex)s'&quot;"><code><span class="variable-quote">"</span>echo&nbsp;x&nbsp;|&nbsp;latex&nbsp;'\\batchmode\\input&nbsp;%(te<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.cli-module.html#MAKEINDEX_COMMAND"><code>MAKEINDEX_COMMAND</code></a></b> = <span title="'makeindex -q %(idx)s'"><code><span class="variable-quote">'</span>makeindex&nbsp;-q&nbsp;%(idx)s<span class="variable-quote">'</span>               </code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>int</code></font></td>
+<td><b><a href="epydoc.cli-module.html#PROFILE"><code>PROFILE</code></a></b>: Whether or not to run the profiler.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.cli-module.html#PS2PDF_COMMAND"><code>PS2PDF_COMMAND</code></a></b> = <span title="'ps2pdf -sPAPERSIZE=letter -dMaxSubsetPct=100 -dSubsetFonts=true -dCompatibilityLevel=1.2 -dEmbedAllFonts=true %(ps)s %(pdf)s'"><code><span class="variable-quote">'</span>ps2pdf&nbsp;-sPAPERSIZE=letter&nbsp;-dMaxSubsetP<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="epydoc.cli-module.html#TESTS"><code>TESTS</code></a></b>: The lists of tests that can be run with <code>'epydoc 
+--check'</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>int</code></font></td>
+<td><b><a href="../private/epydoc.cli-module.html#_encountered_internal_error"><code>_encountered_internal_error</code></a></b>: A global variable recording whether any internal errors have been 
+detected.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="cli"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">cli</span>()</span>
+  </h3>
+  Command line interface for epydoc.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_check"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_check</span>(<span class=sig-arg>docmap</span>,
+          <span class=sig-arg>options</span>)</span>
+  </h3>
+  Run completeness checks on the objects in the given documentation 
+  map. By default, <code>_check</code> checks for docstrings in all 
+  public modules, classes, functions, and properties. Additional checks 
+  can be added with the <code>'tests'</code> option:
+  <ul>
+    <li>
+      <code>private</code>: Also checks private objects.
+    </li>
+    <li>
+      <code>vars</code>: Also checks variables, parameters, and return 
+      values.
+    </li>
+  </ul>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docmap</b></code> -
+         A documentation map containing the documentation for the 
+        objects whose API documentation should be created.
+      <dd><code><b>options</b></code> -
+         Options from the command-line arguments.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>dict</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_check_css"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_check_css</span>(<span class=sig-arg>cssname</span>)</span>
+  </h3>
+  If <code>cssname</code> is not valid, then issue an error and 
+  exit.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_help"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_help</span>(<span class=sig-arg>arg</span>)</span>
+  </h3>
+  Display a speficied help message, and exit.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>arg</b></code> -
+         The name of the help message to display. Currently, only 
+        <code>&quot;css&quot;</code> and <code>&quot;usage&quot;</code> 
+        are recognized.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_html"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_html</span>(<span class=sig-arg>docmap</span>,
+          <span class=sig-arg>options</span>)</span>
+  </h3>
+  Create the HTML documentation for the objects in the given 
+  documentation map.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docmap</b></code> -
+         A documentation map containing the documentation for the 
+        objects whose API documentation should be created.
+      <dd><code><b>options</b></code> -
+         Options from the command-line arguments.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>dict</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_import"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_import</span>(<span class=sig-arg>module_names</span>,
+          <span class=sig-arg>verbosity</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>module_names</b></code> -
+         The list of module filenames.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>string</code>)</i>
+      <dd><code><b>verbosity</b></code> -
+         Verbosity level for tracing output.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of the modules contained in the given files. Duplicates 
+        are removed. Order is preserved.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>module</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_internal_error"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_internal_error</span>(<span class=sig-arg>e</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Print a warning message about an internal error.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The return value from calling <code>func</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_latex"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_latex</span>(<span class=sig-arg>docmap</span>,
+          <span class=sig-arg>options</span>,
+          <span class=sig-arg>format</span>)</span>
+  </h3>
+  Create the LaTeX documentation for the objects in the given 
+  documentation map.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docmap</b></code> -
+         A documentation map containing the documentation for the 
+        objects whose API documentation should be created.
+      <dd><code><b>options</b></code> -
+         Options from the command-line arguments.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>dict</code>)</i>
+      <dd><code><b>format</b></code> -
+         One of <code>'latex'</code>, <code>'dvi'</code>, 
+        <code>'ps'</code>, or <code>'pdf'</code>.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_make_docmap"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_make_docmap</span>(<span class=sig-arg>modules</span>,
+          <span class=sig-arg>options</span>)</span>
+  </h3>
+  Construct the documentation map for the given modules.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>modules</b></code> -
+         The modules that should be documented.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>Module</code>)</i>
+      <dd><code><b>options</b></code> -
+         Options from the command-line arguments.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>dict</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_parse_args"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_parse_args</span>()</span>
+  </h3>
+  Process the command line arguments; return a dictionary containing 
+  the relevant info.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A dictionary mapping from configuration parameters to values. 
+        If a parameter is specified on the command line, then that value 
+        is used; otherwise, a default value is used. Currently, the 
+        following configuration parameters are set: <code>target</code>, 
+        <code>modules</code>, <code>verbosity</code>, 
+        <code>prj_name</code>, <code>output</code>, 
+        <code>show_imports</code>, <code>frames</code>, 
+        <code>private</code>, <code>debug</code>, <code>top</code>, 
+        <code>list_classes_separately</code>, <code>docformat</code>, 
+        <code>inheritance</code>, <code>autogen_vars</code>, and 
+        <code>test</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_usage"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_usage</span>(<span class=sig-arg>exit_code</span>=<span class=sig-default>1</span>)</span>
+  </h3>
+  Display a usage message.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>exit_code</b></code> -
+         An exit status that will be passed to 
+        <code>sys.exit</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_usage_error"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_usage_error</span>(<span class=sig-arg>estr</span>,
+          <span class=sig-arg>exit_code</span>=<span class=sig-default>1</span>)</span>
+  </h3>
+  Issue an error message, and exit.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_version"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_version</span>()</span>
+  </h3>
+  Display the version information, and exit.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="DEBUG_LATEX_COMMAND"></a>
+<h3>DEBUG_LATEX_COMMAND</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'echo x | latex %(tex)s'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>echo x | latex %(tex)s<span class="variable-quote">'</span>                                               </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="DVIPS_COMMAND"></a>
+<h3>DVIPS_COMMAND</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'dvips -q %(dvi)s -o %(ps)s -G0 -Ppdf'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>dvips -q %(dvi)s -o %(ps)s -G0 -Ppdf<span class="variable-quote">'</span>                                 </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="LATEX_COMMAND"></a>
+<h3>LATEX_COMMAND</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="&quot;echo x | latex '\\batchmode\\input %(tex)s'&quot;">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">"</span>echo x | latex '\\batchmode\\input %(tex)s'<span class="variable-quote">"</span>                          </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="MAKEINDEX_COMMAND"></a>
+<h3>MAKEINDEX_COMMAND</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'makeindex -q %(idx)s'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>makeindex -q %(idx)s<span class="variable-quote">'</span>                                                 </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="PROFILE"></a>
+<h3>PROFILE</h3>
+Whether or not to run the profiler.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>int</code>
+
+      </dd>
+<span title="0">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="PS2PDF_COMMAND"></a>
+<h3>PS2PDF_COMMAND</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'ps2pdf -sPAPERSIZE=letter -dMaxSubsetPct=100 -dSubsetFonts=true -dCompatibilityLevel=1.2 -dEmbedAllFonts=true %(ps)s %(pdf)s'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>ps2pdf -sPAPERSIZE=letter -dMaxSubsetPct=100 -dSubsetFonts=true -dCom<span class="variable-linewrap">\</span>
+patibilityLevel=1.2 -dEmbedAllFonts=true %(ps)s %(pdf)s<span class="variable-quote">'</span>               </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="TESTS"></a>
+<h3>TESTS</h3>
+The lists of tests that can be run with <code>'epydoc 
+--check'</code>.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="('basic', 'types', 'vars', 'private', 'authors', 'versions', 'all')">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+('basic', 'types', 'vars', 'private', 'authors', 'versions', 'all')    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_encountered_internal_error"></a>
+<h3>_encountered_internal_error</h3>
+A global variable recording whether any internal errors have been 
+detected. If this variable is set to true, then <a 
+href="epydoc.cli-module.html#cli" class="link"><code>cli</code></a> will 
+issue a warning once it completes running.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>int</code>
+
+      </dd>
+<span title="0">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+0&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:18 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,52 @@
+#!/bin/csh
+
+#
+# figure out which version of python to use
+#
+# usage: ./INSTALL [-rig]
+#  if -rig is provided, then comedi is installed for data acquisition..
+#
+
+###########################################################################
+#
+# comedi only gets installed on RIG MACHINES!!!
+#
+
+if ("$1" == '-rig') then
+  ./install-comedi
+endif
+
+###########################################################################
+#
+# install/update SDL
+#   install-sdl script checks to see SDL is needed before doing anything.
+#
+./install-sdl
+
+###########################################################################
+#
+# rpms
+#
+set d=`../pydetect -r`
+cd rpms
+  sudo rpm -Uvh --force *.rpm $d/*.rpm
+cd ..
+
+###########################################################################
+#
+# python add-ons
+#
+# - these are all the required pure-python packages.
+# - these should be installed at the end, because PyOpenGL needs
+#   glut rpms installed above
+#
+
+./install-pypackage Imaging-1.1.5.tar.gz
+./install-pypackage Numeric-24.2.tar.gz
+./install-pypackage PyOpenGL-2.0.2.01.tar.gz
+./install-pypackage pygame-1.7.1release.tar.gz
+./install-pypackage python2-biggles-1.6.4.tar.gz
+
+
+exit 0
+

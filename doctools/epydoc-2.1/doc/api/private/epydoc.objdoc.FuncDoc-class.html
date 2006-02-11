@@ -1,0 +1,758 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.objdoc.FuncDoc</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.objdoc-module.html">Module&nbsp;objdoc</a> ::
+        Class&nbsp;FuncDoc
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.objdoc.FuncDoc-class.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.objdoc.FuncDoc-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class FuncDoc</h2>
+
+<pre class="base-tree">
+<a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a> --+
+         |
+        <b>FuncDoc</b>
+</pre><br />
+
+<hr/>
+
+The documentation for a function. This documentation consists of 
+standard pieces of documentation (as defined in <a 
+href="epydoc.objdoc.ObjDoc-class.html" 
+class="link"><code>ObjDoc</code></a>), and the following 
+function-specific pieces of documentation:
+<ul>
+  <li>
+    <a name="index-parameters"></a><i 
+    class="indexterm">parameters</i>: A list of the function's positional 
+    parameters.
+  </li>
+  <li>
+    <a name="index-vararg"></a><i class="indexterm">vararg</i>: The 
+    function's vararg parameter, or <code>None</code>.
+  </li>
+  <li>
+    <a name="index-kwarg"></a><i class="indexterm">kwarg</i>: The 
+    function's keyword parameter, or <code>None</code>.
+  </li>
+  <li>
+    <a name="index-returns"></a><i class="indexterm">returns</i>: The 
+    function's return value.
+  </li>
+  <li>
+    <a name="index-raises"></a><i class="indexterm">raises</i>: A list 
+    of exceptions that may be raised by the function.
+  </li>
+  <li>
+    <a name="index-overrides"></a><i class="indexterm">overrides</i>: 
+    The method that this method overrides.
+  </li>
+</ul>
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__init__"></a><span class="summary-sig"><span class="summary-sig-name">__init__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>verbosity</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__repr__"></a><span class="summary-sig"><span class="summary-sig-name">__repr__</span>(<span class=summary-sig-arg>self</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#keywords" class="summary-sig-name"><code>keywords</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the keyword parameters for the function/method documented by this 
+<code>FuncDoc</code>.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_sort"><code>_sort</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Accessors</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#parameters" class="summary-sig-name"><code>parameters</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the positional parameters for the function/method documented by this 
+<code>FuncDoc</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#vararg" class="summary-sig-name"><code>vararg</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the vararg parameter for the function/method documented by this 
+<code>FuncDoc</code>, or <code>None</code> if it has no vararg 
+parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#kwarg" class="summary-sig-name"><code>kwarg</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the keyword parameter for the function/method documented by this 
+<code>FuncDoc</code>, or <code>None</code> if it has no keyword 
+parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#returns" class="summary-sig-name"><code>returns</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the return value for the function/method documented by this 
+<code>FuncDoc</code>, or <code>None</code> if it has no return value.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.objdoc.Raise-class.html" 
+        class="link"><code>Raise</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#raises" class="summary-sig-name"><code>raises</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of exceptions that may be raised by the function/method 
+documented by this <code>FuncDoc</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#overrides" class="summary-sig-name"><code>overrides</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the method overridden by the method documented by this 
+<code>FuncDoc</code>; or <code>None</code> if the method documented by 
+this <code>FuncDoc</code> does not override any method, or if this 
+<code>FuncDoc</code> documents a function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#matches_override" class="summary-sig-name"><code>matches_override</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return true if the method documented by this <code>FuncDoc</code> overrides 
+another method, and its signature matches the signature of the overridden 
+method.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#parameter_list" class="summary-sig-name"><code>parameter_list</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a (flat) list of all parameters for the function/method documented by 
+this <code>FuncDoc</code>.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="epydoc.objdoc.ObjDoc-class.html#by_group"><code>by_group</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#defines_groups"><code>defines_groups</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#descr"><code>descr</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#field_values"><code>field_values</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#fields"><code>fields</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#groups"><code>groups</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#has_docstring"><code>has_docstring</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#sortorder"><code>sortorder</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#summary"><code>summary</code></a>, 
+      <a href="epydoc.objdoc.ObjDoc-class.html#uid"><code>uid</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Inheritance</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc.FuncDoc-class.html#find_override" class="summary-sig-name"><code>find_override</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>bases</span>)</span></code>
+<br />
+Find the method that this method overrides.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Signature Parsing</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_init_signature"></a><span class="summary-sig"><span class="summary-sig-name">_init_signature</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>func</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_params_to_vars"></a><span class="summary-sig"><span class="summary-sig-name">_params_to_vars</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>params</span>,
+          <span class=summary-sig-arg>defaults</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc.FuncDoc-class.html#_signature_match" class="summary-sig-name"><code>_signature_match</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>basespec</span>,
+          <span class=summary-sig-arg>childspec</span>)</span></code>
+<br />
+Return true if the signature of <code>childfunc</code> matches the signature 
+of <code>basefunc</code> well enough that we should inherit its 
+documentation.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc.FuncDoc-class.html#_init_builtin_signature" class="summary-sig-name"><code>_init_builtin_signature</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>func</span>)</span></code>
+<br />
+Construct the signature for a builtin function or method from its 
+docstring.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Error Handling</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_print_errors"><code>_print_errors</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc.FuncDoc-class.html#_process_field" class="summary-sig-name"><code>_process_field</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>tag</span>,
+          <span class=summary-sig-arg>arg</span>,
+          <span class=summary-sig-arg>descr</span>,
+          <span class=summary-sig-arg>warnings</span>)</span></code>
+<br />
+Process a field from this object's docstring.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Instance Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_kwarg_param"><code>_kwarg_param</code></a></b>: This function's keyword parameter, or <code>None</code> if it has 
+none.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_params"><code>_params</code></a></b>: A list of this function's normal parameters.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code> of <a 
+          href="epydoc.objdoc.Raise-class.html" 
+          class="link"><code>Raise</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_raises"><code>_raises</code></a></b>: The exceptions that may be raised by this function.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_return"><code>_return</code></a></b>: This function's return value.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_vararg_param"><code>_vararg_param</code></a></b>: This function's vararg parameter, or <code>None</code> if it has 
+none.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_uid"><code>_uid</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Error Handling</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_field_warnings"><code>_field_warnings</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_misc_warnings"><code>_misc_warnings</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_parse_errors"><code>_parse_errors</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_parse_warnings"><code>_parse_warnings</code></a>
+    </td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_descr"><code>_descr</code></a>, 
+      <a href="../private/epydoc.objdoc.ObjDoc-class.html#_fields"><code>_fields</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Class Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>SRE_Pattern</code></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_SIGNATURE_RE"><code>_SIGNATURE_RE</code></a></b>: A regular expression that is used to check whether a builtin function 
+or method has a signature in its docstring.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Error Reporting</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>list</code></font></td>
+<td><b><a href="../private/epydoc.objdoc.FuncDoc-class.html#_param_mismatches"><code>_param_mismatches</code></a></b>: A dictionary whose keys are pairs (uid, base_uid), where uid is a 
+method whose parameters do not match the parameters of its base class 
+base_uid.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a>:</b>
+      <a href="epydoc.objdoc.ObjDoc-class.html#STANDARD_FIELDS"><code>STANDARD_FIELDS</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="parameters"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">parameters</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The positional parameters for the function/method documented 
+        by this <code>FuncDoc</code>. This is typically a list of 
+        parameters, but it can contain sublists if the function/method's 
+        signature contains sublists. For example, for the function:
+<pre class="doctestblock">
+<span class="py-src"><span class="py-prompt">&gt;&gt;&gt; </span><span class="py-keyword">def</span> f(a, (b, c), d): <span class="py-keyword">pass</span></span></pre>
+        <p>For this function, <code>parameters</code> will return a 
+        three-element list, whose second element is a sublist containing 
+        <code>Var</code>s for <code>b</code> and <code>c</code>.</p>
+        If you just want a list of all parameters used by the 
+        function/method, use <a 
+        href="epydoc.objdoc.FuncDoc-class.html#parameter_list" 
+        class="link"><code>parameter_list</code></a> instead.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="vararg"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">vararg</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The vararg parameter for the function/method documented by 
+        this <code>FuncDoc</code>, or <code>None</code> if it has no 
+        vararg parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="kwarg"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">kwarg</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The keyword parameter for the function/method documented by 
+        this <code>FuncDoc</code>, or <code>None</code> if it has no 
+        keyword parameter.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="returns"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">returns</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The return value for the function/method documented by this 
+        <code>FuncDoc</code>, or <code>None</code> if it has no return 
+        value.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="raises"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">raises</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of exceptions that may be raised by the function/method 
+        documented by this <code>FuncDoc</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.objdoc.Raise-class.html" 
+        class="link"><code>Raise</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="overrides"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">overrides</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The method overridden by the method documented by this 
+        <code>FuncDoc</code>; or <code>None</code> if the method 
+        documented by this <code>FuncDoc</code> does not override any 
+        method, or if this <code>FuncDoc</code> documents a function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="matches_override"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">matches_override</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if the method documented by this <code>FuncDoc</code> 
+        overrides another method, and its signature matches the signature 
+        of the overridden method.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="parameter_list"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">parameter_list</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A (flat) list of all parameters for the function/method 
+        documented by this <code>FuncDoc</code>. If you are interested in 
+        the signature of the function/method, you should use <a 
+        href="epydoc.objdoc.FuncDoc-class.html#parameters" 
+        class="link"><code>parameters</code></a> instead. This list 
+        includes vararg &amp; keyword params, but does not include the 
+        return value.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <a href="epydoc.objdoc.FuncDoc-class.html#parameters" 
+class="link"><code>parameters</code></a>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="find_override"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">find_override</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>bases</span>)</span>
+  </h3>
+  Find the method that this method overrides.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_signature_match"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_signature_match</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>basespec</span>,
+          <span class=sig-arg>childspec</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if the signature of <code>childfunc</code> matches the 
+        signature of <code>basefunc</code> well enough that we should 
+        inherit its documentation.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_init_builtin_signature"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_init_builtin_signature</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>func</span>)</span>
+  </h3>
+  Construct the signature for a builtin function or method from its 
+  docstring. If the docstring uses the standard convention of including a 
+  signature in the first line of the docstring (and formats that 
+  signature according to standard conventions), then it will be used to 
+  extract a signature. Otherwise, the signature will be set to a single 
+  varargs variable named <code>&quot;...&quot;</code>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="keywords"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">keywords</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The keyword parameters for the function/method documented by 
+        this <code>FuncDoc</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+        class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_process_field"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_process_field</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>tag</span>,
+          <span class=sig-arg>arg</span>,
+          <span class=sig-arg>descr</span>,
+          <span class=sig-arg>warnings</span>)</span>
+  </h3>
+  Process a field from this object's docstring. 
+  <code>ObjDoc._process_field</code> be overridden by child classes of 
+  <code>ObjDoc</code>, and called as the default case.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>tag</b></code> -
+         The field's tag name
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>arg</b></code> -
+         The field's optional argument (or <code>None</code> if no 
+        argument was specified).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>descr</b></code> -
+         The field's body.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      <dd><code><b>warnings</b></code> -
+         A list of warnings that have been encountered. If any new 
+        warnings are encountered, then they should be appended to this 
+        list.
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="../private/epydoc.objdoc.ObjDoc-class.html#_process_field"><code>epydoc.objdoc.ObjDoc._process_field</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_kwarg_param"></a>
+<h3>_kwarg_param</h3>
+This function's keyword parameter, or <code>None</code> if it has 
+none.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_params"></a>
+<h3>_params</h3>
+A list of this function's normal parameters.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code> of <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_raises"></a>
+<h3>_raises</h3>
+The exceptions that may be raised by this function.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code> of <a 
+          href="epydoc.objdoc.Raise-class.html" 
+          class="link"><code>Raise</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_return"></a>
+<h3>_return</h3>
+This function's return value.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_vararg_param"></a>
+<h3>_vararg_param</h3>
+This function's vararg parameter, or <code>None</code> if it has 
+none.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <a href="epydoc.objdoc.Var-class.html" 
+          class="link"><code>Var</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF CLASS VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Class Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_param_mismatches"></a>
+<h3>_param_mismatches</h3>
+A dictionary whose keys are pairs (uid, base_uid), where uid is a 
+method whose parameters do not match the parameters of its base class 
+base_uid.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>list</code>
+
+      </dd>
+<span title="[]">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+[]                                                                     </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_SIGNATURE_RE"></a>
+<h3>_SIGNATURE_RE</h3>
+A regular expression that is used to check whether a builtin function 
+or method has a signature in its docstring.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>SRE_Pattern</code>
+
+      </dd>
+<span title="&lt;_sre.SRE_Pattern object at 0x82479e0&gt;">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="re"><span class="re-char">^</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">(</span><span class="re-group">(</span><span class="re-char">\w</span><span class="re-op">+</span><span class="re-group">)</span><span class="re-char">\.</span><span class="re-group">)</span><span class="re-op">?</span><span class="re-group">(</span><span class="re-char">\w</span><span class="re-op">+</span><span class="re-group">)</span><span class="re-char">\(</span><span class="re-group">(</span><span class="re-group">(</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-char">\[</span><span class="re-op">?</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">[</span><span class="re-char">\w</span>-<span class="re-char">\.</span><span class="re-group">]</span><span class="re-op">+</span><span class="re-group">(</span>=<span class="re-char">.</span><span class="re-op">+?</span><span class="re-group">)</span><span class="re-op">?</span><span class="re-group">(</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-char">\[</span><span class="re-op">?</span><span class="re-char">\s</span><span class="re-op">*</span>,<span class="re-char">\s</span><span class="re-op">*</span><span class="re-char">\]</span><span class="re-op">?</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">[</span><span class="re-char">\w<span class="variable-linewrap">\</span>
+</span>-<span class="re-char">\.</span><span class="re-group">]</span><span class="re-op">+</span><span class="re-group">(</span>=<span class="re-char">.</span><span class="re-op">+?</span><span class="re-group">)</span><span class="re-op">?</span><span class="re-group">)</span><span class="re-op">*</span><span class="re-char">\]</span><span class="re-op">*</span><span class="re-group">)</span><span class="re-op">?</span><span class="re-group">)</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-char">\)</span><span class="re-group">(</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">(</span>-&gt;<span class="re-op">|</span>&lt;=<span class="re-op">+</span>&gt;<span class="re-group">)</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">(</span><span class="re-char">\S</span><span class="re-char">.</span><span class="re-op">*?</span><span class="re-group">)</span><span class="re-group">)</span><span class="re-op">?</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">(</span><span class="re-char">\n</span><span class="re-op">|</span><span class="re-char">\s</span><span class="re-op">+</span>--<span class="re-char">\s</span><span class="re-op">+</span><span class="re-op">|</span><span class="re-char">$</span><span class="re-op">|</span><span class="re-char">\.<span class="variable-linewrap">\</span>
+</span><span class="re-char">\s</span><span class="re-op">|</span><span class="re-char">\.</span><span class="re-char">\n</span><span class="re-group">)</span></span>                                                               </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:16 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

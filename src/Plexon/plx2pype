@@ -1,0 +1,26 @@
+#!/bin/csh
+
+if ("$1" == "") then
+    echo "usage: `basename $0` input_plexon_data_file output_timestamp_file"
+    echo "    or `basename $0` -batch input_plexon_data_files ..."
+    exit 0
+endif
+
+if ("$1" == "-batch") then
+    shift
+    foreach f ($*)
+	echo -n "$f --- "
+	set b=`basename $f`
+	if { test ! -e $b.ts } then
+	    echo "extracting"
+	    pypenv pyplex $f $b.ts
+	else if { test $f -nt $b.ts } then
+	    echo "extracting"
+	    pypenv pyplex $f $b.ts
+	else
+	    echo "ok"
+	endif
+    end
+else
+    pypenv pyplex.py $1 $2
+endif

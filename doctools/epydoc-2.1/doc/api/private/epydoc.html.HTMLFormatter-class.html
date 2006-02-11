@@ -1,0 +1,2850 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.html.HTMLFormatter</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.html-module.html">Module&nbsp;html</a> ::
+        Class&nbsp;HTMLFormatter
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.html.HTMLFormatter-class.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.html.HTMLFormatter-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class HTMLFormatter</h2>
+
+<hr/>
+
+Documentation to HTML converter. The API documentation produced 
+<code>HTMLFormatter</code> consists of a set of HTML files. Two 
+subdirectories are created for the public and private documentation. 
+Within each subdirectories, every class and module is documented in its 
+own file. An index file, a trees file, a help file, and a frames-based 
+table of contents are also created. In particular, 
+<code>HTMLFormatter</code> generates the following files:
+<ul>
+  <li>
+    <a name="index-index_html"></a><i 
+    class="indexterm">index.html</i>: The standard entry point for the 
+    documentation. Normally, index.html is a frame index file, which 
+    defines three frames: two frames on the left side of the browser 
+    contain a table of contents, and the main frame on the right side of 
+    the window contains documentation pages. But if the --no-frames 
+    option is used, then index.html will redirect the user to the 
+    project's top page.
+  </li>
+  <li>
+    <a name="index-module_module_html"></a><i 
+    class="indexterm"><i>module</i>-module.html</i>: The API 
+    documentation for a module. <i>module</i> is the complete dotted name 
+    of the module, such as sys or epydoc.epytext.
+  </li>
+  <li>
+    <a name="index-class_class_html"></a><i 
+    class="indexterm"><i>class</i>-class.html</i>: The API documentation 
+    for a class, exception, or type. <i>class</i> is the complete dotted 
+    name of the class, such as epydoc.epytext.Token or 
+    array.ArrayType.
+  </li>
+  <li>
+    <a name="index-trees_html"></a><i 
+    class="indexterm">trees.html</i>: The module and class 
+    hierarchies.
+  </li>
+  <li>
+    <a name="index-indices_html"></a><i 
+    class="indexterm">indices.html</i> The term and identifier 
+    indices.
+  </li>
+  <li>
+    <a name="index-help_html"></a><i class="indexterm">help.html</i>: 
+    The help page for the project. This page explains how to use and 
+    navigate the webpage produced by epydoc.
+  </li>
+  <li>
+    <a name="index-toc_html"></a><i class="indexterm">toc.html</i>: 
+    The top-level table of contents page. This page is displayed in the 
+    upper-left frame, and provides links to toc-everything.html and the 
+    toc-<i>module</i>-module.html files. toc.html is not generated if the 
+    --no-frames option is used.
+  </li>
+  <li>
+    <a name="index-toc_everything_html"></a><i 
+    class="indexterm">toc-everything.html</i>: The table of contents for 
+    the entire project. This page is displayed in the lower-left frame, 
+    and provides links to every class, type, exception, function, and 
+    variable defined by the project. toc-everything.html is not generated 
+    if the --no-frames option is used.
+  </li>
+  <li>
+    <a name="index-toc_module_module_html"></a><i 
+    class="indexterm">toc-<i>module</i>-module.html</i>: The table of 
+    contents for a module. This page is displayed in the lower-left 
+    frame, and provides links to every class, type, exception, function, 
+    and variable defined by the module. module is the complete dotted 
+    name of the module, such as sys or epydoc.epytext. toc-m-module.html 
+    is not generated if the --no-frames option is used.
+  </li>
+  <li>
+    <a name="index-epydoc_css"></a><i 
+    class="indexterm">epydoc.css</i>: The CSS stylesheet used to display 
+    all HTML pages.
+  </li>
+</ul>
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.html.HTMLFormatter-class.html#__init__" class="summary-sig-name"><code>__init__</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>docmap</span>,
+          <span class="summary-sig-kwarg">**kwargs</span>)</span></code>
+<br />
+Construct a new HTML formatter, using the given documentation map.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.html.HTMLFormatter-class.html#format" class="summary-sig-name"><code>format</code></a>(<span class=summary-sig-arg>object</span>,
+          <span class=summary-sig-arg>error_stream</span>,
+          <span class=summary-sig-arg>show_private</span>,
+          <span class=summary-sig-arg>body_only</span>,
+          <span class="summary-sig-kwarg">**options</span>)</span></code>
+<br />
+Return a string containing the HTML documentation for the given object.    <i>(Static method)</i>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>int</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.html.HTMLFormatter-class.html#num_files" class="summary-sig-name"><code>num_files</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the number of files that this <code>HTMLFormatter</code> will 
+generate.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.html.HTMLFormatter-class.html#write" class="summary-sig-name"><code>write</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>directory</span>,
+          <span class=summary-sig-arg>progress_callback</span>)</span></code>
+<br />
+Write the documentation to the given directory.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_base_tree" class="summary-sig-name"><code>_base_tree</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>width</span>,
+          <span class=summary-sig-arg>postfix</span>)</span></code>
+<br />
+Return the HTML code for a class's base tree.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_breadcrumbs" class="summary-sig-name"><code>_breadcrumbs</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>)</span></code>
+<br />
+Return the HTML code for a series of links to the ancestors of 
+<code>uid</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_descrlist" class="summary-sig-name"><code>_descrlist</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>items</span>,
+          <span class=summary-sig-arg>singular</span>,
+          <span class=summary-sig-arg>plural</span>,
+          <span class=summary-sig-arg>short</span>)</span></code>
+<br />
+Return the HTML code for a list of description items.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_docstring_to_html" class="summary-sig-name"><code>_docstring_to_html</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>docstring</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>indent</span>)</span></code>
+<br />
+Return a string containing the HTML encoding for the given 
+<code>ParsedDocstring</code></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>boolean</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_documented" class="summary-sig-name"><code>_documented</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>)</span></code>
+<br />
+Return true if the given UID is documented by the documentation map for this 
+<code>HTMLFormatter</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_extract_identifier_index" class="summary-sig-name"><code>_extract_identifier_index</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a list of the <code>UID</code>s of all objects and variables 
+documented by <code>_docmap</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <code>(string, <a 
+        href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>, list of 
+        Link)</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_extract_term_index" class="summary-sig-name"><code>_extract_term_index</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Extract the set of terms that should be indexed from all documented 
+docstrings.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_find_top_page" class="summary-sig-name"><code>_find_top_page</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>pagename</span>)</span></code>
+<br />
+Find the top page for the API documentation.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_find_toplevel" class="summary-sig-name"><code>_find_toplevel</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the UID of the top-level module or package, or</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>int</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_find_tree_width" class="summary-sig-name"><code>_find_tree_width</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>)</span></code>
+<br />
+Helper function for <a 
+href="../private/epydoc.html.HTMLFormatter-class.html#_base_tree" 
+class="link"><code>_base_tree</code></a>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_footer" class="summary-sig-name"><code>_footer</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the HTML code for the footer of a page.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_frames_link" class="summary-sig-name"><code>_frames_link</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>where</span>)</span></code>
+<br />
+Return hTML code for the frames/noframes selector.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_func_details_entry" class="summary-sig-name"><code>_func_details_entry</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>function</span>,
+          <span class=summary-sig-arg>container</span>)</span></code>
+<br />
+Return the HTML code for an entry in the function details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_func_signature" class="summary-sig-name"><code>_func_signature</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>fname</span>,
+          <span class=summary-sig-arg>fuid</span>,
+          <span class=summary-sig-arg>fdoc</span>,
+          <span class=summary-sig-arg>href</span>,
+          <span class=summary-sig-arg>show_defaults</span>,
+          <span class=summary-sig-arg>css_class</span>)</span></code>
+<br />
+Return the HTML code for the function signature of the function with the 
+given name and documentation.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_get_index_terms" class="summary-sig-name"><code>_get_index_terms</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>parsed_docstring</span>,
+          <span class=summary-sig-arg>link</span>,
+          <span class=summary-sig-arg>terms</span>,
+          <span class=summary-sig-arg>links</span>)</span></code>
+<br />
+A helper function for <a 
+href="../private/epydoc.html.HTMLFormatter-class.html#_extract_term_index" 
+class="link"><code>_extract_term_index</code></a>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_group_header"></a><span class="summary-sig"><span class="summary-sig-name">_group_header</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>group</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_header" class="summary-sig-name"><code>_header</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>name</span>)</span></code>
+<br />
+Return the HTML code for the header of a page with the given name.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_linewrap_html" class="summary-sig-name"><code>_linewrap_html</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>str</span>,
+          <span class=summary-sig-arg>linelen</span>,
+          <span class=summary-sig-arg>maxlines</span>)</span></code>
+<br />
+Add line-wrapping to the HTML string <code>str</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_link_to_html" class="summary-sig-name"><code>_link_to_html</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>link</span>)</span></code>
+<br />
+Return the HTML code for the given link.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_mkdir" class="summary-sig-name"><code>_mkdir</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>directory</span>)</span></code>
+<br />
+If the given directory does not exist, then attempt to create it.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_param_to_html" class="summary-sig-name"><code>_param_to_html</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>param</span>,
+          <span class=summary-sig-arg>show_defaults</span>,
+          <span class=summary-sig-arg>css_class</span>)</span></code>
+<br />
+Return the HTML code for a single parameter.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_parameter_list"></a><span class="summary-sig"><span class="summary-sig-name">_parameter_list</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>parameters</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_pprint_var_value" class="summary-sig-name"><code>_pprint_var_value</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>var</span>,
+          <span class=summary-sig-arg>multiline</span>,
+          <span class=summary-sig-arg>summary_linelen</span>)</span></code>
+<br />
+Return a string representation of the value of the variable <code>var</code>, 
+suitable for use in a <code>&lt;pre&gt;...&lt;/pre&gt;</code> HTML 
+block.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_property_in_public_details" class="summary-sig-name"><code>_property_in_public_details</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>puid</span>)</span></code>
+<br />
+Return true if the given property should be shown in the public version of 
+the property details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_public_private_link" class="summary-sig-name"><code>_public_private_link</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>where</span>,
+          <span class=summary-sig-arg>toc</span>,
+          <span class=summary-sig-arg>from_private</span>)</span></code>
+<br />
+Return hTML code for the show/hide private selector.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>pair</code> of <code>list</code> of <a 
+        href="epydoc.uid.Link-class.html" 
+        class="link"><code>uid.Link</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_split_classes" class="summary-sig-name"><code>_split_classes</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>classes_and_excepts</span>)</span></code>
+<br />
+Divide the classes fromt the given module into exceptions and 
+non-exceptions.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <a 
+        href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_standard_field_values" class="summary-sig-name"><code>_standard_field_values</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>doc</span>)</span></code>
+<br />
+Return a list of epytext field values that includes all fields that are 
+common to all <a href="epydoc.objdoc.ObjDoc-class.html" 
+class="link"><code>ObjDoc</code></a>s.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_standard_fields" class="summary-sig-name"><code>_standard_fields</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>doc</span>)</span></code>
+<br />
+Return hTML code containing descriptions of the epytext fields that are 
+common to all <a href="epydoc.objdoc.ObjDoc-class.html" 
+class="link"><code>ObjDoc</code></a>s (except for 
+<code>descr</code>).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_start_of" class="summary-sig-name"><code>_start_of</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Return the HTML code for a 'start-of' comment.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_summary" class="summary-sig-name"><code>_summary</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>doc</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>indent</span>)</span></code>
+<br />
+Return the HTML code for the summary description of the object documented by 
+<code>doc</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_table_header" class="summary-sig-name"><code>_table_header</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>heading</span>,
+          <span class=summary-sig-arg>css_class</span>)</span></code>
+<br />
+Return the HTML code for the start of a table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_term_index_to_anchor" class="summary-sig-name"><code>_term_index_to_anchor</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>term</span>)</span></code>
+<br />
+Given the name of an inline index item, construct a URI anchor.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_uid_to_filename"></a><span class="summary-sig"><span class="summary-sig-name">_uid_to_filename</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_uid_to_href" class="summary-sig-name"><code>_uid_to_href</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>label</span>,
+          <span class=summary-sig-arg>css_class</span>,
+          <span class=summary-sig-arg>code</span>)</span></code>
+<br />
+Return the HTML code to link to the given UID.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_uid_to_uri" class="summary-sig-name"><code>_uid_to_uri</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>uid</span>)</span></code>
+<br />
+Return a URI that points to the description of the object identified by 
+<code>uid</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_var_details_entry" class="summary-sig-name"><code>_var_details_entry</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>var</span>,
+          <span class=summary-sig-arg>container</span>)</span></code>
+<br />
+Return the HTML code for an entry in the variable details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_var_value_tooltip" class="summary-sig-name"><code>_var_value_tooltip</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>var</span>)</span></code>
+<br />
+Return a string representation of the value of the variable <code>var</code>, 
+suitable for use in a tooltip.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write" class="summary-sig-name"><code>_write</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>write_func</span>,
+          <span class=summary-sig-arg>directory</span>,
+          <span class=summary-sig-arg>filename</span>,
+          <span class=summary-sig-arg>progress_callback</span>,
+          <span class=summary-sig-arg>is_public</span>,
+          <span class="summary-sig-vararg">*args</span>)</span></code>
+<br />
+A helper for <a href="epydoc.html.HTMLFormatter-class.html#write" 
+class="link"><code>write</code></a>, that creates new public and private 
+streams for a given filename, and delegates writing to 
+<code>write_func</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_breadcrumbs" class="summary-sig-name"><code>_write_breadcrumbs</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>where</span>)</span></code>
+<br />
+Write the HTML code for the breadcrumbs line to the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" class="summary-sig-name"><code>_write_class</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>doc</span>,
+          <span class=summary-sig-arg>body_only</span>)</span></code>
+<br />
+Write an HTML page describing the given module to the given 
+streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_class_summary" class="summary-sig-name"><code>_write_class_summary</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>classes</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a class summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_class_summary_row" class="summary-sig-name"><code>_write_class_summary_row</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>link</span>)</span></code>
+<br />
+Write HTML code for a row in the class summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_class_tree" class="summary-sig-name"><code>_write_class_tree</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write HTML code for a nested list showing the base/subclass 
+relationships between all documented classes.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_class_tree_item" class="summary-sig-name"><code>_write_class_tree_item</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>depth</span>,
+          <span class=summary-sig-arg>public_base</span>)</span></code>
+<br />
+Write HTML code for a list item describing a class and all of its 
+subclasses.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_css" class="summary-sig-name"><code>_write_css</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>directory</span>,
+          <span class=summary-sig-arg>cssname</span>)</span></code>
+<br />
+Write the CSS stylesheet in the given directory.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_frames" class="summary-sig-name"><code>_write_frames</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write the frames index file for the frames-based table of contents to 
+the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_func_details" class="summary-sig-name"><code>_write_func_details</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>functions</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a function details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_func_summary" class="summary-sig-name"><code>_write_func_summary</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>functions</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a function summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_func_summary_row" class="summary-sig-name"><code>_write_func_summary_row</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>function</span>,
+          <span class=summary-sig-arg>container</span>)</span></code>
+<br />
+Write HTML code for a row in the function summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_help" class="summary-sig-name"><code>_write_help</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write an HTML help file to the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_write_imports"></a><span class="summary-sig"><span class="summary-sig-name">_write_imports</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>doc</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_index" class="summary-sig-name"><code>_write_index</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>directory</span>,
+          <span class=summary-sig-arg>frombase</span>)</span></code>
+<br />
+Write an <code>index.html</code> file in the given directory.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_indices" class="summary-sig-name"><code>_write_indices</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write an HTML page containing the term and identifier indices to the 
+given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_inheritance_list" class="summary-sig-name"><code>_write_inheritance_list</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>links</span>,
+          <span class=summary-sig-arg>cls</span>)</span></code>
+<br />
+Return a string containing HTML that lists all objects from that were 
+inherited from a base ancestor of <code>cls</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" class="summary-sig-name"><code>_write_module</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>doc</span>,
+          <span class=summary-sig-arg>body_only</span>)</span></code>
+<br />
+Write an HTML page describing the given module to the given 
+streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_module_list" class="summary-sig-name"><code>_write_module_list</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>modules</span>)</span></code>
+<br />
+Write HTML code for a list of the submodules to the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_module_toc" class="summary-sig-name"><code>_write_module_toc</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>doc</span>)</span></code>
+<br />
+Write an HTML page containing the table of contents page for the given 
+module to the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_module_tree" class="summary-sig-name"><code>_write_module_tree</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write HTML code for a nested list showing the submodule relationships 
+between all documented packages and modules.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_module_tree_item" class="summary-sig-name"><code>_write_module_tree_item</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>uid</span>,
+          <span class=summary-sig-arg>depth</span>)</span></code>
+<br />
+Write HTML for a list item describing a package/module and all of its 
+submodules.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_navbar" class="summary-sig-name"><code>_write_navbar</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>where</span>)</span></code>
+<br />
+Write the HTML code for the navigation bar to the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_project_toc" class="summary-sig-name"><code>_write_project_toc</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write an HTML page containing the table of contents page for the whole 
+project to the given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_property_details" class="summary-sig-name"><code>_write_property_details</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>properties</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a properties details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_property_details_entry" class="summary-sig-name"><code>_write_property_details_entry</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>property</span>,
+          <span class=summary-sig-arg>container</span>)</span></code>
+<br />
+Write HTML code for an individual property in the properties details 
+section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_property_summary" class="summary-sig-name"><code>_write_property_summary</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>properties</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a property summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_property_summary_row" class="summary-sig-name"><code>_write_property_summary_row</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>property</span>,
+          <span class=summary-sig-arg>container</span>)</span></code>
+<br />
+Write HTML code for a row in the property summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_toc" class="summary-sig-name"><code>_write_toc</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write an HTML page containing the top-level table of contents.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_write_toc_section"></a><span class="summary-sig"><span class="summary-sig-name">_write_toc_section</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>section</span>,
+          <span class=summary-sig-arg>links</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_trees" class="summary-sig-name"><code>_write_trees</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>)</span></code>
+<br />
+Write an HTML page containing the module and class hierarchies to the 
+given streams.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_var_details" class="summary-sig-name"><code>_write_var_details</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>vars</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a variable details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_var_summary" class="summary-sig-name"><code>_write_var_summary</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>variables</span>,
+          <span class=summary-sig-arg>heading</span>)</span></code>
+<br />
+Write HTML code for a variable summary table.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.html.HTMLFormatter-class.html#_write_var_summary_row" class="summary-sig-name"><code>_write_var_summary_row</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>public</span>,
+          <span class=summary-sig-arg>private</span>,
+          <span class=summary-sig-arg>var</span>,
+          <span class=summary-sig-arg>container</span>)</span></code>
+<br />
+Write HTML code for a row in the variable summary table.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Instance Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_create_private_docs"><code>_create_private_docs</code></a></b>: Whether or not to create documentation pages that include information 
+about private objects.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_css"><code>_css</code></a></b>: The name of a file containing a CSS stylesheet; or the name of a CSS 
+stylesheet.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><a href="epydoc.objdoc.DocMap-class.html" 
+          class="link"><code>DocMap</code></a></font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_docmap"><code>_docmap</code></a></b>: The documentation map, encoding the objects that should be 
+documented.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_frames_index"><code>_frames_index</code></a></b>: Whether or not to create a frames-based table of contents for the 
+documentation.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>string</code></font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_prj_name"><code>_prj_name</code></a></b>: A name for the documentation (for the navbar).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>string</code></font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_prj_url"><code>_prj_url</code></a></b>: A URL for the documentation (for the navpar).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_top_page"><code>_top_page</code></a></b>: The URI of the top page.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_variable_linelen"><code>_variable_linelen</code></a></b>: The maximum line length used for displaying the values of variables in 
+the variable details sections.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_variable_maxlines"><code>_variable_maxlines</code></a></b>: The maximum number of lines that should be displayed for the value of 
+a variable in the variable details section.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+<td><b><a href="../private/epydoc.html.HTMLFormatter-class.html#_variable_tooltip_linelen"><code>_variable_tooltip_linelen</code></a></b>: The maximum line length for variable value tooltips.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Method Details</th></tr>
+</table>
+
+<a name="__init__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__init__</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>docmap</span>,
+          <span class="sig-kwarg">**kwargs</span>)</span>
+    <br /><i>(Constructor)</i>
+  </h3>
+  Construct a new HTML formatter, using the given documentation 
+  map.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docmap</b></code> -
+         The documentation to output.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.DocMap-class.html" 
+              class="link"><code>DocMap</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Keyword Parameters:</b></dt>
+      <dd><code><b>prj_name</b></code> -
+         The name of the project. Defaults to none.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>prj_url</b></code> -
+         The target for the project hopeage link on the navigation bar. 
+        If <code>prj_url</code> is not specified, then no hyperlink is 
+        created.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>prj_link</b></code> -
+         The label for the project link on the navigation bar. This 
+        link can contain arbitrary HTML code (e.g. images). By default, a 
+        label is constructed from <code>prj_name</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>top</b></code> -
+         The top page for the documentation. This is the default page 
+        shown main frame, when frames are enabled. <code>top</code> can 
+        be a URL, the name of a module, the name of a class, or one of 
+        the special strings <code>&quot;trees.html&quot;</code>, 
+        <code>&quot;indices.html&quot;</code>, or 
+        <code>&quot;help.html&quot;</code>. By default, the top-level 
+        package or module is used, if there is one; otherwise, 
+        <code>&quot;trees&quot;</code> is used.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>css</b></code> -
+         The CSS stylesheet file. If <code>css</code> is a file name, 
+        then the specified file's conents will be used. Otherwise, if 
+        <code>css</code> is the name of a CSS stylesheet in <a 
+        href="epydoc.css-module.html" 
+        class="link"><code>epydoc.css</code></a>, then that stylesheet 
+        will be used. Otherwise, an error is reported. If no stylesheet 
+        is specified, then the default stylesheet is used.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>private_css</b></code> -
+         The CSS stylesheet file for the private API documentation. If 
+        <code>css</code> is a file name, then the specified file's 
+        conents will be used. Otherwise, if <code>css</code> is the name 
+        of a CSS stylesheet in <a href="epydoc.css-module.html" 
+        class="link"><code>epydoc.css</code></a>, then that stylesheet 
+        will be used. Otherwise, an error is reported. If no stylesheet 
+        is specified, then the private API documentation will use the 
+        same stylesheet as the public API documentation.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>help</b></code> -
+         The name of the help file. If no help file is specified, then 
+        the default help file will be used.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>private</b></code> -
+         Whether to create documentation for private objects. By 
+        default, private objects are documented.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      <dd><code><b>frames</b></code> -
+         Whether to create a frames-based table of contents. By 
+        default, it is produced.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>))</i>
+      <dd><code><b>show_imports</b></code> -
+         Whether or not to display lists of imported functions and 
+        classes. By default, they are not shown.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      <dd><code><b>index_parameters</b></code> -
+         Whether or not to include function parameters in the 
+        identifier index. By default, they are not included.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      <dd><code><b>variable_maxlines</b></code> -
+         The maximum number of lines that should be displayed for the 
+        value of a variable in the variable details section. By default, 
+        8 lines are displayed.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>variable_linelength</b></code> -
+         The maximum line length used for displaying the values of 
+        variables in the variable details sections. If a line is longer 
+        than this length, then it will be wrapped to the next line. The 
+        default line length is 70 characters.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>variable_summary_linelength</b></code> -
+         The maximum line length used for displaying the values of 
+        variables in the summary section. If a line is longer than this 
+        length, then it will be truncated. The default is 40 
+        characters.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>variable_tooltip_linelength</b></code> -
+         The maximum line length used for tooltips for the values of 
+        variables. If a line is longer than this length, then it will be 
+        truncated. The default is 600 characters.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>property_function_linelength</b></code> -
+         The maximum line length used to dispaly property functions 
+        (<code>fget</code>, <code>fset</code>, and <code>fdel</code>) 
+        that contain something other than a function object. The dfeault 
+        length is 40 characters.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      <dd><code><b>inheritance</b></code> -
+         How inherited objects should be displayed. If 
+        <code>inheritance='grouped'</code>, then inherited objects are 
+        gathered into groups; if <code>inheritance='listed'</code>, then 
+        inherited objects are listed in a short list at the end of their 
+        group; if <code>inheritance='included'</code>, then inherited 
+        objects are mixed in with non-inherited objects. The default is 
+        'grouped'.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="num_files"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">num_files</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The number of files that this <code>HTMLFormatter</code> will 
+        generate.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="write"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">write</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>directory</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>progress_callback</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Write the documentation to the given directory.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>directory</b></code> -
+         The directory to which output should be written. If no 
+        directory is specified, output will be written to the current 
+        directory. If the directory does not exist, it will be 
+        created.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>progress_callback</b></code> -
+         A callback function that is called before each file is 
+        written, with the name of the created file.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>function</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+    <dl><dt><b>Raises:</b></dt>
+      <dd><code><b>OSError</b></code> -
+        If <code>directory</code> cannot be created,
+      <dd><code><b>OSError</b></code> -
+        If any file cannot be created or written to.
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_base_tree"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_base_tree</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>width</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>postfix</span>=<span class=sig-default>''</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for a class's base tree. The tree is drawn 
+        'upside-down' and right justified, to allow for multiple 
+        inheritance.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_breadcrumbs"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_breadcrumbs</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>uid</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>uid</b></code> -
+         The UID of the object whose ancestors should be listed.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for a series of links to the ancestors of 
+        <code>uid</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_descrlist"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_descrlist</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>items</span>,
+          <span class=sig-arg>singular</span>,
+          <span class=sig-arg>plural</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>short</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>items</b></code> -
+         The description items.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>string</code>)</i>
+      <dd><code><b>singular</b></code> -
+         The name of the list, if there is one element.
+      <dd><code><b>plural</b></code> -
+         The name of the list, if there are multiple elements.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for a list of description items.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_docstring_to_html"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_docstring_to_html</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>docstring</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>indent</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>uid</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>None</code> or <code>UID</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string containing the HTML encoding for the given 
+        <code>ParsedDocstring</code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_documented"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_documented</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>uid</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if the given UID is documented by the documentation map 
+        for this <code>HTMLFormatter</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_extract_identifier_index"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_extract_identifier_index</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of the <code>UID</code>s of all objects and variables 
+        documented by <code>_docmap</code>. This list is used by <a 
+        href="../private/epydoc.html.HTMLFormatter-class.html#_write_indices" 
+        class="link"><code>_write_indices</code></a> to construct the 
+        identifier index.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_extract_term_index"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_extract_term_index</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  Extract the set of terms that should be indexed from all documented 
+  docstrings. Return the extracted set as a list of tuples of the form 
+  <code>(key, term, [links])</code>. This list is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_indices" 
+  class="link"><code>_write_indices</code></a> to construct the term 
+  index.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>list</code> of <code>(string, <a 
+        href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>, list of 
+        Link)</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_top_page"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_top_page</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>pagename</span>)</span>
+  </h3>
+  Find the top page for the API documentation. This page is used as 
+  the default page shown in the main frame, when frames are used. When 
+  frames are not used, a redirect page is created from 
+  <code>index.html</code> to the top page.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>pagename</b></code> -
+         The name of the page, as specified by the keyword argument 
+        <code>top</code> to the constructor.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The URL of the top page.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_toplevel"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_toplevel</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <p>The UID of the top-level module or package, or</p>
+        <code>None</code> if there is no top-level module or 
+        package.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_tree_width"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_tree_width</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>uid</span>)</span>
+  </h3>
+  Helper function for <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_base_tree" 
+  class="link"><code>_base_tree</code></a>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The width of a base tree, when drawn right-justified. This is 
+        used by <a 
+        href="../private/epydoc.html.HTMLFormatter-class.html#_base_tree" 
+        class="link"><code>_base_tree</code></a> to determine how far to 
+        indent lines of the base tree.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>int</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_footer"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_footer</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for the footer of a page.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_frames_link"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_frames_link</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>where</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>where</b></code> -
+         An identifier indiciating the page we're creating a navigation 
+        bar for. This is either a UID or the name of a file without the 
+        &quot;.html&quot; extension.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        HTML code for the frames/noframes selector. This selector is 
+        used to turn the frames-based table of contents on or off.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_func_details_entry"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_func_details_entry</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>function</span>,
+          <span class=sig-arg>container</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>function</b></code> -
+         The function that should be described by this entry.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.Link-class.html" 
+              class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for an entry in the function details section. 
+        Each entry gives a complete description of a documented 
+        function.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_func_signature"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_func_signature</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>fname</span>,
+          <span class=sig-arg>fuid</span>,
+          <span class=sig-arg>fdoc</span>,
+          <span class=sig-arg>href</span>=<span class=sig-default>0</span>,
+          <span class=sig-arg>show_defaults</span>=<span class=sig-default>1</span>,
+          <span class=sig-arg>css_class</span>=<span class=sig-default>'sig'</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>fname</b></code> -
+         The short name of the function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>fuid</b></code> -
+         The UID of the function (used to generate the optional href 
+        link).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      <dd><code><b>fdoc</b></code> -
+         The documentation for the function.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.FuncDoc-class.html" 
+              class="link"><code>objdoc.FuncDoc</code></a>)</i>
+      <dd><code><b>href</b></code> -
+         Whether to create an href link from the function's name to its 
+        details description.
+      <dd><code><b>show_defaults</b></code> -
+         Whether or not to show default values for parameters.
+      <dd><code><b>css_class</b></code> -
+         The CSS class that should be used to mark the signature.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for the function signature of the function with 
+        the given name and documentation.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_get_index_terms"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_get_index_terms</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>parsed_docstring</span>,
+          <span class=sig-arg>link</span>,
+          <span class=sig-arg>terms</span>,
+          <span class=sig-arg>links</span>)</span>
+  </h3>
+  <p>A helper function for <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_extract_term_index" 
+  class="link"><code>_extract_term_index</code></a>.</p>
+  For each index term <i class="math">t</i> with key <i 
+  class="math">k</i> in <code>parsed_docstring</code>, modify 
+  <code>terms</code> and <code>links</code> as follows:
+  <ul>
+    <li>
+      Set <code>terms[<i class="math">k</i>] = t</code> (if 
+      <code>terms[<i class="math">k</i>]</code> doesn't exist).
+    </li>
+    <li>
+      Append <code>link</code> to <code>links[<i 
+      class="math">k</i>]</code>.
+    </li>
+  </ul>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_header"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_header</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>name</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for the header of a page with the given 
+        name.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_linewrap_html"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_linewrap_html</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>str</span>,
+          <span class=sig-arg>linelen</span>,
+          <span class=sig-arg>maxlines</span>)</span>
+  </h3>
+  Add line-wrapping to the HTML string <code>str</code>. Line length 
+  is determined by <code>linelen</code>; and the maximum number of lines 
+  to display is determined by <code>maxlines</code>. This function treats 
+  HTML entities (e.g., <code>&amp;amp;</code>) as single characters; and 
+  ignores HTML tags (e.g., <code>&lt;p&gt;</code>).
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_link_to_html"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_link_to_html</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>link</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>link</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.Link-class.html" 
+              class="link"><code>uid.Link</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for the given link. This code consists of an 
+        anchor with an href to the page for the link's target, and with 
+        text taken from the link's name. If the target is not documented, 
+        then the HTML code will just contain the name, and no href.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_mkdir"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_mkdir</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>directory</span>)</span>
+  </h3>
+  If the given directory does not exist, then attempt to create 
+  it.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_param_to_html"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_param_to_html</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>param</span>,
+          <span class=sig-arg>show_defaults</span>,
+          <span class=sig-arg>css_class</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>show_defaults</b></code> -
+         Whether or not to show default values for parameters.
+      <dd><code><b>css_class</b></code> -
+         The CSS class that should be used to mark the signature.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for a single parameter. Note that a single 
+        parameter can consists of a sublist of parameters (although this 
+        feature isn't often used). This is a helper function for <a 
+        href="../private/epydoc.html.HTMLFormatter-class.html#_func_signature" 
+        class="link"><code>_func_signature</code></a>.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_pprint_var_value"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_pprint_var_value</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>var</span>,
+          <span class=sig-arg>multiline</span>=<span class=sig-default>1</span>,
+          <span class=sig-arg>summary_linelen</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>var</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.Var-class.html" 
+              class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string representation of the value of the variable 
+        <code>var</code>, suitable for use in a 
+        <code>&lt;pre&gt;...&lt;/pre&gt;</code> HTML block.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_property_in_public_details"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_property_in_public_details</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>puid</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        True if the given property should be shown in the public 
+        version of the property details section.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_public_private_link"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_public_private_link</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>where</span>,
+          <span class=sig-arg>toc</span>=<span class=sig-default>0</span>,
+          <span class=sig-arg>from_private</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>where</b></code> -
+         An identifier indiciating the page we're creating a navigation 
+        bar for. This is either a UID or the name of a file without the 
+        &quot;.html&quot; extension.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        HTML code for the show/hide private selector. This selector is 
+        used to select whether private objects should be displayed.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_split_classes"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_split_classes</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>classes_and_excepts</span>)</span>
+  </h3>
+  Divide the classes fromt the given module into exceptions and 
+  non-exceptions. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to list exceptions and 
+  non-exceptions separately.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>classes_and_excepts</b></code> -
+         The list of classes to split up.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a 
+              href="epydoc.uid.Link-class.html" 
+              class="link"><code>uid.Link</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list <code>(<i>classes</i>, <i>excepts</i>)</code>, where 
+        <code><i>classes</i></code> is the list of non-exception classes, 
+        and <code><i>excepts</i></code> is the list of exception 
+        classes.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>pair</code> of <code>list</code> of <a 
+        href="epydoc.uid.Link-class.html" 
+        class="link"><code>uid.Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_standard_field_values"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_standard_field_values</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>doc</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of epytext field values that includes all fields that 
+        are common to all <a href="epydoc.objdoc.ObjDoc-class.html" 
+        class="link"><code>ObjDoc</code></a>s. 
+        <code>_standard_field_values</code> is used by <a 
+        href="../private/epydoc.html.HTMLFormatter-class.html#_extract_term_index" 
+        class="link"><code>_extract_term_index</code></a>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a 
+        href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_standard_fields"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_standard_fields</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>doc</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>doc</b></code> -
+         The object whose fields should be described.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        HTML code containing descriptions of the epytext fields that 
+        are common to all <a href="epydoc.objdoc.ObjDoc-class.html" 
+        class="link"><code>ObjDoc</code></a>s (except for 
+        <code>descr</code>).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_start_of"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_start_of</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>heading</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>heading</b></code> -
+         The name of the section that is starting.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for a 'start-of' comment. These comments are 
+        used to deliniate sections of the HTML output.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_summary"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_summary</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>doc</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>indent</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>doc</b></code> -
+         The documentation for the object whose summary should be 
+        returned.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.ObjDoc-class.html" 
+              class="link"><code>objdoc.ObjDoc</code></a>)</i>
+      <dd><code><b>uid</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>uid.UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for the summary description of the object 
+        documented by <code>doc</code>. A summary description is the 
+        first sentence of the <code>doc</code>'s 'description' field. If 
+        the <code>doc</code> has no 'description' field, but does have a 
+        'return' field, then the summary is taken from the return field 
+        instead.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_table_header"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_table_header</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>heading</span>,
+          <span class=sig-arg>css_class</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>heading</b></code> -
+         The name for the table.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>css_class</b></code> -
+         The css class for the table. This is used to allow different 
+        tables to be given different styles. Currently, the following 
+        classes are used: <code>'summary'</code>; <code>'details'</code>; 
+        and <code>'index'</code>.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for the start of a table. This is used by class 
+        tables, function tables, variable tables, etc.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_term_index_to_anchor"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_term_index_to_anchor</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>term</span>)</span>
+  </h3>
+  Given the name of an inline index item, construct a URI anchor. 
+  These anchors are used to create links from the index page to each 
+  index item.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_uid_to_href"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_uid_to_href</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>label</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>css_class</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>code</span>=<span class=sig-default>1</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>uid</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>uid.UID</code></a>)</i>
+      <dd><code><b>label</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>code</b></code> -
+         Whether or not to include 
+        <code>&lt;code&gt;...&lt;/code&gt;</code> tags around the 
+        label.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code to link to the given UID. This code consists of 
+        an anchor with an href to the page for <code>uid</code>. If 
+        <code>label</code> is not <code>None</code>, then it is used as 
+        the text for the link; otherwise, <code>uid</code> is used as the 
+        text. If <code>uid</code> is not documented, then the HTML code 
+        will just contain the name, and no href.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_uid_to_uri"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_uid_to_uri</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>uid</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>uid</b></code> -
+         A unique identifier for the object.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        a URI that points to the description of the object identified 
+        by <code>uid</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_var_details_entry"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_var_details_entry</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>var</span>,
+          <span class=sig-arg>container</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>var</b></code> -
+         The variable that should be described.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The HTML code for an entry in the variable details section. 
+        Each entry gives a complete description of a documented 
+        variable.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_var_value_tooltip"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_var_value_tooltip</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>var</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>var</b></code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.Var-class.html" 
+              class="link"><code>Var</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string representation of the value of the variable 
+        <code>var</code>, suitable for use in a tooltip. In particular, 
+        use <code>repr</code> to convert the var to a string; truncate it 
+        to <a 
+        href="../private/epydoc.html.HTMLFormatter-class.html#_variable_tooltip_linelen" 
+        class="link"><code>_variable_tooltip_linelen</code></a>; and 
+        convert it to HTML.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>write_func</span>,
+          <span class=sig-arg>directory</span>,
+          <span class=sig-arg>filename</span>,
+          <span class=sig-arg>progress_callback</span>,
+          <span class=sig-arg>is_public</span>,
+          <span class="sig-vararg">*args</span>)</span>
+  </h3>
+  A helper for <a href="epydoc.html.HTMLFormatter-class.html#write" 
+  class="link"><code>write</code></a>, that creates new public and 
+  private streams for a given filename, and delegates writing to 
+  <code>write_func</code>. If <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_create_private_docs" 
+  class="link"><code>_create_private_docs</code></a> is true, then the 
+  streams are created in the <code>'public'</code> and 
+  <code>'private'</code> subdirectories of <code>directory</code>. If 
+  it's false, then the public stream is created in 
+  <code>directory</code>, and a <a 
+  href="../private/epydoc.html._DevNull-class.html" 
+  class="link"><code>_DevNull</code></a> is used for the private 
+  stream.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>write_func</b></code> -
+         The output function to delegate to. It is called with a public 
+        stream, a private stream, and any arguments given in 
+        <code>args</code>.
+      <dd><code><b>directory</b></code> -
+         The base directory for the output files
+      <dd><code><b>filename</b></code> -
+         The filename of the file(s) that <code>write_func</code> 
+        should write to.
+      <dd><code><b>progress_callback</b></code> -
+         A progress callback function. If it is not <code>None</code>, 
+        then it is called with <code>filename</code> before 
+        <code>write_func</code> is called.
+      <dd><code><b>is_public</b></code> -
+         Whether this is a public page. If it is not a public page, 
+        then a <code>_DevNull</code> will be used for the public stream. 
+        (Or if it is not a public page and 
+        <code>_create_private_docs</code> is false, then immediately 
+        return.)
+      <dd><code><b>args</b></code> -
+         Extra arguments for <code>write_func</code>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_breadcrumbs"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_breadcrumbs</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>where</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Write the HTML code for the breadcrumbs line to the given streams. 
+  The breadcrumbs line is an invisible table with a list of pointers to 
+  the current object's ancestors on the left; and the show/hide private 
+  selector and the frames/noframes selector on the right.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>where</b></code> -
+         An identifier indicating what page we're creating a navigation 
+        bar for. This is either a UID (for an object documentation page); 
+        or a string. If it is a UID, then a list of pointers to its 
+        ancestors is displayed.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_class"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_class</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>doc</span>,
+          <span class=sig-arg>body_only</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  Write an HTML page describing the given module to the given 
+  streams.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>uid</b></code> -
+         The UID of the module to document.
+      <dd><code><b>doc</b></code> -
+         The <a href="epydoc.objdoc.ModuleDoc-class.html" 
+        class="link"><code>ModuleDoc</code></a> of the module to 
+        document.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_class_summary"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_class_summary</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>classes</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Class&nbsp;Summary'</span>)</span>
+  </h3>
+  Write HTML code for a class summary table. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to list the classes in a 
+  module.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The module that contains the classes. <code>container</code> 
+        is used to group the classes.
+      <dd><code><b>classes</b></code> -
+         The classes that should be included in the list.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_class_summary_row"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_class_summary_row</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>link</span>)</span>
+  </h3>
+  Write HTML code for a row in the class summary table. Each row gives 
+  the name and summary of a single class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>link</b></code> -
+         A link to the class that should be described by this row.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_class_tree"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_class_tree</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write HTML code for a nested list showing the base/subclass 
+  relationships between all documented classes. Each element of the 
+  top-level list is a class with no (documented) bases; and under each 
+  class is listed all of its subclasses. Note that in the case of 
+  multiple inheritance, a class may appear multiple times. This is used 
+  by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_trees" 
+  class="link"><code>_write_trees</code></a> to write the class 
+  hierarchy.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+<p><b>Bug:</b> This function does not list public subclasses of private bases.
+</p>
+
+<p><b>To Do:</b> For multiple inheritance, don't repeat subclasses the second time a 
+class is mentioned; instead, link to the first mention.
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_class_tree_item"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_class_tree_item</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>depth</span>=<span class=sig-default>2</span>,
+          <span class=sig-arg>public_base</span>=<span class=sig-default>1</span>)</span>
+  </h3>
+  Write HTML code for a list item describing a class and all of its 
+  subclasses. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class_tree" 
+  class="link"><code>_write_class_tree</code></a> to write the class 
+  hierarchy.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>uid</b></code> -
+         The <code>UID</code> of the class tree to describe
+      <dd><code><b>depth</b></code> -
+         The indentation depth.
+      <dd><code><b>public_base</b></code> -
+         True if output should be generated for the public stream. This 
+        is prevents public classes with private bases from being 
+        listed.
+      </dd>
+    </dl>
+<p><b>Bug:</b> This doesn't generate &lt;/li&gt; close tags.
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_css"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_css</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>directory</span>,
+          <span class=sig-arg>cssname</span>)</span>
+  </h3>
+  Write the CSS stylesheet in the given directory. If 
+  <code>cssname</code> contains a stylesheet file or name (from <a 
+  href="epydoc.css-module.html" 
+  class="link"><code>epydoc.css</code></a>), then use that stylesheet; 
+  otherwise, if a stylesheet file already exists, use that stylesheet. 
+  Otherwise, use the default stylesheet.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_frames"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_frames</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write the frames index file for the frames-based table of contents 
+  to the given streams.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_func_details"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_func_details</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>functions</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Function&nbsp;Details'</span>)</span>
+  </h3>
+  Write HTML code for a function details section. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to describe the functions 
+  in a module; and by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" 
+  class="link"><code>_write_class</code></a> to describe the methods in a 
+  class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The module or class that contains the functions. 
+        <code>container</code> is used to group the functions.
+      <dd><code><b>functions</b></code> -
+         The functions that should be included in the section.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_func_summary"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_func_summary</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>functions</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Function&nbsp;Summary'</span>)</span>
+  </h3>
+  Write HTML code for a function summary table. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to list the functions in a 
+  module; and by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" 
+  class="link"><code>_write_class</code></a> to list the methods in a 
+  class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The module or class that contains the functions. 
+        <code>container</code> is used to group the functions.
+      <dd><code><b>functions</b></code> -
+         The functions that should be included in the list.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_func_summary_row"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_func_summary_row</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>function</span>,
+          <span class=sig-arg>container</span>)</span>
+  </h3>
+  Write HTML code for a row in the function summary table. Each row 
+  gives a breif description of a single function.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>function</b></code> -
+         The function that should be described by this row.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.Link-class.html" 
+              class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_help"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_help</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write an HTML help file to the given streams. If 
+  <code>self._helpfile</code> contains a help file, then use it; 
+  otherwise, use the default helpfile from <a 
+  href="epydoc.help-module.html" 
+  class="link"><code>epydoc.help</code></a>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_index"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_index</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>directory</span>,
+          <span class=sig-arg>frombase</span>)</span>
+  </h3>
+  Write an <code>index.html</code> file in the given directory. The 
+  contents of this file are copied or linked from an existing page. The 
+  page used is determined by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_frames_index" 
+  class="link"><code>_frames_index</code></a> and <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_top_page" 
+  class="link"><code>_top_page</code></a>:
+  <ul>
+    <li>
+      If <a 
+      href="../private/epydoc.html.HTMLFormatter-class.html#_frames_index" 
+      class="link"><code>_frames_index</code></a> is true, then 
+      <code>frames.html</code> is copied.
+    </li>
+    <li>
+      Otherwise, the page specified by <a 
+      href="../private/epydoc.html.HTMLFormatter-class.html#_top_page" 
+      class="link"><code>_top_page</code></a> is copied.
+    </li>
+  </ul>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>frombase</b></code> -
+         True if this is the index file for the base directory when we 
+        are generating both public and private documentation. In this 
+        case, all local hyperlinks should be changed to point into the 
+        <code>public</code> subdirectory.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>boolean</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_indices"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_indices</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write an HTML page containing the term and identifier indices to the 
+  given streams.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+<p><b>Bug:</b> If there are private indexed terms, but no public indexed terms, then 
+this function will still write a header for the Term Index to the public 
+stream.
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_inheritance_list"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_inheritance_list</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>links</span>,
+          <span class=sig-arg>cls</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>links</b></code> -
+         The set of member objects of <code>cls</code> that should be 
+        listed by ancestor.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a 
+              href="epydoc.uid.Link-class.html" 
+              class="link"><code>Link</code></a>)</i>
+      <dd><code><b>cls</b></code> -
+         The UID of the class whose inherited objects should be 
+        listed.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string containing HTML that lists all objects from that were 
+        inherited from a base ancestor of <code>cls</code>. Only the 
+        objects linked to from one of the links in <code>links</code> are 
+        considered. The HTML lists the objects in one row of a table, 
+        grouped by ancestor.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_module"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_module</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>doc</span>,
+          <span class=sig-arg>body_only</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  Write an HTML page describing the given module to the given 
+  streams.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>uid</b></code> -
+         The UID of the module to document.
+      <dd><code><b>doc</b></code> -
+         The <a href="epydoc.objdoc.ModuleDoc-class.html" 
+        class="link"><code>ModuleDoc</code></a> of the module to 
+        document.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_module_list"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_module_list</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>modules</span>)</span>
+  </h3>
+  Write HTML code for a list of the submodules to the given streams. 
+  This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to list the submodules in a 
+  package.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The package that contains the modules (as submodules). 
+        <code>container</code> is used to group the modules.
+      <dd><code><b>modules</b></code> -
+         The modules that should be included in the list.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_module_toc"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_module_toc</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>doc</span>)</span>
+  </h3>
+  Write an HTML page containing the table of contents page for the 
+  given module to the given streams. This page lists the modules, 
+  classes, exceptions, functions, and variables defined by the 
+  module.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_module_tree"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_module_tree</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write HTML code for a nested list showing the submodule 
+  relationships between all documented packages and modules. This is used 
+  by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_trees" 
+  class="link"><code>_write_trees</code></a> to write the module 
+  hierarchy.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_module_tree_item"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_module_tree_item</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>uid</span>,
+          <span class=sig-arg>depth</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  Write HTML for a list item describing a package/module and all of 
+  its submodules. This is used by both <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module_tree" 
+  class="link"><code>_write_module_tree</code></a> and <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module_list" 
+  class="link"><code>_write_module_list</code></a> to write package 
+  hierarchies.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>uid</b></code> -
+         The <code>UID</code> of the module to describe
+      <dd><code><b>depth</b></code> -
+         The indentation depth.
+      </dd>
+    </dl>
+<p><b>Bug:</b> This doesn't generate &lt;/li&gt; close tags.
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_navbar"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_navbar</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>where</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Write the HTML code for the navigation bar to the given streams. The 
+  navigation bar typically looks like:
+<pre class="literalblock">
+       [ Home Trees Index Help            Project ]
+</pre>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>where</b></code> -
+         An identifier indicating what page we're creating a navigation 
+        bar for. This is either a UID (for an object documentation page); 
+        or one of the strings <code>'tree'</code>, <code>'index'</code>, 
+        and <code>'help'</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>UID</code> or <code>string</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_project_toc"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_project_toc</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write an HTML page containing the table of contents page for the 
+  whole project to the given streams. This page lists the classes, 
+  exceptions, functions, and variables defined by any module or package 
+  in the project.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_property_details"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_property_details</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>properties</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Property&nbsp;Details'</span>)</span>
+  </h3>
+  Write HTML code for a properties details section. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" 
+  class="link"><code>_write_class</code></a> to describe the properties 
+  in a class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The or class that contains the properties. 
+        <code>container</code> is used to group the functions.
+      <dd><code><b>properties</b></code> -
+         The properties that should be included in the section.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_property_details_entry"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_property_details_entry</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>property</span>,
+          <span class=sig-arg>container</span>)</span>
+  </h3>
+  Write HTML code for an individual property in the properties details 
+  section. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_property_details" 
+  class="link"><code>_write_property_details</code></a>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>property</b></code> -
+         The property that should be described by this entry.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.Link-class.html" 
+              class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_property_summary"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_property_summary</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>properties</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Property&nbsp;Summary'</span>)</span>
+  </h3>
+  Write HTML code for a property summary table. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" 
+  class="link"><code>_write_class</code></a> to list the properties in a 
+  class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The module or class that contains the properties. 
+        <code>container</code> is used to group the properties.
+      <dd><code><b>properties</b></code> -
+         The properties that should be included in the list.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_property_summary_row"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_property_summary_row</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>property</span>,
+          <span class=sig-arg>container</span>)</span>
+  </h3>
+  Write HTML code for a row in the property summary table. Each row 
+  gives a brief description of a single property.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>property</b></code> -
+         The property that should be described by this row.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.Link-class.html" 
+              class="link"><code>Link</code></a>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_toc"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_toc</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write an HTML page containing the top-level table of contents. This 
+  page is used to select a module table of contents page, or the 
+  &quot;everything&quot; table of contents page.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_trees"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_trees</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>)</span>
+  </h3>
+  Write an HTML page containing the module and class hierarchies to 
+  the given streams.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_var_details"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_var_details</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>vars</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Variable&nbsp;Details'</span>)</span>
+  </h3>
+  Write HTML code for a variable details section. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to describe the variables 
+  in a module; and by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" 
+  class="link"><code>_write_class</code></a> to describe the instance and 
+  class variables in a class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The module or class that contains the variables. 
+        <code>container</code> is used to group the properties.
+      <dd><code><b>vars</b></code> -
+         The variables that should be included in the section.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_var_summary"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_var_summary</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>container</span>,
+          <span class=sig-arg>variables</span>,
+          <span class=sig-arg>heading</span>=<span class=sig-default>'Variable&nbsp;Summary'</span>)</span>
+  </h3>
+  Write HTML code for a variable summary table. This is used by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_module" 
+  class="link"><code>_write_module</code></a> to list the variables in a 
+  module; and by <a 
+  href="../private/epydoc.html.HTMLFormatter-class.html#_write_class" 
+  class="link"><code>_write_class</code></a> to list the instance and 
+  class variables in a class.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>container</b></code> -
+         The module or class that contains the variables. 
+        <code>container</code> is used to group the properties.
+      <dd><code><b>variables</b></code> -
+         The variables that should be included in the list.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_write_var_summary_row"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_write_var_summary_row</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>public</span>,
+          <span class=sig-arg>private</span>,
+          <span class=sig-arg>var</span>,
+          <span class=sig-arg>container</span>)</span>
+  </h3>
+  Write HTML code for a row in the variable summary table. Each row 
+  gives a brief description of a single variable.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>public</b></code> -
+         The output stream for the public version of the page.
+      <dd><code><b>private</b></code> -
+         The output stream for the private version of the page.
+      <dd><code><b>var</b></code> -
+         The variable that should be described by this row.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF STATIC METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Static Method Details</th></tr>
+</table>
+
+<a name="format"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">format</span>(<span class=sig-arg>object</span>,
+          <span class=sig-arg>error_stream</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>show_private</span>=<span class=sig-default>1</span>,
+          <span class=sig-arg>body_only</span>=<span class=sig-default>1</span>,
+          <span class="sig-kwarg">**options</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>object</b></code> -
+         The object to document. <code>object</code> can be a module, a 
+        class, a function, a method, or a property; or it can be the <a 
+        href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> of any object; or it can be a 
+        <a href="epydoc.uid.Link-class.html" 
+        class="link"><code>Link</code></a> to any object.
+      <dd><code><b>error_stream</b></code> -
+         A file or stream where errors and warnings will be written. If 
+        <code>error_stream</code> is unspecified, then warnings and 
+        errors are discarded.
+      <dd><code><b>show_private</b></code> -
+         If true, then include private objects in the output; if false, 
+        then only include public objects.
+      <dd><code><b>body_only</b></code> -
+         If true, then don't include navigation bars and breadcrumbs 
+        when generating the HTML documentation for a module or a class. 
+        If false, then do include them.
+      <dd><code><b>options</b></code> -
+         Options for the <code>HTMLFormatter</code> object that will be 
+        used to generate the HTML. See <a 
+        href="epydoc.html.HTMLFormatter-class.html#__init__" 
+        class="link"><code>HTMLFormatter.__init__</code></a> for a 
+        complete list of options.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A string containing the HTML documentation for the given 
+        object.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_create_private_docs"></a>
+<h3>_create_private_docs</h3>
+Whether or not to create documentation pages that include information 
+about private objects.
+</td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_css"></a>
+<h3>_css</h3>
+The name of a file containing a CSS stylesheet; or the name of a CSS 
+stylesheet.
+</td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_docmap"></a>
+<h3>_docmap</h3>
+The documentation map, encoding the objects that should be 
+documented.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <a href="epydoc.objdoc.DocMap-class.html" 
+          class="link"><code>DocMap</code></a>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_frames_index"></a>
+<h3>_frames_index</h3>
+Whether or not to create a frames-based table of contents for the 
+documentation.
+</td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_prj_name"></a>
+<h3>_prj_name</h3>
+A name for the documentation (for the navbar).
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>string</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_prj_url"></a>
+<h3>_prj_url</h3>
+A URL for the documentation (for the navpar).
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>string</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_top_page"></a>
+<h3>_top_page</h3>
+The URI of the top page. This is the page shown in the main frame by 
+the frames index; and the page that is used as the noframes index.
+</td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_variable_linelen"></a>
+<h3>_variable_linelen</h3>
+The maximum line length used for displaying the values of variables in 
+the variable details sections.
+</td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_variable_maxlines"></a>
+<h3>_variable_maxlines</h3>
+The maximum number of lines that should be displayed for the value of 
+a variable in the variable details section.
+</td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_variable_tooltip_linelen"></a>
+<h3>_variable_tooltip_linelen</h3>
+The maximum line length for variable value tooltips.
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:11 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

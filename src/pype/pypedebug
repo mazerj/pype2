@@ -1,0 +1,16 @@
+#!/bin/sh
+# 
+# This send's a SIGUSR2 to the current pyperun process.
+# Normally this is caught by a signal handler and the pype
+# process should print out a stack trace to drop into an
+# interactive debugger shell.
+#
+
+pid=$(ps ax | grep pyperun | grep -v grep | awk '{print $1}')
+if [ "$pid" = "" ]; then
+  echo "nothing to debug"
+else
+  echo pyperun pid is $pid
+  kill -USR2 $pid
+fi
+

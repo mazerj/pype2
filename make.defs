@@ -1,0 +1,21 @@
+######################################################################
+# Customize for your environment.  You # must have write access to
+# this directory! Note: ?= searchs 'env' first..
+PYPEDIR ?= /usr/local/pype2
+
+######################################################################
+# where do the netpbm libs live on your machine?
+# redhat/std:
+PBMLIBS = -lpnm -lppm -lpbm -lpgm
+# debian:
+#PBMLIBS = -lnetpbm
+
+######################################################################
+# do as you wish here:
+GLOBAL_CFLAGS = -O -Wall -D_REENTRANT
+
+
+#######################################################################
+PYTHONINC ?= -I$(PYTHONPREFIX)/include/python$(PYTHONFULLVER)
+PYCOMPILE ?= $(PYTHONEXE) $(PYTHONPREFIX)/lib/python$(PYTHONFULLVER)/compileall.py
+

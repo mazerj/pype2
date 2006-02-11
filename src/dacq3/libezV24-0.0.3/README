@@ -1,0 +1,70 @@
+                                                      -*- indented-text -*-
+Project:    ezV24-Library
+File:       libezv24/README
+Time-stamp: <01/11/15 14:34:37 jd>
+----------------------------------------------------------------------------
+
+This is a preliminary release of the `ezV24' library. The goal of this libary
+is to provide a easy to use interface to the serial ports of the linux
+system. This release comes with rudimentary support for the CYGWIN toolchain
+(see http://www.cygwin.com/). Due to the great work of the cygwin folks, only
+minimal changes are needed. I know that that the cygwin-stuff isn't the final
+stuff, but it's a first step and it works.
+
+
+HOME ON THE NET
+---------------
+
+The project it hosted at sourceforge. You can find the latest release of the
+`ezV24' library at http://libezV24.sourceforge.net/. If you have some questions,
+feel free to write me an email <jdesch@users.sourceforge.net>.
+
+
+INSTALLATION
+------------
+
+To install the libary, just unpack the archive (you may have done this ;) and
+execute the following steps:
+
+(1) compile the library by typing `make'. The result should be a executable
+    shared library named `libezV24.so.*'.
+
+    $ make
+
+(2) become root and install the library and the header files. This call will
+    update you ldd-cache too! Note that this doen's install the html
+    documentation! I'm not shure where to install it, so you can put it into 
+    your prefered directory.
+
+    > su
+    > make install
+    > exit
+
+(3) Now you have the `ezV24'-library installed. The last (optional) step is
+    to compile the sample program.
+
+    $ make test-v24
+
+    The result is a small executable `test-v24'. To see what `test-v24' do,
+    you must have a look into the source code.
+
+
+
+USAGE
+-----
+
+To use the libary for your own applications, you have to include the main
+header:
+
+	#include <ezV24/ezV24.h>
+
+To link the shared library to your application, you just have to specify the
+basename of the library with `-lezV24'. The whole call could look like this:
+
+	gcc -o foo foo.c -lezV24
+
+
+
+-- 
+Joerg Desch
+-----------------------------------------------------------[end of file]----

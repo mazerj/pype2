@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.uid</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        Module&nbsp;uid
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.uid-module.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.uid-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module epydoc.uid</h2>
+
+Unique identifiers and crossreference links for Python objects. Each 
+Python object is identified by a globally unique identifier, implemented 
+with the <a href="epydoc.uid.UID-class.html" 
+class="link"><code>UID</code></a> class. It is important that each object 
+have a single unique identifier, because one object may have more than 
+one name. UIDs should be always created using the <a 
+href="epydoc.uid-module.html#make_uid" 
+class="link"><code>make_uid</code></a> function; do not create UIDs 
+directly. The <a href="epydoc.uid.Link-class.html" 
+class="link"><code>Link</code></a> class uses UIDs to implement 
+crossreferencing between <code>ObjDoc</code>s.
+<hr/>
+<p><b>Bugs:</b>
+<ul>
+  <li>UIDs are not generated correctly for nested classes; and in general, 
+nested classes are not well supported. (E.g., they are listed under their 
+module, not their containing class). The effect of this bug is that 
+docstring &quot;<code>L{links}</code>&quot; that refer to the nested 
+class using its normal name (e.g. 
+<code>ContainerClass.NestedClass</code>) won't be resolved correctly. But 
+you should be able to link to it with just <code>NestedClass</code>.
+</li>
+  <li><code>PropertyDoc</code> usually creates an incorrect UID for its 
+fget, fset, and fdel accessors. This arises because they are represented 
+as functions, not methods; so epydoc doesn't have any way to tell what 
+class they were defined in. As a result, it just assumes that they were 
+installed at the module level. The effect of this bug is that the 
+hyperlinks from property accessor methods don't point to the right 
+targets.
+
+  </li>
+</ul></p>
+
+<p><b>See Also:</b> <a href="epydoc.objdoc-module.html" 
+class="link"><code>epydoc.objdoc</code></a>
+</p>
+
+
+<!-- =========== START OF CLASSES =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Classes</th></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.ObjectUID-class.html"><code>ObjectUID</code></a></b></td>
+  <td>A globally unique identifier used to refer to a Python object.</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Unique Identifiers</th></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.UID-class.html"><code>UID</code></a></b></td>
+  <td>A globally unique identifier.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.RelativeUID-class.html"><code>RelativeUID</code></a></b></td>
+  <td>A globally unique identifier used to refer to a variable, relative to 
+a Python object.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.VariableUID-class.html"><code>VariableUID</code></a></b></td>
+  <td>&nbsp;</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.PropertyUID-class.html"><code>PropertyUID</code></a></b></td>
+  <td>&nbsp;</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.StaticMethodUID-class.html"><code>StaticMethodUID</code></a></b></td>
+  <td>&nbsp;</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.ClassMethodUID-class.html"><code>ClassMethodUID</code></a></b></td>
+  <td>&nbsp;</td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Crossreferences</th></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.uid.Link-class.html"><code>Link</code></a></b></td>
+  <td>A cross-reference link between documentation.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid-module.html#make_uid" class="summary-sig-name"><code>make_uid</code></a>(<span class=summary-sig-arg>object</span>,
+          <span class=summary-sig-arg>base_uid</span>,
+          <span class=summary-sig-arg>shortname</span>)</span></code>
+<br />
+Create a globally unique identifier for the given object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid-module.html#findUID" class="summary-sig-name"><code>findUID</code></a>(<span class=summary-sig-arg>name</span>,
+          <span class=summary-sig-arg>container</span>,
+          <span class=summary-sig-arg>docmap</span>)</span></code>
+<br />
+Attempt to find the UID for the object that can be accessed with the 
+name <code>name</code> from the module <code>module</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.uid-module.html#reset_uid_cache" class="summary-sig-name"><code>reset_uid_cache</code></a>()</span></code>
+<br />
+Reset the internal cache of UIDs for objects.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="make_uid"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">make_uid</span>(<span class=sig-arg>object</span>,
+          <span class=sig-arg>base_uid</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>shortname</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Create a globally unique identifier for the given object.
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="findUID"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">findUID</span>(<span class=sig-arg>name</span>,
+          <span class=sig-arg>container</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>docmap</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Attempt to find the UID for the object that can be accessed with the 
+  name <code>name</code> from the module <code>module</code>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>name</b></code> -
+         The name used to identify the object.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      <dd><code><b>container</b></code> -
+         The UID of the class or module containing the object. If no 
+        container is specified, then <code>__builtin__</code> is 
+        used.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+              class="link"><code>UID</code></a> or <code>None</code>)</i>
+      <dd><code><b>docmap</b></code> -
+         A documentation map, which is used to check if 
+        <code>name</code> is the name of a module variable, class 
+        variable, or instance variable.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.objdoc.DocMap-class.html" 
+              class="link"><code>objdoc.DocMap</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The UID for the object that can be accessed with the name 
+        <code>name</code> from the module <code>module</code>; or 
+        <code>None</code> if no object was found.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.uid.UID-class.html" 
+        class="link"><code>UID</code></a> or <code>None</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="reset_uid_cache"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">reset_uid_cache</span>()</span>
+  </h3>
+  Reset the internal cache of UIDs for objects.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:15 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

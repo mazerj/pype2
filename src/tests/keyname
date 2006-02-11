@@ -1,0 +1,30 @@
+#!/usr/bin/python
+# -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
+
+
+from Tkinter import *
+
+def pretty_print(o):
+    for k in o.__dict__.keys():
+        try:
+            if len(k) > l:
+                l = len(k)
+        except NameError:
+            l = len(k)
+                
+    for k in o.__dict__.keys():
+        print "%s%s: %s" % (' '*(l-len(k)), k, o.__dict__[k])
+
+
+def keyevent(ev):
+    print ev.keysym
+    pretty_print(ev)
+    
+
+root = Tk()
+f = Label(root, bg='yellow', text='Keystrokes here')
+f.bind("<KeyPress>", keyevent)
+f.pack(expand=1)
+f.focus_set()
+
+root.mainloop()

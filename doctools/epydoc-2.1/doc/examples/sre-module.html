@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>sre</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th bgcolor="#70b0f0" class="navselect">&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc examples</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        Module&nbsp;sre
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="sre-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module sre</h2>
+
+<pre class="literalblock">
+Support for regular expressions (RE).
+
+This module provides regular expression matching operations similar to
+those found in Perl.  It supports both 8-bit and Unicode strings; both
+the pattern and the strings being processed can contain null bytes and
+characters outside the US ASCII range.
+
+Regular expressions can contain both special and ordinary characters.
+Most ordinary characters, like &quot;A&quot;, &quot;a&quot;, or &quot;0&quot;, are the simplest
+regular expressions; they simply match themselves.  You can
+concatenate ordinary characters, so last matches the string 'last'.
+
+The special characters are:
+    &quot;.&quot;      Matches any character except a newline.
+    &quot;^&quot;      Matches the start of the string.
+    &quot;$&quot;      Matches the end of the string.
+    &quot;*&quot;      Matches 0 or more (greedy) repetitions of the preceding RE.
+             Greedy means that it will match as many repetitions as possible.
+    &quot;+&quot;      Matches 1 or more (greedy) repetitions of the preceding RE.
+    &quot;?&quot;      Matches 0 or 1 (greedy) of the preceding RE.
+    *?,+?,?? Non-greedy versions of the previous three special characters.
+    {m,n}    Matches from m to n repetitions of the preceding RE.
+    {m,n}?   Non-greedy version of the above.
+    &quot;\\&quot;      Either escapes special characters or signals a special sequence.
+    []       Indicates a set of characters.
+             A &quot;^&quot; as the first character indicates a complementing set.
+    &quot;|&quot;      A|B, creates an RE that will match either A or B.
+    (...)    Matches the RE inside the parentheses.
+             The contents can be retrieved or matched later in the string.
+    (?iLmsux) Set the I, L, M, S, U, or X flag for the RE (see below).
+    (?:...)  Non-grouping version of regular parentheses.
+    (?P&lt;name&gt;...) The substring matched by the group is accessible by name.
+    (?P=name)     Matches the text matched earlier by the group named name.
+    (?#...)  A comment; ignored.
+    (?=...)  Matches if ... matches next, but doesn't consume the string.
+    (?!...)  Matches if ... doesn't match next.
+
+The special sequences consist of &quot;\\&quot; and a character from the list
+below.  If the ordinary character is not on the list, then the
+resulting RE will match the second character.
+    \number  Matches the contents of the group of the same number.
+    \A       Matches only at the start of the string.
+    \Z       Matches only at the end of the string.
+    \b       Matches the empty string, but only at the start or end of a word.
+    \B       Matches the empty string, but not at the start or end of a word.
+    \d       Matches any decimal digit; equivalent to the set [0-9].
+    \D       Matches any non-digit character; equivalent to the set [^0-9].
+    \s       Matches any whitespace character; equivalent to [ \t\n\r\f\v].
+    \S       Matches any non-whitespace character; equiv. to [^ \t\n\r\f\v].
+    \w       Matches any alphanumeric character; equivalent to [a-zA-Z0-9_].
+             With LOCALE, it will match the set [0-9_] plus characters defined
+             as letters for the current locale.
+    \W       Matches the complement of \w.
+    \\       Matches a literal backslash.
+
+This module exports the following functions:
+    match    Match a regular expression pattern to the beginning of a string.
+    search   Search a string for the presence of a pattern.
+    sub      Substitute occurrences of a pattern found in a string.
+    subn     Same as sub, but also return the number of substitutions made.
+    split    Split a string by the occurrences of a pattern.
+    findall  Find all occurrences of a pattern in a string.
+    compile  Compile a pattern into a RegexObject.
+    purge    Clear the regular expression cache.
+    escape   Backslash all non-alphanumerics in a string.
+
+Some of the functions in this module takes flags as optional parameters:
+    I  IGNORECASE  Perform case-insensitive matching.
+    L  LOCALE      Make \w, \W, \b, \B, dependent on the current locale.
+    M  MULTILINE   &quot;^&quot; matches the beginning of lines as well as the string.
+                   &quot;$&quot; matches the end of lines as well as the string.
+    S  DOTALL      &quot;.&quot; matches any character at all, including the newline.
+    X  VERBOSE     Ignore whitespace and comments for nicer looking RE's.
+    U  UNICODE     Make \w, \W, \b, \B, dependent on the Unicode locale.
+
+This module also defines an exception 'error'.
+</pre>
+<hr/>
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#compile" class="summary-sig-name"><code>compile</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>flags</span>)</span></code>
+<br />
+Compile a regular expression pattern, returning a pattern object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#escape" class="summary-sig-name"><code>escape</code></a>(<span class=summary-sig-arg>pattern</span>)</span></code>
+<br />
+Escape all non-alphanumeric characters in pattern.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#findall" class="summary-sig-name"><code>findall</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>string</span>)</span></code>
+<br />
+Return a list of all non-overlapping matches in the string.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#match" class="summary-sig-name"><code>match</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>flags</span>)</span></code>
+<br />
+Try to apply the pattern at the start of the string, returning
+a match object, or None if no match was found.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#purge" class="summary-sig-name"><code>purge</code></a>()</span></code>
+<br />
+Clear the regular expression cache...</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#search" class="summary-sig-name"><code>search</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>flags</span>)</span></code>
+<br />
+Scan through string looking for a match to the pattern, returning
+a match object, or None if no match was found.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#split" class="summary-sig-name"><code>split</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>maxsplit</span>)</span></code>
+<br />
+Split the source string by the occurrences of the pattern,
+returning a list containing the resulting substrings.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#sub" class="summary-sig-name"><code>sub</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>repl</span>,
+          <span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>count</span>)</span></code>
+<br />
+Return the string obtained by replacing the leftmost...</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#subn" class="summary-sig-name"><code>subn</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>repl</span>,
+          <span class=summary-sig-arg>string</span>,
+          <span class=summary-sig-arg>count</span>)</span></code>
+<br />
+Return a 2-tuple containing (new_string, number).</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="sre-module.html#template" class="summary-sig-name"><code>template</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>flags</span>)</span></code>
+<br />
+Compile a template pattern, returning a pattern object...</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="compile"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">compile</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>flags</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Compile a regular expression pattern, returning a pattern object.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="escape"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">escape</span>(<span class=sig-arg>pattern</span>)</span>
+  </h3>
+<pre class="literalblock">
+Escape all non-alphanumeric characters in pattern.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="findall"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">findall</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>string</span>)</span>
+  </h3>
+<pre class="literalblock">
+Return a list of all non-overlapping matches in the string.
+
+If one or more groups are present in the pattern, return a
+list of groups; this will be a list of tuples if the pattern
+has more than one group.
+
+Empty matches are included in the result.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="match"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">match</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>string</span>,
+          <span class=sig-arg>flags</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Try to apply the pattern at the start of the string, returning
+a match object, or None if no match was found.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="purge"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">purge</span>()</span>
+  </h3>
+<pre class="literalblock">
+Clear the regular expression cache
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="search"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">search</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>string</span>,
+          <span class=sig-arg>flags</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Scan through string looking for a match to the pattern, returning
+a match object, or None if no match was found.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="split"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">split</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>string</span>,
+          <span class=sig-arg>maxsplit</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Split the source string by the occurrences of the pattern,
+returning a list containing the resulting substrings.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="sub"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">sub</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>repl</span>,
+          <span class=sig-arg>string</span>,
+          <span class=sig-arg>count</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Return the string obtained by replacing the leftmost
+non-overlapping occurrences of the pattern in string by the
+replacement repl
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="subn"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">subn</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>repl</span>,
+          <span class=sig-arg>string</span>,
+          <span class=sig-arg>count</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Return a 2-tuple containing (new_string, number).
+new_string is the string obtained by replacing the leftmost
+non-overlapping occurrences of the pattern in the source
+string by the replacement repl.  number is the number of
+substitutions that were made.
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+
+<a name="template"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">template</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>flags</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+<pre class="literalblock">
+Compile a template pattern, returning a pattern object
+</pre>
+  <dl><dt></dt><dd>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th bgcolor="#70b0f0" class="navselect">&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc examples</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:24 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

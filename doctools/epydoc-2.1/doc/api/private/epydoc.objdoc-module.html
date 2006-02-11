@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.objdoc</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        Module&nbsp;objdoc
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[show&nbsp;private&nbsp;|&nbsp;<a href="../public/epydoc.objdoc-module.html">hide&nbsp;private</a>]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.objdoc-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF MODULE DESCRIPTION =========== -->
+<h2 class="module">Module epydoc.objdoc</h2>
+
+<p>Support for <code>ObjDoc</code>s, which encode the information about a 
+Python object that is necessary to create its documentation. 
+<code>ObjDoc</code>s are created and managed by the <code>DocMap</code> 
+class, which acts like a dictionary from <a 
+href="epydoc.uid.UID-class.html" class="link"><code>UID</code></a>s to 
+<code>ObjDoc</code>s.</p>
+<p>Textual documentation entries (e.g., module descriptions, method 
+descriptions, variable types, see-also entries) are encoded as <a 
+href="epydoc.markup.ParsedDocstring-class.html" 
+class="link"><code>ParsedDocstrings</code></a>.</p>
+Each Python object is identified by a globally unique identifier, 
+implemented with the <a href="epydoc.uid.UID-class.html" 
+class="link"><code>UID</code></a> class. These identifiers are also used 
+by the <code>Link</code> class to implement crossreferencing between 
+<code>ObjDoc</code>s.
+<hr/>
+
+<!-- =========== START OF CLASSES =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Classes</th></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.ClassDoc-class.html"><code>ClassDoc</code></a></b></td>
+  <td>The documentation for a class.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.DocField-class.html"><code>DocField</code></a></b></td>
+  <td>A generic docstring field.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.DocMap-class.html"><code>DocMap</code></a></b></td>
+  <td>A dictionary mapping each object to the object's documentation.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.FuncDoc-class.html"><code>FuncDoc</code></a></b></td>
+  <td>The documentation for a function.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.ModuleDoc-class.html"><code>ModuleDoc</code></a></b></td>
+  <td>The documentation for a module or package.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.ObjDoc-class.html"><code>ObjDoc</code></a></b></td>
+  <td>A base class for encoding the information about a Python object that 
+is necessary to create its documentation.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.Param-class.html"><code>Param</code></a></b></td>
+  <td>The documentation for a function parameter.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.PropertyDoc-class.html"><code>PropertyDoc</code></a></b></td>
+  <td>The documentation for a property.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.Raise-class.html"><code>Raise</code></a></b></td>
+  <td>The documentation for the raising of an exception.</td></tr>
+<tr><td width="15%">
+  <b><a href="epydoc.objdoc.Var-class.html"><code>Var</code></a></b></td>
+  <td>The documentation for a variable.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Function Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="report_param_mismatches"></a><span class="summary-sig"><span class="summary-sig-name">report_param_mismatches</span>(<span class=summary-sig-arg>docmap</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>None</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.objdoc-module.html#set_default_docformat" class="summary-sig-name"><code>set_default_docformat</code></a>(<span class=summary-sig-arg>new_format</span>)</span></code>
+<br />
+Change the default value for <code>__docformat__</code> to the given 
+value.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_ast_match" class="summary-sig-name"><code>_ast_match</code></a>(<span class=summary-sig-arg>pattern</span>,
+          <span class=summary-sig-arg>data</span>,
+          <span class=summary-sig-arg>vars</span>,
+          <span class=summary-sig-arg>indent</span>)</span></code>
+<br />
+Match <code>data</code> to <code>pattern</code>, with variable 
+extraction.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_descr_to_docfield"></a><span class="summary-sig"><span class="summary-sig-name">_descr_to_docfield</span>(<span class=summary-sig-arg>arg</span>,
+          <span class=summary-sig-arg>descr</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_descr_to_identifiers" class="summary-sig-name"><code>_descr_to_identifiers</code></a>(<span class=summary-sig-arg>descr</span>)</span></code>
+<br />
+Given a <code>ParsedDocstring</code> that contains a list of 
+identifiers, return a list of those identifiers.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="_dfs_bases"></a><span class="summary-sig"><span class="summary-sig-name">_dfs_bases</span>(<span class=summary-sig-arg>cls</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <code>class</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_find_base_order" class="summary-sig-name"><code>_find_base_order</code></a>(<span class=summary-sig-arg>cls</span>)</span></code>
+<br />
+Return a list of the base ancestors of <code>cls</code>, in the order that 
+they should be searched for attributes.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>(string, int)</code> or <code>(None, None)</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_find_docstring" class="summary-sig-name"><code>_find_docstring</code></a>(<span class=summary-sig-arg>uid</span>)</span></code>
+<br />
+Return the file name and line number of the docstring for the given object; 
+or <code>None</code> if the docstring cannot be found.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_flatten" class="summary-sig-name"><code>_flatten</code></a>(<span class=summary-sig-arg>tree</span>)</span></code>
+<br />
+Recursively explore <code>tree</code>, and return an in-order list of 
+all leaves.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_getdoc" class="summary-sig-name"><code>_getdoc</code></a>(<span class=summary-sig-arg>obj</span>)</span></code>
+<br />
+Get the documentation string for an object.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.objdoc-module.html#_lookup_class_field" class="summary-sig-name"><code>_lookup_class_field</code></a>(<span class=summary-sig-arg>cls</span>,
+          <span class=summary-sig-arg>field</span>,
+          <span class=summary-sig-arg>base_order</span>)</span></code>
+<br />
+Find the value for a class's field by looking through its base order 
+list, and using getattr to access the first base that contains the 
+field.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc.objdoc-module.html#DEFAULT_DOCFORMAT"><code>DEFAULT_DOCFORMAT</code></a></b>: The default value for <code>__docformat__</code>, if it is not 
+specified by modules.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="epydoc.objdoc-module.html#KNOWN_DOCFORMATS"><code>KNOWN_DOCFORMATS</code></a></b> = <span title="('plaintext', 'epytext', 'restructuredtext', 'javadoc')"><code>('plaintext',&nbsp;'epytext',&nbsp;'restructure<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>SRE_Pattern</code></font></td>
+<td><b><a href="../private/epydoc.objdoc-module.html#_IDENTIFIER_LIST_REGEXP"><code>_IDENTIFIER_LIST_REGEXP</code></a></b> = <span title="&lt;_sre.SRE_Pattern object at 0x825f448&gt;"><code><span class="re"><span class="re-char">^</span><span class="re-group">[</span><span class="re-char">\w</span><span class="re-char">\.</span><span class="re-char">\*</span><span class="re-group">]</span><span class="re-op">+</span><span class="re-group">(</span><span class="re-group">[</span><span class="re-char">\s</span>,:;<span class="re-group">]</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">[</span><span class="re-char">\w</span><span class="re-char">\.</span><span class="re-char">\*</span><span class="re-group">]</span><span class="re-op">+<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>tuple</code></font></td>
+<td><b><a href="../private/epydoc.objdoc-module.html#_KNOWN_FIELD_TAGS"><code>_KNOWN_FIELD_TAGS</code></a></b> = <span title="('var', 'variable', 'ivar', 'ivariable', 'cvar', 'cvariable', 'type', 'group', 'sort', 'return', 'returns', 'rtype', 'returntype', 'param', 'parameter', 'arg', 'argument', 'raise', 'raises', 'exception', 'except', 'summary', 'keyword', 'kwarg', 'kwparam', 'undocumented', 'include')"><code>('var',&nbsp;'variable',&nbsp;'ivar',&nbsp;'ivariab<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+</table><br />
+
+
+<!-- =========== START OF FUNCTION DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Function Details</th></tr>
+</table>
+
+<a name="set_default_docformat"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">set_default_docformat</span>(<span class=sig-arg>new_format</span>)</span>
+  </h3>
+  Change the default value for <code>__docformat__</code> to the given 
+  value. The current default value for <code>__docformat__</code> is 
+  recorded in <code>DEFAULT_DOCFORMAT</code>.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>new_format</b></code> -
+         The new default value for <code>__docformat__</code>
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        <code>None</code>
+      </dd>
+    </dl>
+<p><b>See Also:</b> <a href="epydoc.objdoc-module.html#DEFAULT_DOCFORMAT" 
+class="link"><code>DEFAULT_DOCFORMAT</code></a>
+</p>
+
+  </dd></dl>
+</td></tr></table>
+
+<a name="_ast_match"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_ast_match</span>(<span class=sig-arg>pattern</span>,
+          <span class=sig-arg>data</span>,
+          <span class=sig-arg>vars</span>=<span class=sig-default>None</span>,
+          <span class=sig-arg>indent</span>=<span class=sig-default>0</span>)</span>
+  </h3>
+  <p>Match <code>data</code> to <code>pattern</code>, with variable 
+  extraction.</p>
+  The <code>pattern</code> value may contain variables of the form 
+  <code>['<i class="math">varname</i>']</code> which are allowed to match 
+  anything. The value that is matched is returned as part of a dictionary 
+  which maps '<i class="math">varname</i>' to the matched value. '<i 
+  class="math">varname</i>' is not required to be a string object, but 
+  using strings makes patterns and the code which uses them more 
+  readable.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>pattern</b></code> -
+         Pattern to match against, possibly containing variables.
+      <dd><code><b>data</b></code> -
+         Data to be checked and against which variables are 
+        extracted.
+      <dd><code><b>vars</b></code> -
+         Dictionary of variables which have already been found. If not 
+        provided, an empty dictionary is created.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        two values -- a boolean indicating whether a match was found 
+        and a dictionary mapping variable names to their associated 
+        values.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_descr_to_identifiers"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_descr_to_identifiers</span>(<span class=sig-arg>descr</span>)</span>
+  </h3>
+  Given a <code>ParsedDocstring</code> that contains a list of 
+  identifiers, return a list of those identifiers. This is used by fields 
+  such as <code>&#64;group</code> and <code>&#64;sort</code>, which 
+  expect lists of identifiers as their values. To extract the 
+  identifiers, the docstring is first converted to plaintext, and then 
+  split. The plaintext content of the docstring must be a a list of 
+  identifiers, separated by spaces, commas, colons, or semicolons.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>descr</b></code> -
+         A <code>ParsedDocstring</code> containing a list of 
+        identifiers.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+              class="link"><code>markup.ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of the identifier names contained in 
+        <code>descr</code>.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Raises:</b></dt>
+      <dd><code><b>ValueError</b></code> -
+        If <code>descr</code> does not contain a valid list of 
+        identifiers.
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_base_order"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_base_order</span>(<span class=sig-arg>cls</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A list of the base ancestors of <code>cls</code>, in the order 
+        that they should be searched for attributes. Each base ancestor 
+        should be listed exactly once. The base order list includes the 
+        given class as its first element.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>class</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_find_docstring"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_find_docstring</span>(<span class=sig-arg>uid</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The file name and line number of the docstring for the given 
+        object; or <code>None</code> if the docstring cannot be found. 
+        Line numbers are indexed from zero (i.e., the first line's line 
+        number is 0).
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>(string, int)</code> or <code>(None, None)</code>)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_flatten"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_flatten</span>(<span class=sig-arg>tree</span>)</span>
+  </h3>
+  Recursively explore <code>tree</code>, and return an in-order list 
+  of all leaves.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>tree</b></code> -
+         The tree whose leaves should be returned. The tree structure 
+        of <code>tree</code> is represented by tuples and lists. In 
+        particular, every tuple or list contained in <code>tree</code> is 
+        considered a subtree; and any other element is considered a 
+        leaf.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> or <code>tuple</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        An in-order list of the leaves of <code>tree</code>.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_getdoc"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_getdoc</span>(<span class=sig-arg>obj</span>)</span>
+  </h3>
+  Get the documentation string for an object. This function is similar 
+  to <code>inspect.getdoc</code>. In particular, it finds the minimum 
+  indentation fromthe second line onwards, and removes that indentation 
+  from each line. But it also checks to make sure that the docstring is 
+  actually a string (since some programs put other data in the 
+  docstrings).
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>obj</b></code> -
+         The object whose documentation string should be returned.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=any)</i>
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="_lookup_class_field"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">_lookup_class_field</span>(<span class=sig-arg>cls</span>,
+          <span class=sig-arg>field</span>,
+          <span class=sig-arg>base_order</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Find the value for a class's field by looking through its base order 
+  list, and using getattr to access the first base that contains the 
+  field. Note that this is different from just using <code>getattr</code> 
+  directly, since for methods it will return a method of the base class, 
+  rather than a method of the given class. This is useful for 
+  constructing UIDs for class methods.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A pair <code>(val, container)</code>, where <code>val</code> 
+        is the value that was found; and <code>container</code> is the 
+        base that contains <code>val</code>.
+      </dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="DEFAULT_DOCFORMAT"></a>
+<h3>DEFAULT_DOCFORMAT</h3>
+The default value for <code>__docformat__</code>, if it is not 
+specified by modules. <code>__docformat__</code> is a module variable 
+that specifies the markup language for the docstrings in a module. Its 
+value is a string, consisting the name of a markup language, optionally 
+followed by a language code (such as <code>en</code> for English). Some 
+typical values for <code>__docformat__</code> are:
+<pre class="doctestblock">
+<span class="py-src"><span class="py-prompt">&gt;&gt;&gt; </span>__docformat__ = <span class="py-string">'plaintext'</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>__docformat__ = <span class="py-string">'epytext'</span>
+<span class="py-prompt">&gt;&gt;&gt; </span>__docformat__ = <span class="py-string">'epytext en'</span></span></pre>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'plaintext'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>plaintext<span class="variable-quote">'</span>                                                            </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="KNOWN_DOCFORMATS"></a>
+<h3>KNOWN_DOCFORMATS</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="('plaintext', 'epytext', 'restructuredtext', 'javadoc')">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+('plaintext', 'epytext', 'restructuredtext', 'javadoc')                </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_IDENTIFIER_LIST_REGEXP"></a>
+<h3>_IDENTIFIER_LIST_REGEXP</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>SRE_Pattern</code>
+
+      </dd>
+<span title="&lt;_sre.SRE_Pattern object at 0x825f448&gt;">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="re"><span class="re-char">^</span><span class="re-group">[</span><span class="re-char">\w</span><span class="re-char">\.</span><span class="re-char">\*</span><span class="re-group">]</span><span class="re-op">+</span><span class="re-group">(</span><span class="re-group">[</span><span class="re-char">\s</span>,:;<span class="re-group">]</span><span class="re-char">\s</span><span class="re-op">*</span><span class="re-group">[</span><span class="re-char">\w</span><span class="re-char">\.</span><span class="re-char">\*</span><span class="re-group">]</span><span class="re-op">+</span><span class="re-group">)</span><span class="re-op">*</span><span class="re-char">$</span></span>                                      </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="_KNOWN_FIELD_TAGS"></a>
+<h3>_KNOWN_FIELD_TAGS</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>tuple</code>
+
+      </dd>
+<span title="('var', 'variable', 'ivar', 'ivariable', 'cvar', 'cvariable', 'type', 'group', 'sort', 'return', 'returns', 'rtype', 'returntype', 'param', 'parameter', 'arg', 'argument', 'raise', 'raises', 'exception', 'except', 'summary', 'keyword', 'kwarg', 'kwparam', 'undocumented', 'include')">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+('var',
+ 'variable',
+ 'ivar',
+ 'ivariable',
+ 'cvar',
+ 'cvariable',
+ 'type',
+ 'group',
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:19 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

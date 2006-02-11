@@ -1,0 +1,339 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+          "http://www.w3.org/TR/html40/loose.dtd">
+
+<html>
+         
+  <head>
+    <title>Module: utils</title>
+  </head>
+
+  <body bgcolor="#ffffff">
+
+        <p><i><a href="../../../index.html">Table of Contents</a></i></p>
+        
+        <table border="0" cellpadding="5" cellspacing="0" width="100%">
+        <tr>
+            <th rowspan="2"
+                valign="top"
+                align="left"
+                width="10%"
+                bgcolor="#88bbee"><font color="#000000">Module: utils</font>
+            </th>
+            <th bgcolor="#88bbee"
+                width="90%"
+                align="right"><font color="#000000">../HappyDoc-r2_1/happydoclib/parseinfo/utils.py</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<p>Utility functions for parseinfo package.</p>
+<table border="0" cellpadding="5" cellspacing="0" width="100%">
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Imported modules">Imported modules</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-pprint.html">pprint</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-symbol.html">symbol</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-token.html">token</a><br>
+<b>import</b> <a href="http://www.python.org/doc/current/lib/module-types.html">types</a><br>
+
+</td></tr>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="Functions">Functions</a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        
+<a href="#drill">drill</a><br>
+<a href="#findNode">findNode</a><br>
+<a href="#joinCodeSnippets">joinCodeSnippets</a><br>
+<a href="#lenientMatch">lenientMatch</a><br>
+<a href="#match">match</a><br>
+<a href="#parseTreeToString">parseTreeToString</a><br>
+
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="drill"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">drill&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+drill ( tree,  depth )
+
+</pre></font>
+
+<p>Return the section of the parse <code>tree</code> that is <code>depth</code> nodes deep.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="findNode"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">findNode&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+findNode (
+        tree,
+        node,
+        response=None,
+        )
+
+</pre></font>
+
+<p>Return a sequence of subtrees starting with node value of <code>node</code>.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="joinCodeSnippets"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">joinCodeSnippets&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+joinCodeSnippets (
+        first,
+        second,
+        separator,
+        )
+
+</pre></font>
+
+<h3>Join two code snippets into one string.</h3>
+<p>    Use some general code content rules to try to make the
+    resulting snippet look nice.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="lenientMatch"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">lenientMatch&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+lenientMatch (
+        pattern,
+        data,
+        vars=None,
+        dbg=0,
+        )
+
+</pre></font>
+
+<h3>Match `data' to `pattern', with variable extraction.</h3>
+<dl>
+<dt>    pattern</dt>
+<dd>Pattern to match against, possibly containing variables.</dd>
+<dt>    data</dt>
+<dd>Data to be checked and against which variables are extracted.</dd>
+<dt>    vars</dt>
+<dd>Dictionary of variables which have already been found.  If not
+        provided, an empty dictionary is created.</dd>
+</dl>
+<p>    The `pattern' value may contain variables of the form ['varname'] which
+    are allowed to match anything.  The value that is matched is returned as
+    part of a dictionary which maps <code>varname</code> to the matched value.  <code>varname</code>
+    is not required to be a string object, but using strings makes patterns
+    and the code which uses them more readable.</p>
+<p>    This function is based on the match() function, but is more lenient.
+    The pattern does not have to completely describe the tree.  Instead,
+    it can be the <code>top</code> portion of the tree.  Everything must match down
+    to the leaves of the pattern.  At that point, the matching stops.  If
+    a match was found at all, the return values indicate a match.</p>
+<p>    This function returns two values: a boolean indicating whether a match
+    was found and a dictionary mapping variable names to their associated
+    values.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="match"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">match&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+match (
+        pattern,
+        data,
+        vars=None,
+        dbg=0,
+        )
+
+</pre></font>
+
+<h3>Match `data' to `pattern', with variable extraction.</h3>
+<dl>
+<dt>    pattern</dt>
+<dd>Pattern to match against, possibly containing variables.</dd>
+<dt>    data</dt>
+<dd>Data to be checked and against which variables are extracted.</dd>
+<dt>    vars</dt>
+<dd>Dictionary of variables which have already been found.  If not
+        provided, an empty dictionary is created.</dd>
+</dl>
+<p>    The `pattern' value may contain variables of the form ['varname'] which
+    are allowed to match anything.  The value that is matched is returned as
+    part of a dictionary which maps <code>varname</code> to the matched value.  <code>varname</code>
+    is not required to be a string object, but using strings makes patterns
+    and the code which uses them more readable.</p>
+<p>    This function returns two values: a boolean indicating whether a match
+    was found and a dictionary mapping variable names to their associated
+    values.</p>
+
+        <tr>
+            <th bgcolor="#99ccff"
+                rowspan="2"
+                valign="top"
+                align="left"
+                width="20%"
+                >
+                <font color="#000000">
+                  <a name="parseTreeToString"></a>&nbsp;
+                </font>
+            </th>
+            <th bgcolor="#99ccff"
+                valign="top"
+                align="left"
+                width="80%"
+                >
+                <font color="#000000">parseTreeToString&nbsp;</font>
+            </th>
+        </tr>
+        <tr>
+        <td>
+        <font color="#000088"><pre>
+parseTreeToString ( tree,  separator=' ' )
+
+</pre></font>
+
+<h3>Convert a parse tree to a string which would have parsed in that way.</h3>
+<p>    Given a parse tree, walk it to determine the original string
+    which would have been parsed to produce that tree.</p>
+</td></tr>
+</td></tr>
+</table>
+
+        </td>
+        </tr>
+        </table>
+
+        <hr>
+
+        <p><i><a href="../../../index.html">Table of Contents</a></i></p>
+
+        <font size="-2"><i>This document was automatically generated
+        on Sat Aug 24 16:57:40 2002 by
+        <a href="http://happydoc.sourceforge.net">HappyDoc</a> version
+        2.1</i></font>
+        
+        </body>
+        </html>
+        

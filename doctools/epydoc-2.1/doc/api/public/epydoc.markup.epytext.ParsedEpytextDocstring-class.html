@@ -1,0 +1,433 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.markup.epytext.ParsedEpytextDocstring</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.markup-module.html">Package&nbsp;markup</a> ::
+        <a href="epydoc.markup.epytext-module.html">Module&nbsp;epytext</a> ::
+        Class&nbsp;ParsedEpytextDocstring
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc.markup.epytext.ParsedEpytextDocstring-class.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class ParsedEpytextDocstring</h2>
+
+<pre class="base-tree">
+<a href="epydoc.markup.ParsedDocstring-class.html"><code>ParsedDocstring</code></a> --+
+                  |
+                 <b>ParsedEpytextDocstring</b>
+</pre><br />
+
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><a name="__init__"></a><span class="summary-sig"><span class="summary-sig-name">__init__</span>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>dom_tree</span>)</span></code>
+</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#concatenate" class="summary-sig-name"><code>concatenate</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>other</span>)</span></code>
+<br />
+Return a new parsed docstring containing the concatination of this docstring 
+and <code>other</code>.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>list</code> of <code>ParsedDocstring</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#index_terms" class="summary-sig-name"><code>index_terms</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return the list of index terms that are defined in this docstring.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>(<a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>ParsedDocstring</code></a>, list of <a 
+        href="epydoc.markup.Field-class.html" 
+        class="link"><code>Field</code></a>)</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#split_fields" class="summary-sig-name"><code>split_fields</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>errors</span>)</span></code>
+<br />
+Split this docstring into its body and its fields.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>ParsedDocstring</code></a>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#summary" class="summary-sig-name"><code>summary</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Return a short summary of this docstring.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#to_html" class="summary-sig-name"><code>to_html</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>docstring_linker</span>,
+          <span class="summary-sig-kwarg">**options</span>)</span></code>
+<br />
+Translate this docstring to HTML.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#to_latex" class="summary-sig-name"><code>to_latex</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>docstring_linker</span>,
+          <span class="summary-sig-kwarg">**options</span>)</span></code>
+<br />
+Translate this docstring to LaTeX.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">        <code>string</code>
+</font></td>
+  <td><code><span class="summary-sig"><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#to_plaintext" class="summary-sig-name"><code>to_plaintext</code></a>(<span class=summary-sig-arg>self</span>,
+          <span class=summary-sig-arg>docstring_linker</span>,
+          <span class="summary-sig-kwarg">**options</span>)</span></code>
+<br />
+Translate this docstring to plaintext.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="epydoc.markup.ParsedDocstring-class.html"><code>ParsedDocstring</code></a>:</b>
+      <a href="epydoc.markup.ParsedDocstring-class.html#__add__"><code>__add__</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Class Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>dict</code></font></td>
+<td><b><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#SYMBOL_TO_HTML"><code>SYMBOL_TO_HTML</code></a></b> = <span title="{'xi': 'xi', '&gt;=': 'ge', 'lArr': 'lArr', 'Chi': 'Chi', 'omega': 'omega', 'ge': 'ge', 'sube': 'sube', 'asymp': 'asymp', 'otimes': 'otimes', 'zeta': 'zeta', 'prop': 'prop', 'Nu': 'Nu', 'equiv': 'equiv', 'Psi': 'Psi', 'integral': 'int', 'cup': 'cup', 'chi': 'chi', 'Eta': 'Eta', 'Beta': 'Beta', 'perp': 'perp', 'Delta': 'Delta', 'there4': 'there4', 'Upsilon': 'Upsilon', 'Lambda': 'Lambda', 'iota': 'iota', 'empty': 'empty', 'notin': 'notin', 'Kappa': 'Kappa', 'darr': 'darr', 'sup': 'sup', 'part': 'part', 'delta': 'delta', 'upsilon': 'upsilon', 'copy': 'copy', '^': 'uarr', 'Tau': 'Tau', 'Xi': 'Xi'..."><code>{'xi':&nbsp;'xi',&nbsp;'&gt;=':&nbsp;'ge',&nbsp;'lArr':&nbsp;'lArr'<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>dict</code></font></td>
+<td><b><a href="epydoc.markup.epytext.ParsedEpytextDocstring-class.html#SYMBOL_TO_LATEX"><code>SYMBOL_TO_LATEX</code></a></b> = <span title="{'xi': '\\(\\xi\\)', '&gt;=': '\\(\\ge\\)', 'lArr': '\\(\\Leftarrow\\)', 'Chi': '\\(\\chi\\)', 'omega': '\\(\\omega\\)', 'ge': '\\(\\ge\\)', 'sube': '\\(\\subseteq\\)', 'asymp': '\\(\\approx\\)', 'otimes': '\\(\\otimes\\)', 'zeta': '\\(\\zeta\\)', 'prop': '\\(\\propto\\)', 'Nu': '\\(\\nu\\)', 'equiv': '\\(\\equiv\\)', 'Psi': '\\(\\Psi\\)', 'integral': '\\(\\int\\)', 'cup': '\\(\\cup\\)', 'chi': '\\(\\chi\\)', 'Eta': '\\(\\eta\\)', 'Beta': '\\(\\beta\\)', 'perp': '\\(\\perp\\)', 'Delta': '\\(\\Delta\\)', 'there4': '\\(\\therefore\\)', 'Upsilon': '\\(\\Upsilon\\)', 'Lambda': '\\(\\Lambda\\)', 'i..."><code>{'xi':&nbsp;'\\(\\xi\\)',&nbsp;'&gt;=':&nbsp;'\\(\\ge\\)<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="concatenate"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">concatenate</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>other</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A new parsed docstring containing the concatination of this 
+        docstring and <code>other</code>.
+      </dd>
+    </dl>
+    <dl><dt><b>Raises:</b></dt>
+      <dd><code><b>ValueError</b></code> -
+        If the two parsed docstrings are incompatible.
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#concatenate"><code>epydoc.markup.ParsedDocstring.concatenate</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="index_terms"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">index_terms</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        The list of index terms that are defined in this docstring. 
+        Each of these items will be added to the index page of the 
+        documentation.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <code>ParsedDocstring</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#index_terms"><code>epydoc.markup.ParsedDocstring.index_terms</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="split_fields"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">split_fields</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>errors</span>=<span class=sig-default>None</span>)</span>
+  </h3>
+  Split this docstring into its body and its fields.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>errors</b></code> -
+         A list where any errors generated during splitting will be 
+        stored. If no list is specified, then errors will be ignored.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>list</code> of <a 
+              href="epydoc.markup.ParseError-class.html" 
+              class="link"><code>ParseError</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A tuple <code>(<i class="math">body</i>, <i 
+        class="math">fields</i>)</code>, where <code><i 
+        class="math">body</i></code> is the main body of this docstring, 
+        and <code><i class="math">fields</i></code> is a list of its 
+        fields.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>(<a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>ParsedDocstring</code></a>, list of <a 
+        href="epydoc.markup.Field-class.html" 
+        class="link"><code>Field</code></a>)</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#split_fields"><code>epydoc.markup.ParsedDocstring.split_fields</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="summary"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">summary</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A short summary of this docstring. Typically, the summary 
+        consists of the first sentence of the docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.ParsedDocstring-class.html" 
+        class="link"><code>ParsedDocstring</code></a>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#summary"><code>epydoc.markup.ParsedDocstring.summary</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="to_html"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">to_html</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>docstring_linker</span>,
+          <span class="sig-kwarg">**options</span>)</span>
+  </h3>
+  Translate this docstring to HTML.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docstring_linker</b></code> -
+         An HTML translator for crossreference links into and out of 
+        the docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.DocstringLinker-class.html" 
+              class="link"><code>DocstringLinker</code></a>)</i>
+      <dd><code><b>options</b></code> -
+         Any extra options for the output. Unknown options are 
+        ignored.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        An HTML fragment that encodes this docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#to_html"><code>epydoc.markup.ParsedDocstring.to_html</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="to_latex"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">to_latex</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>docstring_linker</span>,
+          <span class="sig-kwarg">**options</span>)</span>
+  </h3>
+  Translate this docstring to LaTeX.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docstring_linker</b></code> -
+         A LaTeX translator for crossreference links into and out of 
+        the docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.DocstringLinker-class.html" 
+              class="link"><code>DocstringLinker</code></a>)</i>
+      <dd><code><b>options</b></code> -
+         Any extra options for the output. Unknown options are 
+        ignored.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A LaTeX fragment that encodes this docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#to_latex"><code>epydoc.markup.ParsedDocstring.to_latex</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="to_plaintext"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">to_plaintext</span>(<span class=sig-arg>self</span>,
+          <span class=sig-arg>docstring_linker</span>,
+          <span class="sig-kwarg">**options</span>)</span>
+  </h3>
+  Translate this docstring to plaintext.
+  <dl><dt></dt><dd>
+    <dl><dt><b>Parameters:</b></dt>
+      <dd><code><b>docstring_linker</b></code> -
+         A plaintext translator for crossreference links into and out 
+        of the docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<a href="epydoc.markup.DocstringLinker-class.html" 
+              class="link"><code>DocstringLinker</code></a>)</i>
+      <dd><code><b>options</b></code> -
+         Any extra options for the output. Unknown options are 
+        ignored.
+      </dd>
+    </dl>
+    <dl><dt><b>Returns:</b></dt>
+      <dd>
+        A plaintext fragment that encodes this docstring.
+        <br /><i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        (type=<code>string</code>)</i>
+      </dd>
+    </dl>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="epydoc.markup.ParsedDocstring-class.html#to_plaintext"><code>epydoc.markup.ParsedDocstring.to_plaintext</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF CLASS VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Class Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="SYMBOL_TO_HTML"></a>
+<h3>SYMBOL_TO_HTML</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>dict</code>
+
+      </dd>
+<span title="{'xi': 'xi', '&gt;=': 'ge', 'lArr': 'lArr', 'Chi': 'Chi', 'omega': 'omega', 'ge': 'ge', 'sube': 'sube', 'asymp': 'asymp', 'otimes': 'otimes', 'zeta': 'zeta', 'prop': 'prop', 'Nu': 'Nu', 'equiv': 'equiv', 'Psi': 'Psi', 'integral': 'int', 'cup': 'cup', 'chi': 'chi', 'Eta': 'Eta', 'Beta': 'Beta', 'perp': 'perp', 'Delta': 'Delta', 'there4': 'there4', 'Upsilon': 'Upsilon', 'Lambda': 'Lambda', 'iota': 'iota', 'empty': 'empty', 'notin': 'notin', 'Kappa': 'Kappa', 'darr': 'darr', 'sup': 'sup', 'part': 'part', 'delta': 'delta', 'upsilon': 'upsilon', 'copy': 'copy', '^': 'uarr', 'Tau': 'Tau', 'Xi': 'Xi'...">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+{'&gt;=': 'ge',
+ 'Chi': 'Chi',
+ 'asymp': 'asymp',
+ 'ge': 'ge',
+ 'lArr': 'lArr',
+ 'omega': 'omega',
+ 'otimes': 'otimes',
+ 'sube': 'sube',
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="SYMBOL_TO_LATEX"></a>
+<h3>SYMBOL_TO_LATEX</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>dict</code>
+
+      </dd>
+<span title="{'xi': '\\(\\xi\\)', '&gt;=': '\\(\\ge\\)', 'lArr': '\\(\\Leftarrow\\)', 'Chi': '\\(\\chi\\)', 'omega': '\\(\\omega\\)', 'ge': '\\(\\ge\\)', 'sube': '\\(\\subseteq\\)', 'asymp': '\\(\\approx\\)', 'otimes': '\\(\\otimes\\)', 'zeta': '\\(\\zeta\\)', 'prop': '\\(\\propto\\)', 'Nu': '\\(\\nu\\)', 'equiv': '\\(\\equiv\\)', 'Psi': '\\(\\Psi\\)', 'integral': '\\(\\int\\)', 'cup': '\\(\\cup\\)', 'chi': '\\(\\chi\\)', 'Eta': '\\(\\eta\\)', 'Beta': '\\(\\beta\\)', 'perp': '\\(\\perp\\)', 'Delta': '\\(\\Delta\\)', 'there4': '\\(\\therefore\\)', 'Upsilon': '\\(\\Upsilon\\)', 'Lambda': '\\(\\Lambda\\)', 'i...">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+{'&gt;=': '\\(\\ge\\)',
+ 'Chi': '\\(\\chi\\)',
+ 'asymp': '\\(\\approx\\)',
+ 'ge': '\\(\\ge\\)',
+ 'lArr': '\\(\\Leftarrow\\)',
+ 'omega': '\\(\\omega\\)',
+ 'otimes': '\\(\\otimes\\)',
+ 'sube': '\\(\\subseteq\\)',
+<span class="variable-ellipsis">...</span>                                                                    </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:18 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

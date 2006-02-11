@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc.markup.restructuredtext._DocumentPseudoWriter</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        <a href="epydoc-module.html">Package&nbsp;epydoc</a> ::
+        <a href="epydoc.markup-module.html">Package&nbsp;markup</a> ::
+        <a href="epydoc.markup.restructuredtext-module.html">Module&nbsp;restructuredtext</a> ::
+        Class&nbsp;_DocumentPseudoWriter
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<b>show&nbsp;private</b>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="../private/epydoc.markup.restructuredtext._DocumentPseudoWriter-class.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF CLASS DESCRIPTION =========== -->
+<h2 class="class">Class _DocumentPseudoWriter</h2>
+
+<pre class="base-tree">
+ <a href="docutils.SettingsSpec-class.html"><code>SettingsSpec</code></a> --+        
+                |        
+<a href="docutils.TransformSpec-class.html"><code>TransformSpec</code></a> --+        
+                |        
+        <a href="docutils.Component-class.html"><code>Component</code></a> --+    
+                    |    
+               <a href="docutils.writers.Writer-class.html"><code>Writer</code></a> --+
+                        |
+                       <b>_DocumentPseudoWriter</b>
+</pre><br />
+
+<hr/>
+
+A pseudo-writer for the docutils framework, that can be used to access 
+the document itself. The output of <code>_DocumentPseudoWriter</code> is 
+just an empty string; but after it has been used, the most recently 
+processed document is available as the instance variable 
+<code>document</code>
+<hr/>
+
+
+<!-- =========== START OF METHOD SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Method Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.markup.restructuredtext._DocumentPseudoWriter-class.html#__init__" class="summary-sig-name"><code>__init__</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Initialize the Writer instance.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1">&nbsp;</font></td>
+  <td><code><span class="summary-sig"><a href="../private/epydoc.markup.restructuredtext._DocumentPseudoWriter-class.html#translate" class="summary-sig-name"><code>translate</code></a>(<span class=summary-sig-arg>self</span>)</span></code>
+<br />
+Override to do final document tree translation.</td></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="docutils.writers.Writer-class.html"><code>Writer</code></a>:</b>
+      <a href="docutils.writers.Writer-class.html#write"><code>write</code></a>
+      <br />
+    <b>Inherited from <a href="docutils.Component-class.html"><code>Component</code></a>:</b>
+      <a href="docutils.Component-class.html#supports"><code>supports</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Instance Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>docutils.nodes.document</code></font></td>
+<td><b><a href="../private/epydoc.markup.restructuredtext._DocumentPseudoWriter-class.html#document"><code>document</code></a></b>: The most recently processed document.</td></tr>
+</table><br />
+
+
+<!-- =========== START OF CLASS VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Class Variable Summary</th></tr>
+  <tr><td colspan="2">
+    <b>Inherited from <a href="docutils.writers.Writer-class.html"><code>Writer</code></a>:</b>
+      <a href="docutils.writers.Writer-class.html#component_type"><code>component_type</code></a>, 
+      <a href="docutils.writers.Writer-class.html#destination"><code>destination</code></a>, 
+      <a href="docutils.writers.Writer-class.html#language"><code>language</code></a>
+      <br />
+    <b>Inherited from <a href="docutils.Component-class.html"><code>Component</code></a>:</b>
+      <a href="docutils.Component-class.html#supported"><code>supported</code></a>
+      <br />
+    <b>Inherited from <a href="docutils.SettingsSpec-class.html"><code>SettingsSpec</code></a>:</b>
+      <a href="docutils.SettingsSpec-class.html#relative_path_settings"><code>relative_path_settings</code></a>, 
+      <a href="docutils.SettingsSpec-class.html#settings_default_overrides"><code>settings_default_overrides</code></a>, 
+      <a href="docutils.SettingsSpec-class.html#settings_defaults"><code>settings_defaults</code></a>, 
+      <a href="docutils.SettingsSpec-class.html#settings_spec"><code>settings_spec</code></a>
+      <br />
+    <b>Inherited from <a href="docutils.TransformSpec-class.html"><code>TransformSpec</code></a>:</b>
+      <a href="docutils.TransformSpec-class.html#default_transforms"><code>default_transforms</code></a>
+    </td></tr>
+</table><br />
+
+
+<!-- =========== START OF METHOD DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Method Details</th></tr>
+</table>
+
+<a name="__init__"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">__init__</span>(<span class=sig-arg>self</span>)</span>
+    <br /><i>(Constructor)</i>
+  </h3>
+Initialize the Writer instance.  <dl><dt></dt><dd>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="docutils.writers.Writer-class.html#__init__"><code>docutils.writers.Writer.__init__</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+
+<a name="translate"></a>
+<table width="100%" class="func-details" bgcolor="#e0e0e0"><tr><td>
+  <h3><span class="sig"><span class="sig-name">translate</span>(<span class=sig-arg>self</span>)</span>
+  </h3>
+<p>Override to do final document tree translation.</p>
+<p>This is usually done with a <a href="docutils.nodes.NodeVisitor-class.html" class="link"><code>docutils.nodes.NodeVisitor</code></a> subclass, in
+combination with a call to <code>docutils.nodes.Node.walk()</code> or
+<code>docutils.nodes.Node.walkabout()</code>.  The <tt class="literal"><span class="pre">NodeVisitor</span></tt> subclass must
+support all standard elements (listed in
+<code>docutils.nodes.node_class_names</code>) and possibly non-standard elements
+used by the current Reader as well.</p>
+  <dl><dt></dt><dd>
+    <dl><dt><b>Overrides:</b></dt>
+      <dd><a href="docutils.writers.Writer-class.html#translate"><code>docutils.writers.Writer.translate</code></a> <i>(inherited documentation)</i>
+</dd>
+    </dl>
+  </dd></dl>
+</td></tr></table>
+<br />
+
+
+<!-- =========== START OF INSTANCE VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Instance Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="document"></a>
+<h3>document</h3>
+The most recently processed document.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>docutils.nodes.document</code>
+
+      </dd>
+    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="epydoc-module.html">Home</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:19 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

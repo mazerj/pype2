@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+          "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>epydoc</title>
+  <link rel="stylesheet" href="epydoc.css" type="text/css"></link>
+</head>
+<body bgcolor="white" text="black" link="blue" vlink="#204080"
+      alink="#204080">
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th bgcolor="#70b0f0" class="navselect">&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr valign="top">
+    <td width="100%">
+      <font size="-1"><b class="breadcrumbs">
+        Package&nbsp;epydoc
+      </b></font></br>
+    </td>
+    <td><table cellpadding="0" cellspacing="0">
+      <tr><td align="right"><font size="-2">[<a href="../private/epydoc-module.html">show&nbsp;private</a>&nbsp;|&nbsp;hide&nbsp;private]</font></td></tr>
+      <tr><td align="right"><font size="-2">[<a href="frames.html"target="_top">frames</a>&nbsp;|&nbsp;<a href="epydoc-module.html" target="_top">no&nbsp;frames</a>]</font></td></tr>
+    </table></td>
+</tr></table>
+
+<!-- =========== START OF PACKAGE DESCRIPTION =========== -->
+<h2 class="package">Package epydoc</h2>
+
+Automatic Python reference documentation generator. Epydoc processes 
+Python modules and docstrings to generate formatted API documentation, in 
+the form of HTML pages. Epydoc can be used via a command-line interface 
+(<a href="epydoc.cli-module.html" 
+class="link"><code>epydoc.cli</code></a>) and a graphical interface (<a 
+href="epydoc.gui-module.html" class="link"><code>epydoc.gui</code></a>). 
+Both interfaces let the user specify a set of modules to document, and 
+produce API documentation using the following steps:
+<ol start="1">
+  <li>
+    Import the requested modules, using <a 
+    href="epydoc.imports-module.html" 
+    class="link"><code>epydoc.imports</code></a>.
+  </li>
+  <li>
+    Construct documentation for each object, using <a 
+    href="epydoc.objdoc-module.html" 
+    class="link"><code>epydoc.objdoc</code></a>.
+    <ul>
+      <li>
+        <a href="epydoc.uid-module.html" 
+        class="link"><code>epydoc.uid</code></a> is used to create unique 
+        identifiers for each object.
+      </li>
+      <li>
+        The <a href="epydoc.markup-module.html" 
+        class="link"><code>epydoc.markup</code></a> package is used to 
+        parse the objects' documentation strings.
+      </li>
+    </ul>
+  </li>
+  <li>
+    Generate output, using <a href="epydoc.html-module.html" 
+    class="link"><code>epydoc.html</code></a> or <a 
+    href="epydoc.latex-module.html" 
+    class="link"><code>epydoc.latex</code></a>.
+    <ul>
+      <li>
+        <a href="epydoc.css-module.html" 
+        class="link"><code>epydoc.css</code></a> is used to generate the 
+        CSS stylehseet for HTML output.
+      </li>
+      <li>
+        <a href="epydoc.help-module.html" 
+        class="link"><code>epydoc.help</code></a> is used to generate the 
+        help page for HTML output.
+      </li>
+      <li>
+        <a href="epydoc.colorize-module.html" 
+        class="link"><code>epydoc.colorize</code></a> is used to colorize 
+        doctest blocks and regular expressions variable values for HTML 
+        output.
+      </li>
+    </ul>
+  </li>
+</ol>
+<hr/>
+<p><b>Version:</b> 2.1
+</p>
+
+<p><b>Author:</b> <a href="mailto:edloper&#64;gradient.cis.upenn.edu">Edward 
+Loper</a>
+</p>
+
+<p><b>Copyright:</b> (C) 2003 Edward Loper
+</p>
+
+<p><b>License:</b> IBM Open Source License
+</p>
+
+<p><b>Requires:</b> Python 2.1+, or Python 2.0 with <a 
+href="http://lfw.org/python/inspect.html"><code>inspect.py</code></a>.
+</p>
+
+<dl><dt><b>See Also:</b></dt>
+  <dd>
+    <a href="http://epydoc.sourceforge.net">The epydoc webpage</a>,
+    <a href="http://epydoc.sourceforge.net/epytext.html">The epytext 
+markup language manual</a>
+  </dd>
+</dl>
+
+<p><b>To Do:</b> Consider other names for <code>&#64;undocumented</code>: 
+<code>&#64;bypass</code>, <code>&#64;nodoc</code>, 
+<code>&#64;exclude</code>, <code>&#64;omit</code>?
+</p>
+
+<p><b>To Do for Version 3.0:</b>
+<ul>
+  <li>Support encodings.
+</li>
+  <li>Refactor <a href="epydoc.objdoc.ObjDoc-class.html" 
+class="link"><code>epydoc.objdoc.ObjDoc</code></a>:
+<ul>
+  <li>
+    <code>ObjDoc</code>s will contain info about objects, but not 
+    gather it.
+  </li>
+  <li>
+    An <code>inspection</code> module will gather info via 
+    inspection.
+  </li>
+  <li>
+    A new <code>parsing</code> module will provide an alternative, 
+    gathering info by parsing python files.
+  </li>
+  <li>
+    <code>Var</code> will be replaced by <code>VarDoc</code>, a 
+    subclass of <code>ObjDoc</code>.
+  </li>
+  <li>
+    Structure <code>ObjDoc</code>s in a directed acyclic graph, rather 
+    than using a links and a dictionary? Are non-directed cycles a 
+    problem? Interaction of the access hierarchy (a.b.c) and the base 
+    class hierarchy? What does pydoc do?
+  </li>
+</ul>
+</li>
+  <li>Create a better default top_page than trees.html.
+</li>
+  <li>Add the man-page style outputter. (epyman)
+</li>
+  <li>Docstring inheritance for overridden properties.
+</li>
+  <li>Optimize epytext
+<ul>
+  <li>
+    Use classes instead of minidom nodes?
+  </li>
+</ul>
+</li>
+  <li>Rewrite <code>epydoc.uid.findUID</code> to be more robust.
+
+  </li>
+</ul></p>
+
+<p><b>Contributors (Alphabetical Order):</b>
+<ul>
+  <li><a href="mailto:glyph&#64;twistedmatrix.com">Glyph Lefkowitz</a>
+</li>
+  <li><a href="mailto:edloper&#64;gradient.cis.upenn.edu">Edward 
+Loper</a>
+</li>
+  <li><a href="mailto:bruce&#64;cubik.org">Bruce Mitchener</a>
+</li>
+  <li><a href="mailto:spamies&#64;bipbap.de">Simon Pamies</a>
+</li>
+  <li><a href="mailto:kiko&#64;async.com.br">Christian Reis</a>
+</li>
+  <li><a href="mailto:jeff&#64;ohalloran.ca">Jeff O'Halloran</a>
+
+  </li>
+</ul></p>
+
+
+<!-- =========== START OF SUBMODULES =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Submodules</th></tr>
+  <tr><td><ul>
+<li> <b><a href="epydoc.foog-module.html"><code>foog</code></a></b>
+  </ul></td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Interface Modules</th></tr>
+  <tr><td><ul>
+<li> <b><a href="epydoc.cli-module.html"><code>cli</code></a></b>: <i>Command-line interface for epydoc.</i>
+<li> <b><a href="epydoc.gui-module.html"><code>gui</code></a></b>: <i>Graphical interface to epydoc.</i>
+  </ul></td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Inspection Modules</th></tr>
+  <tr><td><ul>
+<li> <b><a href="epydoc.uid-module.html"><code>uid</code></a></b>: <i>Unique identifiers and crossreference links for Python objects.</i>
+<li> <b><a href="epydoc.objdoc-module.html"><code>objdoc</code></a></b>: <i>Support for <code>ObjDoc</code>s, which encode the information about a 
+Python object that is necessary to create its documentation.</i>
+<li> <b><a href="epydoc.imports-module.html"><code>imports</code></a></b>: <i>Module import support for epydoc.</i>
+  </ul></td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Docstring Parsing Modules</th></tr>
+  <tr><td><ul>
+<li> <b><a href="epydoc.markup-module.html"><code>markup</code></a></b>: <i>Markup language support for docstrings.</i>
+  <ul>
+    <li> <b><a href="epydoc.markup.epytext-module.html"><code>epytext</code></a></b>: <i>Parser for epytext strings.</i>
+    <li> <b><a href="epydoc.markup.javadoc-module.html"><code>javadoc</code></a></b>: <i>Epydoc parser for <a 
+href="http://java.sun.com/j2se/javadoc/">Javadoc</a> docstrings.</i>
+    <li> <b><a href="epydoc.markup.plaintext-module.html"><code>plaintext</code></a></b>: <i>Parser for plaintext docstrings.</i>
+    <li> <b><a href="epydoc.markup.restructuredtext-module.html"><code>restructuredtext</code></a></b>: <i>Epydoc parser for ReStructuredText strings.</i>
+  </ul>
+  </ul></td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Documentation Output Modules</th></tr>
+  <tr><td><ul>
+<li> <b><a href="epydoc.html-module.html"><code>html</code></a></b>: <i>Documentation to HTML converter.</i>
+<li> <b><a href="epydoc.css-module.html"><code>css</code></a></b>: <i>Predefined CSS stylesheets for the HTML outputter (<a 
+href="epydoc.html-module.html" 
+class="link"><code>epydoc.html</code></a>).</i>
+<li> <b><a href="epydoc.help-module.html"><code>help</code></a></b>: <i>Default help file for the HTML outputter (<a 
+href="epydoc.html-module.html" 
+class="link"><code>epydoc.html</code></a>).</i>
+<li> <b><a href="epydoc.colorize-module.html"><code>colorize</code></a></b>: <i>Functions to produce colorized HTML code for various objects.</i>
+<li> <b><a href="epydoc.latex-module.html"><code>latex</code></a></b>: <i>Documentation to LaTeX converter.</i>
+<li> <b><a href="epydoc.man-module.html"><code>man</code></a></b>: <i>Documentation formatter that produces man-style documentation.</i>
+  </ul></td></tr>
+<tr bgcolor="#e8f0f8" class="group">
+  <th colspan="2">&nbsp;&nbsp;&nbsp;&nbsp;Testing Modules</th></tr>
+  <tr><td><ul>
+<li> <b><a href="epydoc.checker-module.html"><code>checker</code></a></b>: <i>Documentation completeness checker.</i>
+<li> <b><a href="epydoc.test-module.html"><code>test</code></a></b>: <i>Unit tests for the NLTK modules.</i>
+  <ul>
+    <li> <b><a href="epydoc.test.epytext-module.html"><code>epytext</code></a></b>: <i>Regression testing for the epytext markup language.</i>
+  </ul>
+  </ul></td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE SUMMARY =========== -->
+<table class="summary" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="summary">
+  <th colspan="2">Variable Summary</th></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc-module.html#__author__"><code>__author__</code></a></b> = <span title="'Edward Loper &lt;edloper@gradient.cis.upenn.edu&gt;'"><code><span class="variable-quote">'</span>Edward&nbsp;Loper&nbsp;&lt;edloper&#64;gradient.cis.upenn.e<span class="variable-ellipsis">...</span></code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc-module.html#__license__"><code>__license__</code></a></b>: The license governing the use and distribution of epydoc.</td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc-module.html#__url__"><code>__url__</code></a></b> = <span title="'http://epydoc.sourceforge.net'"><code><span class="variable-quote">'</span>http://epydoc.sourceforge.net<span class="variable-quote">'</span>                </code>
+</span></td></tr>
+<tr><td align="right" valign="top" width="15%"><font size="-1"><code>str</code></font></td>
+<td><b><a href="epydoc-module.html#__version__"><code>__version__</code></a></b> = <span title="'2.1'"><code><span class="variable-quote">'</span>2.1<span class="variable-quote">'</span>                                      </code>
+</span></td></tr>
+</table><br />
+
+
+<!-- =========== START OF VARIABLE DETAILS =========== -->
+<table class="details" border="1" cellpadding="3" cellspacing="0" width="100%" bgcolor="white">
+<tr bgcolor="#70b0f0" class="details">
+  <th colspan="2">Variable Details</th></tr>
+</table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="__author__"></a>
+<h3>__author__</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'Edward Loper &lt;edloper@gradient.cis.upenn.edu&gt;'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>Edward Loper &lt;edloper&#64;gradient.cis.upenn.edu&gt;<span class="variable-quote">'</span>                        </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="__license__"></a>
+<h3>__license__</h3>
+The license governing the use and distribution of epydoc.
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'IBM Open Source License'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>IBM Open Source License<span class="variable-quote">'</span>                                              </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="__url__"></a>
+<h3>__url__</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'http://epydoc.sourceforge.net'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>http://epydoc.sourceforge.net<span class="variable-quote">'</span>                                        </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<table width="100%" class="var-details" bgcolor="#e0e0e0"><tr><td>
+<a name="__version__"></a>
+<h3>__version__</h3>
+<dl>
+  <dt></dt>
+  <dd>
+    <dl>
+      <dt><b>Type:</b></dt>
+      <dd>
+          <code>str</code>
+
+      </dd>
+<span title="'2.1'">      <dt><b>Value:</b></dt>
+      <dd><table><tr><td>
+<pre class="variable">
+<span class="variable-quote">'</span>2.1<span class="variable-quote">'</span>                                                                  </pre>
+        </td></tr></table></dd>
+</span>    </dl>
+  </dd>
+</dl></td></tr></table>
+<br />
+
+
+<!-- =========== START OF NAVBAR =========== -->
+<table class="navbar" border="0" width="100%" cellpadding="0" bgcolor="#a0c0ff" cellspacing="0">
+  <tr valign="center">
+    <th bgcolor="#70b0f0" class="navselect">&nbsp;&nbsp;&nbsp;Home&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="trees.html">Trees</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="indices.html">Index</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar">&nbsp;&nbsp;&nbsp;<a class="navbar" href="help.html">Help</a>&nbsp;&nbsp;&nbsp;</th>
+    <th class="navbar" align="right" width="100%">
+      <table border="0" cellpadding="0" cellspacing="0">
+      <tr><th class="navbar" align="center">
+        <p class="nomargin">
+          <a class="navbar" target="_top" href="http://epydoc.sourceforge.net">epydoc 2.0</a>
+      </p></th></tr></table>
+    </th>
+  </tr>
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+    <td align="left"><font size="-2">Generated by Epydoc 2.1 on Sat Mar 20 17:46:19 2004</font></td>
+    <td align="right"><a href="http://epydoc.sourceforge.net"
+                      ><font size="-2">http://epydoc.sf.net</font></a></td>
+  </tr>
+</table>
+</body>
+</html>

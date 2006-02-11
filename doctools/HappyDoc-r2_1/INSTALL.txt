@@ -1,0 +1,16 @@
+Installing HappyDoc
+
+  HappyDoc uses the Distutils package for installation.  Unpack the
+  tarball downloaded from SourceForge in a temporary directory.  Then
+  run::
+
+    % python ./setup.py install
+
+  to install the package.
+
+  !!! WARNING !!!
+
+    Before installing HappyDoc 2.0+, any version earlier than 2.0 must
+    be removed.  This includes the file 'happydoc.pth' and directory
+    'happydoc' in site-packages, as well as the executable 'happydoc'
+    in the 'bin' directory.
