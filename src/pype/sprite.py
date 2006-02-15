@@ -1500,6 +1500,7 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.unlock()
 
 	def rotate(self, angle, preserve_size=1, trim=0):
 		"""Lossy rotation of spite image data
@@ -1538,7 +1539,8 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-
+		self.im.unlock()
+		
 	def scale(self, new_width, new_height):
 		"""Resize this sprite (fast).
 		
@@ -1567,11 +1569,13 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.unlock()
 
 		# Wed Nov 23 14:50:34 2005 mazer 
 		# these need to be new too; I forgot and only regenerated
 		# the alpha channel.
 		self.array = pygame.surfarray.pixels3d(self.im)
+		self.im.unlock()
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
 

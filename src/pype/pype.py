@@ -3191,19 +3191,34 @@ def candy2(app):
 
 	itag = None
 	beep(500, 100)
+	bg = Sprite(x=0, y=0, fb=app.fb,
+				width=app.fb.w, height=app.fb.h)
+	#bg.big = 1
+	bg.noise(0.50)
+	
 	while app._candy:
 		x = uniform(-200,200)
 		y = uniform(-200,200)
-		inum = int(uniform(0,len(l)))
-		fname = l[inum][:-1]
-		if not posixpath.exists(fname):
-			continue
-		app.console.writenl(' file: %s' % fname)
-		s = Sprite(fname=fname, fb=app.fb, x=x, y=x)
-		bg = Sprite(x=0, y=0, fb=app.fb,
-					width=app.fb.w, height=app.fb.h)
-		bg.big = 1
-		bg.noise(0.50)
+		while 1:
+			inum = int(uniform(0,len(l)))
+			fname = l[inum][:-1]
+			if not posixpath.exists(fname):
+				continue
+			app.console.writenl(' file: %s' % fname)
+			try:
+				s = Sprite(fname=fname, fb=app.fb, x=x, y=x)
+				if s.w > 10 and s.h > 10:
+					break
+			except:
+				sys.stderr.write('dud file: %s\n' % fname)
+		maxd = 512.0
+		if s.w > maxd:
+			m = maxd / s.w
+			s.scale(int(m * s.w), int(m * s.h))
+		elif s.h > maxd:
+			m = maxd / s.h
+			s.scale(int(m * s.w), int(m * s.h))
+			
 		app.fb.clear(color=(1, 1, 1), flip=0)
 		bg.blit()
 		s.blit()
