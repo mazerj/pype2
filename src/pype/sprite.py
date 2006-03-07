@@ -24,6 +24,13 @@ Mon Nov 21 18:35:39 2005 mazer
  - Sprite.clone() method correctly sets the sprite name to avoid
    errors on deletion.
    
+Tue Mar  7 09:26:05 2006 mazer
+
+ - Added Sprite.rotateCW(0 and Sprite.rotateCCW() methods. This is
+   because the standard pygame-based rotation method actually rotates
+   CW, and really we want CCW rotation. This has previously been
+   corrected at the task level..
+ 
 """
 
 import os
@@ -1499,9 +1506,18 @@ class Sprite(_ImageBase):
 		self.h = self.im.get_height()
 		self.iw = self.w
 		self.ih = self.h
+		
 		self.alpha = pygame.surfarray.pixels_alpha(self.im)
 		self.im.unlock()
+		self.array = pygame.surfarray.pixels3d(self.im)
+		self.im.unlock()
 
+	def rotateCCW(self, angle, preserve_size=1, trim=0):
+		self.rotate(-angle, preserve_size=preserve_size, trim=trim)
+
+	def rotateCW(self, angle, preserve_size=1, trim=0):
+		self.rotate(angle, preserve_size=preserve_size, trim=trim)
+		
 	def rotate(self, angle, preserve_size=1, trim=0):
 		"""Lossy rotation of spite image data
 		
@@ -1523,6 +1539,8 @@ class Sprite(_ImageBase):
 		 2. this is NOT invertable! Multiple rotations will accumulate
 		 errors, so keep an original and only rotate copies. Ideal only
 		 rotate things once!
+
+		 3. 03/07/2006: note rotation direction is CW!!
 		"""
 		new = pygame.transform.rotate(self.im, -angle)
 		if preserve_size:
@@ -1538,7 +1556,10 @@ class Sprite(_ImageBase):
 		self.h = self.im.get_height()
 		self.iw = self.w
 		self.ih = self.h
+		
 		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.unlock()
+		self.array = pygame.surfarray.pixels3d(self.im)
 		self.im.unlock()
 		
 	def scale(self, new_width, new_height):
@@ -1568,14 +1589,15 @@ class Sprite(_ImageBase):
 		self.h = self.im.get_height()
 		self.iw = self.w
 		self.ih = self.h
+		
 		self.alpha = pygame.surfarray.pixels_alpha(self.im)
 		self.im.unlock()
-
 		# Wed Nov 23 14:50:34 2005 mazer 
 		# these need to be new too; I forgot and only regenerated
 		# the alpha channel.
 		self.array = pygame.surfarray.pixels3d(self.im)
 		self.im.unlock()
+		
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
 

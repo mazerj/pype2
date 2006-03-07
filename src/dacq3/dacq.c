@@ -523,7 +523,7 @@ int dacq_juice_drip(int ms)
   return(1);
 }
 
-int dacq_fixbreak_tau(int n)
+void dacq_fixbreak_tau(int n)
 {
   /*
    * set time period (in ms/sampling ticks) the eye must be outside

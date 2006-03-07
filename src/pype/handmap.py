@@ -176,9 +176,13 @@ class _Probe:
 			self.s = None
 
 	def pp(self):
-		a = -(self.a-90)+180
+		# Tue Mar  7 15:44:49 2006 mazer
+		# this little bug-fixer is no longer needed -- the grating
+		# functions were fixed today!
+		#   a = -(self.a-90)+180
+		#   a1 = a % 180
 		
-		a1 = a % 180
+		a1 = self.a % 180
 		a2 = a1 + 180
 		rx = self.x - self.app.udpy.fix_x
 		ry = self.y - self.app.udpy.fix_y
@@ -303,13 +307,13 @@ class _Probe:
 		self.colorname = name
 		if self.s is None:
 			if self.barmode == 0:
-				self.s = Sprite(width=self.length, height=self.width,
+				self.s = Sprite(width=self.width, height=self.length,
 								fb=self.app.fb, depth=99)
 				if color is None:
 					self.s.noise(0.5)
 				else:
 					self.s.fill(color)
-				self.s.rotate(self.a, 0, 1)
+				self.s.rotateCCW(self.a, 0, 1)
 			elif self.barmode == 1:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
@@ -373,16 +377,17 @@ class _Probe:
 			self.s.off()
 
 		(x, y) = self.app.udpy.fb2can(x, y)
-		_tsin = math.sin(math.pi * self.a / 180.)
-		_tcos = math.cos(math.pi * self.a / 180.)
-		y1 = y + (self.length / 2) * _tsin
-		x1 = x + (self.length / 2) * _tcos
-		y2 = y - (self.length / 2) * _tsin
-		x2 = x - (self.length / 2) * _tcos
-		xx1 = x - self.length / 2
-		xx2 = x + self.length / 2
-		yy1 = y - self.length / 2
-		yy2 = y + self.length / 2
+		l2 = self.length / 2.0
+		_tsin = l2 * math.sin(math.pi * (270.0 - self.a) / 180.0)
+		_tcos = l2 * math.cos(math.pi * (270.0 - self.a) / 180.0)
+		y1 = y + _tsin
+		x1 = x + _tcos
+		y2 = y - _tsin
+		x2 = x - _tcos
+		xx1 = x - l2
+		xx2 = x + l2
+		yy1 = y - l2
+		yy2 = y + l2
 			
 		if self.l:
 			if self.barmode == 0:
@@ -397,12 +402,6 @@ class _Probe:
 				self.l = self.app.udpy._canvas.create_oval(xx1, yy1, xx2, yy2)
 			self.l2 = self.app.udpy._canvas.create_line(x1, y1, x2, y2,
 														fill='pink', width=2)
-
-		#if self.txt:
-		#	self.app.udpy._canvas.delete(self.txt)
-		#self.txt = self.app.udpy._canvas.create_text((x1+x2)/2-50,
-		#											 min(y1,y2)-50,
-		#											 text=_bool(self.on))
 
 		if color:
 			fill = "#%02x%02x%02x" % color
@@ -500,10 +499,10 @@ def _key_handler(app, c, ev):
 		p.nextcolor(1)
 		p.reset()
 	elif c == '8':
-		p.a = (p.a - 15) % 360
+		p.a = (p.a + 15) % 360
 		p.reset()
 	elif c == '9':
-		p.a = (p.a + 15) % 360
+		p.a = (p.a - 15) % 360
 		p.reset()
 	elif c == 'q':
 		p.length = _incr(p.length, 1)

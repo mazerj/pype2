@@ -54,7 +54,7 @@ extern int dacq_sw2(void);
 extern void dacq_juice(int on);
 extern int dacq_juice_drip(int ms);
 
-int dacq_fixbreak_tau(int n);
+extern void dacq_fixbreak_tau(int n);
 extern int dacq_fixwin(int n, int cx, int cy, int radius, float vbias);
 extern int dacq_fixwin_genint(int n, int b);
 extern int dacq_fixwin_reset(int n);

@@ -16,6 +16,16 @@ Tue Aug 23 11:01:19 2005 mazer
   changed ori in singrat,cosgrat etc, such that 0deg -> vertical; convention
   is that motion to left is 0deg, motion up is 90deg, orientation follow
   along orthogonally. Not sure alphaGaussian2() is correct now!!
+
+Tue Mar  7 09:28:03 2006 mazer
+  change noted above was not correct. I changed the arctan2() calls:
+      t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
+  to
+      t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+  which should give the correct orientations now. Note that the
+  real problem is that these functions have been broken from the
+  very beginning, but handmap.py and spotmap.py (which uses the
+  sprite rotate method) have corrected for this.
 """
 
 import math
@@ -59,7 +69,7 @@ def pixelize(a, rgb=None, norm=1):
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
     """Note: frequency are in cycles/sprite"""
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
+    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
 	x, y = (r * cos(t), r * sin(t))
 
 	i = 127.0 * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
@@ -69,7 +79,7 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
     """Note: frequency are in cycles/sprite"""
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
+    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 
 	i = 127.0 * cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
@@ -80,9 +90,9 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
              R=1.0, G=1.0, B=1.0, logpolar=0):
 	"""Note: frequencies are in cycles/sprite or cycles/360deg"""
     if polarity < 0:
-        polarity = -1
+        polarity = -1.0
     else:
-        polarity = 1
+        polarity = 1.0
     x, y = (polarity * s.xx/s.w, s.yy/s.h)
 
     if logpolar:
@@ -104,7 +114,7 @@ def hypergrat(s, freq, phase_deg, ori_deg,
               R=1.0, G=1.0, B=1.0):
 	"""Note: frequencies are in cycles/sprite or cycles/360deg"""
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
+    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 
 	z = sqrt(fabs((x * freq) ** 2 - (y * freq) ** 2))
@@ -149,6 +159,9 @@ def Make_2D_Sine(freq, phase, rot, rc, gc, bc, im):
 	rc,gc,bc	red, green, blue contrast (float)
 	im			target image (typically sprite.im)
 	"""
+	
+	sys.stderr.write("Warning: use singrat instead of Make_2D_Sine!\n")
+	
 	w, h = im.get_size()
 	x, y = sprite.genaxes(w, h, Float)
 	x = x / w
@@ -183,7 +196,8 @@ def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
 				is CCW out from center.
 	im: target image (typically sprite.im)
 	"""
-	
+
+	sys.stderr.write("Warning: use polargrat instead of Make_2D_Cnc_Rdl!\n")
 	
 	w, h = im.get_size()
 	x, y = sprite.genaxes(w, h, Float)
@@ -215,6 +229,9 @@ def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
 	pygame.surfarray.pixels_alpha(im)[:] = 255
 
 def Make_2D_Hyperbolic(Pf, Phase, Rot, rc, gc, bc, im):
+	
+	sys.stderr.write("Warning: use hypergrat instead of Make_2D_Hyperbolic!\n")
+	
 	w, h = im.get_size()
 	x, y = sprite.genaxes(w, h, Float)
 	x = x / w
