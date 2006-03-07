@@ -56,4 +56,4 @@ def print_version_info():
         print "%s\t%s" % (k, v[k])
     
 if __name__ == '__main__':
-    print print_version_info()
+    print_version_info()

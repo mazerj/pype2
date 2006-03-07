@@ -31,6 +31,9 @@ Tue Mar  7 09:26:05 2006 mazer
    CW, and really we want CCW rotation. This has previously been
    corrected at the task level..
  
+Tue Mar  7 16:27:40 2006 mazer
+
+ - oops -- missed one thing --> barsprite
 """
 
 import os
@@ -2317,6 +2320,12 @@ def barsprite(w, h, angle, color, **kw):
 		s.fill(color)
 	s.rotate(angle, 0, 1)
 	return s
+
+def barspriteCW(w, h, angle, color, **kw):
+	return apply(barsprite, (w, h, angle, color), kw)
+
+def barspriteCCW(w, h, angle, color, **kw):
+	return apply(barsprite, (w, h, -angle, color), kw)
 
 def fixsprite(x, y, fb, fix_size, color, bg):
 	"""fixation target sprite generator
