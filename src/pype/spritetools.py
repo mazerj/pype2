@@ -29,6 +29,7 @@ Tue Mar  7 09:28:03 2006 mazer
 """
 
 import math
+import sys
 from Numeric import *
 
 import pygame.surfarray
