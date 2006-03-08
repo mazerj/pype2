@@ -90,3 +90,16 @@ docs:
 	(cd src/pype; make happydoc)
 
 .PHONY: install
+
+###############################################################
+
+# useful svn targets
+
+unstable:
+	@if [ -e RELEASE ]; then svn mv RELEASE UNSTABLE; fi
+	@echo UNSTABLE
+
+stable:
+	@if [ -e UNSTABLE ]; then svn mv UNSTABLE RELEASE; fi
+	@echo RELEASE
+
