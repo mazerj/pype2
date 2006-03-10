@@ -8,9 +8,8 @@ install-shared: pypeversion install-pypelib \
 		install-pyperun-shared install-pypebin
 
 install-pypelib:
-	@echo "installing: "
 	@for i in $(FILES); \
-		do (echo "  $$i " ; cp $$i $(PYPEDIR)/lib);\
+		do (cp $$i $(PYPEDIR)/lib);\
 		done
 	@echo ""
 	@cp cour.ttf $(PYPEDIR)/lib
@@ -41,9 +40,6 @@ install-pypebin:
 
 	@chmod +x pypeplex.py
 	@cp pypeplex.py $(PYPEDIR)/bin
-
-
-
 
 pypeversion:
 	@sed 's/%%INSTALLDATE%%/$(shell date)/' \

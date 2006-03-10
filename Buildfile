@@ -22,28 +22,28 @@ all-nodacq: install-nodacq wrapper
 
 install:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install; cd ..);\
+		do (cd $$i ; make install);\
 		done
-	(cd $(PYPEDIR); $(PYCOMPILE) lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
 
 install-nodacq:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install-nodacq; cd ..);\
+		do (cd $$i ; make install-nodacq);\
 		done
-	(cd $(PYPEDIR); $(PYCOMPILE) lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
 
 install-shared:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install-shared; cd ..);\
+		do (cd $$i ; make install-shared);\
 		done
-	(cd $(PYPEDIR); $(PYCOMPILE) lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
 
 pycompile:
-	(cd $(PYPEDIR); $(PYCOMPILE) lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
 
 wrapper:
 ifeq ($(WHO),root)
@@ -57,7 +57,7 @@ clean:
 	@find . -name core | xargs rm -f
 	@find . -name \*.pyc | xargs rm -f
 	for i in $(SUBDIRS); \
-		do (cd $$i ; make clean; cd ..);\
+		do (cd $$i ; make clean);\
 		done
 	cd src/wrapper ; make clean
 

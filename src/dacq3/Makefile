@@ -25,6 +25,9 @@ sigs.o: sigs.c sigs.h
 psems.o: psems.c psems.h
 	$(CC) -c psems.c
 
+usbjs.o: usbjs.c usbjs.h
+	$(CC) -c usbjs.c
+
 procname.o: procname.c procname.h
 	$(CC) -c procname.c
 
@@ -37,8 +40,8 @@ cmdeyelink: cmdeyelink.o
 das16_server.o: das16_server.c das_common.c das_common.h \
 	procname.h procname.c
 
-das16_server: das16_server.o dacq.h sigs.o psems.o procname.o
-	$(CC) -o $@ $< sigs.o psems.o procname.o $(LIBEYELINK)
+das16_server: das16_server.o dacq.h sigs.o psems.o procname.o usbjs.o
+	$(CC) -o $@ $< sigs.o psems.o procname.o usbjs.o $(LIBEYELINK)
 
 comedi:
 	if [ -f /usr/include/comedi.h -o -f /usr/local/include/comedi.h ]; then \
@@ -48,21 +51,21 @@ comedi:
 comedi_server.o: comedi_server.c das_common.c das_common.h \
 	procname.h procname.c
 
-comedi_server: comedi_server.o dacq.h sigs.o psems.o procname.o
-	$(CC) -o $@ $< sigs.o  psems.o procname.o $(LIBEYELINK) -lcomedi
+comedi_server: comedi_server.o dacq.h sigs.o psems.o procname.o usbjs.o
+	$(CC) -o $@ $< sigs.o  psems.o procname.o usbjs.o $(LIBEYELINK) -lcomedi
 
-das08_server.o: das08_server.c das_common.c das_common.h \
+das08_server.o: das08_server.c das_common.c das_common.h usbjs.o \
 	procname.h procname.c
 
-das08_server: das08_server.o dacq.h sigs.o psems.o procname.o
-	$(CC) -o $@ $< sigs.o psems.o procname.o $(LIBEYELINK)
+das08_server: das08_server.o dacq.h sigs.o psems.o procname.o usbjs.o
+	$(CC) -o $@ $< sigs.o psems.o procname.o usbjs.o $(LIBEYELINK)
 
-iscan_server: iscan_server.o dacq.h sigs.o  psems.o procname.o libez
+iscan_server: iscan_server.o dacq.h sigs.o  psems.o procname.o usbjs.o libez
 	@echo "NOTE: can't tell if libez is fresh, will relink iscan_server"
 	$(CC) -o $@ $< sigs.o psems.o procname.o libezV24-0.0.3/libezV24-0.a
 
 libez:
-	(cd libezV24-0.0.3 ; make static; cd ..)
+	(cd libezV24-0.0.3 ; make static)
 
 
 dacq.c: dacq.h
@@ -104,7 +107,7 @@ dastest_cont: dastest_cont.o
 clean:
 	@rm -f *.o _dacqmodule.so *.i *.pyc _dacqmodule \
 		*_server *_wrap.* .*~ dacq.py
-	(cd libezV24-0.0.3 ; make clean; cd ..)
+	(cd libezV24-0.0.3 ; make clean)
 	@rm -f libezV24-0.0.3/libezV24-0.a
 	@rm -f das16_server comedi_server das08_server _dacqmodule.so 
 

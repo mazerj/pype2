@@ -118,6 +118,7 @@ Mon Jan 23 10:11:46 2006 mazer
 - added vbias option to FixWin to turn the fixwin into an ellipse. See
   comments in the fixwin class for more details.
 
+Thu Mar  9 18:08:00 2006 mazer
 """
 
 #####################################################################
@@ -317,6 +318,9 @@ class PypeApp:
 
 		# added 17-jan-2006 shinji
 		self.config.set('OPENGL',	 '0',				override=None)
+
+		# added 09-mar-2006 mazer
+		self.config.set('USB_JS_DEV',	'',				override=None)
 
 		# these MUST be set from now on..
 		monw = self.config.fget('MONW', -1)
@@ -909,6 +913,10 @@ class PypeApp:
 		os.environ['XXEYELINK_CAMERA'] = self.config.get('EYELINK_CAMERA')
 		if self.config.iget('SWAP_XY'):
 			os.environ['XXSWAP_XY'] = '1'
+
+		# possibly have the dacq module initialize a usb joystick device
+		if len(self.config.get('USB_JS_DEV')) > 0:
+			os.environ['XXUSBJS'] = self.config.get('USB_JS_DEV')
 
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),

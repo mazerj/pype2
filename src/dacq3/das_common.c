@@ -33,6 +33,11 @@
 ** Mon Jan 23 10:01:22 2006 mazer 
 **   Added handling of FIXWIN.vbias for vertical elongation of the
 **   fixation window.
+**
+** Fri Mar 10 10:08:25 2006 mazer 
+**   Added stub support of a usb joystick or keypad. Right now the
+**   device is detected and initialized, but nothing's done yet
+**   with the signals.
 */
 
 #include <unistd.h>
@@ -47,6 +52,7 @@
 #ifdef CHANGE_NAME
 # include "procname.h"
 #endif
+#include "usbjs.h"
 
 /* these are eyelink API header files */
 #include "eyelink.h"
@@ -64,13 +70,12 @@ static char *_tmodes[] = { "ANALOG", "ISCAN", "EYELINK", "EYELINK_TEST" };
 #define INSIDE		1
 #define OUTSIDE		0
 
-
-
 static int tracker_mode = ANALOG;
 static int semid = -1;
 static unsigned long long ticks_per_ms = 0;
 static int eyelink_camera = -1;
 static int swap_xy = 0;
+static int usbjs_dev = -1;
 
 static double find_clockfreq()	/* get clock frequency in Hz */
 {
@@ -79,7 +84,7 @@ static double find_clockfreq()	/* get clock frequency in Hz */
   double mhz;
 
   if ((fp = fopen("/proc/cpuinfo", "r")) == NULL) {
-    fprintf(stderr, "%s: Can't open /proc/cpuinfo\n", progname);
+    fprintf(stderr, "%s: can't open /proc/cpuinfo\n", progname);
     exit(1);
   }
   mhz = -1.0;
@@ -337,6 +342,8 @@ static void mainloop(void)
   int eyelink_new;
   int k;
   long accum[NADC], naccum;
+  int jsbut, jsnum, jsval;
+  unsigned long jstime;
 
   register float sx=0, sy=0;
   int si, sn;
@@ -474,6 +481,22 @@ static void mainloop(void)
     
     /* read digital input lines */
     dig_in();
+
+    /* Fri Mar 10 10:05:30 2006 mazer 
+     * Check joystick for mock-digital inputs, if joystick's been
+     * initialized. Right now this is just a stub...
+     */
+    if (usbjs_dev > 0) {
+      if (usbjs_query(usbjs_dev, &jsbut, &jsnum, &jsval, &jstime)) {
+	if (jsbut) {
+	  /* button press: jsnum is button number, jsval is up/down */
+	} else if (jsbut == 0 && jsnum == 0) {
+	  /* x-axis motion, jsval indicates the current value */
+	} else if (jsbut == 0 && jsnum == 1) {
+	  /* y-axis motion, jsval indicates the current value */
+	}
+      }
+    }
     
     /* set digital output lines, only if the strobe's been set */
     LOCK(semid);
@@ -630,6 +653,9 @@ static void mainloop(void)
   fprintf(stderr, "%s: terminate signaled\n", progname);
   iscan_halt();
   eyelink_halt();
+  if (usbjs_dev >= 0) {
+    usbjs_close(usbjs_dev);
+  }
 
   /* no longer ready */
   LOCK(semid);
@@ -702,6 +728,15 @@ int main(int ac, char **av, char **envp)
   if (getenv("XXSWAP_XY")) {
     swap_xy = 1;
     fprintf(stderr, "%s: swapping X and Y\n", progname);
+  }
+
+  if ((p = getenv("XXUSBJS")) != NULL) {
+    usbjs_dev = usbjs_init(p);
+    if (usbjs_dev < 0) {
+      fprintf(stderr, "%s: can't open joystick %s\n", progname, p);
+    } else {
+      fprintf(stderr, "%s: joystick at %s configured\n", progname, p);
+    }
   }
 
   mainloop();
