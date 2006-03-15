@@ -139,6 +139,7 @@
 #include <math.h>
 #include <sys/io.h>
 #include <sched.h>
+#include <errno.h>
 
 #include "dacqinfo.h"
 #include "psems.h"
@@ -207,9 +208,15 @@ int dacq_start(int boot, int testmode, char *tracker_type,
 
   if ((shmid =
        shmget((key_t)SHMKEY, sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
-    perror("shmget");
-    fprintf(stderr, "dacq_start: kernel compiled with SHM/IPC?\n");
-    return(0);
+    if (errno == EINVAL) {
+      fprintf(stderr, "dacq_start: Shared memory buffer's changed sizes!\n");
+      fprintf(stderr, "            Run pypekill, then try pype again.\n");
+      return(0);
+    } else {
+      perror("shmget");
+      fprintf(stderr, "dacq_start: %d kernel compiled with SHM/IPC?\n", errno);
+      return(0);
+    }
   }
 
   if ((dacq_data = shmat(shmid, NULL, 0)) == NULL) {

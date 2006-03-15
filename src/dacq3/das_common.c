@@ -669,30 +669,17 @@ static void mainloop(void)
 int main(int ac, char **av, char **envp)
 {
   char *p;
-  //char buf[100];
   float mhz;
 
 #ifdef CHANGE_NAME
   init_set_proc_title(ac, av, envp);
 #endif
 
-  /*
-  fprintf(stderr, "**** %s (pid=%d ppid=%d)****\n",
-	  av[0], getpid(), getppid());
-  */
-
-
   p = rindex(av[0], '/');
   progname = p ? (p + 1) : av[0];
 
   ticks_per_ms = (unsigned long long)(0.5 +
 				      ((mhz = find_clockfreq()) / 1000.0));
-
-  //fprintf(stderr, "%s: started up\n", progname);
-  //fprintf(stderr, "%s: <%s>\n", progname, getcwd(buf, sizeof(buf)));
-  //fprintf(stderr, "%s: cpu/rdtsc @ %f mHz\n", progname, mhz/1e6);
-  //fprintf(stderr, "%s: MAXSMOOTH=%d\n", progname, MAXSMOOTH);
-  //fprintf(stderr, "%s: ADBUFLEN = ~ %.1f s\n", progname, ADBUFLEN/1000.0);
 
   if ((semid = psem_init(SEMKEY)) < 0) {
     perror("psem_init");
@@ -702,10 +689,6 @@ int main(int ac, char **av, char **envp)
 
   init();
   fprintf(stderr, "%s: initted\n", progname);
-  
-
-  //fprintf(stderr, "av[1]=<%s>\n", av[1]);
-  //fprintf(stderr, "av[2]=<%s>\n", av[2]);
 
   if (av[1] && (strcmp(av[1], "-eyelink") == 0)) {
     eyelink_init(av[2]);
@@ -713,19 +696,18 @@ int main(int ac, char **av, char **envp)
     eyelink_init(getenv("EYELINK_TEST"));
     if (tracker_mode == EYELINK) {
       tracker_mode = EYELINK_TEST;
-      fprintf(stderr, "*********************************\n");
-      fprintf(stderr, "*** eyelink test mode SUCCESS ***\n");
-      fprintf(stderr, "*********************************\n");
+      fprintf(stderr, "*** eyelink test mode SUCCESS!\n");
     } else {
-      fprintf(stderr, "*********************************\n");
-      fprintf(stderr, "*** eyelink test mode FAILED  ***\n");
-      fprintf(stderr, "*********************************\n");
+      fprintf(stderr, "*** eyelink test mode FAILED!\n");
     }
   } else if (ac > 2) {
     iscan_init(av[1], av[2]);
   }
 
   if (getenv("XXSWAP_XY")) {
+    /* this option is useful ONLY if the camera is rotated, like with
+     * the original software release for the eyelink ELCL...
+     */
     swap_xy = 1;
     fprintf(stderr, "%s: swapping X and Y\n", progname);
   }

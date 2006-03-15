@@ -31,42 +31,37 @@ usbjs.o: usbjs.c usbjs.h
 procname.o: procname.c procname.h
 	$(CC) -c procname.c
 
-psems: psems.c psems.h
-	$(CC) -o psems -DTEST psems.c
-
-cmdeyelink: cmdeyelink.o
-	$(CC) -o $@ $< $(LIBEYELINK)
-
-das16_server.o: das16_server.c das_common.c das_common.h \
-	procname.h procname.c
-
-das16_server: das16_server.o dacq.h sigs.o psems.o procname.o usbjs.o
-	$(CC) -o $@ $< sigs.o psems.o procname.o usbjs.o $(LIBEYELINK)
-
 comedi:
 	if [ -f /usr/include/comedi.h -o -f /usr/local/include/comedi.h ]; then \
 		make comedi_server; \
 	fi;
 
-comedi_server.o: comedi_server.c das_common.c das_common.h \
-	procname.h procname.c
+SERVER_SRCS = das_common.c das_common.h procname.h procname.c
+SERVER_OBJS = sigs.o psems.o procname.o usbjs.o
 
-comedi_server: comedi_server.o dacq.h sigs.o psems.o procname.o usbjs.o
-	$(CC) -o $@ $< sigs.o  psems.o procname.o usbjs.o $(LIBEYELINK) -lcomedi
+dummy_server.o: dummy_server.c $(SERVER_SRCS)
+comedi_server.o: comedi_server.c $(SERVER_SRCS)
+das16_server.o: das16_server.c $(SAVER_SRCS)
+das08_server.o: das08_server.c $(SERVER_SRCS)
 
-das08_server.o: das08_server.c das_common.c das_common.h usbjs.o \
-	procname.h procname.c
+dummy_server: dummy_server.o dacq.h $(SERVER_OBJS)
+	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
 
-das08_server: das08_server.o dacq.h sigs.o psems.o procname.o usbjs.o
-	$(CC) -o $@ $< sigs.o psems.o procname.o usbjs.o $(LIBEYELINK)
+das16_server: das16_server.o $(SERVER_OBJS)
+	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
 
-iscan_server: iscan_server.o dacq.h sigs.o  psems.o procname.o usbjs.o libez
+comedi_server: comedi_server.o $(SERVER_OBJS)
+	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK) -lcomedi
+
+das08_server: das08_server.o $(SERVER_OBJS)
+	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
+
+iscan_server: iscan_server.o libez $(SERVER_OBJS)
 	@echo "NOTE: can't tell if libez is fresh, will relink iscan_server"
-	$(CC) -o $@ $< sigs.o psems.o procname.o libezV24-0.0.3/libezV24-0.a
+	$(CC) -o $@ $< $(SERVER_OBJS) libezV24-0.0.3/libezV24-0.a
 
 libez:
 	(cd libezV24-0.0.3 ; make static)
-
 
 dacq.c: dacq.h
 
@@ -84,7 +79,9 @@ dacq_wrap.o: dacq_wrap.c
 _dacqmodule.so: dacq_wrap.o dacq.o psems.o
 	$(CC) -shared dacq_wrap.o dacq.o psems.o -o $@
 
-install: das16_server das08_server _dacqmodule.so iscan_server comedi
+install: dummy_server \
+		das16_server das08_server _dacqmodule.so iscan_server comedi
+	cp dummy_server $(PYPEDIR)/bin
 	cp das16_server $(PYPEDIR)/bin
 	cp das08_server $(PYPEDIR)/bin
 	cp iscan_server $(PYPEDIR)/bin
@@ -92,14 +89,6 @@ install: das16_server das08_server _dacqmodule.so iscan_server comedi
 	cp _dacqmodule.so $(PYPEDIR)/lib
 	#cp libeyelinkcore.so $(PYPEDIR)/lib
 	if [ -x comedi_server ]; then cp comedi_server $(PYPEDIR)/bin; fi;
-
-#############################################################
-
-dastest_poll: dastest_poll.o
-	$(CC) -o $@ $<
-
-dastest_cont: dastest_cont.o
-	$(CC) -o $@ $<
 
 #############################################################
 
