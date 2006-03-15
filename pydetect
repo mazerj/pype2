@@ -53,6 +53,8 @@ if ( $rh_or_fc == "true" ) then
       set major=2 minor=3
     else if ($distno == "3") then
       set major=2 minor=3
+    else if ($distno == "4") then
+      set major=2 minor=4
     else
       echo "Can't identify distribution number."
       exit 1
