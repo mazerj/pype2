@@ -39,12 +39,18 @@
 **   added: int psem_decr_mine(int semid)
 **   which decremements (UNLOCKS) the semaphore ONLY if it's owned by
 **   the processes calling the function..
+**
+** Thu Mar 23 11:45:54 2006 mazer 
+**   dummy_server under ubuntu 5.10 seems to die if the semaphore's are
+**   deleted and then decremented.. now a warning is printed and then it
+**   should exit normally.
 */
 
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
+#include <errno.h>
 
 #include "psems.h"
 
@@ -96,8 +102,13 @@ int psem_incr(int semid)
   s.sem_flg = 0;		/* block/wait */
     
   if (semop(semid, &s, 1) < 0) {
-    perror("psem_incr/semop");
-    return(-1);
+    if (errno == EINVAL) {
+      fprintf(stderr, "warning: psem_incr semaphore destroyed?\n");
+      return(1);
+    } else {
+      perror("psem_incr/semop");
+      return(-1);
+    }
   } else {
     return(1);
   }
@@ -112,8 +123,13 @@ int psem_decr(int semid)
   s.sem_flg = 0;		/* block/wait */
     
   if (semop(semid, &s, 1) < 0) {
-    perror("psem_decr/semop");
-    return(-1);
+    if (errno == EINVAL) {
+      fprintf(stderr, "warning: psem_decr semaphore destroyed?\n");
+      return(1);
+    } else {
+      perror("psem_decr/semop");
+      return(-1);
+    }
   } else {
     return(1);
   }

@@ -5,16 +5,16 @@ class Plex:4,83
 PlexNet.py,262
 class PlexNet:12,187
 	def __init__(13,202
-	def __del__(44,1131
-	def __put(51,1250
-	def __get(59,1492
-	def start_data(66,1647
-	def stop_data(69,1726
-	def pump(72,1803
-	def run(125,3359
-	def drain(142,3776
-	def neuronlist(152,4061
-	def status(161,4258
+	def __del__(46,1162
+	def __put(53,1281
+	def __get(61,1523
+	def start_data(68,1678
+	def stop_data(71,1757
+	def pump(74,1834
+	def run(127,3390
+	def drain(144,3807
+	def neuronlist(154,4092
+	def status(163,4289
 
 about.py,90
 class AboutPype:20,389
@@ -22,11 +22,13 @@ class AboutPype:20,389
 	def _withdraw(57,1347
 def splash(60,1396
 
-beep.py,81
-def nobeep(33,702
-def beep_init(42,922
-def beep(70,1470
-def wavbeep(120,2837
+beep.py,125
+class _Beeper:36,1019
+	def __init__(40,1065
+	def beep(61,1699
+	def synth(77,2085
+def beep(102,2816
+def nobeep(110,3048
 
 blt.py,1869
 def _loadblt(46,1172
@@ -115,11 +117,11 @@ class Config:23,391
 error.py,0
 
 events.py,120
-def iscorrect(38,919
-def isabort(44,1003
-def isui(50,1074
-def ismaxrt_exceeded(56,1154
-def isearly_release(62,1243
+def iscorrect(38,920
+def isabort(44,1004
+def isui(50,1075
+def ismaxrt_exceeded(56,1155
+def isearly_release(62,1244
 
 filebox.py,746
 def _comparedatafiles(28,487
@@ -231,32 +233,36 @@ class EventQueue:198,4348
 def warn(217,4702
 def __done(276,6189
 def beepwarn(278,6216
-def ask(330,7490
-def undermouse(340,7705
-def screencenter(354,8102
+def ask(330,7482
+def undermouse(340,7697
+def screencenter(354,8094
 
 handmap.py,493
-def _bool(56,1457
-class _Probe:63,1525
-	def __init__(64,1539
-	def __del__(106,2310
-	def save(110,2376
-	def load(139,2976
-	def pp(178,3831
-	def clear(216,5366
-	def reset(228,5632
-	def color(234,5740
-	def nextcolor(276,6911
-	def showprobe(279,6983
-	def draw(283,7109
-def _incr(425,11092
-def _key_handler(432,11176
-def _hmap_idlefn(576,14103
-def hmap_set_dlist(592,14467
-def hmap_show(595,14529
-def hmap_hide(600,14625
-def hmap_install(605,14721
-def hmap_uninstall(612,14927
+def _bool(56,1458
+class _Probe:63,1526
+	def __init__(64,1540
+	def __del__(106,2311
+	def save(110,2377
+	def load(139,2977
+	def pp(178,3832
+	def clear(220,5523
+	def reset(232,5789
+	def color(238,5897
+	def nextcolor(280,7068
+	def showprobe(283,7140
+	def draw(287,7266
+def _incr(424,10989
+def _key_handler(431,11073
+def _hmap_idlefn(575,14000
+def hmap_set_dlist(591,14364
+def hmap_show(594,14426
+def hmap_hide(599,14522
+def hmap_install(604,14618
+def hmap_uninstall(611,14824
+
+info.py,52
+def libinfo(12,249
+def print_version_info(51,1058
 
 iplot.py,481
 def graceplot(30,692
@@ -408,152 +414,153 @@ class ParamTable:438,7730
 	def check(695,14568
 	def runlock(707,14847
 
-pype.py,3828
-class PypeApp:168,5277
-	def __init__(188,6133
-	def _keyboard(1009,35666
-	def set_state(1015,35817
-	def isrunning(1027,36118
-	def ispaused(1030,36163
-	def tally(1033,36206
-	def testad(1051,36617
-	def getcommon(1061,36787
-	def make_taskmenu(1073,37141
-	def add_tasks(1097,37852
-	def unloadtask(1122,38491
-	def newloadtask(1130,38630
-	def set_canvashook(1206,40514
-			def hookfn(1210,40679
-	def udpy_note(1228,41229
-	def eyeset(1231,41278
-	def init_framebuffer(1270,42514
-	def _statefile(1299,43390
-	def _savestate(1303,43487
-	def _readstate(1325,43955
-	def trial_clear(1335,44129
-	def trial_new(1342,44413
-	def trial_correct(1346,44532
-	def trial_ui(1353,44776
-	def new_cell(1362,45102
-	def set_fxfy(1370,45311
-	def set_startfn(1374,45443
-	def _start(1383,45687
-	def _starttmp(1430,46861
-	def shutdown(1433,46908
-	def ts(1448,47320
-	def status(1455,47465
-	def eyepos(1462,47648
-	def looking_at(1470,47877
-	def eyeshift(1482,48216
-	def eyeadjust(1510,49272
-	def drain(1517,49507
-	def idlefn(1522,49643
-	def history(1651,53164
-	def alarm(1669,53740
-	def warn_run_start(1677,53908
-	def warn_run_stop(1688,54081
-	def warn_trial_start(1697,54214
-	def start_tone(1702,54399
-	def warn_trial_correct(1708,54563
-	def warn_trial_incorrect(1714,54710
-	def led(1724,54948
-	def nreps(1735,55219
-	def notdone(1742,55391
-	def runstate(1750,55569
-	def dropsize(1763,55825
-	def dropvar(1770,55999
-	def reward(1777,56179
-	def __reward2(1825,57582
-	def juice_on(1836,57912
-	def juice_off(1842,57994
-	def juice_drip(1848,58074
-	def hide(1854,58189
-	def lshiftdown(1862,58361
-	def rshiftdown(1871,58572
-	def barchanges(1880,58784
-	def bar_genint(1895,59273
-	def int_handler(1915,59869
-	def debug_handler(1964,61322
-	def bardown(1971,61559
-	def barup(1982,61740
-	def sw1(1985,61787
-	def sw2(2000,62077
-	def close(2014,62365
-	def repinfo(2064,63562
-	def taskname(2067,63630
-	def _recfile(2083,64070
-	def set_userbutton(2098,64502
-	def taskbutton(2109,64899
-	def record_start(2120,65279
-	def record_stop(2147,66133
-	def plexnet_query(2167,66579
-	def plexon_state(2176,66805
-	def plexon_psth_trigger(2186,67087
-	def eyetrace(2191,67256
-	def encode(2209,67747
-	def get_spikes(2229,68241
-	def get_spikes_now(2236,68388
-	def get_eyepos_now(2258,69061
-	def get_photo_now(2279,69644
-	def get_events_now(2293,69880
-	def record_write(2300,70071
-	def record_note(2445,74527
-	def _guess(2455,74744
-	def record_done(2484,75440
-	def record_selectfile(2490,75552
-	def idlefb(2527,76494
-	def synctest(2542,76875
-	def plotEyetracesRange(2633,79106
-	def plotEyetraces(2637,79229
-def npypes(2701,80798
-def find_ttl(2722,81431
-class EyeGraph_dummy:2751,82178
-	def __init__(2770,82787
-	def show(2774,82847
-def safeLookup(2782,83145
-def subject(2795,83372
-def subjectrc(2805,83570
-def pyperc(2817,83920
-def pypedir(2825,84047
-def libdir(2833,84165
-def gethostname(2841,84290
-class FixWin:2853,84572
-	def __init__(2854,84586
-	def __del__(2860,84715
-	def genint(2866,84845
-	def set(2876,85116
-	def reset(2881,85205
-	def on(2884,85249
-	def off(2888,85359
-	def inside(2892,85454
-	def broke(2898,85618
-	def break_time(2904,85800
-	def draw(2908,85892
-	def clear(2917,86192
-class Timer:2925,86353
-	def __init__(2926,86366
-	def reset(2929,86403
-	def ms(2932,86451
-	def us(2935,86503
-class GenericTask:2939,86634
-	def __init__(2940,86653
-	def run(2943,86697
-	def cleanup(2946,86721
-class Holder:2949,86749
-class DancingBear:2953,86842
-	def __init__(2955,86871
-	def dance(2958,86924
-def dance(2970,87212
-def debug(2973,87255
-def loadwarn(2986,87475
-def now(3001,87923
-def candy1(3017,88298
-def candy2(3082,89557
-def appbusy(3151,90957
-class PyIcon:3160,91175
-	def __init__(3170,91504
-	def image(3178,91691
-def get_plexon_events(3181,91729
+pype.py,3854
+class PypeApp:180,5647
+	def __init__(200,6503
+	def _keyboard(1066,37570
+	def marktime(1072,37721
+	def set_state(1077,37840
+	def isrunning(1089,38141
+	def ispaused(1092,38186
+	def tally(1095,38229
+	def testad(1113,38640
+	def getcommon(1123,38810
+	def make_taskmenu(1135,39164
+	def add_tasks(1159,39875
+	def unloadtask(1184,40514
+	def newloadtask(1192,40653
+	def set_canvashook(1268,42537
+			def hookfn(1272,42702
+	def udpy_note(1290,43252
+	def eyeset(1293,43301
+	def init_framebuffer(1335,44605
+	def _statefile(1370,45604
+	def _savestate(1374,45701
+	def _readstate(1396,46169
+	def trial_clear(1406,46343
+	def trial_new(1413,46627
+	def trial_correct(1417,46746
+	def trial_ui(1424,46990
+	def new_cell(1433,47316
+	def set_fxfy(1441,47525
+	def set_startfn(1445,47657
+	def _start(1454,47901
+	def _starttmp(1501,49075
+	def shutdown(1504,49122
+	def ts(1519,49534
+	def status(1526,49679
+	def eyepos(1533,49862
+	def looking_at(1541,50091
+	def eyeshift(1553,50430
+	def eyeadjust(1581,51486
+	def drain(1588,51721
+	def idlefn(1593,51857
+	def history(1722,55379
+	def alarm(1740,55955
+	def warn_run_start(1748,56107
+	def warn_run_stop(1759,56280
+	def warn_trial_start(1768,56413
+	def start_tone(1773,56598
+	def warn_trial_correct(1779,56694
+	def warn_trial_incorrect(1785,56841
+	def led(1795,57079
+	def nreps(1806,57350
+	def notdone(1813,57522
+	def runstate(1821,57700
+	def dropsize(1834,57956
+	def dropvar(1841,58130
+	def reward(1848,58310
+	def __reward2(1896,59711
+	def juice_on(1907,60041
+	def juice_off(1913,60123
+	def juice_drip(1919,60203
+	def hide(1925,60318
+	def lshiftdown(1933,60490
+	def rshiftdown(1942,60701
+	def barchanges(1951,60913
+	def bar_genint(1966,61402
+	def int_handler(1986,61998
+	def debug_handler(2035,63451
+	def bardown(2042,63688
+	def barup(2053,63869
+	def sw1(2056,63916
+	def sw2(2071,64206
+	def close(2085,64494
+	def repinfo(2137,65799
+	def taskname(2140,65867
+	def _recfile(2156,66307
+	def set_userbutton(2171,66739
+	def taskbutton(2182,67136
+	def record_start(2193,67516
+	def record_stop(2222,68404
+	def plexnet_query(2242,68850
+	def plexon_state(2251,69076
+	def plexon_psth_trigger(2261,69357
+	def eyetrace(2266,69526
+	def encode(2284,70017
+	def get_spikes(2304,70511
+	def get_spikes_now(2311,70658
+	def get_eyepos_now(2333,71331
+	def get_photo_now(2354,71914
+	def get_events_now(2368,72150
+	def record_write(2375,72341
+	def record_note(2520,76797
+	def _guess(2530,77014
+	def record_done(2559,77710
+	def record_selectfile(2565,77822
+	def idlefb(2602,78764
+	def synctest(2617,79145
+	def plotEyetracesRange(2708,81376
+	def plotEyetraces(2712,81499
+def npypes(2776,83068
+def find_ttl(2797,83701
+class EyeGraph_dummy:2826,84448
+	def __init__(2845,85057
+	def show(2849,85117
+def safeLookup(2857,85415
+def subject(2870,85642
+def subjectrc(2880,85840
+def pyperc(2892,86190
+def pypedir(2900,86317
+def libdir(2908,86435
+def gethostname(2916,86560
+class FixWin:2928,86842
+	def __init__(2930,86857
+	def __del__(2947,87399
+	def genint(2953,87529
+	def set(2963,87800
+	def reset(2968,87889
+	def on(2971,87933
+	def off(2975,88055
+	def inside(2979,88155
+	def broke(2985,88319
+	def break_time(2991,88501
+	def draw(2995,88593
+	def clear(3004,88904
+class Timer:3012,89065
+	def __init__(3013,89078
+	def reset(3016,89115
+	def ms(3019,89163
+	def us(3022,89215
+class GenericTask:3026,89346
+	def __init__(3027,89365
+	def run(3030,89409
+	def cleanup(3033,89433
+class Holder:3036,89461
+class DancingBear:3040,89554
+	def __init__(3042,89583
+	def dance(3045,89636
+def dance(3057,89924
+def debug(3060,89967
+def loadwarn(3073,90187
+def now(3088,90635
+def candy1(3104,91010
+def candy2(3169,92269
+def appbusy(3253,93962
+class PyIcon:3262,94180
+	def __init__(3272,94509
+	def image(3280,94696
+def get_plexon_events(3283,94734
 
 pype_aux.py,867
 def tic(27,466
@@ -594,35 +601,36 @@ def find_events2(542,12131
 def align_events(559,12448
 def dir2ori(568,12619
 
-pypedata.py,687
-class PypedataTimeError(97,3113
-class Note:106,3318
-	def __init__(107,3330
-class PypeRecord:111,3398
-	def __init__(113,3439
-	def __repr__(174,5537
-	def printevents(177,5605
-	def pp(187,5818
-	def debugprint(190,5882
-	def compute(255,7755
-class PypeFile:349,10599
-	def __init__(350,10615
-	def backload(395,11996
-	def _backload2(399,12089
-	def __repr__(430,12906
-	def close(433,12995
-	def _next(443,13200
-	def nth(542,16743
-	def freenth(562,17130
-	def last(566,17210
-def count_spikes(581,17542
-def extract_spikes(588,17674
-def fixvel(599,17971
-def pix2deg(619,18535
-def deg2pix(626,18733
-def find_saccades(633,18931
-def findfix(801,24004
-def parseargs(857,25748
+pypedata.py,711
+class PypedataTimeError(115,3732
+class Note:124,3937
+	def __init__(125,3949
+class PypeRecord:129,4017
+	def __init__(132,4078
+	def __repr__(198,6436
+	def printevents(201,6504
+	def pp(211,6717
+	def debugprint(214,6781
+	def compute(281,8681
+	def spikes(400,12364
+class PypeFile:429,13226
+	def __init__(430,13242
+	def backload(475,14623
+	def _backload2(479,14716
+	def __repr__(510,15533
+	def close(513,15622
+	def _next(523,15827
+	def nth(622,19370
+	def freenth(642,19757
+	def last(646,19837
+def count_spikes(661,20169
+def extract_spikes(668,20301
+def fixvel(679,20598
+def pix2deg(699,21162
+def deg2pix(706,21360
+def find_saccades(713,21558
+def findfix(881,26631
+def parseargs(937,28375
 
 pypedebug.py,93
 def keyboard(15,287
@@ -642,6 +650,9 @@ class TaskAbort(23,578
 class GuiOnlyFunction(24,611
 class BarTransition(25,650
 class FixBreak(26,687
+
+pypeplex.py,20
+def extract(12,196
 
 pyplex.py,361
 def readbytes(63,1701
@@ -664,137 +675,143 @@ def _realuid(20,375
 def root_take(33,698
 def root_drop(43,925
 
-sprite.py,2756
-class PygameIncompleteError(63,1316
-class SpriteError(64,1361
-def _got_root(66,1397
-def genaxes(71,1493
-def gend(103,2686
-def genrad(114,3047
-def gentheta(127,3417
-class FrameBuffer:148,4118
-	def __init__(149,4137
-	def __del__(361,11095
-	def calcfps(370,11321
-	def set_gamma(431,12831
-	def cursor(456,13592
-	def close(465,13799
-	def _xy(481,14210
-	def hide(512,15081
-	def show(521,15280
-	def sync(530,15498
-	def sync_toggle(545,15784
-	def clear(557,16043
-	def flip(579,16637
-	def string(604,17614
-	def clearkey(658,19146
-	def getkey(669,19452
-	def ungetkey(709,20527
-	def snapshot(719,20820
-	def rectangle(743,21638
-	def line(766,22403
-	def circle(788,22976
-def zoomdown(804,23410
-class _ImageBase:841,24577
-	def __init__(860,25173
-	def XY(863,25269
-	def X(869,25390
-	def Y(875,25479
-class Sprite(882,25569
-	def __init__(914,26707
-		class draws 924,27122
-	def __del__(1016,29786
-	def __repr__(1025,30007
-	def __getitem__(1033,30240
-	def __setitem__(1050,30642
-	def asPhotoImage(1065,31052
-	def set_alpha(1088,31718
-	def line(1100,31968
-	def clear(1123,32533
-	def fill(1136,32829
-	def noise(1148,33086
-	def circlefill(1169,33696
-	def circle(1202,34379
-	def rect(1245,35401
-	def pix(1267,35917
-	def pix_octr(1283,36342
-	def pix_rc(1302,36839
-	def axisflip(1325,37404
-	def rotate(1345,37944
-	def scale(1383,39033
-	def circmask(1412,39871
-	def alpha_aperture(1419,40092
-	def alpha_gradient(1438,40684
-	def alpha_gradient2(1459,41394
-	def dim(1489,42278
-	def thresh(1510,42919
-	def as_array(1523,43244
-	def on(1540,43764
-	def off(1547,43849
-	def toggle(1554,43969
-	def state(1565,44134
-	def moveto(1572,44253
-	def rmove(1583,44430
-	def saveunder(1595,44683
-	def unblit(1598,44772
-	def blit(1601,44841
-	def fastblit(1655,46195
-	def render(1674,46802
-	def unrender(1686,47150
-	def subimage(1696,47321
-	def clone(1724,47966
-	def setdir(1749,48479
-	def save(1763,48814
-	def save_alpha(1768,48930
-	def fix(1773,49052
-	def invert(1778,49181
-	def trim(1783,49284
-	def roll(1788,49386
-	def old_subimage(1797,49605
-class MpegMovie(1807,49861
-	def __init__(1816,50183
-	def getlength(1845,50903
-	def showframe(1861,51334
-class PolySprite:1884,51859
-	def __init__(1893,52104
-	def blit(1927,52941
-	def on(1943,53268
-	def off(1948,53329
-class DisplayList:1953,53392
-	def __init__(1974,54147
-	def __del__(1989,54532
-	def add(2000,54851
-	def delete(2014,55133
-	def clear(2031,55513
-	def delete_all(2038,55628
-	def update(2045,55741
-	def _print(2068,56191
-def _is_seq(2074,56310
-def barsprite(2084,56474
-def fixsprite(2103,56971
-def fixsprite2(2135,57764
-def _C(2176,58668
-def color24(2213,59722
-def grey24(2218,59831
-def gray24(2223,59945
-def quickinit(2228,60059
+sprite.py,2926
+class PygameIncompleteError(88,1997
+class SpriteError(89,2042
+def _got_root(91,2078
+def genaxes(96,2174
+def gend(128,3367
+def genrad(139,3728
+def gentheta(152,4098
+class FrameBuffer:173,4799
+	def __init__(174,4818
+	def __del__(403,12110
+	def printinfo(412,12334
+	def calcfps(435,13412
+	def set_gamma(500,15031
+	def cursor(525,15792
+	def close(534,15999
+	def _xy(550,16410
+	def hide(581,17281
+	def show(590,17480
+	def sync(599,17698
+	def sync_toggle(614,17984
+	def clear(626,18243
+	def flip(660,19128
+	def string(694,20236
+	def clearkey(770,22326
+	def getkey(781,22632
+	def ungetkey(821,23707
+	def snapshot(831,24000
+	def rectangle(855,24818
+	def line(889,25924
+	def circle(926,26931
+	def pygl_setxy(953,27772
+def zoomdown(961,28001
+class _ImageBase:998,29168
+	def __init__(1017,29764
+	def XY(1020,29860
+	def X(1026,29981
+	def Y(1032,30070
+class Sprite(1039,30160
+	def __init__(1071,31298
+		class draws 1081,31713
+	def __del__(1185,34789
+	def __repr__(1194,35010
+	def __getitem__(1202,35243
+	def __setitem__(1219,35645
+	def asPhotoImage(1234,36055
+	def set_alpha(1257,36721
+	def line(1269,36971
+	def clear(1292,37536
+	def fill(1305,37832
+	def noise(1317,38089
+	def circlefill(1338,38699
+	def circle(1371,39382
+	def rect(1414,40404
+	def pix(1436,40920
+	def pix_octr(1452,41345
+	def pix_rc(1471,41842
+	def axisflip(1494,42407
+	def rotateCCW(1518,43038
+	def rotateCW(1521,43155
+	def rotate(1524,43272
+	def scale(1568,44505
+	def circmask(1607,45668
+	def alpha_aperture(1614,45889
+	def alpha_gradient(1633,46481
+	def alpha_gradient2(1654,47191
+	def dim(1684,48075
+	def thresh(1705,48716
+	def as_array(1718,49041
+	def on(1735,49561
+	def off(1742,49646
+	def toggle(1749,49766
+	def state(1760,49931
+	def moveto(1767,50050
+	def rmove(1778,50227
+	def saveunder(1790,50480
+	def unblit(1793,50569
+	def blit(1796,50638
+	def fastblit(1860,52276
+	def render(1889,53298
+	def unrender(1906,53778
+	def subimage(1916,53949
+	def clone(1944,54594
+	def setdir(1970,55128
+	def save(1984,55463
+	def save_alpha(1989,55579
+	def fix(1994,55701
+	def invert(1999,55830
+	def trim(2004,55933
+	def roll(2009,56035
+	def old_subimage(2018,56254
+class MpegMovie(2028,56510
+	def __init__(2037,56832
+	def getlength(2066,57552
+	def showframe(2082,57983
+class PolySprite:2105,58508
+	def __init__(2114,58753
+	def blit(2148,59590
+	def on(2164,59917
+	def off(2169,59978
+class DisplayList:2174,60041
+	def __init__(2195,60796
+	def __del__(2210,61181
+	def add(2221,61500
+	def delete(2235,61782
+	def clear(2252,62162
+	def delete_all(2259,62277
+	def update(2266,62390
+	def _print(2289,62840
+def _is_seq(2295,62959
+def barsprite(2305,63123
+def barspriteCW(2324,63620
+def barspriteCCW(2327,63715
+def fixsprite(2330,63812
+def fixsprite2(2362,64605
+def _C(2403,65509
+def color24(2440,66563
+def grey24(2445,66672
+def gray24(2450,66786
+def quickinit(2455,66900
 
-spritetools.py,385
-def g2rgb(33,987
-def pixelize(40,1166
-def singrat(59,1741
-def cosgrat(69,2191
-def polargrat(79,2641
-def logpolargrat(96,3278
-def hypergrat(103,3545
-def alphaGaussian(115,4061
-def alphaGaussian2(125,4353
-def Make_2D_Sine(144,5119
-def Make_2D_Cnc_Rdl(172,5817
-def Make_2D_Hyperbolic(217,6786
-def gaussianEnvelope(240,7354
-def image_circmask(253,7805
-def surfinfo(262,8113
+spritetools.py,387
+def g2rgb(44,1462
+def pixelize(51,1641
+def singrat(70,2216
+def cosgrat(80,2660
+def polargrat(90,3105
+def logpolargrat(107,3746
+def hypergrat(114,4013
+def alphaGaussian(126,4524
+def alphaGaussian2(136,4816
+def Make_2D_Sine(155,5582
+def Make_2D_Cnc_Rdl(186,6353
+def Make_2D_Hyperbolic(232,7395
+def gaussianEnvelope(258,8044
+def image_circmask(271,8495
+def surfinfo(280,8803
 
 stats.py,4232
 class Dispatch:356,14449
@@ -961,60 +978,60 @@ stimlib.py,0
 tario.py,20
 def tarfile(17,298
 
-userdpy.py,1380
-class UserDisplay:44,980
-	def __init__(45,999
-	def hide(226,6602
-	def note(229,6645
-	def _placenote(252,7369
-	def help(263,7696
-	def deltags(281,8184
-	def eye_clear(286,8279
-	def eye_at(294,8478
-	def showsprites(318,9181
-	def fb2can(323,9337
-	def can2fb(329,9487
-	def _drawaxis(335,9650
-	def clearbox(396,11400
-	def setbox(399,11447
-	def drawbox(410,11772
-	def _key(437,12589
-	def addpoint(487,13903
-	def deletepoint(495,14204
-	def querypoint(516,14726
-	def clearpoints(535,15165
-	def savepoints(542,15329
-	def loadpoints(555,15686
-	def loadpoints_ascii(583,16357
-	def getpoints(621,17160
-	def _phototoggle(632,17404
-	def _mouse_motion(635,17477
-	def _mouse_enter(643,17697
-	def _mouse_leave(646,17754
-	def display(649,17791
-	def icon(693,19050
-	def texticon(722,19868
-	def _showfidmarks(735,20253
-	def fidinfo(758,20876
-	def loadfidmarks(822,22575
-	def savefidmarks(847,23235
-	def _redrawfidmarks(867,23741
-	def _putfidmark(876,23927
-	def _clearfidmarks(895,24511
-	def _clearfidmark(898,24567
-	def _movefidmarks(934,25404
-	def _scalefidmarks(943,25611
-	def _fixset(958,25997
-	def _fixzero(979,26546
-	def _fixxy(982,26602
-	def set_taskpopup(993,26888
-	def do_taskpopup(1001,27136
-	def do_popup(1007,27278
-	def bind_but3(1013,27408
-	def invoke_but3(1017,27492
-class FID:1022,27583
-	def __init__(1023,27594
-	def _load(1033,27791
+userdpy.py,1383
+class UserDisplay:50,1134
+	def __init__(51,1153
+	def hide(236,6890
+	def note(239,6933
+	def _placenote(262,7657
+	def help(273,7984
+	def deltags(291,8472
+	def eye_clear(296,8567
+	def eye_at(304,8766
+	def showsprites(328,9469
+	def fb2can(333,9625
+	def can2fb(339,9775
+	def _drawaxis(345,9938
+	def clearbox(406,11688
+	def setbox(409,11735
+	def drawbox(420,12060
+	def _key(447,12877
+	def addpoint(500,14262
+	def deletepoint(508,14563
+	def querypoint(529,15085
+	def clearpoints(548,15524
+	def savepoints(555,15688
+	def loadpoints(568,16045
+	def loadpoints_ascii(596,16716
+	def getpoints(634,17519
+	def _phototoggle(645,17763
+	def _mouse_motion(648,17836
+	def _mouse_enter(656,18056
+	def _mouse_leave(659,18113
+	def display(662,18150
+	def icon(706,19409
+	def texticon(735,20227
+	def _showfidmarks(748,20612
+	def fidinfo(771,21235
+	def loadfidmarks(835,22934
+	def savefidmarks(860,23594
+	def _redrawfidmarks(880,24100
+	def _putfidmark(889,24286
+	def _clearfidmarks(908,24870
+	def _clearfidmark(911,24926
+	def _movefidmarks(947,25763
+	def _scalefidmarks(956,25970
+	def _fixset(971,26356
+	def _fixzero(992,26905
+	def _fixxy(995,26961
+	def set_taskpopup(1006,27247
+	def do_taskpopup(1014,27495
+	def do_popup(1020,27637
+	def bind_but3(1026,27767
+	def invoke_but3(1030,27851
+class FID:1035,27942
+	def __init__(1036,27953
+	def _load(1046,28150
 
 userparams.py,95
 class Config:23,417

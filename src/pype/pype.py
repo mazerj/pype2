@@ -118,7 +118,11 @@ Mon Jan 23 10:11:46 2006 mazer
 - added vbias option to FixWin to turn the fixwin into an ellipse. See
   comments in the fixwin class for more details.
 
-Thu Mar  9 18:08:00 2006 mazer
+Thu Mar 23 11:45:11 2006 mazer
+
+- changed candy1/candy2 -> bounce/slideshow and added rig parameter
+  to disable the noise background during slideshows..
+  
 """
 
 #####################################################################
@@ -515,6 +519,9 @@ class PypeApp:
 			sub_common = DockWindow(checkbutton=b, title='subj/cell')
 			self.sub_common = ParamTable(sub_common,
 			(
+				("Eye Candy Params", None, None),
+				("show_noise", 1, is_boolean),
+				
 				("Session Data", None, None),
 				("subject",		"", is_any, "subject identification (name, number, etc)"),
 				("owner",		"", is_any, "datafile owner"),
@@ -576,8 +583,8 @@ class PypeApp:
 				("mon_fps",		"0",			is_float, "", -1),
 
 				("Eye Tracker Info", None, None),
-				("eyetracker",	"iscan",		is_any, "", -1),
-				("eyefreq",		"120",			is_int),
+				("eyetracker",	"",				is_any, "", -1),
+				("eyefreq",		"",				is_int),
 				("eyelag",		"0",			is_int, "", -1),
 				("plotskip",	"1",			is_int,
 				 "number points to skip when plotting for speed"),
@@ -699,14 +706,14 @@ class PypeApp:
 			self.balloon.bind(b, "make stop sound w/o stopping")
 
 			self._candy = 0
-			b = Button(cpane, text="candy-1",
-					   command=lambda s=self: candy1(s),
+			b = Button(cpane, text="bounce",
+					   command=lambda s=self: bounce(s),
 					   bg='white')
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "following the bouncing ball")
 			
-			b = Button(cpane, text="candy-2",
-					   command=lambda s=self: candy2(s),
+			b = Button(cpane, text="slideshow",
+					   command=lambda s=self: slideshow(s),
 					   bg='white')
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "slide show from ~/.pyperc/candy.lst")
@@ -3101,7 +3108,7 @@ def now(military=1):
 		else:
 			return "%02d:%02d PM" % (h-12, m)
 
-def candy1(app):
+def bounce(app):
 	if app.running: return
 
 	if not app.tk:
@@ -3166,7 +3173,7 @@ def candy1(app):
 	app.fb.clear(color=(1, 1, 1), flip=1)
 	app.idlefb()
 
-def candy2(app):
+def slideshow(app):
 	if app.running: return
 
 	if not app.tk:
@@ -3202,7 +3209,8 @@ def candy2(app):
 	bg = Sprite(x=0, y=0, fb=app.fb,
 				width=app.fb.w, height=app.fb.h)
 	#bg.big = 1
-	bg.noise(0.50)
+	if app.sub_common.queryv('show_noise'):
+		bg.noise(0.50)
 	
 	while app._candy:
 		x = uniform(-200,200)
