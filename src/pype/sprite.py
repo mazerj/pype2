@@ -1006,6 +1006,37 @@ def zoomdown(fb, cx, cy, width=100, height=100,
 	fb.flip()
 		
 
+class _SurfArrayAccess:
+	"""INTERNAL
+	
+	Surfarray accessor class for sprites.
+	Makes sprite.array, sprite.alpha behave almost as though they 
+	were direct references to the surfarray array3d Numeric arrays.
+
+	For example:
+	  array = self.array[:]
+	  array = self.array[3:,4]
+	  self.array[:] = newarray
+	  self.array[4,3] = 12
+	
+	However, self.array is not really a Numeric array itself, so don't do:
+	  BAD self.array = newarray (use self.array[:] = newarray)
+	  BAD sz = size(self.array) (use size(self.array[:])).
+	Similarly for self.alpha.  
+	"""
+	def __init__(self, im, get, set):
+		self.im  = im
+		self.get = get
+		self.set = set
+ 
+	def __getitem__(self, idx):
+		array = self.get(self.im)
+		return array[idx]
+
+	def __setitem__(self, idx, value):
+		array = self.set(self.im)
+		array[:] = value
+
 class _ImageBase:
 	"""INTERNAL -- do not instantiate!
 	
@@ -1045,7 +1076,6 @@ class _ImageBase:
 			return (self.h / 2) - y
 		else:
 			return y
-
 
 class Sprite(_ImageBase):
 	"""	
@@ -1153,22 +1183,31 @@ class Sprite(_ImageBase):
 		## why did I do this in the first place????? 11/29/2001 JM
 
 		## should just be this:
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
 
 		# Tue Jan 31 11:34:47 2006 mazer 
 		# starting with pygame-1.6.2 pixels_alpha() pixel3d() cause
 		# the surface to be locked, making it unblitable. According to
 		# Pete Shinners, calling unlock after the surfarray calls
 		# will solve this problem (so long as they're not RLE accelerated!)
-		self.im.unlock()
+		#self.im.unlock()
 		
-
 		# generate array referencing the surface
-		self.array = pygame.surfarray.pixels3d(self.im)
+		#self.array = pygame.surfarray.pixels3d(self.im)
 
 		# Tue Jan 31 11:35:27 2006 mazer
 		# see above comment re:surface locking
-		self.im.unlock()
+		#self.im.unlock()
+
+		# 24 mar 2006 willmore
+		# Replace self.array and self.alpha with accessor classes.
+
+		self.array = _SurfArrayAccess(im=self.im, 
+									  get=pygame.surfarray.array3d,
+									  set=pygame.surfarray.pixels3d)
+		self.alpha = _SurfArrayAccess(im=self.im,
+									  get=pygame.surfarray.array_alpha,
+									  set=pygame.surfarray.pixels_alpha)
 
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
@@ -1339,10 +1378,11 @@ class Sprite(_ImageBase):
 		from RandomArray import uniform
 		
 		if thresh is None:
-			n = uniform(1, 255, shape=shape(self.alpha))
+			n = uniform(1, 255, shape=shape(self.alpha[:]))
 		else:
-			n = where(greater(uniform(0, 1, shape=shape(self.alpha)), thresh),
-					  255, 1)
+			n = where(greater(uniform(0, 1, 
+					  shape=shape(self.alpha[:])), thresh), 255, 1)
+
 		self.array[:] = transpose(array([n, n, n]),
 								  axes=[1,2,0]).astype(UnsignedInt8)[:]
 
@@ -1521,10 +1561,12 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		self.im.unlock()
-		self.array = pygame.surfarray.pixels3d(self.im)
-		self.im.unlock()
+		# 24 mar 2006 willmore
+		# replaced by accessors
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.im.unlock()
+		#self.array = pygame.surfarray.pixels3d(self.im)
+		#self.im.unlock()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
 		self.rotate(-angle, preserve_size=preserve_size, trim=trim)
@@ -1571,10 +1613,12 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		self.im.unlock()
-		self.array = pygame.surfarray.pixels3d(self.im)
-		self.im.unlock()
+		# 24 mar 2006 willmore
+		# replaced by accessors
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.im.unlock()
+		#self.array = pygame.surfarray.pixels3d(self.im)
+		#self.im.unlock()
 		
 	def scale(self, new_width, new_height):
 		"""Resize this sprite (fast).
@@ -1604,13 +1648,15 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		self.im.unlock()
+		# 24 mar 2006 willmore
+		# replaced by accessors
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.im.unlock()
 		# Wed Nov 23 14:50:34 2005 mazer 
 		# these need to be new too; I forgot and only regenerated
 		# the alpha channel.
-		self.array = pygame.surfarray.pixels3d(self.im)
-		self.im.unlock()
+		#self.array = pygame.surfarray.pixels3d(self.im)
+		#self.im.unlock()
 		
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
@@ -1679,7 +1725,10 @@ class Sprite(_ImageBase):
 		"""
 		d = 1.0 - ((hypot(self.ax-x, self.ay-y) - r1) / (r2 - r1))
 		alpha = clip(d, 0.0, 1.0)
-		i = pygame.surfarray.pixels3d(self.im)
+
+		# 24 mar 2006 willmore
+		# use accessor
+		#i = pygame.surfarray.pixels3d(self.im)
 		alpha = transpose(array((alpha,alpha,alpha)), axes=[1,2,0])
 		if _is_seq(bg):
 			bgi = zeros(i.shape)
@@ -1688,7 +1737,7 @@ class Sprite(_ImageBase):
 			bgi[:,:,2] = bg[2]
 		else:
 			bgi = bg
-		i[:] = ((alpha * i.astype(Float)) +
+		self.array[:] = ((alpha * i.astype(Float)) +
 				((1.0-alpha) * bgi)).astype(UnsignedInt8)
 		self.alpha[:] = 255;
 	
