@@ -34,6 +34,11 @@ Tue Mar  7 09:26:05 2006 mazer
 Tue Mar  7 16:27:40 2006 mazer
 
  - oops -- missed one thing --> barsprite
+
+Fri Mar 24 11:09:23 2006 mazer
+
+ - fixed fb.show()/hide() methods -- I think these should work
+   now, at least with the OPENGL driver..
 """
 
 import os
@@ -400,6 +405,9 @@ class FrameBuffer:
 		# print useful info to console
 		#self.printinfo()
 
+		# this flag is used for the show/hide methods below:
+		self._fullscreen = 1
+
 	def __del__(self):
 		"""Cleanup function.
 		
@@ -584,7 +592,9 @@ class FrameBuffer:
 		Hide (ie, iconify) the graphics display. This really only
 		works in non-fullscreen mode.
 		"""
-		if pygame.display.iconify():
+		if self._fullscreen:
+			pygame.display.toggle_fullscreen()
+			pygame.display.iconify()
 			self._fullscreen = 0
 
 	def show(self):
@@ -593,7 +603,8 @@ class FrameBuffer:
 		Restore (ie, de-iconify) the graphics display. This really only
 		works in non-fullscreen mode.
 		"""
-		if pygame.display.toggle_fullscreen():
+		if not self._fullscreen:
+			pygame.display.toggle_fullscreen()
 			self._fullscreen = 1
 
 	def sync(self, state, flip=None):
