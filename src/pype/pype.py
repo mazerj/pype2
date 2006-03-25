@@ -408,6 +408,13 @@ class PypeApp:
 						   label='About Pype', command=AboutPype)
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command', 
+						   label='show framebuffer',
+						   command=self.showfb)
+			mb.addmenuitem('File', 'command', 
+						   label='hide framebuffer',
+						   command=self.hidefb)
+			mb.addmenuitem('File', 'separator')
+			mb.addmenuitem('File', 'command', 
 						   label='Load task from file',
 						   command=lambda s=self: s.newloadtask(ask=1))
 			mb.addmenuitem('File', 'separator')
@@ -680,7 +687,7 @@ class PypeApp:
 			if debug():
 				b = Button(cpane, text="synctest", command=self.synctest)
 				b.pack(expand=0, fill=X, side=TOP, pady=2)
-			
+
 			b = Button(cpane, text="new cell", command=self.new_cell)
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "create a new cell number")
@@ -2620,6 +2627,12 @@ class PypeApp:
 			self._testpat.blit(force=1)
 			self.fb.sync(0)
 			self.fb.flip()
+
+	def showfb(self):
+		self.fb.show()
+
+	def hidefb(self):
+		self.fb.hide()
 
 	def synctest(self):
 		"""

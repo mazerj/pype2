@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <sys/capability.h>
+// #include <sys/capability.h>
 
 #include "usbjs.h"
 
