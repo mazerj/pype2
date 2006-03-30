@@ -3,7 +3,7 @@
 # kill stray pype processes -- AS ROOT!! BE CAREFULL
 
 ps -Al --width=1000 2>/dev/null | \
-    egrep "(pyperun|das.*server|iscan_server|comedi_server)" | \
+    egrep "(pyperun|das.*server|iscan_server|comedi_server|dummy_server)" | \
 	grep -v grep | tee /dev/tty | \
 	awk '{print $4}' | xargs -r pypeboot kill -9
 

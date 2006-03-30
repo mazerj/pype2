@@ -30,10 +30,12 @@ Wed Dec 26 15:58:28 2001 mazer
 import sys, posixpath, os, glob, string
 
 def pathprefix(d):
+    """Add directory 'd' to the HEAD of the python search path."""
     sys.path = [d] + sys.path
     #debug: sys.stderr.write(' prefixed path: "%s"\n' % d)
 
 def pathpostfix(d):
+    """Add directory 'd' to the TAIL of the python search path."""
     sys.path = sys.path + [d]
     sys.stderr.write('postfixed path: "%s"\n' % d)
 
@@ -101,40 +103,22 @@ if os.environ.has_key('LD_LIBRARY_PATH'):
     os.environ['LD_LIBRARY_PATH'] = os.environ['PYPEDIR'] + '/lib:' + \
                                     os.environ['LD_LIBRARY_PATH']
 
-# check to see that Numeric and pygame are properly installed:
+# now that $PYPEDIR is partially setup, pype and pype modules
+# should be importable...
 
+# 1st check to see that Numeric and pygame are properly installed:
 from info import libinfo
 info = libinfo()
-
-if info['numeric'] is None:
-    sys.stderr.write("Error: Numeric not installed locally.\n")
-    sys.exit(1)
-
-if info['pygame'] is None:
-    sys.stderr.write("Error: pygame not installed locally.\n")
-    sys.exit(1)
-
-# now that $PYPEDIR is partially setup and pype is importable..
+for k in ('numeric', 'pygame'):
+    if info[k] is None:
+        sys.stderr.write("Error: %s not installed locally.\n" % k)
+        sys.exit(1)
 
 try:
 	import pype
 except ImportError:
-    sys.stderr.write("""\
-Failed to 'import pype', $PYPEDIR is probably set incorrectly.
-If that's not the case, consider the following:
- - new bug in pype.py
- - some required external library (eg, Numeric or pygame) is not
-   installed properly
-   
-Note that if there's a real bug in pype.py, then you need to
-comment out the try/except clause near <import pype> in
-'pyperun.py' to unmask the error and see the error message!
-""")
-	#from pypedebug import get_traceback
-    #sys.stderr.write(" **** STACK TRACE FOLLOWS ****\n")
-    #sys.stderr.write(get_traceback())
+    sys.stderr.write("""Error on 'import pype'. Check $PYPEDIR\n""")
 	sys.exit(1)
-
 
 # add the ~/.pyperc directories to the python search path
 for i in ['Tasks', 'Modules']:
@@ -144,57 +128,58 @@ for d in glob.glob(pype.pyperc('Tasks/*')):
     if os.path.isdir(d):
         pathprefix(d)
 
-# parse command line for subject info
-if len(sys.argv) > 1 and sys.argv[1][:2] == 's=':
-    try:
-        subj = string.split(sys.argv[1], '=')[1]
-    except:
-        sys.stderr.write('improper argument, try: s=<subject>\n')
-        sys.exit(1)
-
-    os.environ['SUBJECT'] = subj
-    
-    if not posixpath.exists(pype.subjectrc(None)):
-        sys.stderr.write('No subject directory for "%s".\n' % subj)
-        sys.stderr.write('Ok to make one (y or n)? ')
-        l = sys.stdin.readline()
-        if not (l[0] in 'yY'):
-            sys.exit(0)
-        os.mkdir(pype.subjectrc(None))
-        os.chown(pype.subjectrc(None), os.getuid(), os.getgid())
-
-    # consume the used argument..
-    sys.argv = sys.argv[0:1] + sys.argv[2:]
-
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
-	# AHA!! We've been invoked as pypenv..
-	if len(sys.argv) == 2:
-		# interactive mode, drop into an interactive shell
-		import code
-		print "<<<<pypenv interactive python shell>>>>"
-		code.interact()
-		sys.exit(0)
-	else:
-		# clip the .../pyperun from the head of sys.argv and let
-		# script_runner() replace the -s with the module name..
-		sys.argv = sys.argv[2:]
-        #sys.stderr.write('running: %s\n' % (posixpath.basename(sys.argv[0])))
+    # AHA!! We've been invoked as pypenv..
+    if len(sys.argv) == 2:
+        # interactive mode, drop into an interactive shell
+        import code
+        print "<<<<pypenv interactive python shell>>>>"
+        code.interact()
+        sys.exit(0)
+    else:
+        # clip the .../pyperun from the head of sys.argv and let
+        # script_runner() replace the -s with the module name..
+        sys.argv = sys.argv[2:]
         if script_runner(sys.argv[0]) == 0:
             sys.stderr.write("Can't find module '%s'\n" % sys.argv[0])
-
+            exit(1)
 else:
-	# otherwise, we're in regular old pype mode:
-    #   import pype with *
-    #   then fire up the gui..
+    # parse command line
+    av = []
+    psych = 0
+    subj = None
+    for n in range(1, len(sys.argv)):
+        if sys.argv[n][:2] == "s=":
+            try:
+                subj = string.split(sys.argv[n], '=')[1]
+            except:
+                sys.stderr.write('improper argument, try: s=<subject>\n')
+                sys.exit(1)
+            os.environ['SUBJECT'] = subj
+            if not posixpath.exists(pype.subjectrc(None)):
+                sys.stderr.write('No subject directory for "%s".\n' % subj)
+                sys.stderr.write('Ok to make one (y or n)? ')
+                l = sys.stdin.readline()
+                if not (l[0] in 'yY'):
+                    sys.exit(0)
+                os.mkdir(pype.subjectrc(None))
+                os.chown(pype.subjectrc(None), os.getuid(), os.getgid())
+        elif sys.argv[n] == '-p':
+            # psychophysics mode (withdraw framebuffer)
+            psych = 1
+        else:
+            av.append(sys.argv[n])
+
+    # startup pype with gui
 	from pype import *
 
 	try:
-		app = PypeApp(framebuffer=1, gui=1)
+		app = PypeApp(psych=psych)
 	except FatalPypeError:
 		sys.exit(1)
-
-    if len(sys.argv) > 1:
-        taskname = posixpath.splitext(sys.argv[1])[0]
+        
+    if len(av) > 0:
+        taskname = posixpath.splitext(av[0])[0]
 		try:
 			app.newloadtask(taskname)
 		except ImportError:
@@ -205,4 +190,3 @@ else:
     while not app.terminate:
         app.idlefn(toplevel=1)
 	app.close()
-

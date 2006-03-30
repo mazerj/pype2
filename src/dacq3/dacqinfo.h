@@ -35,6 +35,7 @@
 #define NFIXWIN	1
 #define ADBUFLEN (1000 * 60)
 #define MAXSMOOTH 25
+#define NJOYBUT	10
 
 /* pseudo-interupt codes */
 #define INT_DIN		1
@@ -110,6 +111,9 @@ typedef struct {
   FIXWIN fixwin[NFIXWIN];
   int		fixbreak_tau;		/* number of samples outside */
 					/* before it counts as a break */
+
+  /* joystick button states (usb joystick) */
+  int		js[NJOYBUT];
 
   /* 'interrupt' classes & arguments */
   int int_class;

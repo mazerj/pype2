@@ -119,6 +119,10 @@
 **
 ** Thu Feb  2 10:03:25 2006 mazer 
 **   added dacq_fixbreak_tau().
+**
+** Wed Mar 29 15:25:00 2006 mazer 
+**   initialize dacq_data->js[]
+**   added: dacq_jsbut(int n)
 */
 
 #include <sys/types.h>
@@ -267,6 +271,10 @@ int dacq_start(int boot, int testmode, char *tracker_type,
     for (i = 0; i < NFIXWIN; i++) {
       dacq_data->fixwin[i].active = 0;
       dacq_data->fixwin[i].genint = 0;
+    }
+
+    for (i = 0; i < NJOYBUT; i++) {
+      dacq_data->js[i] = 0;
     }
 
     dacq_data->adbuf_on = 0;
@@ -940,6 +948,17 @@ int dacq_int_arg(void)
   int i;
   LOCK(semid);
   i = dacq_data->int_arg;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_jsbut(int n)
+{
+  int i;
+
+  /* read the nth joystick button */
+  LOCK(semid);
+  i = (n < NJOYBUT) ? dacq_data->js[n] : -1;
   UNLOCK(semid);
   return(i);
 }

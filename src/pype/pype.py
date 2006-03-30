@@ -123,6 +123,10 @@ Thu Mar 23 11:45:11 2006 mazer
 - changed candy1/candy2 -> bounce/slideshow and added rig parameter
   to disable the noise background during slideshows..
   
+Thu Mar 30 10:18:18 2006 mazer
+
+- deleted framebuffer arg to PypeApp() and added pysch arg
+
 """
 
 #####################################################################
@@ -201,7 +205,7 @@ class PypeApp:
 	for all additions.
 	"""
 
-	def __init__(self, framebuffer=1, gui=1):
+	def __init__(self, gui=1, psych=0):
 		"""
 		Initialize a PypeApp instance, with side effects ::
 		
@@ -352,6 +356,7 @@ class PypeApp:
 		if gui:
 			state = self._readstate()
 
+		self.psych = psych
 		self.terminate = 0
 		self.paused = 0
 		self.running = 0
@@ -1013,17 +1018,13 @@ class PypeApp:
 			
 		root_take()
 
-		if framebuffer:
-			self.init_framebuffer()
-			self._testpat = None
-			# added automatic detection of framerate (13-jan-2004 JAM):
-			fps = self.fb.calcfps(duration=250)
-			self.rig_common.set('mon_fps', '%g' % fps)
-			self.idlefb()
-			sys.stderr.write('pype: estimated fps = %g\n' % fps)
-		else:
-			self.rig_common.set('mon_fps', '-1')
-			self.fb = None
+		self.init_framebuffer()
+		self._testpat = None
+		# added automatic detection of framerate (13-jan-2004 JAM):
+		fps = self.fb.calcfps(duration=250)
+		self.rig_common.set('mon_fps', '%g' % fps)
+		self.idlefb()
+		sys.stderr.write('pype: estimated fps = %g\n' % fps)
 		
 		# drop root access
 		# Tue Jul 12 10:01:53 2005 mazer --
@@ -1076,6 +1077,9 @@ class PypeApp:
 			sys.stderr.write('pype build: %s by %s\n' %
 							 (PypeBuildDate, PypeBuildBy))
 			print_version_info()
+
+		if self.psych:
+			self.hidefb()
 
 	def _keyboard(self):
 		app = self
@@ -1654,20 +1658,26 @@ class PypeApp:
 				while t.ms() < ms:
 					pass
 		elif ms is None:
+			if dacq_jsbut(0) and dacq_jsbut(1):
+				# pressing buttons 0 and 1 simultanously will generate
+				# an immediate emergency exit from pype. This is intended
+				# for when your running on a single-headed machine for
+				# psychophysics and lock up in fullscreen mode..
+				sys.stderr.write('\n***EMERGENCY EXIT***\n')
+				self.close()
+				sys.exit(0)
+			elif dacq_jsbut(0) and dacq_jsbut(2):
+				self.hidefb()
+			elif dacq_jsbut(0) and dacq_jsbut(3):
+				self.showfb()
+				
 			(c, ev) = self.keyque.pop()
 			if (c is None) and self.fb:
 				ks = self.fb.getkey(wait=None, down=1)
-				if not ks == 0:
-					# keys on nostromo n52 keypad:
-					if ks == 32:
-						# thumb button
-						c = 'F4'
-					elif ks == 308:
-						# orange trigger
-						c = 'F3'
-					else:
-						#print "<pygame key code: %d>" % ks
-						c = None
+				if ks == 0:
+					pass
+				else:
+					print "<pygame key code: %d>" % ks
 			if c == 'F1':				
 				if not self.running:
 					self.juice_on()
@@ -2066,6 +2076,15 @@ class PypeApp:
 
 	def barup(self):
 		return not self.bardown()
+
+	def joybut(self, n):
+		"""
+		Query the nth joystick button.
+		 -1: no such butten
+		  0: button up
+		  1: button down
+		"""
+		return dacq_jsbut(n)
 
 	def sw1(self):
 		# if FLIP_SW1 < 0, disable switch 1 (for das08 problems)

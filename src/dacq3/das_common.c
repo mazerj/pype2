@@ -490,6 +490,11 @@ static void mainloop(void)
       if (usbjs_query(usbjs_dev, &jsbut, &jsnum, &jsval, &jstime)) {
 	if (jsbut) {
 	  /* button press: jsnum is button number, jsval is up/down */
+	  if (jsnum < NJOYBUT) {
+	    LOCK(semid);
+	    dacq_data->js[jsnum] = jsval;
+	    UNLOCK(semid);
+	  }
 	} else if (jsbut == 0 && jsnum == 0) {
 	  /* x-axis motion, jsval indicates the current value */
 	} else if (jsbut == 0 && jsnum == 1) {

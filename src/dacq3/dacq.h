@@ -99,3 +99,5 @@ extern int dacq_set_mypri(int pri);
 
 extern int dacq_int_class(void);
 extern int dacq_int_arg(void);
+
+extern int dacq_jsbut(int n);

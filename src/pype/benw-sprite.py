@@ -1,5 +1,5 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
+# $Id: sprite.py 163 2006-03-24 22:47:21Z willmore $
 
 """Pygame based sprite engine.
 
@@ -328,11 +328,32 @@ class FrameBuffer:
 			sys.stderr.write('sprite: no joy -- mode not available\n')
 			sys.exit(1)
 		else:
-			self.font = None
-			self.flags = flags
-			self.maxbpp = maxbpp
-			self.fopengl = fopengl
-			self.opendisplay()
+			# note: screen is a Surface
+			# this is a PROBLEM:::
+			# this bug was fixed in the SDL libs or 10-sep-2001, it's
+			# now in the CVS 1.2+ release, but build by hand..
+			#flags = flags & ~DOUBLEBUF
+
+			if fopengl:
+				self.screen = pygame.display.set_mode((self.w, self.h),
+												  flags)
+				# for unknown reason(s), we can not set_mode using
+				# maxbpp in OpenGL mode. (shinji)
+			else:
+				self.screen = pygame.display.set_mode((self.w, self.h),
+												  flags, maxbpp)
+			pygame.display.set_caption('Pype Display (%dx%d; %d bbp)' % \
+									   (self.w, self.h, maxbpp))
+
+			if fopengl:
+				glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
+				glEnable(GL_BLEND)
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+				self.font = None
+			else:
+				# set (0,0,0) to be transparent/colorkey
+				self.screen.set_colorkey((0,0,0,0))
+				self.font = None
 
 		sys.stderr.write('sprite/vid: dev=<%s> (%dx%d; %d bbp)\n' % \
 						 (os.environ['SDL_VIDEODRIVER'],
@@ -384,6 +405,9 @@ class FrameBuffer:
 		# print useful info to console
 		#self.printinfo()
 
+		# this flag is used for the show/hide methods below:
+		self._fullscreen = 1
+
 	def __del__(self):
 		"""Cleanup function.
 		
@@ -392,26 +416,6 @@ class FrameBuffer:
 		closes or deletes the frame buffer.
 		"""
 		self.close()
-
-	def opendisplay(self):
-		if self.fopengl:
-			self.screen = pygame.display.set_mode((self.w, self.h),
-											  self.flags)
-			# for unknown reason(s), we can not set_mode using
-			# maxbpp in OpenGL mode. (shinji)
-		else:
-			self.screen = pygame.display.set_mode((self.w, self.h),
-											  self.flags, self.maxbpp)
-		pygame.display.set_caption('Pype Display (%dx%d; %d bbp)' % \
-								   (self.w, self.h, self.maxbpp))
-
-		if self.fopengl:
-			glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
-			glEnable(GL_BLEND)
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-		else:
-			# set (0,0,0) to be transparent/colorkey
-			self.screen.set_colorkey((0,0,0,0))
 
 	def printinfo(self):
 		vi = pygame.display.Info()
@@ -583,18 +587,25 @@ class FrameBuffer:
 			return (x2, y2)
 
 	def hide(self):
-		"""hide framebuffer
-		At the moment, all this does is pop out of FULLSCREEN mode
+		"""Iconify framebuffer
+		
+		Hide (ie, iconify) the graphics display. This really only
+		works in non-fullscreen mode.
 		"""
-		pygame.display.iconify()
+		if self._fullscreen:
+			pygame.display.toggle_fullscreen()
+			pygame.display.iconify()
+			self._fullscreen = 0
 
 	def show(self):
-		"""show framebuffer
-		At the moment, all this does is restore the default pygame
-		flag settings, which potentially will reactivate fullscreen
-		mode.
+		"""De-iconify framebuffer
+		
+		Restore (ie, de-iconify) the graphics display. This really only
+		works in non-fullscreen mode.
 		"""
-		pygame.display.toggle_fullscreen()
+		if not self._fullscreen:
+			pygame.display.toggle_fullscreen()
+			self._fullscreen = 1
 
 	def sync(self, state, flip=None):
 		"""Draw/set sync pulse sprite
@@ -793,9 +804,6 @@ class FrameBuffer:
 	    **returns** -- keystroke value; negative for key-up, positive
 		for key-down, 0 if no keystrokes are available in the queue.
 		"""
-		if not pygame.display.get_init():
-			return 0
-		
 		if len(self.keystack) > 0:
 			c = self.keystack[0]
 			self.keystack = self.keystack[1:]
@@ -998,6 +1006,37 @@ def zoomdown(fb, cx, cy, width=100, height=100,
 	fb.flip()
 		
 
+class _SurfArrayAccess:
+	"""INTERNAL
+	
+	Surfarray accessor class for sprites.
+	Makes sprite.array, sprite.alpha behave almost as though they 
+	were direct references to the surfarray array3d Numeric arrays.
+
+	For example:
+	  array = self.array[:]
+	  array = self.array[3:,4]
+	  self.array[:] = newarray
+	  self.array[4,3] = 12
+	
+	However, self.array is not really a Numeric array itself, so don't do:
+	  BAD self.array = newarray (use self.array[:] = newarray)
+	  BAD sz = size(self.array) (use size(self.array[:])).
+	Similarly for self.alpha.  
+	"""
+	def __init__(self, im, get, set):
+		self.im  = im
+		self.get = get
+		self.set = set
+ 
+	def __getitem__(self, idx):
+		array = self.get(self.im)
+		return array[idx]
+
+	def __setitem__(self, idx, value):
+		array = self.set(self.im)
+		array[:] = value
+
 class _ImageBase:
 	"""INTERNAL -- do not instantiate!
 	
@@ -1037,7 +1076,6 @@ class _ImageBase:
 			return (self.h / 2) - y
 		else:
 			return y
-
 
 class Sprite(_ImageBase):
 	"""	
@@ -1145,22 +1183,31 @@ class Sprite(_ImageBase):
 		## why did I do this in the first place????? 11/29/2001 JM
 
 		## should just be this:
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
 
 		# Tue Jan 31 11:34:47 2006 mazer 
 		# starting with pygame-1.6.2 pixels_alpha() pixel3d() cause
 		# the surface to be locked, making it unblitable. According to
 		# Pete Shinners, calling unlock after the surfarray calls
 		# will solve this problem (so long as they're not RLE accelerated!)
-		self.im.unlock()
+		#self.im.unlock()
 		
-
 		# generate array referencing the surface
-		self.array = pygame.surfarray.pixels3d(self.im)
+		#self.array = pygame.surfarray.pixels3d(self.im)
 
 		# Tue Jan 31 11:35:27 2006 mazer
 		# see above comment re:surface locking
-		self.im.unlock()
+		#self.im.unlock()
+
+		# 24 mar 2006 willmore
+		# Replace self.array and self.alpha with accessor classes.
+
+		self.array = _SurfArrayAccess(im=self.im, 
+									  get=pygame.surfarray.array3d,
+									  set=pygame.surfarray.pixels3d)
+		self.alpha = _SurfArrayAccess(im=self.im,
+									  get=pygame.surfarray.array_alpha,
+									  set=pygame.surfarray.pixels_alpha)
 
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
@@ -1331,10 +1378,11 @@ class Sprite(_ImageBase):
 		from RandomArray import uniform
 		
 		if thresh is None:
-			n = uniform(1, 255, shape=shape(self.alpha))
+			n = uniform(1, 255, shape=shape(self.alpha[:]))
 		else:
-			n = where(greater(uniform(0, 1, shape=shape(self.alpha)), thresh),
-					  255, 1)
+			n = where(greater(uniform(0, 1, 
+					  shape=shape(self.alpha[:])), thresh), 255, 1)
+
 		self.array[:] = transpose(array([n, n, n]),
 								  axes=[1,2,0]).astype(UnsignedInt8)[:]
 
@@ -1513,10 +1561,12 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		self.im.unlock()
-		self.array = pygame.surfarray.pixels3d(self.im)
-		self.im.unlock()
+		# 24 mar 2006 willmore
+		# replaced by accessors
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.im.unlock()
+		#self.array = pygame.surfarray.pixels3d(self.im)
+		#self.im.unlock()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
 		self.rotate(-angle, preserve_size=preserve_size, trim=trim)
@@ -1563,10 +1613,12 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		self.im.unlock()
-		self.array = pygame.surfarray.pixels3d(self.im)
-		self.im.unlock()
+		# 24 mar 2006 willmore
+		# replaced by accessors
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.im.unlock()
+		#self.array = pygame.surfarray.pixels3d(self.im)
+		#self.im.unlock()
 		
 	def scale(self, new_width, new_height):
 		"""Resize this sprite (fast).
@@ -1596,13 +1648,15 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		self.im.unlock()
+		# 24 mar 2006 willmore
+		# replaced by accessors
+		#self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		#self.im.unlock()
 		# Wed Nov 23 14:50:34 2005 mazer 
 		# these need to be new too; I forgot and only regenerated
 		# the alpha channel.
-		self.array = pygame.surfarray.pixels3d(self.im)
-		self.im.unlock()
+		#self.array = pygame.surfarray.pixels3d(self.im)
+		#self.im.unlock()
 		
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
@@ -1671,7 +1725,10 @@ class Sprite(_ImageBase):
 		"""
 		d = 1.0 - ((hypot(self.ax-x, self.ay-y) - r1) / (r2 - r1))
 		alpha = clip(d, 0.0, 1.0)
-		i = pygame.surfarray.pixels3d(self.im)
+
+		# 24 mar 2006 willmore
+		# use accessor
+		#i = pygame.surfarray.pixels3d(self.im)
 		alpha = transpose(array((alpha,alpha,alpha)), axes=[1,2,0])
 		if _is_seq(bg):
 			bgi = zeros(i.shape)
@@ -1680,7 +1737,7 @@ class Sprite(_ImageBase):
 			bgi[:,:,2] = bg[2]
 		else:
 			bgi = bg
-		i[:] = ((alpha * i.astype(Float)) +
+		self.array[:] = ((alpha * i.astype(Float)) +
 				((1.0-alpha) * bgi)).astype(UnsignedInt8)
 		self.alpha[:] = 255;
 	
