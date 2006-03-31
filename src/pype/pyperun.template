@@ -132,10 +132,14 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
     # AHA!! We've been invoked as pypenv..
     if len(sys.argv) == 2:
         # interactive mode, drop into an interactive shell
-        import code
         print "<<<<pypenv interactive python shell>>>>"
-        code.interact()
-        sys.exit(0)
+        try:
+            from IPython.Shell import IPShellEmbed
+            ipshell = IPShellEmbed([])
+            ipshell()
+        except ImportError:
+            import code
+            code.interact()
     else:
         # clip the .../pyperun from the head of sys.argv and let
         # script_runner() replace the -s with the module name..
