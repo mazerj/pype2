@@ -63,6 +63,9 @@ import pygame.movie
 from pygame.constants import *
 from spritetools import *
 
+from rootperm import *
+from pypedebug import keyboard
+
 #Shinji added 17-Jan-2006:
 try:
 	from OpenGL.GL import *
@@ -292,10 +295,11 @@ class FrameBuffer:
 			os.environ['SDL_VIDEODRIVER'] = videodriver
 
 		if dpy:
-			old_dpy = os.environ['DISPLAY']
-			os.environ['DISPLAY'] = dpy
-
+			self.gui_dpy = os.environ['DISPLAY']
+			self.fb_dpy = dpy
+			
 		self.driver = os.environ['SDL_VIDEODRIVER']
+		os.environ['DISPLAY'] = self.fb_dpy
 		
 		pygame.init()
 		
@@ -337,12 +341,6 @@ class FrameBuffer:
 		sys.stderr.write('sprite/vid: dev=<%s> (%dx%d; %d bbp)\n' % \
 						 (os.environ['SDL_VIDEODRIVER'],
 						  self.w, self.h, maxbpp))
-			
-		if dpy:
-			os.environ['DISPLAY'] = old_dpy
-
-		# turn OFF the cursor!!
-		self.cursor(0)
 
 		# note: for historical reasons, bg is a scalar -- grayscale only..
 		self.bg = bg
@@ -381,9 +379,6 @@ class FrameBuffer:
 		# initial sync state is OFF
 		self.sync(0)
 
-		# print useful info to console
-		#self.printinfo()
-
 	def __del__(self):
 		"""Cleanup function.
 		
@@ -405,6 +400,9 @@ class FrameBuffer:
 		pygame.display.set_caption('Pype Display (%dx%d; %d bbp)' % \
 								   (self.w, self.h, self.maxbpp))
 
+		# turn OFF the cursor!!
+		self.cursor(0)
+
 		if self.fopengl:
 			glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
 			glEnable(GL_BLEND)
@@ -412,7 +410,8 @@ class FrameBuffer:
 		else:
 			# set (0,0,0) to be transparent/colorkey
 			self.screen.set_colorkey((0,0,0,0))
-
+		#self.printinfo()
+		
 	def printinfo(self):
 		vi = pygame.display.Info()
 		sys.stderr.write('Video Info (driver=%s)\n' % \
@@ -586,7 +585,8 @@ class FrameBuffer:
 		"""hide framebuffer
 		At the moment, all this does is pop out of FULLSCREEN mode
 		"""
-		pygame.display.iconify()
+		if pygame.display.get_init():
+			pygame.display.quit()
 
 	def show(self):
 		"""show framebuffer
@@ -594,8 +594,11 @@ class FrameBuffer:
 		flag settings, which potentially will reactivate fullscreen
 		mode.
 		"""
-		pygame.display.toggle_fullscreen()
-
+		if not pygame.display.get_init():
+			root_take()
+			self.opendisplay()
+			root_drop()
+		
 	def sync(self, state, flip=None):
 		"""Draw/set sync pulse sprite
 		
@@ -998,6 +1001,40 @@ def zoomdown(fb, cx, cy, width=100, height=100,
 	fb.flip()
 		
 
+class _SurfArrayAccess:
+	"""INTERNAL
+	
+	Surfarray accessor class for sprites.
+	Makes sprite.array, sprite.alpha behave almost as though they 
+	were direct references to the surfarray array3d Numeric arrays.
+
+	For example:
+	  array = self.array[:]
+	  array = self.array[3:,4]
+	  self.array[:] = newarray
+	  self.array[4,3] = 12
+	
+	However, self.array is not really a Numeric array itself, so don't do:
+	  BAD self.array = newarray (use self.array[:] = newarray)
+	  BAD sz = size(self.array) (use size(self.array[:])).
+	Similarly for self.alpha.  
+	"""
+	def __init__(self, im, get, set):
+		self.im  = im
+		self.get = get
+		self.set = set
+ 
+	def __getitem__(self, idx):
+		array = self.get(self.im)
+		return array[idx]
+
+	def __setitem__(self, idx, value):
+		array = self.set(self.im)
+		if type(value) is arraytype:
+			array[idx] = value.astype(array.typecode())
+		else:
+			array[idx] = value
+
 class _ImageBase:
 	"""INTERNAL -- do not instantiate!
 	
@@ -1184,6 +1221,14 @@ class Sprite(_ImageBase):
 		# add sprite to list of sprites (this also acts as a count,
 		# since deleted sprites get deleted from the list too).
 		Sprite.__list__.append(self.name)
+
+		self._array = _SurfArrayAccess(im=self.im, 
+									   get=pygame.surfarray.array3d,
+									   set=pygame.surfarray.pixels3d)
+		self._alpha = _SurfArrayAccess(im=self.im,
+									   get=pygame.surfarray.array_alpha,
+									   set=pygame.surfarray.pixels_alpha)
+		
 
 	def __del__(self):
 		"""INTERNAL

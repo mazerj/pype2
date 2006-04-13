@@ -27,7 +27,7 @@
 */
 
 extern int dacq_start(int boot, int testmode, char *tracker_type,
-		      char *dacq_server, char *arg1, char *arg2);
+		      char *dacq_server, char *trakdev);
 extern void dacq_stop(void);
 extern int dacq_release(void);
 
@@ -80,7 +80,7 @@ extern int dacq_adbuf_photo(int ix);	/* aka c2 */
 extern int dacq_adbuf_spikes(int ix);	/* aka c3 */
 
 extern int dacq_eye_smooth(int kn);
-extern void dacq_set_pri(int dacq_pri, int iscan_pri);
+extern void dacq_set_pri(int dacq_pri);
 
 extern int pp_init(int base);
 extern int pp_bar(void);

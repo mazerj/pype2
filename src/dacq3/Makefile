@@ -17,7 +17,7 @@ CC = gcc
 
 all: build install
 
-build: das16_server das08_server _dacqmodule.so iscan_server comedi
+build: das16_server das08_server _dacqmodule.so comedi
 
 sigs.o: sigs.c sigs.h
 	$(CC) -c sigs.c
@@ -37,7 +37,7 @@ comedi:
 	fi;
 
 SERVER_SRCS = das_common.c das_common.h procname.h procname.c
-SERVER_OBJS = sigs.o psems.o procname.o usbjs.o
+SERVER_OBJS = sigs.o psems.o procname.o usbjs.o libezV24-0.0.3/libezV24-0.a
 
 dummy_server.o: dummy_server.c $(SERVER_SRCS)
 comedi_server.o: comedi_server.c $(SERVER_SRCS)
@@ -56,11 +56,7 @@ comedi_server: comedi_server.o $(SERVER_OBJS)
 das08_server: das08_server.o $(SERVER_OBJS)
 	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
 
-iscan_server: iscan_server.o libez $(SERVER_OBJS)
-	@echo "NOTE: can't tell if libez is fresh, will relink iscan_server"
-	$(CC) -o $@ $< $(SERVER_OBJS) libezV24-0.0.3/libezV24-0.a
-
-libez:
+libezV24-0.0.3/libezV24-0.a:
 	(cd libezV24-0.0.3 ; make static)
 
 dacq.c: dacq.h
@@ -80,11 +76,10 @@ _dacqmodule.so: dacq_wrap.o dacq.o psems.o
 	$(CC) -shared dacq_wrap.o dacq.o psems.o -o $@
 
 install: dummy_server \
-		das16_server das08_server _dacqmodule.so iscan_server comedi
+		das16_server das08_server _dacqmodule.so comedi
 	cp dummy_server $(PYPEDIR)/bin
 	cp das16_server $(PYPEDIR)/bin
 	cp das08_server $(PYPEDIR)/bin
-	cp iscan_server $(PYPEDIR)/bin
 	cp dacq.py $(PYPEDIR)/lib
 	cp _dacqmodule.so $(PYPEDIR)/lib
 	#cp libeyelinkcore.so $(PYPEDIR)/lib

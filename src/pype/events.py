@@ -26,6 +26,7 @@ USER_ABORT				= 'A'
 UNINITIATED_TRIAL		= 'U'
 MAXRT_EXCEEDED			= 'M'
 EARLY_RELEASE			= 'E'
+ERROR_RESPONSE			= 'X'
 
 rcodes = {
 	'C': 'CORRECT_RESPONSE',
@@ -102,6 +103,9 @@ FIX_ACQUIRED			= 'fix_acquired'
 OLD_FIX_ACQUIRED		= 'fix_acuired'
 FIX_LOST				= 'fix_lost'
 FIX_DONE				= 'fix_done'
+
+TARGET_ACQUIRED			= 'target_acquired'
+TARGET_LOST				= 'target_lost'
 
 START_SPONT				= 'start_spont'
 STOP_SPONT				= 'stop_spont'

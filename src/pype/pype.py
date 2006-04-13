@@ -127,6 +127,11 @@ Thu Mar 30 10:18:18 2006 mazer
 
 - deleted framebuffer arg to PypeApp() and added pysch arg
 
+Tue Apr  4 11:47:37 2006 mazer
+
+- added arguments to eyeset() to allow tasks to muck with the
+  xgain,ygain,xoffset and yoffset values
+  
 """
 
 #####################################################################
@@ -246,7 +251,6 @@ class PypeApp:
 		debug(self.config.iget('DEBUG'))
 		
 		self.config.set('DACQ_SERVER',	'das16_server',	override=None)
-		self.config.set('ISCAN_SERVER', '',				override=None)
 		self.config.set('EYETRACKER_DEV','',			override=None)
 		self.config.set('PPORT',		'-1',			override=None)
 		self.config.set('BLOCKED',		'',				override=None)
@@ -413,11 +417,11 @@ class PypeApp:
 						   label='About Pype', command=AboutPype)
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command', 
-						   label='show framebuffer',
-						   command=self.showfb)
+						   label='hide updy',
+						   command=lambda s=self: s.hide())
 			mb.addmenuitem('File', 'command', 
-						   label='hide framebuffer',
-						   command=self.hidefb)
+						   label='show updy',
+						   command=lambda s=self: s.hide(restore=1))
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command', 
 						   label='Load task from file',
@@ -614,8 +618,6 @@ class PypeApp:
 				 "length of running average used to smooth eye traces -- UPDATE to take effect"),
 				("dacq_pri",		"-10",		is_int,
 				 "priority of DACQ process (nice value)"),
-				("iscan_pri",		"-5",		is_int,
-				 "priority of (optional) eyetracker process (nice value)"),
 				("rt_sched",		"0",		is_bool,
 				 "boolean: try to use rt_scheduler??"),
 				("fb_pri",			"-10",		is_int,
@@ -941,7 +943,6 @@ class PypeApp:
 				   self.config.iget('DACQ_TESTMODE'),
 				   self.config.get('EYETRACKER'),
 				   self.config.get('DACQ_SERVER'),
-				   self.config.get('ISCAN_SERVER'),
 				   self.config.get('EYETRACKER_DEV'))
 		self.dacq_going = 1
 		self.eyeset()
@@ -1079,7 +1080,8 @@ class PypeApp:
 			print_version_info()
 
 		if self.psych:
-			self.hidefb()
+			self.fb.hide()
+			self.hide()
 
 	def _keyboard(self):
 		app = self
@@ -1308,7 +1310,7 @@ class PypeApp:
 	def udpy_note(self, t=''):
 		self.udpy.note(t)
 
-	def eyeset(self):
+	def eyeset(self, xgain=None, ygain=None, xoff=None, yoff=None):
 		"""Update eye coil params from entry boxes"""
 
 		k = self.rig_common.queryv('eye_smooth')
@@ -1317,26 +1319,49 @@ class PypeApp:
 		k = self.rig_common.queryv('fixbreak_tau')
 		k = dacq_fixbreak_tau(k)
 
+		#print xgain, ygain, xoff, yoff
+
 		try:
 			self.eye_tweak = self._eye_tweak.component('entry').get()
 		except:
 			self.eye_tweak = 1
-		try:
-			self.eye_xgain = float(self._eye_xgain.component('entry').get())
-		except:
-			self.eye_xgain = 1.0
-		try:
-			self.eye_ygain = float(self._eye_ygain.component('entry').get())
-		except:
-			self.eye_ygain = 1.0
-		try:
-			self.eye_xoff = int(self._eye_xoff.component('entry').get())
-		except:
-			self.eye_xoff = 0
-		try:
-			self.eye_yoff = int(self._eye_yoff.component('entry').get())
-		except:
-			self.eye_yoff = 0
+
+		if not xgain is None:
+			self.eye_xgain = xgain
+		else:
+			try:
+				self.eye_xgain = float(self._eye_xgain.component('entry').get())
+			except:
+				self.eye_xgain = 1.0
+		self._eye_xgain.setentry(self.eye_xgain)
+		
+		if not ygain is None:
+			self.eye_ygain = ygain
+		else:
+			try:
+				self.eye_ygain = float(self._eye_ygain.component('entry').get())
+			except:
+				self.eye_ygain = 1.0
+		self._eye_ygain.setentry(self.eye_ygain)
+		
+		if not xoff is None:
+			self.eye_xoff = int(round(xoff))
+		else:
+			try:
+				self.eye_xoff = int(self._eye_xoff.component('entry').get())
+			except:
+				self.eye_xoff = 0
+		self._eye_xoff.setentry(self.eye_xoff)
+		
+		if not yoff is None:
+			self.eye_yoff = int(round(yoff))
+		else:
+			try:
+				self.eye_yoff = int(self._eye_yoff.component('entry').get())
+			except:
+				self.eye_yoff = 0
+		self._eye_yoff.setentry(self.eye_yoff)
+		
 
 		# JAM 07-Feb-2003: prior to today monitor dimensions were not
 		# taken into account in computing the gain values because we
@@ -1348,7 +1373,9 @@ class PypeApp:
 		yg = self.eye_ygain * self.rig_common.queryv("mon_v_ppd")
 
 		# send these along to the DACQ modules for fast calculation..
-		dacq_eye_params(xg, yg, self.eye_xoff, self.eye_yoff)
+		dacq_eye_params(xg, yg,
+						int(round(self.eye_xoff)),
+						int(round(self.eye_yoff)))
 
 	def init_framebuffer(self):
 		if self.config.iget('FULLSCREEN'):
@@ -1469,7 +1496,13 @@ class PypeApp:
 			self._startbut.config(state=NORMAL)
 			self._startbut_tmp.config(state=NORMAL)
 
-	def _start(self, temp=None):
+	def _start(self):
+		self._start_helper(temp=None)
+		
+	def _starttmp(self):
+		self._start_helper(temp=1)
+
+	def _start_helper(self, temp):
 		self._savestate()
 		
 		if self.startfn:
@@ -1494,6 +1527,8 @@ class PypeApp:
 				self._allowabort = 1
 
 				try:
+					if self.psych:
+						self.fb.show()
 					self.startfn(self)
 				finally:
 					dacq_set_pri(0, 0)
@@ -1507,6 +1542,8 @@ class PypeApp:
 						self._startbut_tmp.config(text='tmp start',
 												  state=NORMAL)
 						self._loadmenu.enableall()
+					if self.psych:
+						self.fb.hide()					
 			else:
 				if self.tk:
 					self._startbut.config(state=DISABLED)
@@ -1515,9 +1552,6 @@ class PypeApp:
 				self.udpy.eye_clear()
 		else:
 			self.tk.bell()
-
-	def _starttmp(self):
-		self._start(temp=1)
 		
 	def shutdown(self):
 		"""
@@ -1667,12 +1701,12 @@ class PypeApp:
 				self.close()
 				sys.exit(0)
 			elif dacq_jsbut(0) and dacq_jsbut(2):
-				self.hidefb()
+				self.fb.hide()
 			elif dacq_jsbut(0) and dacq_jsbut(3):
-				self.showfb()
+				self.fb.show()
 				
 			(c, ev) = self.keyque.pop()
-			if (c is None) and self.fb:
+			if 0 and (c is None) and self.fb:
 				ks = self.fb.getkey(wait=None, down=1)
 				if ks == 0:
 					pass
@@ -1948,11 +1982,11 @@ class PypeApp:
 
 	def hide(self, restore=None):
 		if restore is None:
-			self.tk.withdraw()
+			#self.tk.withdraw()
 			self.udpy.master.withdraw()
 		else:
-			self.tk.deiconfify()
-			self.udpy.master.deiconfify()
+			#self.tk.deiconify()
+			self.udpy.master.deiconify()
 
 	def lshiftdown(self):
 		"""
@@ -2231,8 +2265,7 @@ class PypeApp:
 		to this call.
 		"""
 		# bump up the data collect process priorities
-		dacq_set_pri(self.rig_common.queryv('dacq_pri'),
-					 self.rig_common.queryv('iscan_pri'))
+		dacq_set_pri(self.rig_common.queryv('dacq_pri'))
 		dacq_set_mypri(self.rig_common.queryv('fb_pri'))
 		if self.rig_common.queryv('rt_sched'):
 			# if rt_sched is set in the rig menu, switch scheduler mode
@@ -2646,12 +2679,6 @@ class PypeApp:
 			self._testpat.blit(force=1)
 			self.fb.sync(0)
 			self.fb.flip()
-
-	def showfb(self):
-		self.fb.show()
-
-	def hidefb(self):
-		self.fb.hide()
 
 	def synctest(self):
 		"""

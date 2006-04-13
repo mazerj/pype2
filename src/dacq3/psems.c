@@ -44,6 +44,19 @@
 **   dummy_server under ubuntu 5.10 seems to die if the semaphore's are
 **   deleted and then decremented.. now a warning is printed and then it
 **   should exit normally.
+**
+** Thu Apr 13 09:42:44 2006 mazer 
+**   Modified the psem_incr/_decr() code to use a common underlying
+**   function and put the underlying function in a loop. I think stray
+**   interupts can cause semop() to exit before getting the semaphore,
+**   which gets things out of sync. With this change, the semaphore code
+**   loops UNTIL it takes or drops the semaphore, even if it gets
+**   interupted.
+**
+**   NOTE: This really only seemed to be a problem when the standalone
+**         iscan_server program was running. Now that the iscan_server
+**         functionality has been folded into das_common, I think this
+**         fix may be extraneous.. but I think it's still correct.
 */
 
 #include <stdio.h>
@@ -93,46 +106,36 @@ int psem_info(int semid)
   printf("value = %d\n", semctl(semid, 0, GETVAL, 0));
 }
 
-int psem_incr(int semid)
+int _psem_change(int semid, int dir)
 {
   struct sembuf s;
 
   s.sem_num = 0;		/* first semaphore */
-  s.sem_op = 1;			/* add one */
+  s.sem_op = dir;
   s.sem_flg = 0;		/* block/wait */
-    
-  if (semop(semid, &s, 1) < 0) {
-    if (errno == EINVAL) {
-      fprintf(stderr, "warning: psem_incr semaphore destroyed?\n");
-      return(1);
+
+  while (1) {
+    if (semop(semid, &s, 1) < 0) {
+      if (errno == EINVAL) {
+	fprintf(stderr, "warning: psem_decr semaphore destroyed?\n");
+	return(1);
+      } else {
+	perror("psem_change/semop (restarted)");
+      }
     } else {
-      perror("psem_incr/semop");
-      return(-1);
+      return(1);
     }
-  } else {
-    return(1);
   }
+}
+
+int psem_incr(int semid)
+{
+  return(_psem_change(semid, 1));
 }
 
 int psem_decr(int semid)
 {
-  struct sembuf s;
-
-  s.sem_num = 0;		/* first semaphore */
-  s.sem_op = -1;		/* subtrace one */
-  s.sem_flg = 0;		/* block/wait */
-    
-  if (semop(semid, &s, 1) < 0) {
-    if (errno == EINVAL) {
-      fprintf(stderr, "warning: psem_decr semaphore destroyed?\n");
-      return(1);
-    } else {
-      perror("psem_decr/semop");
-      return(-1);
-    }
-  } else {
-    return(1);
-  }
+  return(_psem_change(semid, -1));
 }
 
 int psem_incr_mine(int semid)

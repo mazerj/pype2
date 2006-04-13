@@ -47,7 +47,13 @@ class _Beeper:
 		elif _Beeper._init:
 			if pygame.mixer.get_init() is not None:
 				sys.stderr.write('_Beeper.init: audio was initialized!\n')
-			pygame.mixer.init(22050, -16, 1)
+			try:
+				pygame.mixer.init(22050, -16, 1)
+			except:
+				sys.stderr.write('_Beeper.init: audio disabled -- no access!\n')
+				_Beeper._disabled = 1
+				return
+				
 			i = pygame.mixer.get_init()
 			sys.stderr.write('_Beeper.init: %d hz, %d bits, stereo=%d\n' % i)
 			(_Beeper.daf, _Beeper.bits, _Beeper.stereo) = i

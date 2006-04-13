@@ -23,6 +23,10 @@
 **
 ** Mon Jan 23 10:01:22 2006 mazer 
 **   Added FIXWIN.vbias for vertical elongation of the fixation window.
+**
+** Thu Apr 13 09:40:47 2006 mazer 
+**   eliminated iscan_server specific members from the main data
+**   structures.
 */
 
 #define SHMKEY	0xDA01
@@ -67,12 +71,6 @@ typedef struct {
   int	eye_y;			/* current eye position: Y position */
   int	eye_pa;			/* current pupil area, if available */
 
-  /* iscan_[xy] values are maintained continuously
-  ** by the iscan_server.c module
-  */
-  int	iscan_x;		/* last iscan value: X position */
-  int	iscan_y;		/* last iscan value: Y position */
-
   int	adc[NADC];		/* current values for ADC channels */
   int	dac[NDAC];		/* current values for DAC channels */
   int	dac_strobe;		/* software strobe (force DA output) */
@@ -83,14 +81,11 @@ typedef struct {
 
   /* housekeeping flags */
   unsigned long timestamp;	/* timestamp of last update (ms resolution) */
-  int	iscan_terminate;	/* set flag to force iscan termination */
   int	terminate;		/* set flag to force termination */
   int	das_ready;		/* sync flag -- when true, dacq proc ready */
-  int	iscan_ready;		/* sync flag -- when true, iscan proc ready */
 
   /* used only once.. */
   int	dacq_pri;
-  int	iscan_pri;
 
   /* d/a buffers */
   unsigned int	adbuf_on;	/* flag to trigger a/d collect */

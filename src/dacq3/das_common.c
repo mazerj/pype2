@@ -38,6 +38,12 @@
 **   Added stub support of a usb joystick or keypad. Right now the
 **   device is detected and initialized, but nothing's done yet
 **   with the signals.
+**
+** Thu Apr 13 09:38:38 2006 mazer 
+**   merged stand-alone iscan_server code into the main event
+**   loop for das_common, so all XXX_server's will be able to
+**   talk to the iscan without competition from a separate
+**   process.
 */
 
 #include <unistd.h>
@@ -61,6 +67,9 @@
 /* this has set_eyelink_address() etc.. */
 #include "exptsppt.h"
 
+/* ez-serial library for iscan interface */
+#include "libezV24-0.0.3/ezV24.h"
+
 static char *_tmodes[] = { "ANALOG", "ISCAN", "EYELINK", "EYELINK_TEST" };
 #define ANALOG		0
 #define ISCAN		1
@@ -76,6 +85,8 @@ static unsigned long long ticks_per_ms = 0;
 static int eyelink_camera = -1;
 static int swap_xy = 0;
 static int usbjs_dev = -1;
+static v24_port_t *iscan_port = NULL;
+static int iscan_x, iscan_y, iscan_p;
 
 static double find_clockfreq()	/* get clock frequency in Hz */
 {
@@ -98,47 +109,78 @@ static double find_clockfreq()	/* get clock frequency in Hz */
 
 static void iscan_init(char *server, char *dev)
 {
-  int pid, k;
-
-  LOCK(semid);
-  dacq_data->iscan_terminate = 0;
-  dacq_data->iscan_ready = 0;
-  UNLOCK(semid);
-  if ((pid = fork()) == 0) {
-    execlp(server, server, dev, NULL);
-  } else {
-    fprintf(stderr, "%s: waiting for iscan_ready\n", progname);
-    do {
-      LOCK(semid);
-      k = dacq_data->iscan_ready;
-      UNLOCK(semid);
-      usleep(100);
-    } while (! k);
+  if ((iscan_port = v24OpenPort(dev, V24_NO_DELAY | V24_NON_BLOCK)) == NULL) {
+    fprintf(stderr, "%s: iscan_init can't open \"%s\"\n.", progname, dev);
+    exit(1);
   }
+  v24SetParameters(iscan_port, V24_B115200, V24_8BIT, V24_NONE);
+
   tracker_mode = ISCAN;
+  fprintf(stderr, "%s: opened iscan_port\n", progname);
 }
 
 static void iscan_halt()
 {
-  int k;
-
-  fprintf(stderr, "%s: in iscan_halt\n", progname);
-
-  if (tracker_mode == ISCAN) {
-    fprintf(stderr, "%s: terminating iscan\n", progname);
-    LOCK(semid);
-    dacq_data->iscan_terminate = 1;
-    UNLOCK(semid);
-    do { 
-      LOCK(semid);
-      k = dacq_data->iscan_ready;
-      UNLOCK(semid);
-      usleep(100);
-    } while (k);
-    tracker_mode = ANALOG;
+  if (iscan_port) {
+    v24ClosePort(iscan_port);
+    fprintf(stderr, "%s: closed iscan_port\n", progname);
   }
-  fprintf(stderr, "%s: leaving iscan_halt\n", progname);
 }
+
+static void iscan_read()
+{
+  static unsigned char buf[25];
+  static int bp = -1;
+  static short *ibuf;
+  static int lastc = -1;
+  int c;
+
+  /* initialize the read buffer */
+  if (bp < 0) {
+    for (bp = 0; bp < sizeof(buf); bp++) {
+      buf[bp] = 0;
+    }
+    bp = -1;
+    ibuf = (short *)buf;
+    iscan_x = 99999;
+    iscan_y = 99999;
+    iscan_p = 0;
+  }
+
+  if ((c = v24Getc(iscan_port)) < 0) {
+    return;
+  }
+  if (c == 'D') {
+    if (lastc == 'D') {
+      lastc = -1;
+      bp = 0;
+    } else {
+      lastc = c;
+    }
+    return;
+  }
+  if (bp >= 0) {
+    buf[bp] = 0x00ff & c;
+    if (bp == 7) {
+      if (ibuf[0] || ibuf[1] || ibuf[2] || ibuf[3]) {
+	iscan_x = (float) (ibuf[0] - ibuf[2] + 4096);
+	iscan_y = (float) (ibuf[1] - ibuf[3] + 4096);
+	iscan_p = (float) (1000.0);
+	return;
+      } else {
+	iscan_x = (float) 99999;
+	iscan_y = (float) 99999;
+	iscan_p = (float) 0;
+	return;
+      }
+    } else {
+      if (++bp > 7) {
+	fprintf(stderr, "something bad happened.\n");
+      }
+    }
+  }
+}
+
 
 static void eyelink_init(char *ip_address)
 {
@@ -405,6 +447,9 @@ static void mainloop(void)
 	}
       }
       naccum += 1;
+      if (tracker_mode == ISCAN) {
+	iscan_read();
+      }
     } while (((ts = timestamp(0)) - last_ts) < 1);
     last_ts = ts;
 
@@ -416,11 +461,9 @@ static void mainloop(void)
     }
 
     if (tracker_mode == ISCAN) {
-      LOCK(semid);
-      x = dacq_data->iscan_x;
-      y = dacq_data->iscan_y;
-      UNLOCK(semid);
-      pa = -1;
+      x = iscan_x;
+      y = iscan_y;
+      pa = iscan_p;
     } else if (tracker_mode == EYELINK) {
       /* try reading from eyelink */
       if (eyelink_read(&tx, &ty, &tp, &eyelink_t, &eyelink_new) != 0) {

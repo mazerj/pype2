@@ -123,6 +123,12 @@
 ** Wed Mar 29 15:25:00 2006 mazer 
 **   initialize dacq_data->js[]
 **   added: dacq_jsbut(int n)
+**
+** Wed Apr 12 18:13:57 2006 mazer 
+**   Removed all iscan_server.c junk --> now part of das_common.c
+**   This involved changing the syntax for dacq_boot(), dacq_set_pri()
+**     and messing with the DACQINFO structure to remove iscan_server
+**     specific members.
 */
 
 #include <sys/types.h>
@@ -202,7 +208,7 @@ static void dacq_sigchld_handler(int signum)
 }
 
 int dacq_start(int boot, int testmode, char *tracker_type,
-	       char *dacq_server, char *arg1, char *arg2)
+	       char *dacq_server, char *trakdev)
 {
   int shmid;
 
@@ -299,17 +305,14 @@ int dacq_start(int boot, int testmode, char *tracker_type,
     dacq_data->dac_strobe = 0;
 
     dacq_data->timestamp = 0;
-    dacq_data->iscan_terminate = 0;
     dacq_data->terminate = 0;
     dacq_data->das_ready = 0;
 
-    dacq_data->iscan_ready = 0;
     dacq_data->eye_smooth = 0;
     dacq_data->eye_x = 0;
     dacq_data->eye_y = 0;
 
     dacq_data->dacq_pri = 0;
-    dacq_data->iscan_pri = 0;
 
     dacq_data->fixbreak_tau = 5;
 
@@ -324,10 +327,10 @@ int dacq_start(int boot, int testmode, char *tracker_type,
 
 	if (strcmp(tracker_type, "ISCAN") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting iscan\n");
-	  execlp(dacq_server, dacq_server, arg1, arg2, NULL);
+	  execlp(dacq_server, dacq_server, trakdev, NULL);
 	} else if (strcmp(tracker_type, "EYELINK") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
-	  execlp(dacq_server, dacq_server, "-eyelink", arg2, NULL);
+	  execlp(dacq_server, dacq_server, "-eyelink", trakdev, NULL);
 	} else if (strcmp(tracker_type, "ANALOG") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting analog\n");
 	  execlp(dacq_server, dacq_server, NULL);
@@ -803,11 +806,10 @@ int dacq_eye_smooth(int kn)
   return(i);
 }
 
-void dacq_set_pri(int dacq_pri, int iscan_pri)
+void dacq_set_pri(int dacq_pri)
 {
   LOCK(semid);
   dacq_data->dacq_pri = dacq_pri;
-  dacq_data->iscan_pri = iscan_pri;
   UNLOCK(semid);
 }
 
