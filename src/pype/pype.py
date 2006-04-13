@@ -334,6 +334,11 @@ class PypeApp:
 		# added 09-mar-2006 mazer
 		self.config.set('USB_JS_DEV',	'',				override=None)
 
+		# Thu Apr 13 14:21:40 2006 mazer
+		# sanity check to make sure framerate is correct
+		self.config.set('FPS',			'0',			override=None)
+
+
 		# these MUST be set from now on..
 		monw = self.config.fget('MONW', -1)
 		if monw < 0:
@@ -1028,6 +1033,9 @@ class PypeApp:
 		self._testpat = None
 		# added automatic detection of framerate (13-jan-2004 JAM):
 		fps = self.fb.calcfps(duration=250)
+		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
+			sys.stderr.write('pype: error! fps does not match requested rate\n')
+			sys.exit(1)
 		self.rig_common.set('mon_fps', '%g' % fps)
 		self.idlefb()
 		sys.stderr.write('pype: estimated fps = %g\n' % fps)
