@@ -939,6 +939,11 @@ class PypeApp:
 		if len(self.config.get('USB_JS_DEV')) > 0:
 			os.environ['XXUSBJS'] = self.config.get('USB_JS_DEV')
 
+		print self.config.iget('DACQ_TESTMODE'), \
+			  self.config.get('EYETRACKER'), \
+				   self.config.get('DACQ_SERVER'),\
+				   self.config.get('EYETRACKER_DEV')
+				   
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),
 				   self.config.get('EYETRACKER'),
@@ -1531,7 +1536,7 @@ class PypeApp:
 						self.fb.show()
 					self.startfn(self)
 				finally:
-					dacq_set_pri(0, 0)
+					dacq_set_pri(0)
 					dacq_set_mypri(0)
 					dacq_set_rt(0)
 					self.idlefb()
@@ -2298,7 +2303,7 @@ class PypeApp:
 		self.plexon_state(0)
 
 		# bump back down the data collect process priorities
-		dacq_set_pri(0, 0)
+		dacq_set_pri(0)
 		dacq_set_mypri(0)
 		dacq_set_rt(0)
 

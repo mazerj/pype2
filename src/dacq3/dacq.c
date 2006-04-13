@@ -327,7 +327,7 @@ int dacq_start(int boot, int testmode, char *tracker_type,
 
 	if (strcmp(tracker_type, "ISCAN") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting iscan\n");
-	  execlp(dacq_server, dacq_server, trakdev, NULL);
+	  execlp(dacq_server, dacq_server, "-iscan", trakdev, NULL);
 	} else if (strcmp(tracker_type, "EYELINK") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
 	  execlp(dacq_server, dacq_server, "-eyelink", trakdev, NULL);

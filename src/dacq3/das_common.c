@@ -107,7 +107,7 @@ static double find_clockfreq()	/* get clock frequency in Hz */
   return(mhz * 1.0e6);
 }
 
-static void iscan_init(char *server, char *dev)
+static void iscan_init(char *dev)
 {
   if ((iscan_port = v24OpenPort(dev, V24_NO_DELAY | V24_NON_BLOCK)) == NULL) {
     fprintf(stderr, "%s: iscan_init can't open \"%s\"\n.", progname, dev);
@@ -738,7 +738,9 @@ int main(int ac, char **av, char **envp)
   init();
   fprintf(stderr, "%s: initted\n", progname);
 
-  if (av[1] && (strcmp(av[1], "-eyelink") == 0)) {
+  if (av[1] && (strcmp(av[1], "-iscan") == 0)) {
+    iscan_init(av[2]);
+  } else if (av[1] && (strcmp(av[1], "-eyelink") == 0)) {
     eyelink_init(av[2]);
   } else if (getenv("EYELINK_TEST") != NULL) {
     eyelink_init(getenv("EYELINK_TEST"));
@@ -748,8 +750,6 @@ int main(int ac, char **av, char **envp)
     } else {
       fprintf(stderr, "*** eyelink test mode FAILED!\n");
     }
-  } else if (ac > 2) {
-    iscan_init(av[1], av[2]);
   }
 
   if (getenv("XXSWAP_XY")) {
