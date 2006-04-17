@@ -132,6 +132,17 @@ Tue Apr  4 11:47:37 2006 mazer
 - added arguments to eyeset() to allow tasks to muck with the
   xgain,ygain,xoffset and yoffset values
   
+Fri Apr 14 09:21:34 2006 mazer
+
+- added LandingZone class -- see notes in class definition
+
+Mon Apr 17 09:32:06 2006 mazer
+
+- added SectorLandingZone and PypeApp method eye_txy() to
+  query time, x and y position of last eye position sample.
+  This is just like the eyepos() method, but also returns
+  the sample time.
+
 """
 
 #####################################################################
@@ -145,6 +156,8 @@ import posixpath
 import signal
 import socket
 from types import *
+import math
+
 
 #####################################################################
 #  GUI imports -- required
@@ -231,8 +244,6 @@ class PypeApp:
 		really require some sort of underlying locking method to prevent
 		collision.
 		"""
-
-		import math
 
 		n = npypes()
 		if n > 0:
@@ -1595,13 +1606,27 @@ class PypeApp:
 		else:
 			raise GuiOnlyFunction, "status"
 
-	def eyepos(self):
+	def eye_txy(self):
+		"""
+		Get last measured eye position and time of measurement.
+		Returns: (time_ms, xpos_pix, ypos_pix)
+		"""
+		
 		ts = dacq_ts()
 		if (self._last_eyepos) is None or (ts > self._last_eyepos):
 			self._eye_x = dacq_eye_read(0)
 			self._eye_y = dacq_eye_read(1)
 			self._last_eyepos = ts
-		return (self._eye_x, self._eye_y)
+		return (self._last_eyepos, self._eye_x, self._eye_y)
+
+	def eyepos(self):
+		"""
+		Get last measured eye position, no time info.
+		Returns: (xpos_pix, ypos_pix)
+		"""
+		(t, x, y) = self.eye_txy()
+		return (x, y)
+	
 
 	def looking_at(self, x=0, y=0):
 		"""
@@ -2417,6 +2442,8 @@ class PypeApp:
 		to adapt the task based on his eye movements.  This should
 		NOT be considered the final data, particularly if you're
 		still in record mode when you call this function
+
+		Returns: t, x, y VECTORS!!
 		"""
 		n = dacq_adbuf_size()
 		t = zeros(n)
@@ -3005,7 +3032,6 @@ def gethostname():
 		return 'NOHOST'
 
 class FixWin:
-
 	def __init__(self, x=0, y=0, size=10, app=None, vbias=1.0):
 		self.app = app
 		self.icon = None
@@ -3088,6 +3114,134 @@ class FixWin:
 			self.app.udpy.texticon(self.text)
 			self.text = None
 
+class LandingZone:
+	"""
+	Circular Landing zone detector -- this is sort of like a FixWin,
+	but all done in pype, without dacq_server intervention. A landing
+	zone is circular region located at (x,y) with a radius of size
+	pixels.  Once the eyes enter the landing zone, a counter is
+	started. If the eyes are still in the landing zone after fixtime,
+	then it's considered a landing event the .inside() method returns
+	one.
+
+	This depends on the .inside() method being in some sort of
+	tight loop and called over and over again until something
+	happens, otherwise you might miss exit/entry events..
+
+	Eyes must stay inside the zone for fixtime_ms before it's
+	considered a fixation insize the zone. Use fixtime_ms=0 if
+	you want to accept pass throughs w/o fixations.
+	"""
+	
+	def __init__(self, x, y, size, fixtime, app):
+		self.app = app
+		self.icon = None
+		self.x, self.y, self.size = x, y, size
+		self.size2 = size**2
+		self.fixtime = fixtime
+		self.entered_at = None
+		
+	def __del__(self):
+		self.clear()
+
+	def inside(self, t=None, x=None, y=None):
+		"""
+		If you have multiple landing zones, you can sit in a loop, use
+		app.eye_txy() to query time and eye position ONCE, and then apply
+		it to multiple landing zones by passing in (x,y) values
+		"""
+		if t is None:
+			(t, x, y) = self.app.eye_txy()
+		if ((self.x-x)**2 + (self.y-y)**2) < size2:
+			if self.entered_at is None:
+				self.entered_at = t
+			if (t - self.entered_at) >= fixtime:
+				return 1
+			return 0
+		else:
+			return 0
+			
+	def draw(self, color='grey', dash=None, text=None):
+		self.clear()
+		self.icon = self.app.udpy.icon(self.x, self.y,
+									   2*self.size, 2*self.size*self.vbias,
+									   color=color, type=2, dash=dash)
+		
+	def clear(self):
+		if self.icon:
+			self.app.udpy.icon(self.icon)
+			self.icon = None
+
+class SectorLandingZone:
+	"""
+	Sector-style Landing zone detector -- landing zone is defined
+	as an angular sector of an annular zone around a fixation
+	spot (xo, yo). Annular sector runs from inner_pix to outer_pix
+	and has an angular subtense of angle_deg +- subtense_deg.
+
+	Eyes must stay inside the zone for fixtime_ms before it's
+	considered a fixation insize the zone. Use fixtime_ms=0 if
+	you want to accept pass throughs w/o fixations.
+
+	See LandingZone for additional details about usage.
+	"""
+	
+	def __init__(self, xo, yo,
+				 inner_pix, outer_pix, angle_deg, subtense_deg,
+				 fixtime_ms, app):
+		self.app = app
+		self.icon = None
+		self.xo, self.yo = xo, yo
+		self.inner = inner_pix
+		self.outer = outer_pix
+		self.angle = math.pi * angle_deg / 180.0
+		self.subtense = math.pi * subtense_deg / 180.0
+		self.fixtime = fixtime_ms
+		self.entered_at = None
+		
+	def __del__(self):
+		self.clear()
+
+	def inside(self, t=None, x=None, y=None):
+		"""
+		If you have multiple landing zones, you can sit in a loop, use
+		app.eye_txy() to query time and eye position ONCE, and then apply
+		it to multiple landing zones by passing in (x,y) values
+		"""
+		
+		if t is None:
+			(t, x, y) = self.app.eye_txy()
+
+		x, y = x - self.xo, y - self.yo
+		r = (x**2 + y**2)**0.5
+		if (r > self.inner) and (r < self.outer):
+			d = abs(math.pi * math.atan2(y, x) - self.angle)
+			if d > pi:
+				d = (2 * math.pi) - d
+			if d < self.subtense:
+				# inside sector
+				if self.entered_at is None:
+					self.entered_at = t
+				if (t - self.entered_at) >= fixtime:
+					return 1
+			return 0
+		else:
+			return 0
+			
+	def draw(self, color='grey', dash=None, text=None):
+		x = self.xo + (self.inner+self.outer)/2.0 + math.cos(self.angle)
+		y = self.xo + (self.inner+self.outer)/2.0 + math.sin(self.angle)
+		self.clear()
+		self.icon = self.app.udpy.icon(x, y,
+									   self.outer-self.inter,
+									   self.outer-self.inter,
+									   color=color, type=1, dash=dash)
+		
+	def clear(self):
+		if self.icon:
+			self.app.udpy.icon(self.icon)
+			self.icon = None		
+
 class Timer:
 	def __init__(self):
 		self.reset()
@@ -3101,16 +3255,6 @@ class Timer:
 	def us(self):
 		sys.stderr.write("Warning: timer.us method obsolete, faking it\n");
 		return 1000 * (dacq_ts() - self._start_at)
-
-class GenericTask:
-	def __init__(self, app):
-		self.app = app
-
-	def run(self):
-		pass
-
-	def cleanup(self):
-		pass
 
 class Holder:
         """Dummy class just to hold info (ie, just a handle)."""
