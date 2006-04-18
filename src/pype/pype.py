@@ -256,8 +256,7 @@ class PypeApp:
 
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
-		self.config = Config(pyperc('Config.%s' % gethostname()))
-		
+		self.config = pype_hostconfig()
 		self.config.set('DEBUG',		'0',			override=None)
 		debug(self.config.iget('DEBUG'))
 		
@@ -2879,6 +2878,10 @@ class PypeApp:
 			# (might be different if new or reopened window..)
 			self._eyetrace_window  = attach(oldgraph)
 			
+def pype_hostconfig():
+	"""Read ~/.pyperc/Config.$HOSTNAME"""
+	return Config(pyperc('Config.%s' % gethostname()))
+		
 def npypes():
 	"""Count number of pype programs currently running.
 	
