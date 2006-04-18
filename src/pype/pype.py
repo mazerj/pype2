@@ -3152,13 +3152,14 @@ class LandingZone:
 		"""
 		if t is None:
 			(t, x, y) = self.app.eye_txy()
-		if ((self.x-x)**2 + (self.y-y)**2) < size2:
+		if ((self.x-x)**2 + (self.y-y)**2) < self.size2:
 			if self.entered_at is None:
 				self.entered_at = t
-			if (t - self.entered_at) >= fixtime:
+			if (t - self.entered_at) >= self.fixtime:
 				return 1
 			return 0
 		else:
+			self.entered_at = None
 			return 0
 			
 	def draw(self, color='grey', dash=None, text=None):
@@ -3222,10 +3223,11 @@ class SectorLandingZone:
 				# inside sector
 				if self.entered_at is None:
 					self.entered_at = t
-				if (t - self.entered_at) >= fixtime:
+				if (t - self.entered_at) >= self.fixtime:
 					return 1
 			return 0
 		else:
+			self.entered_at = None
 			return 0
 			
 	def draw(self, color='grey', dash=None, text=None):
