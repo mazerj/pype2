@@ -1967,7 +1967,8 @@ class Sprite(_ImageBase):
 		Generates a **new** sprite from the specified sub-region of
 		current sprite.
 
-		**x,y** (pixels) -- coordinates of subregion
+		**x,y** (pixels) -- coordinates of subregion (0,0) is upper
+		left corner of parent/src sprite
 		
 		**w,h** (pixels) -- width and height of subregion
 
@@ -1975,6 +1976,11 @@ class Sprite(_ImageBase):
 		upper left corner of sprite?
 
 		**returns** -- new sprite
+
+		NOTE: Wed Apr 19 14:32:03 2006 mazer
+		Despite what the pygame docs say about subsurface(), this
+		function COPIES the image data. Changes to the subimage will
+		**NOT** affect the parent!
 		"""
 		if center:
 			x = self.X(x) + (w/2)
@@ -1994,6 +2000,11 @@ class Sprite(_ImageBase):
 		
 		Clone this sprite; make's a new instance of class Sprite
 		with all data duplicated.
+
+		NOTE: Wed Apr 19 14:32:03 2006 mazer
+		Despite what the pygame docs say about subsurface(), this
+		function COPIES the image data. Changes to the clone will
+		**NOT** affect the parent!
 		"""
 		name = "Clone of %s" % self.name
 		s = Sprite(image=self.im.subsurface((0, 0, self.w, self.h)),
