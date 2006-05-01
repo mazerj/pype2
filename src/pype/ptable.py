@@ -543,8 +543,10 @@ class ParamTable:
 		strings if this is disabled.
 		
 		- mergewith=<dict> -> pass in an existing dictionary and
-		results will be merged into the existing
-		dictionary, new merged dictionary is returned
+		results will be merged into the existing dictionary, new
+		merged dictionary is returned.
+		
+		NOTE: THIS DICTIONARY WILL HAVE PRIORITY
 		"""
 
 		if mergewith:

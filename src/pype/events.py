@@ -143,13 +143,13 @@ START					= 'start'
 STOP					= 'stop'
 EYE_START				= 'eye_start'
 EYE_STOP				= 'eye_stop'
+EYE_OVERFLOW			= 'eye_overflow'
 
 # new events for non-cortex-like stuff... add below:
 FLIP					= 'flip'
 
 # debugging mark
 MARK					= 'mark'
-
 
 ####################################################################
 # label tags for pickled datafiles

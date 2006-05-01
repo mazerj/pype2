@@ -143,6 +143,17 @@ Mon Apr 17 09:32:06 2006 mazer
   This is just like the eyepos() method, but also returns
   the sample time.
 
+Tue Apr 25 14:13:14 2006 mazer
+
+- set things up so environment var $(PYPERC) can override the default
+  ~/.pyperc config files. This is for when multiple users want to share
+  a common .pyperc directory for a single animal.
+
+Mon May  1 11:10:29 2006 mazer
+
+- check permission on the config directory 1st thing when pype is
+  fired up and exit if you don't have write access to save state.
+  Again, this is really for shared config/pyperc dirs
 """
 
 #####################################################################
@@ -223,6 +234,8 @@ class PypeApp:
 	for all additions.
 	"""
 
+	handle = None
+
 	def __init__(self, gui=1, psych=0):
 		"""
 		Initialize a PypeApp instance, with side effects ::
@@ -245,12 +258,24 @@ class PypeApp:
 		collision.
 		"""
 
+		# save handle for this instance as a pseudo-global (this
+		# is really just for the functions in helper.py
+		PypeApp.handle = self
+
+		# check to see if ~/.pyperc or $PYPERC is accessible
+		# by the user before going any further:
+		f, ok = self._statefile(accesscheck=1)
+		if not ok:
+			sys.stderr.write("No access to %s\n" % f)
+			sys.stderr.write("Check config dir permissions: %s \n" % pyperc())
+			raise FatalPypeError
+
 		n = npypes()
 		if n > 0:
 			sys.stderr.write("Fatal Error\n")
 			sys.stderr.write(" pype appears to be running:\n")
 			sys.stderr.write("  %d processes are attached to the SHM.\n" % n);
-			sys.stderr.write("  (2 processes/pype instance)\n");
+			sys.stderr.write("  (>1 processes/pype instance)\n");
 			sys.stderr.write("*** try running pypekill ***\n")
 			raise FatalPypeError
 
@@ -745,7 +770,7 @@ class PypeApp:
 					   command=lambda s=self: slideshow(s),
 					   bg='white')
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
-			self.balloon.bind(b, "slide show from ~/.pyperc/candy.lst")
+			self.balloon.bind(b, "slide show from $(PYPERC)/candy.lst")
 
 			self.eyegraph = EyeGraph_dummy(self)
 
@@ -1106,6 +1131,9 @@ class PypeApp:
 			self.fb.hide()
 			self.hide()
 
+		self.console.writenl('cwd: <%s>' % os.getcwd())
+		self.console.writenl('pyperc: <%s>' % pyperc())
+
 	def _keyboard(self):
 		app = self
 		sys.stderr.write('Dropping into keyboard shell\n')
@@ -1435,12 +1463,20 @@ class PypeApp:
 		except:
 			pass
 
-	def _statefile(self):
+	def _statefile(self, accesscheck=None):
 		hostname = gethostname()
-		return subjectrc('pypestate.%s' % hostname)
+		fname = subjectrc('pypestate.%s' % hostname)
+		if accesscheck:
+			if os.access(fname, os.W_OK):
+				return (fname, 1)
+			else:
+				return (fname, 0)
+		else:
+			return fname
 
 	def _savestate(self):
 		import cPickle
+
 		if self.tk:
 			d = {}
 
@@ -1549,6 +1585,7 @@ class PypeApp:
 					self._startbut_tmp.config(text='stop')
 				self._allowabort = 1
 
+				self.console.clear()
 				try:
 					if self.psych:
 						self.fb.show()
@@ -2380,6 +2417,7 @@ class PypeApp:
 			# only allow turn off once..
 			self.encode(EYE_STOP)
 			if dacq_adbuf_toggle(0):
+				self.encode(EYE_STOP)
 				sys.stderr.write('warning: eyetrace overflowed\n')
 				warn('warning', 'eye trace overflow')
 			self._eyetrace = 0
@@ -2879,7 +2917,7 @@ class PypeApp:
 			self._eyetrace_window  = attach(oldgraph)
 			
 def pype_hostconfig():
-	"""Read ~/.pyperc/Config.$HOSTNAME"""
+	"""Read $(PYPERC)/Config.$HOSTNAME"""
 	return Config(pyperc('Config.%s' % gethostname()))
 		
 def npypes():
@@ -2986,25 +3024,28 @@ def subject():
 	except KeyError:
 		return 'none'
 	
-def subjectrc(s=None):
+def subjectrc(s=""):
 	"""Get current subject's private .pyperc directory.
 
 	Each subject has a directory inside $HOME/.pyperc that's used to
 	store subject-specific configuration data and state parameters.
 	"""
-	subj = '_' + subject() + '/'
-	if s:
-		return os.environ['HOME']+'/.pyperc/'+subj+s
-	else:
-		return os.environ['HOME']+'/.pyperc/'+subj
+	return pyperc('_' + subject() + '/' + s)
 
-def pyperc(s=None):
+
+def pyperc(s=""):
 	"""
+	If $(PYPERC) is set, then use $(PYPERC) as the base for the
+	user's .pyperc directory. Otherwise use "$HOME/.pyperc".
 	"""
-	if s:
-		return os.environ['HOME']+'/.pyperc/'+s
+	if os.environ.has_key('PYPERC'):
+		rc = os.environ['PYPERC']
+		if rc[-1] != '/':
+			rc = rc + '/'
 	else:
-		return os.environ['HOME']+'/.pyperc/'
+		rc = os.environ['HOME'] + '/.pyperc/'
+		
+	return rc+s
 
 def pypedir(s=None):
 	"""
@@ -3350,7 +3391,8 @@ def bounce(app):
 		app._startbut_tmp.config(state=DISABLED)
 
 		app._candy = 1
-		app.console.writenl('candy running')
+		app.console.clear()
+		app.console.writenl('bounce running')
 
 	x, y, n = 0, 0, 0
 	slist = []
@@ -3423,7 +3465,8 @@ def slideshow(app):
 				 'make %s to use this feature.' % pyperc('candy.lst'))
 			return
 		app._candy = 1
-		app.console.writenl('candy running')
+		app.console.clear()
+		app.console.writenl('slideshow running')
 
 	itag = None
 	beep(500, 100)
@@ -3441,7 +3484,7 @@ def slideshow(app):
 			fname = l[inum][:-1]
 			if not posixpath.exists(fname):
 				continue
-			app.console.writenl(' file: %s' % fname)
+			app.console.writenl(fname)
 			try:
 				s = Sprite(fname=fname, fb=app.fb, x=x, y=x)
 				if s.w > 10 and s.h > 10:

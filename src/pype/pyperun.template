@@ -83,11 +83,12 @@ if not os.environ.has_key('PYPEDIR'):
 
 # setup the path as follows:
 #  <current directory>
-#  <.pyperc/Tasks>
-#  <.pyperc/Modules>
+#  <$PYPERC/Tasks>
+#  <$PYPERC/Modules>
 #  <$PYPEDIR/Tasks>
 #  <$PYPEDIR/lib> (this used to be $PYPEDIR/Modules, but changed 14-jan-04)
 #  ...everything in original $PYTHONPATH...
+#  where, $PYPERC defaults to $HOME/.pyperc if it's not specified
 
 pd = os.environ['PYPEDIR']+'/'
 for d in ['.', pd+'Tasks', pd+'lib', pd+'Modules']:
@@ -122,10 +123,12 @@ except ImportError:
 
 # add the ~/.pyperc directories to the python search path
 for i in ['Tasks', 'Modules']:
+    #print pype.pyperc(i)
     pathprefix(pype.pyperc(i))
 
 for d in glob.glob(pype.pyperc('Tasks/*')):
     if os.path.isdir(d):
+        #print d
         pathprefix(d)
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
@@ -160,14 +163,14 @@ else:
                 sys.stderr.write('improper argument, try: s=<subject>\n')
                 sys.exit(1)
             os.environ['SUBJECT'] = subj
-            if not posixpath.exists(pype.subjectrc(None)):
+            if not posixpath.exists(pype.subjectrc()):
                 sys.stderr.write('No subject directory for "%s".\n' % subj)
                 sys.stderr.write('Ok to make one (y or n)? ')
                 l = sys.stdin.readline()
                 if not (l[0] in 'yY'):
                     sys.exit(0)
-                os.mkdir(pype.subjectrc(None))
-                os.chown(pype.subjectrc(None), os.getuid(), os.getgid())
+                os.mkdir(pype.subjectrc())
+                os.chown(pype.subjectrc(), os.getuid(), os.getgid())
         elif sys.argv[n] == '-p':
             # psychophysics mode (withdraw framebuffer)
             psych = 1
@@ -181,7 +184,7 @@ else:
 		app = PypeApp(psych=psych)
 	except FatalPypeError:
 		sys.exit(1)
-        
+
     if len(av) > 0:
         taskname = posixpath.splitext(av[0])[0]
 		try:

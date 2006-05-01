@@ -940,10 +940,14 @@ class FrameBuffer:
 
 		**width** -- width of circle in pixels. If width==0, then
 		the circle gets filled instead of just drawing an outline
+
+		Tue Apr 25 10:14:33 2006 mazer
+		  GL coords are different!!! circles were flipped/mirrored
+		  around the x-axis in GL-mode!!!!
 		"""
-		(cx, cy) = self._xy((cx, cy), sflip=1)
 
 		if self.opengl:
+			(cx, cy) = self._xy((cx, -cy), sflip=1)
 			surfsize = r*2+width
 			s = pygame.Surface((surfsize, surfsize), 32)
 			s.set_colorkey((0,0,0,0))
@@ -952,6 +956,7 @@ class FrameBuffer:
 			self.pygl_setxy(cx-surfsize/2, cy-surfsize/2)
 			glDrawPixels(surfsize, surfsize, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
 		else:
+			(cx, cy) = self._xy((cx, cy), sflip=1)
 			pygame.draw.circle(self.screen, color, (cx, cy), r, width)
 
 		#added OpenGL drawing 12-jan-2006 shinji
