@@ -2417,7 +2417,7 @@ class PypeApp:
 			# only allow turn off once..
 			self.encode(EYE_STOP)
 			if dacq_adbuf_toggle(0):
-				self.encode(EYE_STOP)
+				self.encode(EYE_OVERFLOW)
 				sys.stderr.write('warning: eyetrace overflowed\n')
 				warn('warning', 'eye trace overflow')
 			self._eyetrace = 0

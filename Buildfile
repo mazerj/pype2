@@ -24,26 +24,26 @@ install:
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; make install);\
 		done
-	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
 install-nodacq:
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; make install-nodacq);\
 		done
-	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
 install-shared:
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; make install-shared);\
 		done
-	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
 pycompile:
-	(cd $(PYPEDIR); $(PYCOMPILE) -q lib)
-	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
 wrapper:
 ifeq ($(WHO),root)

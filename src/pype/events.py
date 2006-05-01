@@ -75,9 +75,6 @@ def isearly_release(code):
 START_ITI				= 'start_iti'
 END_ITI					= 'end_iti'
 
-EYE_START				= 'eye_start'
-EYE_STOP				= 'eye_stop'
-
 START_PRE_TRIAL			= 'start_pre_trial'
 END_PRE_TRIAL			= 'end_pre_trial'
 
