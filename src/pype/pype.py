@@ -817,6 +817,10 @@ class PypeApp:
 					   command=lambda s=self: s.eyeshift(x=0, y=1))
 			b.pack(expand=0, side=LEFT)
 			self.balloon.bind(b, "shift offsets down (immediate effect)")
+
+			Label(setables,
+				  text='Control-<arrow keys> in Scope winodw shift eye pos',
+				  fg='blue').pack(expand=0, fill=X, side=TOP, pady=5)
 			
 			v = safeLookup(state, 'eye_tweak', 1)
 			self._eye_tweak = Pmw.Counter(setables,

@@ -446,6 +446,9 @@ Mouse-3 simulate bar up/down
 
 	def _key(self, ev):
 		c = ev.keysym
+		# NOTE:
+		#  state == 0 --> no modifier
+		#  state == 4 --> control key
 		if ev.state == 0 and c == 'Left':
 			self._movefidmarks(xoff=-1, yoff=0)
 		elif ev.state == 0 and c == 'Right':
@@ -455,12 +458,16 @@ Mouse-3 simulate bar up/down
 		elif ev.state == 0 and c == 'Down':
 			self._movefidmarks(xoff=0, yoff=-1)
 		elif ev.state == 4 and c == 'Left':
+			# control-left
 			self.app.eyeshift(x=1,y=0)
 		elif ev.state == 4 and c == 'Right':
+			# control-right
 			self.app.eyeshift(x=-1,y=0)
 		elif ev.state == 4 and c == 'Up':
+			# control-up
 			self.app.eyeshift(x=0,y=-1)
 		elif ev.state == 4 and c == 'Down':
+			# control-down
 			self.app.eyeshift(x=0,y=1)
 		elif c == 'less':
 			self._scalefidmarks(-1)
