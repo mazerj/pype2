@@ -86,9 +86,17 @@ try
   fs = dir(sprintf('%s_*.m', f));
   for n=1:length(fs)
     f = fs(n).name(1:end-2);
-    eval(f);
+    try
+      eval(f);
+    catch
+      err = lasterror;
+      fprintf('\n');
+      fprintf('ERROR converting record #%d from %s:\n', n, pypefile);
+      fprintf('%s\n', err.message);
+      fprintf('\n');
+      rethrow(err);
+    end
     delete(fs(n).name);
-    %%%fprintf('Loaded record/extradata %d/%d\n', n, length(fs));
     rec(n).ttl_times = rec(n).spike_times;
     fprintf('.');
   end

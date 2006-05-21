@@ -10,6 +10,12 @@ Sun Feb 16 15:07:54 2003 mazer
 
 Thu Nov  3 16:59:59 2005 mazer
   added dumping of PlexNet timestamp data
+
+Sun May 21 08:22:08 2006 mazer
+  Made matlabify a little more strict: varnames can ONLY contain
+  [a-zA-Z0-9_]. Somehow some spaces snuck into some var names which
+  broke p2m. Now anything illegal is replaced by a '_' and p2m.m
+  should report the error more usefully!
 """
 
 import sys, types, string
@@ -71,6 +77,15 @@ def matlabify(m):
 	# colons..
 	m = string.join(string.split(m, ':'), '')
 
+	# matlab wants [a-zA-Z0-9_] only in varnames -- so replace everything
+	# else with '_'
+	s = []
+	for c in m:
+		if c in string.letters+string.digits+'_':
+			s.append(c)
+		else:
+			s.append('_')
+	m = string.join(s, '')
 	return m
 	
 
@@ -244,8 +259,6 @@ def expandFile(fname, prefix):
 			break
 		else:
 			o = expandRecord(fname, prefix, recno, d, pf.extradata)
-			###sys.stderr.write('wrote: %d --> %s\n' % (recno, o))
-			###sys.stderr.flush()
 			sys.stderr.write('.')
 			sys.stderr.flush()
 			recno = recno + 1

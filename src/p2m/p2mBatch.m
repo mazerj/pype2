@@ -75,6 +75,7 @@ for n = 1:length(files)
     fprintf('Saved data to ''%s''\n', matfile);
     errors{n} = '';
   catch
+    fprintf('Error converting file: %s\n', pypefile);
     if exitOnError
       p2mExit(1);
     else
