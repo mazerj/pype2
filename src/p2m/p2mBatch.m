@@ -67,10 +67,16 @@ for n = 1:length(files)
     matfile = ['./' matfile '.p2m'];
   end
   matfile = strrep(matfile, '.gz', '');
+  
+  if exist(matfile, 'file')
+    oldpf = p2mLoad(matfile);
+  else
+    oldpf = [];
+  end
 
   try
     fprintf('%s -> %s\n', pypefile, matfile);
-    PF = p2m(pypefile);
+    PF = p2m(pypefile, oldpf);
     save(matfile, 'PF', '-mat');
     fprintf('Saved data to ''%s''\n', matfile);
     errors{n} = '';

@@ -16,6 +16,11 @@ Sun May 21 08:22:08 2006 mazer
   [a-zA-Z0-9_]. Somehow some spaces snuck into some var names which
   broke p2m. Now anything illegal is replaced by a '_' and p2m.m
   should report the error more usefully!
+
+Sun May 21 13:44:57 2006 mazer
+  Added 'startat' support so you can convert from the middle of a
+  file to the end. This is for appending new data...
+  
 """
 
 import sys, types, string
@@ -249,7 +254,7 @@ def expandRecord(fname, prefix, n, d, xd):
 
 	return outfile
 
-def expandFile(fname, prefix):
+def expandFile(fname, prefix, startat=0):
 	pf = PypeFile(fname, filter=None)
 
 	recno = 0
@@ -257,13 +262,19 @@ def expandFile(fname, prefix):
 		d = pf.nth(recno)
 		if d is None:
 			break
-		else:
+		elif recno >= startat:
 			o = expandRecord(fname, prefix, recno, d, pf.extradata)
 			sys.stderr.write('.')
 			sys.stderr.flush()
-			recno = recno + 1
-		# added following line 07-apr-2004 to reduce memory/swap load
-		pf.freenth(recno)
+		else:
+			sys.stderr.write('-')
+		recno = recno + 1
+		# Sun May 21 13:45:52 2006 mazer
+		# Don't need the freenth() here -- it's now automatic!
+		#
+		## added following line 07-apr-2004 to reduce memory/swap load
+		#pf.freenth(recno)
+		
 	expandExtradata(fname, prefix, pf.extradata)
 	sys.stderr.write('\n')
 	pf.close()
@@ -271,7 +282,9 @@ def expandFile(fname, prefix):
 
 if __name__ == '__main__':
 	if len(sys.argv) < 3:
-		sys.stderr.write("Usage: pype_expander pypefile prefix\n")
+		sys.stderr.write("Usage: pype_expander pypefile prefix [startat]\n")
 		sys.exit(1)
-	expandFile(sys.argv[1], sys.argv[2])
+	if len(sys.argv) > 3:
+		n = int(sys.argv[3])
+	expandFile(sys.argv[1], sys.argv[2], startat=n)
 	sys.exit(0)

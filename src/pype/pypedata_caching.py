@@ -101,23 +101,10 @@ Thu Dec 22 12:54:57 2005 mazer
   channel number, starting at ONE, lowercase letters indicate neuron
   on that electrode, starting with 'a'. To look at all neurons on
   channel 4 you can use '004.' etc..
-
-Sun May 21 13:30:18 2006 mazer
-
-- removed threading code, since this hasn't been used in years.  (I've
-  preserved the code as pypedata_th.py in case we ever need it).
-
-- in addition, the nth() function BY DEFAULT deletes the cached record
-  number. If you always can forward in a file, this will prevent
-  memory usage from exploring. If you want the cache to be maintained,
-  use keyword arg: free=0 to get the old behavior.  99.9% of the time
-  the new behavior is actually what you want!
-
-- these changes should help speed things up
-
+  
 """
 
-import sys, types, string, os
+import sys, types, string, thread, os
 import math, Numeric, MLab, time
 from vectorops import *
 from pype import *
@@ -144,7 +131,7 @@ class PypeRecord:
 	_reportchannel = 1
 	def __init__(self, rec, taskname=None,
 				 trialtime=None, parsed_trialtime=None,
-				 userparams=None,
+				 userparams=None, threaded=None,
 				 tracker_guess=('iscan', 120, 24)):
 		#
 		# Wed Sep 11 14:36:42 2002 mazer
@@ -185,6 +172,10 @@ class PypeRecord:
 		self.parsed_trialtime = parsed_trialtime
 		self.userparams = userparams
 		self.computed = None
+		if threaded:
+			self._lock = thread.allocate_lock()
+		else:
+			self._lock = None
 
 		# these things are fast, the rest of the recording will
 		# be filled in by the compute() method..
@@ -292,6 +283,8 @@ class PypeRecord:
 		Note: All eye info is maintained here in PIXELS.
 		      Use pix2deg() and deg2pix() below to convert.
 		"""
+		if self._lock: self._lock.acquire()
+
 		if not self.computed:
 			# this is new 13-apr-2001:
 			try:
@@ -401,6 +394,7 @@ class PypeRecord:
 
 			self.computed = 1
 
+		if self._lock: self._lock.release()
 		return self
 
 	def spikes(self, pattern=None):
@@ -433,7 +427,7 @@ class PypeRecord:
 		return pattern, ts
 
 class PypeFile:
-	def __init__(self, fname, filter=None, status=None):
+	def __init__(self, fname, filter=None, status=None, threaded=None):
 		flist = string.split(fname, '+')
 		if len(flist) > 1:
 			import posix
@@ -469,8 +463,49 @@ class PypeFile:
 		self.status = status
 		self.filter = filter
 		self.userparams = None
+		self.threaded = threaded
 		self.taskname = None
 		self.extradata = []
+		if self.threaded:
+			self._lock = thread.allocate_lock()
+			self.backload()
+		else:
+			self._lock = None
+
+	def backload(self):
+		self.loading = 1
+		thread.start_new_thread(self._backload2, (None,))
+
+	def _backload2(self, arglist):
+		if self.status:
+			self.status.configure(text='background load going')
+		else:
+			sys.stderr.write('(background load started)\n')
+		self._lock.acquire()
+		self.loading = 1
+		self._lock.release()
+		while self._next():
+			pass
+		self._lock.acquire()
+		self.loading = 0
+		self._lock.release()
+		if self.status:
+			self.status.configure(text='(loaded %d recs [0-%d])' % \
+								  (len(self.cache)-1, len(self.cache)-1))
+		else:
+			sys.stderr.write('(loaded %d recs [0-%d])\n' % (len(self.cache)-1,
+															len(self.cache)-1))
+		n=0
+		for p in self.cache:
+			p.compute()
+			if self.status:
+				self.status.configure(text='crunching #%d' % n)
+			n = n + 1
+
+		if self.status:
+			self.status.configure(text='%d (all) available' % n)
+		else:
+			sys.stderr.write('(all computed)\n')
 
 	def __repr__(self):
 		return '<PypeFile:%s (%d recs)>' % (self.fname, len(self.cache))
@@ -496,9 +531,30 @@ class PypeFile:
 			except EOFError:
 				label, rec = None, None
 			except ImportError:
-                # this is usually caused by pickling a data structure,
-                # see commens in fatal_unpickle_error()
-                fatal_unpickle_error()
+				# this is a fatal error!!!
+				exc_type, exc_value, exc_traceback = sys.exc_info()
+				sys.stderr.write('***************************************\n')
+				sys.stderr.write('Missing module required for unpickling:\n')
+				sys.stderr.write('  %s\n' % exc_value)
+				sys.stderr.write('***************************************\n')
+				sys.stderr.write('You must find the original module that is\n')
+				sys.stderr.write('and add it to your PYTHONPATH in order to\n')
+				sys.stderr.write('access this datafile.\n')
+				sys.stderr.write('***************************************\n')
+				sys.stderr.write('This almost certainly means that the \n')
+				sys.stderr.write('missing module imported Numeric.  If you\n')
+				sys.stderr.write('can not find the original module, make\n')
+				sys.stderr.write('a dummy file of the same name containing:\n')
+				sys.stderr.write('\n')
+				sys.stderr.write('from Numeric import * \n')
+				sys.stderr.write('\n')
+				sys.stderr.write('***************************************\n')
+				sys.stderr.write('Currently:\n')
+				sys.stderr.write(' PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
+				sys.stderr.write('***************************************\n')
+
+				sys.stderr.write(get_traceback())
+								 
 				sys.exit(1)
 
 			if label == None:
@@ -522,11 +578,14 @@ class PypeFile:
 							   parsed_trialtime=trialtime2,
 							   tracker_guess=tracker_guess,
 							   userparams=self.userparams,
-							   taskname=self.taskname)
+							   taskname=self.taskname,
+							   threaded=self.threaded)
 				trialtime = None
 				if not self.filter or (p.result == self.filter):
 					if cache:
+						if self._lock: self._lock.acquire()
 						self.cache.append(p)
+						if self._lock: self._lock.release()
 				return p
 			elif rec[0] == 'NOTE' and rec[1] == 'task_is':
 				self.taskname = rec[2]
@@ -560,28 +619,44 @@ class PypeFile:
 				#sys.stderr.write('stashed: <type=%s>\n' % label)
 				self.extradata.append(Note(rec))
 
-	def nth(self, n, free=1):
+	def nth(self, n):
 		"""Load or return (if cached) nth record."""
 
-        while len(self.cache) <= n:
-            if self._next() is None:
-                return None
-        rec = self.cache[n]
-        if free:
-            self.cache[n] = None
-        return rec
+		if self._lock:
+			while 1:
+				self._lock.acquire()
+				loading = self.loading
+				l = len(self.cache)
+				self._lock.release()
+				if l > n:
+					return self.cache[n]
+				elif not loading:
+					return None
+		else:
+			while len(self.cache) <= n:
+				if self._next() is None:
+					return None
+			return self.cache[n]
 
 
 	def freenth(self, n):
 		if n < len(self.cache):
-			self.cache[n] = None
+			self.cache[n] = 'freed'
 			
 	def last(self):
 		"""Get last record."""
-        while 1:
-            d = self._next()
-            if d is None: break
-        return (self.cache[-1], len(self.cache)-1)
+		if self._lock:
+			while 1:
+				self._lock.acquire()
+				loading = self.loading
+				self._lock.release()
+				if not loading: break
+			return (self.cache[-1], len(self.cache)-1)
+		else:
+			while 1:
+				d = self._next()
+				if d is None: break
+			return (self.cache[-1], len(self.cache)-1)
 
 def count_spikes(spike_times, start, stop):
 	n = 0
@@ -859,30 +934,6 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 
 	return fixations
 
-def fatal_unpickle_error():
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('Missing module required for unpickling:\n')
-        sys.stderr.write('  %s\n' % exc_value)
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('You must find the original module that is\n')
-        sys.stderr.write('and add it to your PYTHONPATH in order to\n')
-        sys.stderr.write('access this datafile.\n')
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('This almost certainly means that the \n')
-        sys.stderr.write('missing module imported Numeric.  If you\n')
-        sys.stderr.write('can not find the original module, make\n')
-        sys.stderr.write('a dummy file of the same name containing:\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('from Numeric import * \n')
-        sys.stderr.write('\n')
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('Currently:\n')
-        sys.stderr.write(' PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write(get_traceback())
-        
-								 
 def parseargs(argv, **kw):
 	newargv = []
 	newargv.append(argv[0])
