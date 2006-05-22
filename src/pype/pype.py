@@ -154,6 +154,11 @@ Mon May  1 11:10:29 2006 mazer
 - check permission on the config directory 1st thing when pype is
   fired up and exit if you don't have write access to save state.
   Again, this is really for shared config/pyperc dirs
+
+Mon May 22 10:24:25 2006 mazer
+
+- added train start button that writes to a "0000" datafile.
+
 """
 
 #####################################################################
@@ -562,6 +567,7 @@ class PypeApp:
 
 			console = book.add('console')
 			info = book.add('info')
+			tally = book.add('tally')
 			setables = book.add('eyeStuff')
 
 			cpane = Frame(f2, borderwidth=3, relief=GROOVE)
@@ -731,6 +737,12 @@ class PypeApp:
 			self.balloon.bind(self._startbut_tmp,
 							  "save data to temp file (ie, don't save)")
 
+			self._trainbut = Button(cpane, text="train",
+									command=self._train, fg='red')
+			self._trainbut.pack(expand=0, fill=X, side=TOP, pady=2)
+			self.balloon.bind(self._trainbut,
+							  "save data to training file (ie, unit#0000)")
+
 			if debug():
 				b = Button(cpane, text="synctest", command=self.synctest)
 				b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -779,6 +791,16 @@ class PypeApp:
 			# INFO CONSOLES ######################################3
 			self.console = Info(parent=console, height=40, width=55)
 			self.info = Info(parent=info, height=40, width=55)
+
+			# TALLY WINDOW ######################################3
+			self.tallyw = Label(tally, text='', anchor=W)
+			self.tallyw.pack(expand=0, fill=BOTH, side=TOP)
+			
+			b = Button(tally, text="clear tally",
+					   command=lambda s=self: s.tally(clear=1))
+			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
+			self.balloon.bind(b, "clear tally statistics")
+			self.tally(type=None)
 
 			# EYE COIL PARAMS ######################################3
 			f = Frame(setables, borderwidth=1, relief=GROOVE)
@@ -924,16 +946,8 @@ class PypeApp:
 			self._status.grid(row=1, column=0, columnspan=3, sticky=W+E)
 			self.balloon.bind(self._status, 'plain old status line')
 			
-			# tally
-			f = Frame(f2)
-			self.tallyw = Button(f2, text='', anchor=W,
-								 command=lambda s=self: s.tally(clear=1))
-			self.tallyw.grid(row=2, column=0, columnspan=3, sticky=W+E)
-			self.tally(clear=1)
-			self.balloon.bind(self.tallyw,
-							  'current tally correct/errors; click to clear')
-			
 			# history info
+			f = Frame(f2)
 			self._hist = Label(f2, text="", anchor=W)
 			self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
 			self._histstr = ""
@@ -1175,14 +1189,13 @@ class PypeApp:
 				self.tallycount[type] = self.tallycount[type] + 1
 			except KeyError:
 				self.tallycount[type] = 1
-		s = ''
+		s = '\n'
+		n = 0
 		for k in self.tallycount.keys():
-			if len(s) == 0:
-				s = 'Press to Clear: '
-			s = s + ' <%s=%d> ' % (k, self.tallycount[k])
-
-		if len(s) == 0:
-			s = '<no tally>'
+			s = s + '%s: %d\n' % (k, self.tallycount[k])
+			n = n + self.tallycount[k]
+			
+		s = s + '\ntotal: %d trials\n' % n
 		self.tallyw.configure(text=s)
 
 	def testad(self, n):
@@ -1492,6 +1505,7 @@ class PypeApp:
 			d['eye_xoff'] = self.eye_xoff
 			d['eye_yoff'] = self.eye_yoff
 			d['eye_tweak'] = self.eye_tweak
+			d['tallycount'] = self.tallycount
 
 			file = open(self._statefile(), 'w')
 			cPickle.dump(d, file)
@@ -1507,9 +1521,17 @@ class PypeApp:
 			file = open(self._statefile(), 'r')
 			d = cPickle.load(file)
 			file.close()
+			try:
+				self.tallycount = d['tallycount']
+				del d['tallycount']
+			except KeyError:
+				self.tallycount = {}
 			return d
 		except IOError:
 			return None
+
+			
+		
 
 	def trial_clear(self):
 		# runset stats
@@ -1555,9 +1577,11 @@ class PypeApp:
 		if self.startfn:
 			self._startbut.config(state=DISABLED)
 			self._startbut_tmp.config(state=DISABLED)
+			self._trainbut.config(state=DISABLED)
 		else:
 			self._startbut.config(state=NORMAL)
 			self._startbut_tmp.config(state=NORMAL)
+			self._trainbut.config(state=NORMAL)
 
 	def _start(self):
 		self._start_helper(temp=None)
@@ -1565,7 +1589,11 @@ class PypeApp:
 	def _starttmp(self):
 		self._start_helper(temp=1)
 
-	def _start_helper(self, temp):
+	def _train(self):
+		# change id #...
+		self._start_helper(temp=None, train=1)
+
+	def _start_helper(self, temp=None, train=None):
 		self._savestate()
 		
 		if self.startfn:
@@ -1580,13 +1608,14 @@ class PypeApp:
 						posix.unlink(fname)
 					self.record_selectfile(fname)
 				else:
-					if self.record_selectfile() is None:
+					if self.record_selectfile(train=train) is None:
 						sys.stderr.write('run aborted\n')
 						return
 						
 				if self.tk:
 					self._startbut.config(text='stop')
 					self._startbut_tmp.config(text='stop')
+					self._trainbut.config(text='stop')
 				self._allowabort = 1
 
 				self.console.clear()
@@ -1605,6 +1634,8 @@ class PypeApp:
 											  state=NORMAL)
 						self._startbut_tmp.config(text='tmp start',
 												  state=NORMAL)
+						self._trainbut.config(text='train',
+											  state=NORMAL)
 						self._loadmenu.enableall()
 					if self.psych:
 						self.fb.hide()					
@@ -1612,6 +1643,7 @@ class PypeApp:
 				if self.tk:
 					self._startbut.config(state=DISABLED)
 					self._startbut_tmp.config(state=DISABLED)
+					self._trainbut.config(state=DISABLED)
 				self.running = 0
 				self.udpy.eye_clear()
 		else:
@@ -2674,11 +2706,14 @@ class PypeApp:
 			labeled_dump('note', rec, f, 1)
 			f.close()
 
-	def _guess(self):
+	def _guess(self, train=None):
 		import glob
 		
 		subject = self.sub_common.queryv('subject')
-		cell = self.sub_common.queryv('cell')
+		if train:
+			cell = 0
+		else:
+			cell = self.sub_common.queryv('cell')
 
 		try:
 			pat = "%s%04d.*.[0-9][0-9][0-9]" % (subject, int(cell))
@@ -2709,7 +2744,7 @@ class PypeApp:
 		self._recfile()
 			
 
-	def record_selectfile(self, fname=None):
+	def record_selectfile(self, fname=None, train=None):
 		import posix
 		
 		if not fname is None:
@@ -2719,7 +2754,7 @@ class PypeApp:
 			while 1:
 				(file, mode) = SaveAs(initialdir=os.getcwd(),
 									  pattern='*.[0-9][0-9][0-9]*',
-									  initialfile=self._guess(),
+									  initialfile=self._guess(train=train),
 									  datafiles=1)
 				if file is None:
 					return None
@@ -3385,6 +3420,7 @@ def bounce(app):
 		app.led(0)
 		app._startbut.config(state=NORMAL)
 		app._startbut_tmp.config(state=NORMAL)
+		app._trainbut.config(state=NORMAL)
 		
 		app._candy = 0
 		app.udpy_note('')
@@ -3393,6 +3429,7 @@ def bounce(app):
 		app.led(1)
 		app._startbut.config(state=DISABLED)
 		app._startbut_tmp.config(state=DISABLED)
+		app._trainbut.config(state=DISABLED)
 
 		app._candy = 1
 		app.console.clear()
@@ -3451,6 +3488,7 @@ def slideshow(app):
 		app.led(0)
 		app._startbut.config(state=NORMAL)
 		app._startbut_tmp.config(state=NORMAL)
+		app._trainbut.config(state=NORMAL)
 		
 		app._candy = 0
 		app.udpy_note('')
@@ -3459,6 +3497,7 @@ def slideshow(app):
 		app.led(1)
 		app._startbut.config(state=DISABLED)
 		app._startbut_tmp.config(state=DISABLED)
+		app._trainbut.config(state=DISABLED)
 		
 		try:
 			f = open(pyperc('candy.lst'), 'r')
