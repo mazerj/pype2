@@ -159,6 +159,12 @@ Mon May 22 10:24:25 2006 mazer
 
 - added train start button that writes to a "0000" datafile.
 
+- added tally tab on notebook and started maintaining tallys
+  across sessions and on a per-task basis. You can clear
+  these with a button or programmatically using app.tally().
+  Note that a lot of tasks have a app.clear(clear=1) at the
+  start of each run, which will defeat this mechanism...
+
 """
 
 #####################################################################
@@ -793,13 +799,19 @@ class PypeApp:
 			self.info = Info(parent=info, height=40, width=55)
 
 			# TALLY WINDOW ######################################3
-			self.tallyw = Label(tally, text='', anchor=W)
+			self.tallyw = Label(tally, text='', anchor=W, justify=LEFT)
 			self.tallyw.pack(expand=0, fill=BOTH, side=TOP)
+			
+			b = Button(tally, text="clear task tally",
+					   command=lambda s=self: s.tally(cleartask=1))
+			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
+			self.balloon.bind(b, "clear tally statistics for this task")
 			
 			b = Button(tally, text="clear tally",
 					   command=lambda s=self: s.tally(clear=1))
 			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
 			self.balloon.bind(b, "clear tally statistics")
+			
 			self.tally(type=None)
 
 			# EYE COIL PARAMS ######################################3
@@ -841,7 +853,7 @@ class PypeApp:
 			self.balloon.bind(b, "shift offsets down (immediate effect)")
 
 			Label(setables,
-				  text='Control-<arrow keys> in Scope winodw shift eye pos',
+				  text='Control-<arrow keys> in Scope window shift eye pos',
 				  fg='blue').pack(expand=0, fill=X, side=TOP, pady=5)
 			
 			v = safeLookup(state, 'eye_tweak', 1)
@@ -854,7 +866,8 @@ class PypeApp:
 										  increment = 1,
 										  datatype = 'integer')
 			self._eye_tweak.pack(expand=0, side=TOP, pady=2, anchor=W)
-			self.balloon.bind(self._eye_tweak, "set size of shifts")
+			self.balloon.bind(self._eye_tweak, \
+							  "size of adjustment step (arrows and arrow keys")
 
 			v = safeLookup(state, 'eye_xgain', 1.0)
 			self._eye_xgain = Pmw.Counter(setables,
@@ -947,7 +960,6 @@ class PypeApp:
 			self.balloon.bind(self._status, 'plain old status line')
 			
 			# history info
-			f = Frame(f2)
 			self._hist = Label(f2, text="", anchor=W)
 			self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
 			self._histstr = ""
@@ -1181,21 +1193,55 @@ class PypeApp:
 	def ispaused(self):
 		return self.paused
 
-	def tally(self, type=None, clear=None):
+	def set_result(self, type):
+		# combination of self.tally() and self.history()
+		self.history(type[0])
+		self.tally(type=type)
+	
+	def tally(self, type=None, clear=None, cleartask=None):
+		ctask = self.task_name
 		if clear:
+			# clear everything
 			self.tallycount = {}
-		if type:
+		elif cleartask:
+			# just clear current task data
+			for (task,type) in self.tallycount.keys():
+				if ctask == task:
+					del self.tallycount[(task,type)]
+		elif type:
+			# add new data to current task stats
 			try:
-				self.tallycount[type] = self.tallycount[type] + 1
+				self.tallycount[ctask,type] = self.tallycount[ctask,type] + 1
 			except KeyError:
-				self.tallycount[type] = 1
-		s = '\n'
-		n = 0
-		for k in self.tallycount.keys():
-			s = s + '%s: %d\n' % (k, self.tallycount[k])
-			n = n + self.tallycount[k]
-			
-		s = s + '\ntotal: %d trials\n' % n
+				self.tallycount[ctask,type] = 1
+			try:
+				del self.tally_recent[0]; self.tally_recent.append(type)
+			except AttributeError:
+				self.tally_recent = [''] * 5
+				
+		ks = self.tallycount.keys()
+		ks.sort()
+		
+		(ntot, s) = (0, '')
+		for (task,type) in self.tallycount.keys():
+			d = string.split(type)
+			if len(d) > 1:
+				d = "%s (%s)" % (d[0], string.join(d[1:]))
+			else:
+				d = d[0]
+			s = s + '%s %s: %d\n' % (task, d, self.tallycount[(task,type)])
+			ntot = ntot + self.tallycount[(task,type)]
+		s = s + '\ntotal: %d trials\n\n' % ntot
+
+		try:
+			N = len(self.tally_recent)
+			for n in range(N):
+				if n == 0:
+					s = s + 'History\n'
+				s = s + '%d: %s\n' % (-(N-n), self.tally_recent[n])
+		except AttributeError:
+			pass
+		
 		self.tallyw.configure(text=s)
 
 	def testad(self, n):
@@ -1529,9 +1575,6 @@ class PypeApp:
 			return d
 		except IOError:
 			return None
-
-			
-		
 
 	def trial_clear(self):
 		# runset stats

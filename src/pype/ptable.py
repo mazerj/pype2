@@ -376,7 +376,10 @@ def is_iparam(s, evaluate=None):
 		x = 0
 		r = INVALID
 	if evaluate:
-		return (r, int(round(x)))
+		try:
+			return (r, int(round(x)))
+		except TypeError:
+			return (INVALID, 0)
 	return r
 
 def is_cdf(s, evaluate=None):
