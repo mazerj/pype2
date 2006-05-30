@@ -86,19 +86,25 @@ if ~exist('extradata', 'var')
   extradata = [];
 end
 
-if isempty(rec)
-  fprintf('No (new) data.\n');
-else
-  fprintf('%d new trials\n', length(rec));
-  pf.rec = rec;
-end
-pf.extradata = extradata;
-pf.src = cannonicalfname(pypefile);
 
-% merge in the old data for return 
-if ~isempty(oldpf)
-  for n = 1:length(oldpf.rec)
-    pf.rec(n) = oldpf.rec(n);
+if isempty(oldpf)
+  fprintf('Converted %d trials.\n', length(rec));
+  pf.extradata = extradata;
+  pf.src = cannonicalfname(pypefile);
+  pf.rec = rec;
+elseif isempty(rec)
+  fprintf('No new data converted.\n');
+  pf = oldpf;
+else
+  fprintf('Converted %d new trials.\n', length(rec) - length(oldpf.rec));
+  pf.extradata = extradata;
+  pf.src = cannonicalfname(pypefile);
+  pf.rec = rec;
+  % merge in the old data for return 
+  if ~isempty(oldpf)
+    for n = 1:length(oldpf.rec)
+      pf.rec(n) = oldpf.rec(n);
+    end
   end
 end
 

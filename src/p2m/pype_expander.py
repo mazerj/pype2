@@ -22,7 +22,6 @@ Sun May 21 13:44:57 2006 mazer
   file to the end. This is for appending new data...
   
 """
-
 import sys, types, string
 from Numeric import *
 from pype import *

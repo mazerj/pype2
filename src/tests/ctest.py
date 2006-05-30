@@ -13,8 +13,7 @@ from pygame.constants import *
 from spritetools import *
 from psycho import *
 
-fb = PsychoFrameBuffer(None, 256, 256, 32, dga=None, gamma=1.0,
-                       flags=DOUBLEBUF|HWSURFACE)
+fb = quickinit(":0.0", 256, 256, 32, flags=DOUBLEBUF|HWSURFACE)
 keyboard()
 
 fb.close()

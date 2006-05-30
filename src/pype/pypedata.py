@@ -517,7 +517,7 @@ class PypeFile:
 				try:
 					xxx=tracker_guess
 				except UnboundLocalError:
-					tracker_guess = 'nd'
+					tracker_guess = ('unknown', -1, -1)
 				p = PypeRecord(rec, trialtime=trialtime,
 							   parsed_trialtime=trialtime2,
 							   tracker_guess=tracker_guess,

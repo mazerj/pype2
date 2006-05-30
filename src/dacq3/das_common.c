@@ -44,6 +44,10 @@
 **   loop for das_common, so all XXX_server's will be able to
 **   talk to the iscan without competition from a separate
 **   process.
+**
+** Thu May 25 11:40:58 2006 mazer 
+**   changed z from int to float in mainloop() to avoid overflow
+**   errors on (x*x)+(y*y) with ISCAN...
 */
 
 #include <unistd.h>
@@ -376,8 +380,8 @@ static void resched(int rt)
 
 static void mainloop(void)
 {
-  register int i, z, lastpri, setpri;
-  register float x, y, pa, tmp, calx, caly;
+  register int i, lastpri, setpri;
+  register float x, y, z, pa, tmp, calx, caly;
   float tx, ty, tp;
   unsigned long last_ts = 0, ts;
   unsigned int eyelink_t;
