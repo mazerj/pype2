@@ -10,11 +10,15 @@ function pf = p2m(pypefile, oldpf)
 %    pypefile = string containing name (full path) of original pype
 %		data file.
 %
+%    oldpf = previously extracted PF structure or name of p2m file.
+%            data in pypefile will be converted, extracted and tacked
+%            on at the end of oldpf and returned as pf
+%
 %  OUTPUT
-%    PF = moderately complicated data structure containing all the data.
-%      PF.rec contains entry for each trial
-%      PF.extradata contains the "extradata" info
-%      PF.src name of file data originated from
+%    pf = moderately complicated data structure containing all the data.
+%      pf.rec contains entry for each trial
+%      pf.extradata contains the "extradata" info
+%      pf.src name of file data originated from
 %
 % Sun Feb 16 17:38:17 2003 mazer 
 %

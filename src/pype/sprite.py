@@ -299,9 +299,12 @@ class FrameBuffer:
 			self.fb_dpy = dpy
 			
 		self.driver = os.environ['SDL_VIDEODRIVER']
-		os.environ['DISPLAY'] = self.fb_dpy
-		
-		pygame.init()
+
+		try:
+			os.environ['DISPLAY'] = self.fb_dpy
+			pygame.init()
+		finally:
+			os.environ['DISPLAY'] = self.gui_dpy
 		
 		if width is None or height is None:
 			modes = pygame.display.list_modes(bpp, flags)
@@ -2046,14 +2049,35 @@ class Sprite(_ImageBase):
 	####################
 
 	def save(self, fname, mode='w'):
-		"""DO NOT USE
-		"""
-		raise PygameIncompleteError, 'save as ppm not available'
+		# use pygame's save function to write image to file (PNG, JPG)
+		return pygame.image.save(self.im, fname)
 
 	def save_alpha(self, fname, mode='w'):
 		"""DO NOT USE
 		"""
-		raise PygameIncompleteError, 'save_salpha not available'
+		raise PygameIncompleteError, 'save_alpha not available'
+
+	def save_ppm(self, fname, mode='w'):
+		try:
+			file = open(fname, mode)
+			file.write('P6\n# pype save_ppm\n%d %d\n255\n' % (self.w, self.h))
+			file.write(pygame.image.tostring(self.im, 'RGB'))
+			file.close()
+		except IOError:
+			sys.stderr.write("Can't write %s.\n" % fname)
+			return None
+
+	def save_alpha_pgm(self, fname, mode='w'):
+		try:
+			file = open(fname, mode)
+			file.write('P5\n# pype save_ppm\n%d %d\n255\n' % (self.w, self.h))
+			a = self.alpha[:]
+			file.write(a.tostring())
+			file.close()
+		except IOError:
+			sys.stderr.write("Can't write %s.\n" % fname)
+			return None
+
 
 	def fix(self, w, h, color, x=None, y=None):
 		"""DO NOT USE

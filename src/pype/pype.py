@@ -317,7 +317,7 @@ class PypeApp:
 			self.config.set('SDLDPY', os.environ['DISPLAY'], override=None)
 		else:
 			self.config.set('SDLDPY', ':0.1',                override=None)
-			os.environ['DISPLAY']=self.config.get('SDLDPY')
+			#os.environ['DISPLAY']=self.config.get('SDLDPY')
 
 		# NB DGA is now obsolete; use VIDEODRIVER instead
 		# willmore 13-jun-2005
@@ -1283,6 +1283,7 @@ class PypeApp:
 		self.add_tasks(menubar, 'cwd', '.')
 		
 		try:
+			# these were added to the search path in pyperun...
 			dirs = os.environ['PYPETASKPATH'].split(':')
 			for d in dirs:
 				self.add_tasks(menubar, posixpath.basename(d), d)
@@ -2056,7 +2057,7 @@ class PypeApp:
 		else:
 			raise GuiOnlyFunction, "dropvar"
 
-	def reward(self, multiplier=1.0, dobeep=1):
+	def reward(self, multiplier=1.0, dobeep=1, ms=None):
 		"""
 		Deliver a squirt of juice based on the dropsize slider and
 		the current state of the reward schedule settings
@@ -2069,9 +2070,13 @@ class PypeApp:
 		# becasue the distribution is normal, very small and very
 		# large numbers can (rarely) come up, so you MUST clip the
 		# distribution to avoid pype locking up in app.__reward2()...
-		
-		ms = int(round(multiplier * float(self.dropsize())))
-		var = self.dropvar()
+
+		if ms is None:
+			ms = int(round(multiplier * float(self.dropsize())))
+			var = self.dropvar()
+		else:
+			# user specified ms, no variance
+			var = 0
 		
 		if ms == 0:
 			return
@@ -3673,6 +3678,17 @@ def get_plexon_events(plex, fc=40000):
 					
 	return events
 
+class SayOnce:
+	"""
+	Simple warning that keeps track of previous messages so that messages
+	will only get printed once.
+	"""
+	msgs = {}
+	def __init__(self, msg):
+		if not SayOnce.msgs.has_key(msg):
+			SayOnce.msgs[msg] = 1
+			sys.stderr.write(msg)
+			
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

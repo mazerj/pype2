@@ -94,6 +94,11 @@ pd = os.environ['PYPEDIR']+'/'
 for d in ['.', pd+'Tasks', pd+'lib', pd+'Modules']:
     pathprefix(d)
 
+# PREFIX specific user-defined paths that can contain. PYPEPATH should
+# be a standard colon-delimted set of paths to search
+if os.environ.has_key('PYPETASKPATH'):
+    for d in string.split(os.environ['PYPETASKPATH'], ':')[::-1]:
+        pathprefix(d)
 
 # Fri Dec 13 17:12:22 2002 mazer
 #  -- add $PYPEDIR/lib onto LD_LIBRARY_PATH
