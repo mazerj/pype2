@@ -1991,8 +1991,8 @@ class Sprite(_ImageBase):
 		**NOT** affect the parent!
 		"""
 		if center:
-			x = self.X(x) + (w/2)
-			y = self.Y(y) + (h/2)
+			x = self.X(x) - (w/2)
+			y = self.Y(y) - (h/2)
 		s = Sprite(image=self.im.subsurface((x, y, w, h)))
 		s.x = self.x 
 		s.y = self.y 
@@ -2109,8 +2109,8 @@ class Sprite(_ImageBase):
 		This is the subimage method from the original Image class.
 		"""
 		if center:
-			x = self.X(x) + (w/2)
-			y = self.Y(y) + (h/2)
+			x = self.X(x) + (w/2) # this should be -
+			y = self.Y(y) + (h/2) # this should be -
 		return Image(image=self.im.subsurface((x, y, w, h)))
 	
 class MpegMovie(_ImageBase):

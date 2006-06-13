@@ -85,6 +85,10 @@ install: dummy_server \
 	#cp libeyelinkcore.so $(PYPEDIR)/lib
 	if [ -x comedi_server ]; then cp comedi_server $(PYPEDIR)/bin; fi;
 
+# test program for comedi drivers
+comedi_test:
+	cc -o comedi_test comedi_test.c -lcomedi
+
 #############################################################
 
 
