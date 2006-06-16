@@ -410,6 +410,10 @@ class PypeApp:
 
 		if gui:
 			state = self._readstate()
+			if state is None:
+				# no state file -- make sure tallycount's initialized..
+				self.tallycount = {}
+				
 
 		self.psych = psych
 		self.terminate = 0
@@ -1531,7 +1535,17 @@ class PypeApp:
 		hostname = gethostname()
 		fname = subjectrc('pypestate.%s' % hostname)
 		if accesscheck:
-			if os.access(fname, os.W_OK):
+			if not posixpath.exists(fname):
+				# statefile doesn't exist, make sure we can write it
+				# when we exit later..
+				try:
+					# open/close for write, then delete..
+					open(fname, 'w').close()
+					os.unlink(fname)
+					return (fname, 1)
+				except IOError:
+					return (fname, 0)
+			elif os.access(fname, os.W_OK):
 				return (fname, 1)
 			else:
 				return (fname, 0)
