@@ -1224,11 +1224,14 @@ class Sprite(_ImageBase):
 			self.name = "file:%s" % fname
 		else:
 			self.name = "#%d" % Sprite.__id__
+
+		# do not mess with _id!!!
+		self._id = Sprite.__id__
 		Sprite.__id__ = Sprite.__id__ + 1
 		
 		# add sprite to list of sprites (this also acts as a count,
 		# since deleted sprites get deleted from the list too).
-		Sprite.__list__.append(self.name)
+		Sprite.__list__.append(self._id)
 
 		self._array = _SurfArrayAccess(im=self.im, 
 									   get=pygame.surfarray.array3d,
@@ -1245,7 +1248,7 @@ class Sprite(_ImageBase):
 		list of sprites to facilitate detection of un-garbage
 		collected sprites
 		"""
-		Sprite.__list__.remove(self.name)
+		Sprite.__list__.remove(self._id)
 
 	def __repr__(self):
 		"""INTERNAL
@@ -2014,7 +2017,7 @@ class Sprite(_ImageBase):
 		function COPIES the image data. Changes to the clone will
 		**NOT** affect the parent!
 		"""
-		name = "Clone of %s" % self.name
+		name = self.name
 		s = Sprite(image=self.im.subsurface((0, 0, self.w, self.h)),
 				   name = name)
 		s.iw = self.iw

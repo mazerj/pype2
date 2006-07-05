@@ -13,6 +13,7 @@ for task worksheets.
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
+
 """
 
 from Tkinter import *
@@ -416,6 +417,42 @@ def is_cdf(s, evaluate=None):
 		except:
 			val = 0
 			r = INVALID
+	if evaluate:
+		return (r, val)
+	return r
+
+def _do_not_use_is_list(s, evaluate=None):
+	"""
+	entry must be a list/vector
+	"""
+
+	val = None
+	try:
+		val = eval(s)
+		if type(val) == types.ListType:
+			r = VALID
+	except:
+		pass
+
+	print val
+
+	if val is None:
+			if s[0] == '=':
+				x = map(int, string.split(s[1:], ':'))
+				inc = 1
+			else:
+				x = map(int, string.split(s, ':'))
+				inc = 0
+			if len(x) == 2:
+				stride = 1
+			else:
+				stride = x(3)
+			r = VALID
+			if inc:
+				val = range(x(1), x(2)+stride, stride)
+			else:
+				val = range(x(1), x(2), stride)
+			
 	if evaluate:
 		return (r, val)
 	return r

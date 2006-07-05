@@ -18,6 +18,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 - Sun Nov  6 13:06:34 2005 mazer
 
  - added stat:stop:step slice syntax to param_expand
+
+- Wed Jul  5 16:16:19 2006 mazer
+
+ - added =start:stop:step for inclusive ranges
 """
 
 import random, sys, time, posixpath
@@ -320,6 +324,12 @@ def param_expand(s, integer=None):
 	  - N[mu,sigma] -- normal dist'd num with mean=mu, var=sigma
 	  
 	  - U[min,max] -- uniform dist'd num between min and max
+
+	  - start:step[:stride] -- generate non-inclusive range (python style) and
+	    pick one at random; default stride is 1
+
+	  - =start:step[:stride] -- generate inclusive range (matlab style) and
+	    pick one at random; default stride is 1
 	  
 	  - X -- just X..
 	  
@@ -358,14 +368,22 @@ def param_expand(s, integer=None):
 	# if 'slice' syntax is used, generate the slice using range
 	# and pick one element randomly. e.g., '1:10:2' would pick
 	# 1, 3, 5, 7 or 9 with equal prob.
-	l = string.split(s, ':')
+	if s[0] == '=':
+		inc = 1
+		l = string.split(s[1:], ':')
+	else:
+		inc = 0
+		l = string.split(s, ':')
 	if len(l) > 1:
 		if len(l) == 3:
 			start, stop, step = map(int, l)
 		elif len(l) == 2:
 			start, stop = map(int, l)
 			step = 1
-		l = range(start, stop, step)
+		if inc:
+			l = range(start, stop+step, step)
+		else:
+			l = range(start, stop, step)
 		return l[pick_one(l)]
 			
 	l = re.split('\+\-', s)
