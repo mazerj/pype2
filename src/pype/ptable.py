@@ -421,38 +421,46 @@ def is_cdf(s, evaluate=None):
 		return (r, val)
 	return r
 
-def _do_not_use_is_list(s, evaluate=None):
+def is_list(s, evaluate=None):
 	"""
 	entry must be a list/vector
 	"""
 
-	val = None
+	try:
+		v = string.split(s, ':')
+		if len(v) > 1:
+			if s[0] == '=':
+				inc = 1
+				v = map(int, string.split(s[1:], ':'))
+			else:
+				v = map(int, string.split(s, ':'))
+				inc = 0
+			if len(v) < 3:
+				stride = 1
+			else:
+				stride = v[2]
+				
+			r = VALID
+			if inc:
+				val = range(v[0], v[1]+1, stride);
+			else:
+				val = range(v[0], v[1], stride);
+				
+			if evaluate:
+				return (r, val)
+			return r
+	except ValueError:
+		pass
+		
+
 	try:
 		val = eval(s)
 		if type(val) == types.ListType:
 			r = VALID
 	except:
-		pass
+		r = INVALID
+		val = []
 
-	print val
-
-	if val is None:
-			if s[0] == '=':
-				x = map(int, string.split(s[1:], ':'))
-				inc = 1
-			else:
-				x = map(int, string.split(s, ':'))
-				inc = 0
-			if len(x) == 2:
-				stride = 1
-			else:
-				stride = x(3)
-			r = VALID
-			if inc:
-				val = range(x(1), x(2)+stride, stride)
-			else:
-				val = range(x(1), x(2), stride)
-			
 	if evaluate:
 		return (r, val)
 	return r

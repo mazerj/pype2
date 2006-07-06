@@ -381,7 +381,7 @@ def param_expand(s, integer=None):
 			start, stop = map(int, l)
 			step = 1
 		if inc:
-			l = range(start, stop+step, step)
+			l = range(start, stop+1, step)
 		else:
 			l = range(start, stop, step)
 		return l[pick_one(l)]
