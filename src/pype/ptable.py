@@ -449,7 +449,7 @@ def is_list(s, evaluate=None):
 			if evaluate:
 				return (r, val)
 			return r
-	except ValueError:
+	except:
 		pass
 		
 
@@ -457,12 +457,16 @@ def is_list(s, evaluate=None):
 		val = eval(s)
 		if type(val) == types.ListType:
 			r = VALID
+		else:
+			r = INVALID
+			val = []
 	except:
 		r = INVALID
 		val = []
 
 	if evaluate:
 		return (r, val)
+	
 	return r
 
 def _unpack_slot(slot):
@@ -776,11 +780,11 @@ if __name__ == '__main__':
 	exitButton.pack(side = 'bottom')
 	p = ParamTable(root,
 				   (('a', '500+-10%', is_param),
+				    ('l', '', is_list),
 					('b', '3', None),
 					('choice', 1, ('yes', 'no')),
 					('c', '4', None)), file='foobar')
 	p.load('foobar')
-	pype.keyboard()
 	root.mainloop()
 else:
 	try:
