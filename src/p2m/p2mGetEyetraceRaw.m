@@ -1,8 +1,11 @@
-function [t, x, y, dx, dy, d, v, a, p] = p2mGetEyetraceRaw(pf, recno, ...
-						  ns, sigma, tinterp, ...
-						  primary)
-%function [t, x, y, dx, dy, d, v, a, p] = p2mGetEyetraceRaw(pf, recno,
-%						ns, sigma, tinterp, primary)
+function [t, x, y, dx, dy, ...
+	  d, v, a, p] = p2mGetEyetraceRaw(pf, recno, ...
+					  ns, sigma, tinterp, ...
+					  primary)
+%function [t, x, y, dx, dy,
+%	  d, v, a, p] = p2mGetEyetraceRaw(pf, recno, ...
+%					  ns, sigma, tinterp, ...
+%					  primary)
 %
 %  Extract and cleanup eyetrace record from p2m data structure.
 %
@@ -11,7 +14,10 @@ function [t, x, y, dx, dy, d, v, a, p] = p2mGetEyetraceRaw(pf, recno, ...
 %    recno = record number (starting at 1)
 %    (optional) ns = half-length of smoothing filter
 %    (optional) sigma = std of Gaussian used for smoothing
-%    (optional) primary = 1->use eyex/y data, 0-> use c0/c1 datastream
+%    (optional) primary = type of RAW data to return:
+%		 1: use eyex/y data as recorded
+%		-1: use uncorrected (remove gain and offset) recorded eyepos
+%		 0: use c0/c1 alternate datastream
 %
 %  OUTPUT
 %    t = time vector (in secs)
@@ -25,7 +31,13 @@ function [t, x, y, dx, dy, d, v, a, p] = p2mGetEyetraceRaw(pf, recno, ...
 %    a = acceleration profile (in AD ticksdeg/s/s)
 %    p = pupil area, if available (in pixels)
 %
-%Thu Jul  3 13:38:39 2003 mazer 
+% Thu Jul  3 13:38:39 2003 mazer 
+%   created
+%
+% Wed Aug  2 10:28:18 2006 mazer 
+%   added primary=-1 to get back uncorrected tracker data (typically
+%   the raw values from the eyelink).
+% 
 
 pf=p2mLoad(pf);
 
@@ -74,16 +86,23 @@ else
   tstep = median(z);
 end
 
-if primary
+if primary > 0
   x = pf.rec(recno).eyex;
   y = pf.rec(recno).eyey;
+  p = pf.rec(recno).eyep;
+elseif primary < 0
+  % if primary is -1, then convert back to raw data from the tracker
+  x = (pf.rec(recno).eyex + pf.rec(recno).params.INTeye_xoff) ./ ...
+      pf.rec(recno).params.INTeye_xgain;
+  y = (pf.rec(recno).eyey + pf.rec(recno).params.INTeye_yoff) ./ ...
+      pf.rec(recno).params.INTeye_ygain;
   p = pf.rec(recno).eyep;
 else
   x = pf.rec(recno).c0;
   y = pf.rec(recno).c1;
   p = pf.rec(recno).c4;
 end
-  
+
 [ut, ix, jx] = unique(t);
 if size(t,2) ~= size(ut,2)
   % duplicate t values in the dataset .. clean them up by just
