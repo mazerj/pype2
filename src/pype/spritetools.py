@@ -26,6 +26,11 @@ Tue Mar  7 09:28:03 2006 mazer
   real problem is that these functions have been broken from the
   very beginning, but handmap.py and spotmap.py (which uses the
   sprite rotate method) have corrected for this.
+
+Tue Aug  8 14:04:36 2006 mazer
+  added alphabar() function -- generates a bar stimulus from a sprite
+  by filling the sprite with the specified color and then setting the
+  alpha channel to let the specified bar stimulus show through.
 """
 
 import math
@@ -122,6 +127,18 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	i = 127.0 * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
     s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
                            axes=[1,2,0])
+
+def alphabar(s, bw, bh, ori_deg, color):
+	"""Generate a bar in an existing sprite using the alpha channel"""
+	
+	r = sprite.genrad(s.w, s.h)
+	t = sprite.gentheta(s.w, s.h) + (pi * ori_deg / 180.0)
+	x = r * cos(t)
+	y = r * sin(t)
+	s.fill(color)
+	mask = where(less(abs(x), (bw/2.0)) * less(abs(y), (bh/2.0)), 255.0, 0.0)
+	s.alpha[:] = mask[:].astype(UnsignedInt8)
+	
 
 def alphaGaussian(s, sigma):
     """
