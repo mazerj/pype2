@@ -31,6 +31,10 @@ Tue Aug  8 14:04:36 2006 mazer
   added alphabar() function -- generates a bar stimulus from a sprite
   by filling the sprite with the specified color and then setting the
   alpha channel to let the specified bar stimulus show through.
+
+Wed Aug  9 13:15:34 2006 mazer
+  Added _unpack_rgb() to make all the stimulus generators use a common
+  color specification. And documented all the grating generators.
 """
 
 import math
@@ -46,6 +50,20 @@ import sprite
 # using the old versions..
 ##########################################################################
 
+def _unpack_rgb(R, G, B):
+	# if R is a 3-tuple, assume it's a standard pype color spec (0-255)
+	# and convert to grating RGB (0-1) values. This one's for Jon T.
+
+
+	try:
+		R, G, B = array(R)/255.0
+	except TypeError:
+		pass
+	except ValueError:
+		pass
+
+	return R, G, B
+    
 def g2rgb(a):
 	"""
 	Covert a single plane (grayscale: shape=(W, H)) numeric array
@@ -73,7 +91,22 @@ def pixelize(a, rgb=None, norm=1):
         return g2rgb(a)
 
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
-    """Note: frequency are in cycles/sprite"""
+    """
+	2D sine grating generator (odd symmetric)
+	
+	INPUT
+		s = Sprite object
+		frequency = frequency in cycles/sprite
+		phase_deg = phase in degrees
+		ori_deg = grating orientation in degrees
+		R = red channel value (0-1) or standard pype RGB color triple
+		G = green channel value (0-1)
+		B = blue channel value (0-1)
+	
+	OUTPUT
+		None.
+	"""
+	R, G, B = _unpack_rgb(R, G, B)
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
     t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
 	x, y = (r * cos(t), r * sin(t))
@@ -83,7 +116,22 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
                            axes=[1,2,0])
 
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
-    """Note: frequency are in cycles/sprite"""
+    """
+	2D cosine grating generator (even symmetric)
+	
+	INPUT
+		s = Sprite object
+		frequency = frequency in cycles/sprite
+		phase_deg = phase in degrees
+		ori_deg = grating orientation in degrees
+		R = red channel value (0-1) or standard pype RGB color triple
+		G = green channel value (0-1)
+		B = blue channel value (0-1)
+	
+	OUTPUT
+		None.
+	"""
+	R, G, B = _unpack_rgb(R, G, B)
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
     t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
@@ -94,7 +142,23 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 
 def polargrat(s, cfreq, rfreq, phase_deg, polarity, 
              R=1.0, G=1.0, B=1.0, logpolar=0):
-	"""Note: frequencies are in cycles/sprite or cycles/360deg"""
+	"""
+	2D polar (non-Cartesian) grating generator
+	
+	INPUT
+		s = Sprite object
+		cfreq = concentric frequency (cycles/sprite)
+		rfreq = concentric frequency (cycles/360deg)
+		phase_deg = phase in degrees
+		polarity = 0 or 1 -> really just a 180 deg phase shift
+		R = red channel value (0-1) or standard pype RGB color triple
+		G = green channel value (0-1)
+		B = blue channel value (0-1)
+	
+	OUTPUT
+		None.
+	"""
+	R, G, B = _unpack_rgb(R, G, B)
     if polarity < 0:
         polarity = -1.0
     else:
@@ -111,14 +175,49 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 
 def logpolargrat(s, cfreq, rfreq, phase_deg, polarity, 
                  R=1.0, G=1.0, B=1.0):
-	"""Note: frequencies are in cycles/sprite or cycles/360deg"""
+	"""
+	2D log polar (non-Cartesian) grating generator
+	
+	INPUT
+		s = Sprite object
+		cfreq = concentric frequency (cycles/sprite)
+		rfreq = concentric frequency (cycles/360deg)
+		phase_deg = phase in degrees
+		polarity = 0 or 1 -> really just a 180 deg phase shift
+		R = red channel value (0-1) or standard pype RGB color triple
+		G = green channel value (0-1)
+		B = blue channel value (0-1)
+	
+	OUTPUT
+		None.
+		
+	Note: frequencies are in cycles/sprite or cycles/360deg
+	"""
     polargrat(s, cfreq, rfreq, phase_deg, polarity, 
-             R=1.0, G=1.0, B=1.0, logpolar=1)
-    
-    
+             R=R, G=G, B=B, logpolar=1)
+
 def hypergrat(s, freq, phase_deg, ori_deg,
               R=1.0, G=1.0, B=1.0):
-	"""Note: frequencies are in cycles/sprite or cycles/360deg"""
+	"""
+	2D hyperbolic (non-Cartesian) grating generator
+	
+	INPUT
+		s = Sprite object
+		freq = frequency (cycles/sprite)
+		phase_deg = phase in degrees
+		ori_deg = orientation in degrees
+		polarity = 0 or 1 -> really just a 180 deg phase shift
+		R = red channel value (0-1) or standard pype RGB color triple
+		G = green channel value (0-1)
+		B = blue channel value (0-1)
+	
+	OUTPUT
+		None.
+
+	Note: frequencies are in cycles/sprite or cycles/360deg
+	"""
+
+	R, G, B = _unpack_rgb(R, G, B)
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
     t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
@@ -128,15 +227,31 @@ def hypergrat(s, freq, phase_deg, ori_deg,
     s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
                            axes=[1,2,0])
 
-def alphabar(s, bw, bh, ori_deg, color):
-	"""Generate a bar in an existing sprite using the alpha channel"""
+def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
+	"""
+	Generate a bar stimulus in an existing sprite using the alpha channel.
+
+	This fills the sprite with 'color' and then puts a [bw x bh] transparent
+	bar of the specified orientation in the alpha channel.
+
+	INPUT
+		s = Sprite()
+		bw,bh = bar width and height in pixels
+		ori_deg = bar orientation in degrees
+		R = standard color triple (0-255) or R channel value (0-1)
+		G = optional G channel value
+		B = optional B channel value
 	
+	OUTPUT
+		None.
+	"""
+	R, G, B = (array(_unpack_rgb(R, G, B)) * 255.0).astype(Int)
 	r = sprite.genrad(s.w, s.h)
 	t = sprite.gentheta(s.w, s.h) + (pi * ori_deg / 180.0)
 	x = r * cos(t)
 	y = r * sin(t)
-	s.fill(color)
-	mask = where(less(abs(x), (bw/2.0)) * less(abs(y), (bh/2.0)), 255.0, 0.0)
+	s.fill((R,G,B))
+	mask = where(less(abs(x), (bw/2.0)) * less(abs(y), (bh/2.0)), 255, 0)
 	s.alpha[:] = mask[:].astype(UnsignedInt8)
 	
 
