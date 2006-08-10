@@ -13,7 +13,7 @@ from pygame.constants import *
 from spritetools import *
 from psycho import *
 
-fb = quickinit(":0.0", 256, 256, 32, flags=DOUBLEBUF|HWSURFACE)
+fb = quickinit(":0.0", 512, 512, 32, flags=DOUBLEBUF|HWSURFACE)
 keyboard()
 
 fb.close()
