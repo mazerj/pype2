@@ -1,5 +1,5 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
+# $Id: sprite.py 186 2006-07-05 20:40:24Z mazer $
 
 """Pygame based sprite engine.
 
@@ -1190,7 +1190,7 @@ class Sprite(_ImageBase):
 		## why did I do this in the first place????? 11/29/2001 JM
 
 		## should just be this:
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.alpha = pygame.surfarray.pixels_alpha(self.im)
 
 		# Tue Jan 31 11:34:47 2006 mazer 
 		# starting with pygame-1.6.2 pixels_alpha() pixel3d() cause
@@ -1201,7 +1201,7 @@ class Sprite(_ImageBase):
 		
 
 		# generate array referencing the surface
-		self.old_array = pygame.surfarray.pixels3d(self.im)
+		self.array = pygame.surfarray.pixels3d(self.im)
 
 		# Tue Jan 31 11:35:27 2006 mazer
 		# see above comment re:surface locking
@@ -1233,10 +1233,10 @@ class Sprite(_ImageBase):
 		# since deleted sprites get deleted from the list too).
 		Sprite.__list__.append(self._id)
 
-		self.array = _SurfArrayAccess(im=self.im, 
+		self._array = _SurfArrayAccess(im=self.im, 
 									   get=pygame.surfarray.array3d,
 									   set=pygame.surfarray.pixels3d)
-		self.alpha = _SurfArrayAccess(im=self.im,
+		self._alpha = _SurfArrayAccess(im=self.im,
 									   get=pygame.surfarray.array_alpha,
 									   set=pygame.surfarray.pixels_alpha)
 		
@@ -1387,10 +1387,10 @@ class Sprite(_ImageBase):
 		from RandomArray import uniform
 		
 		if thresh is None:
-			n = uniform(1, 255, shape=shape(self.alpha[:]))
+			n = uniform(1, 255, shape=shape(self.alpha))
 		else:
-			n = where(greater(uniform(0, 1, shape=shape(self.alpha[:])),
-							  thresh), 255, 1)
+			n = where(greater(uniform(0, 1, shape=shape(self.alpha)), thresh),
+					  255, 1)
 		self.array[:] = transpose(array([n, n, n]),
 								  axes=[1,2,0]).astype(UnsignedInt8)[:]
 
@@ -1569,10 +1569,10 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		###self.im.unlock()
-		###self.array = pygame.surfarray.pixels3d(self.im)
-		###self.im.unlock()
+		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.unlock()
+		self.array = pygame.surfarray.pixels3d(self.im)
+		self.im.unlock()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
 		self.rotate(-angle, preserve_size=preserve_size, trim=trim)
@@ -1619,10 +1619,10 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		###self.im.unlock()
-		###self.array = pygame.surfarray.pixels3d(self.im)
-		###self.im.unlock()
+		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.unlock()
+		self.array = pygame.surfarray.pixels3d(self.im)
+		self.im.unlock()
 		
 	def scale(self, new_width, new_height):
 		"""Resize this sprite (fast).
@@ -1652,13 +1652,13 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		###self.im.unlock()
-		#### Wed Nov 23 14:50:34 2005 mazer 
-		#### these need to be new too; I forgot and only regenerated
-		#### the alpha channel.
-		###self.array = pygame.surfarray.pixels3d(self.im)
-		###self.im.unlock()
+		self.alpha = pygame.surfarray.pixels_alpha(self.im)
+		self.im.unlock()
+		# Wed Nov 23 14:50:34 2005 mazer 
+		# these need to be new too; I forgot and only regenerated
+		# the alpha channel.
+		self.array = pygame.surfarray.pixels3d(self.im)
+		self.im.unlock()
 		
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
