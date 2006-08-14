@@ -14,6 +14,12 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
+Mon Aug 14 13:46:27 2006 mazer
+  - Added field locking buttons ('X' to left of entry fields) to let
+    user lock individual entries to avoid accidental changes.. For
+	Jon Touryan... should work ok with runlock'ing, but I haven't
+	tested it. Is anybody using runlock??
+
 """
 
 from Tkinter import *
@@ -492,6 +498,7 @@ class ParamTable:
 		"""Parameter management table class"""
 		self._table = table
 		self._entries = {}
+		self._locks = {}
 
 		self.tablename = 'noname'
 		
@@ -515,13 +522,7 @@ class ParamTable:
 		Button(f, text="View",
 			   command=self.view).pack(expand=0, fill=X, side=LEFT)
 
-		if 0:
-			h = 15 * len(self._table) + 100;
-			if h < 350: h = 350
-			f = Pmw.ScrolledFrame(parent,
-								  usehullsize=1, hull_width=500, hull_height=h)
-		else:
-			f = Pmw.ScrolledFrame(parent, usehullsize=1)
+		f = Pmw.ScrolledFrame(parent, usehullsize=1)
 		
 		f.pack(expand=1, fill=BOTH)
 		self.balloon = Pmw.Balloon(parent, master=1, relmouse='both')
@@ -530,11 +531,13 @@ class ParamTable:
 		self.names = []
 		for slot in self._table:
 			(name, default, validate, descr, runlock) = _unpack_slot(slot)
+			lf = Frame(f.interior())
+			lf.pack(expand=1, fill=X)
 			if default is None:
-				e = Label(f.interior(), text=name, bg='yellow', anchor=W)
+				e = Label(lf, text=name, bg='yellow', anchor=W)
 				e.pack(expand=1, fill=X)
 			elif None and type(validate) is types.TupleType:
-				e = Pmw.RadioSelect(f.interior(),
+				e = Pmw.RadioSelect(lf,
 								   labelpos = 'w',
 								   label_text = name + ':')
 				e.pack(expand=0, fill=X)
@@ -542,7 +545,7 @@ class ParamTable:
 					e.add(o)
 				e.invoke(default)
 			elif type(validate) is types.TupleType:
-				e = Pmw.ComboBox(f.interior(),
+				e = Pmw.ComboBox(lf,
 								 labelpos = 'w',
 								 label_text = name + ':',
 								 scrolledlist_items = validate)
@@ -551,7 +554,7 @@ class ParamTable:
 				self._entries[name] = e
 				e.component('entry').configure(state=DISABLED)
 			else:
-				e = Pmw.EntryField(f.interior(),
+				e = Pmw.EntryField(lf,
 								   labelpos = 'w',
 								   label_text = name + ':',
 								   validate = validate,
@@ -561,13 +564,26 @@ class ParamTable:
 				else:
 					self.balloon.bind(e, "???")
 				e.component('entry').configure(bg='white', width=75)
+				xxx = Frame(lf, height=12, width=12)
+				xxx.pack_propagate(0)
+				xxx.pack(side=LEFT)
 				if runlock == -1:
+					lockbut = Label(xxx, text = '')
+				else:
+					lockbut = Button(xxx, text = '',\
+									 command=lambda n=name: \
+									 self.lockfield(n, toggle=1))
+				lockbut.pack(fill=BOTH, expand=1)
+				
+				if runlock == -1:
+					# runlock==-1: user can NEVER set this value!
 					e.component('entry').configure(state=DISABLED)
-					e.component('entry').configure(bg='lightgreen')
+					e.component('label').configure(fg='red')
+					lockbut.configure(state=DISABLED)
 				self._entries[name] = e
 				entries.append(e)
 				self.names.append(e)
-				e.pack(expand=1, fill=X)				
+				e.pack(expand=1, anchor=W, fill=X, side=RIGHT)
 
 		f.update_idletasks()
 		h = f.component('frame').winfo_reqheight()
@@ -619,6 +635,16 @@ class ParamTable:
 			d[name] = v
 		return (1, d)
 
+	def lockfield(self, name, toggle=None, state=DISABLED):
+		w = self._entries[name].component('entry')
+		if toggle:
+			if w.cget('state') == DISABLED:
+				state = NORMAL
+			else:
+				state = DISABLED
+		w.configure(state=state)
+		self._locks[name] = state
+
 	def query(self, name):
 		"""
 		Query a single value from the parameter table by name.
@@ -664,6 +690,7 @@ class ParamTable:
 		(ok, x) = self.get(evaluate=0)
 		f = open(file, 'w')
 		cPickle.dump(x, f)
+		cPickle.dump(self._locks, f)
 		f.close()
 
 	def load(self, file=None):
@@ -713,6 +740,10 @@ class ParamTable:
 		try:
 			f = open(file, 'r')
 			x = pickle.load(f)
+			try:
+				locks = pickle.load(f)
+			except EOFError:
+				locks = {}
 			f.close()
 			for slot in self._table:
 				(name, default, validate, descr, runlock) = _unpack_slot(slot)
@@ -729,6 +760,11 @@ class ParamTable:
 						self._entries[name].setentry(x[name])
 					except KeyError:
 						pass
+
+			for k in locks.keys():
+				print 'locking', k, 'state', locks[k]
+				self.lockfield(k, state=locks[k])
+				
 			return 1
 		except IOError:
 			return 0
@@ -762,15 +798,15 @@ class ParamTable:
 		for slot in self._table:
 			(name, default, validate, descr, runlock) = _unpack_slot(slot)
 			if default:
-				e = self._entries[name].component('entry')
+				e = self._entries[name].component('label')
 				if runlock == 1:
 					if lock:
-						e.configure(bg='lightblue')
 						e.configure(state=DISABLED)
 					else:
-						e.configure(bg='white')
-						e.configure(state=NORMAL)
-
+						try:
+							e.configure(state=self._locks[name])
+						except KeyError:
+							e.configure(state=NORMAL)
 
 
 if __name__ == '__main__':
