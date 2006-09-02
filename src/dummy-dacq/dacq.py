@@ -2,7 +2,7 @@
 
 import time
 
-def dacq_start(dummy1, dummy2, dummy3, dummy4, dummy5, dummy6):
+def dacq_start(dummy1, dummy2, dummy3, dummy4, dummy5):
 	return 1
 
 def dacq_stop():
@@ -119,13 +119,10 @@ def dacq_adbuf_spikes(dummy):
 def dacq_eye_smooth(dummy):
 	return 1
 
-def dacq_set_pri(dummy1, dummy2):
+def dacq_set_pri(dummy1):
 	pass
 
 def dacq_seteuid(dummy):
-	return 0
-
-def dacq_set_pri(dummy1, dummy2):
 	return 0
 
 def dacq_set_mypri(dummy):
@@ -135,4 +132,7 @@ def dacq_set_rt(dummy):
 	return 0
 
 def dacq_adbuf_toggle(dummy):
+	return 0
+
+def dacq_jsbut(dummy):
 	return 0
