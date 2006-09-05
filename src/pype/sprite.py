@@ -1027,17 +1027,17 @@ class _SurfArrayAccess:
 	  BAD sz = size(self.array) (use size(self.array[:])).
 	Similarly for self.alpha.  
 	"""
-	def __init__(self, im, get, set):
-		self.im  = im
+	def __init__(self, sprite, get, set):
+		self.sprite = sprite
 		self.get = get
 		self.set = set
  
 	def __getitem__(self, idx):
-		array = self.get(self.im)
+		array = self.get(self.sprite.im)
 		return array[idx]
 
 	def __setitem__(self, idx, value):
-		array = self.set(self.im)
+		array = self.set(self.sprite.im)
 		if type(value) is arraytype:
 			array[idx] = value.astype(array.typecode())
 		else:
@@ -1233,12 +1233,12 @@ class Sprite(_ImageBase):
 		# since deleted sprites get deleted from the list too).
 		Sprite.__list__.append(self._id)
 
-		self.array = _SurfArrayAccess(im=self.im, 
-									   get=pygame.surfarray.array3d,
-									   set=pygame.surfarray.pixels3d)
-		self.alpha = _SurfArrayAccess(im=self.im,
-									   get=pygame.surfarray.array_alpha,
-									   set=pygame.surfarray.pixels_alpha)
+		self.array = _SurfArrayAccess(sprite=self, 
+									  get=pygame.surfarray.array3d,
+									  set=pygame.surfarray.pixels3d)
+		self.alpha = _SurfArrayAccess(sprite=self,
+									  get=pygame.surfarray.array_alpha,
+									  set=pygame.surfarray.pixels_alpha)
 		
 
 	def __del__(self):

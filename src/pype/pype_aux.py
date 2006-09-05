@@ -48,7 +48,7 @@ def toc(label=None):
 		sys.stderr.write(label)
 	if _tic: 
 		t = time.time()-_tic
-		sys.stderr.write("%d secs" % t)
+		sys.stderr.write("%f secs" % t)
 		return t
 	else:
 		return None
