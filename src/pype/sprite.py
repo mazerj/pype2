@@ -1027,17 +1027,24 @@ class _SurfArrayAccess:
 	  BAD sz = size(self.array) (use size(self.array[:])).
 	Similarly for self.alpha.  
 	"""
-	def __init__(self, sprite, get, set):
-		self.sprite = sprite
-		self.get = get
-		self.set = set
+	def __init__(self, im, get, set):
+		self.im  = im
+		self.getfn = get
+		self.setfn = set
+
+	def refresh(self, im):
+		"""
+		Underlying sprite array has changed -- update link/cache.
+		This is for when the sprite is resized or rescaled, etc
+		"""
+		self.im = im
  
 	def __getitem__(self, idx):
-		array = self.get(self.sprite.im)
+		array = self.getfn(self.im)
 		return array[idx]
 
 	def __setitem__(self, idx, value):
-		array = self.set(self.sprite.im)
+		array = self.setfn(self.im)
 		if type(value) is arraytype:
 			array[idx] = value.astype(array.typecode())
 		else:
@@ -1184,14 +1191,6 @@ class Sprite(_ImageBase):
 		self.im = self.im.convert(ALPHAMASKS)
 		self.im.set_colorkey((0,0,0,0))
 
-		# start with fully opaque alpha surface
-		## self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		## self.alpha[:] = 255
-		## why did I do this in the first place????? 11/29/2001 JM
-
-		## should just be this:
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-
 		# Tue Jan 31 11:34:47 2006 mazer 
 		# starting with pygame-1.6.2 pixels_alpha() pixel3d() cause
 		# the surface to be locked, making it unblitable. According to
@@ -1201,7 +1200,7 @@ class Sprite(_ImageBase):
 		
 
 		# generate array referencing the surface
-		self.old_array = pygame.surfarray.pixels3d(self.im)
+		#self.old_array = pygame.surfarray.pixels3d(self.im)
 
 		# Tue Jan 31 11:35:27 2006 mazer
 		# see above comment re:surface locking
@@ -1233,10 +1232,10 @@ class Sprite(_ImageBase):
 		# since deleted sprites get deleted from the list too).
 		Sprite.__list__.append(self._id)
 
-		self.array = _SurfArrayAccess(sprite=self, 
+		self.array = _SurfArrayAccess(self.im, 
 									  get=pygame.surfarray.array3d,
 									  set=pygame.surfarray.pixels3d)
-		self.alpha = _SurfArrayAccess(sprite=self,
+		self.alpha = _SurfArrayAccess(self.im,
 									  get=pygame.surfarray.array_alpha,
 									  set=pygame.surfarray.pixels_alpha)
 		
@@ -1562,17 +1561,14 @@ class Sprite(_ImageBase):
 		"""
 		new = pygame.transform.flip(self.im, xaxis, yaxis)
 		self.im = new.convert(ALPHAMASKS)
+		self.array.refresh(self.im)
+		self.alpha.refresh(self.im)
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
 		self.ih = self.h
-		
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		###self.im.unlock()
-		###self.array = pygame.surfarray.pixels3d(self.im)
-		###self.im.unlock()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
 		self.rotate(-angle, preserve_size=preserve_size, trim=trim)
@@ -1612,17 +1608,14 @@ class Sprite(_ImageBase):
 			y = (h/2) - (self.h/2)
 			new = new.subsurface(x, y, self.w, self.h)
 		self.im = new.convert(ALPHAMASKS)
+		self.array.refresh(self.im)
+		self.alpha.refresh(self.im)
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
 		self.ih = self.h
-		
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		###self.im.unlock()
-		###self.array = pygame.surfarray.pixels3d(self.im)
-		###self.im.unlock()
 		
 	def scale(self, new_width, new_height):
 		"""Resize this sprite (fast).
@@ -1645,20 +1638,14 @@ class Sprite(_ImageBase):
 		"""
 		new = pygame.transform.scale(self.im, (new_width, new_height))
 		self.im = new.convert(ALPHAMASKS)
+		self.array.refresh(self.im)
+		self.alpha.refresh(self.im)
 
 		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
 		self.ih = self.h
-		
-		###self.alpha = pygame.surfarray.pixels_alpha(self.im)
-		###self.im.unlock()
-		#### Wed Nov 23 14:50:34 2005 mazer 
-		#### these need to be new too; I forgot and only regenerated
-		#### the alpha channel.
-		###self.array = pygame.surfarray.pixels3d(self.im)
-		###self.im.unlock()
 		
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
