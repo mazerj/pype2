@@ -105,6 +105,8 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 	
 	OUTPUT
 		None.
+
+    NB: verified frequency is really cycles/sprite JM 17-sep-2006
 	"""
 	R, G, B = _unpack_rgb(R, G, B)
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
@@ -130,6 +132,8 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 	
 	OUTPUT
 		None.
+		
+    NB: verified frequency is really cycles/sprite JM 17-sep-2006
 	"""
 	R, G, B = _unpack_rgb(R, G, B)
     r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
@@ -157,6 +161,9 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 	
 	OUTPUT
 		None.
+
+		
+    NB: verified frequencies are really cycles/sprite JM 17-sep-2006		
 	"""
 	R, G, B = _unpack_rgb(R, G, B)
     if polarity < 0:
@@ -187,11 +194,13 @@ def logpolargrat(s, cfreq, rfreq, phase_deg, polarity,
 		R = red channel value (0-1) or standard pype RGB color triple
 		G = green channel value (0-1)
 		B = blue channel value (0-1)
-	
+		
 	OUTPUT
 		None.
 		
 	Note: frequencies are in cycles/sprite or cycles/360deg
+
+    NB: verified frequenies are really cycles/sprite JM 17-sep-2006
 	"""
     polargrat(s, cfreq, rfreq, phase_deg, polarity, 
              R=R, G=G, B=B, logpolar=1)
@@ -215,6 +224,8 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 		None.
 
 	Note: frequencies are in cycles/sprite or cycles/360deg
+
+    NB: verified frequencies are really cycles/sprite JM 17-sep-2006
 	"""
 
 	R, G, B = _unpack_rgb(R, G, B)
