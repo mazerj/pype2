@@ -1210,11 +1210,11 @@ class PypeApp:
 		self.tally(type=type)
 		if type:
 			if type[0] == 'C':
-				_block_update(correct=1)
+				self._block_update(correct=1)
 			elif type[0] == 'E':
-				_block_update(error=1)
+				self._block_update(error=1)
 			else:
-				_block_update(other=1)
+				self._block_update(other=1)
 	
 	def tally(self, type=None, clear=None, cleartask=None):
 		ctask = self.task_name
@@ -1634,6 +1634,8 @@ class PypeApp:
 			bs = self.sub_common.queryv('blocksize')
 			if (bs > 0) and self.blockstats['ncorrect'] >= bs:
 				self.set_state(running=0)
+				warn('Block Complete',
+					 '%d correct trials. Block done.' % bs, wait=0)
 
 	def trial_ui(self, uimax=1000):
 		"""This trial was un-initiated.."""
@@ -1736,7 +1738,7 @@ class PypeApp:
 						self.fb.show()
 
 					# clear block state before starting a run
-					_block_update(clear=1)
+					self._block_update(clear=1)
 
 					# call start function, giving up control until end
 					# of run...
