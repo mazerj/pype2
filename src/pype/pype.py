@@ -579,6 +579,7 @@ class PypeApp:
 			info = book.add('info')
 			tally = book.add('tally')
 			setables = book.add('eyeStuff')
+			stats = book.add('stats')
 
 			cpane = Frame(f2, borderwidth=3, relief=GROOVE)
 			cpane.grid(row=0, column=0, sticky=N+S)
@@ -798,11 +799,11 @@ class PypeApp:
 
 			self._cpane = cpane
 
-			# INFO CONSOLES ######################################3
+			# INFO CONSOLES ######################################
 			self.console = Info(parent=console, height=40, width=55)
 			self.info = Info(parent=info, height=40, width=55)
 
-			# TALLY WINDOW ######################################3
+			# TALLY WINDOW ######################################
 			self.tallyw = Label(tally, text='', anchor=W, justify=LEFT)
 			self.tallyw.pack(expand=0, fill=BOTH, side=TOP)
 			
@@ -816,9 +817,14 @@ class PypeApp:
 			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
 			self.balloon.bind(b, "clear tally statistics")
 			
+			# MISC STATS WINDOW ######################################
+			self.stats = Label(stats, text='', anchor=W, justify=LEFT)
+			self.stats.pack(expand=0, fill=BOTH, side=TOP)
+			
+			self._block_update(clear=1)
 			self.tally(type=None)
 
-			# EYE COIL PARAMS ######################################3
+			# EYE COIL PARAMS ######################################
 			f = Frame(setables, borderwidth=1, relief=GROOVE)
 			f.pack(expand=0, fill=X, side=TOP)
 
@@ -923,6 +929,7 @@ class PypeApp:
 			Pmw.alignlabels([self._eye_tweak,
 							 self._eye_xgain, self._eye_ygain,
 							 self._eye_xoff, self._eye_yoff])
+
 			# make sure Notebook is big enough for buttons above to show up
 			book.setnaturalsize(pageNames=None)
 
@@ -1201,6 +1208,13 @@ class PypeApp:
 		# combination of self.tally() and self.history()
 		self.history(type[0])
 		self.tally(type=type)
+		if type:
+			if type[0] == 'C':
+				_block_update(correct=1)
+			elif type[0] == 'E':
+				_block_update(error=1)
+			else:
+				_block_update(other=1)
 	
 	def tally(self, type=None, clear=None, cleartask=None):
 		ctask = self.task_name
@@ -1248,6 +1262,13 @@ class PypeApp:
 		
 		self.tallyw.configure(text=s)
 
+		self.stats.configure(\
+			text='ncorrect = %d / %d\nnerrors = %d\nnother = %d' % \
+			(self.blockstats['ncorrect'],
+			 self.sub_common.queryv('blocksize'),
+			 self.blockstats['nerrors'],
+			 self.blockstats['nother']))
+		
 	def testad(self, n):
 		t = Timer()
 		sn = 0.0
@@ -1591,6 +1612,39 @@ class PypeApp:
 		except IOError:
 			return None
 
+	def _block_update(self, clear=None, \
+					  correct=None, error=None, other=None):
+		if clear:
+			self.blockstats = {}
+			self.blockstats['ncorrect'] = 0
+			self.blockstats['nerrors'] = 0
+			self.blockstats['nother'] = 0
+		else:
+			if correct is not None:
+				self.blockstats['ncorrect'] = self.blockstats['ncorrect'] + 1
+			elif error is not None:
+				self.blockstats['nerrors'] = self.blockstats['nerrors'] + 1
+			elif other is not None:
+				self.blockstats['nother'] = self.blockstats['nother'] + 1
+
+			# If blocksize > 0, then blocking mode is engaged. The block
+			# is done when (ncorrect >= blocksize), at which time we set
+			# the run flag to 0 so task will halt by itself:
+
+			bs = self.sub_common.queryv('blocksize')
+			if (bs > 0) and self.blockstats['ncorrect'] >= bs:
+				self.set_state(running=0)
+
+	def trial_ui(self, uimax=1000):
+		"""This trial was un-initiated.."""
+		self.tiralstats['uicount'] = self.trialstats['uicount'] + 1
+		if uimax and (self.trialstats['uicount']  > uimax):
+			warn('Warning',
+				 'UI Count exceeded.\nTime: %s\nPlease intervene.\n' %
+				 Timestamp(), wait=1)
+			self.trialstats['uicount'] = 0
+		
+
 	def trial_clear(self):
 		# runset stats
 		self.trialstats['trialnum'] = 0	# number of total trial
@@ -1680,6 +1734,12 @@ class PypeApp:
 				try:
 					if self.psych:
 						self.fb.show()
+
+					# clear block state before starting a run
+					_block_update(clear=1)
+
+					# call start function, giving up control until end
+					# of run...
 					self.startfn(self)
 				finally:
 					dacq_set_pri(0)

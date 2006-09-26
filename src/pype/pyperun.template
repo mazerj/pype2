@@ -25,22 +25,35 @@ Wed Dec 26 15:58:28 2001 mazer
   Usage:
 		pyperun [task]     -> run with gui & framebuffer
         pyperun -s [args]  -> interactive shell (aka pypenv)
+
+Mon Sep 18 10:00:05 2006 mazer
+  Notes about variables
+
+  PYPEDIR       This is the install directory for pype
+  PYPERC        User's configuration directory. This defaults to
+                ~/.pyperc, unless overridden with an environment
+                variable
+  PYPETASKPATH  colon-delimited search path
+  SUBJECT       subject id (for subject-specific config files)
 """
 
 import sys, posixpath, os, glob, string
 
-def pathprefix(d):
-    """Add directory 'd' to the HEAD of the python search path."""
-    sys.path = [d] + sys.path
-    #debug: sys.stderr.write(' prefixed path: "%s"\n' % d)
+__debug = 0
 
-def pathpostfix(d):
-    """Add directory 'd' to the TAIL of the python search path."""
-    sys.path = sys.path + [d]
-    sys.stderr.write('postfixed path: "%s"\n' % d)
+def addpath(d, end=None):
+    """
+    Add directory to the HEAD (or TAIL) of the python search path.
+    """
+    if end:
+        sys.path = sys.path + [d]
+    else:
+        sys.path = [d] + sys.path + [d]
 
-def script_runner(fullname):
-    """Run module as script -- script name SHOULD have .py extension!!"""
+def run_python_script(fullname):
+    """
+    Run module as script -- script name SHOULD have .py extension!!
+    """
     import imp
 
     name = posixpath.basename(fullname)
@@ -72,7 +85,20 @@ if not os.environ.has_key('HOME'):
 	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
 	sys.exit(1)
 
-# NOTE: the %% PYPEDIR %% gets expanded by the makefile...
+new_argv = []
+for a in sys.argv:
+    if a[:2] == 's=':
+        os.environ['SUBJECT'] = a[2:]
+    else:
+        new_argv.append(a)
+sys.argv = new_argv
+
+if __debug:
+    sys.stderr.write('argv: %s\n' % sys.argv)
+
+#
+# NOTE: \%\%PYPEDIR\%\% gets expanded by the Buildfile system!
+#
 if not os.environ.has_key('PYPEDIR'):
     os.environ['PYPEDIR'] = "%%PYPEDIR%%"
     sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
@@ -92,13 +118,13 @@ if not os.environ.has_key('PYPEDIR'):
 
 pd = os.environ['PYPEDIR']+'/'
 for d in ['.', pd+'Tasks', pd+'lib', pd+'Modules']:
-    pathprefix(d)
+    addpath(d)
 
 # PREFIX specific user-defined paths that can contain. PYPEPATH should
 # be a standard colon-delimted set of paths to search
 if os.environ.has_key('PYPETASKPATH'):
     for d in string.split(os.environ['PYPETASKPATH'], ':')[::-1]:
-        pathprefix(d)
+        addpath(d)
 
 # Fri Dec 13 17:12:22 2002 mazer
 #  -- add $PYPEDIR/lib onto LD_LIBRARY_PATH
@@ -128,55 +154,75 @@ except ImportError:
 
 # add the ~/.pyperc directories to the python search path
 for i in ['Tasks', 'Modules']:
-    #print pype.pyperc(i)
-    pathprefix(pype.pyperc(i))
+    addpath(pype.pyperc(i))
 
 for d in glob.glob(pype.pyperc('Tasks/*')):
     if os.path.isdir(d):
-        #print d
-        pathprefix(d)
+        addpath(d)
+
+if __debug:
+    sys.stderr.write('Search Path:\n')
+    for d in sys.path:
+        if len(d) > 0:
+            sys.stderr.write('  %s\n' % d)
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
-    # AHA!! We've been invoked as pypenv..
+    # *** Invoked as pypenv ***
+    # 
+    # pypenv is really a shell script that does:
+    #   exec pyperun -s $*
+    # So, the -s argument indicates run as a standard python
+    # interpreter (with the path set to include pype stuff).
+    # Otherwise, you get the full blow pype GUI.
     if len(sys.argv) == 2:
+        # This means there's not command line arguments, so we want to
+        # just drop into an interactive shell. First we see if the
+        # IPython packages is installed for a fancier shell..
         # interactive mode, drop into an interactive shell
-        print "<<<<pypenv interactive python shell>>>>"
         try:
             from IPython.Shell import IPShellEmbed
             ipshell = IPShellEmbed([])
             ipshell()
         except ImportError:
+            # IPython's not installed, fall back to standard python
+            # interactive shell
             import code
+            sys.stdout.write("<<<<pypenv: interactive python shell>>>>\n")
             code.interact()
     else:
-        # clip the .../pyperun from the head of sys.argv and let
-        # script_runner() replace the -s with the module name..
+        # Last possibility for pypenv is that we've been invoked with
+        # command line options. Command line options are assumed to
+        # be a module to load and run, just like a standard python
+        # program.
+        #
+        # Tod do that, we trim .../pyperun from the head of sys.argv
+        # and let run_python_script() replace the -s with the module
+        # name and then go ahead and load+run the module.
         sys.argv = sys.argv[2:]
-        if script_runner(sys.argv[0]) == 0:
+        if run_python_script(sys.argv[0]) == 0:
             sys.stderr.write("Can't find module '%s'\n" % sys.argv[0])
-            exit(1)
+            sys.exit(1)
 else:
+    # *** Invoked as pype ***
+    #
+    # This means we want to startup in full GUI mode, but
+    # we're 
     # parse command line
+
+    # make sure subject dir exists, if it doesn't go ahead and make it
+    if not posixpath.exists(pype.subjectrc()):
+        sys.stderr.write('Subject dir does not exist.\n')
+        sys.stderr.write('Building: %s\n' % pype.subjectrc())
+        try:
+            os.mkdir(pype.subjectrc())
+            os.chown(pype.subjectrc(), os.getuid(), os.getgid())
+        except:
+            sys.exit(0)
+    
     av = []
     psych = 0
-    subj = None
     for n in range(1, len(sys.argv)):
-        if sys.argv[n][:2] == "s=":
-            try:
-                subj = string.split(sys.argv[n], '=')[1]
-            except:
-                sys.stderr.write('improper argument, try: s=<subject>\n')
-                sys.exit(1)
-            os.environ['SUBJECT'] = subj
-            if not posixpath.exists(pype.subjectrc()):
-                sys.stderr.write('No subject directory for "%s".\n' % subj)
-                sys.stderr.write('Ok to make one (y or n)? ')
-                l = sys.stdin.readline()
-                if not (l[0] in 'yY'):
-                    sys.exit(0)
-                os.mkdir(pype.subjectrc())
-                os.chown(pype.subjectrc(), os.getuid(), os.getgid())
-        elif sys.argv[n] == '-p':
+        if sys.argv[n] == '-p':
             # psychophysics mode (withdraw framebuffer)
             psych = 1
         else:

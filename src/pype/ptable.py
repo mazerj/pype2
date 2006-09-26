@@ -762,7 +762,6 @@ class ParamTable:
 						pass
 
 			for k in locks.keys():
-				print 'locking', k, 'state', locks[k]
 				self.lockfield(k, state=locks[k])
 				
 			return 1

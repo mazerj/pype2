@@ -382,6 +382,14 @@ class FrameBuffer:
 		# initial sync state is OFF
 		self.sync(0)
 
+		# Timer initialized and used by flip() method for
+		# checking for frame rate glitches. To enage the
+		# timer check, set maxfliptime to some positive value
+		# min ms in your task:
+		self.maxfliptime = 0
+		self.fliptimer = None
+
+
 	def __del__(self):
 		"""Cleanup function.
 		
@@ -687,6 +695,15 @@ class FrameBuffer:
 			# to make sure all stimuli are written to the surface.
 			
 		pygame.display.flip()
+		if self.fliptimer is None:
+			from pype import Timer
+			self.fliptimer = Timer()
+		else:
+			elapsed = self.fliptimer.ms()
+			self.fliptimer.reset()
+			if (self.maxfliptime > 0) and (elapsed > self.maxfliptime):
+				sys.stderr.write('warning: %dms flip\n' % elapsed)
+			
 		
 		# JAM 12/10/2002 -- something on the sdl newsgroup suggested that
 		#   flip doesn't actually block until you try to read or write
