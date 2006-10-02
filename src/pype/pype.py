@@ -165,6 +165,23 @@ Mon May 22 10:24:25 2006 mazer
   Note that a lot of tasks have a app.clear(clear=1) at the
   start of each run, which will defeat this mechanism...
 
+Thu Sep 28 10:16:02 2006 mazer
+
+- 'final' modificaiton to the runstats() code... the current system
+  should be simple for most people. There are now three termination
+  parameters:
+    'max_ntrials': maximum number of trials to run before stopping.
+	             only correct and error trials count.
+    'max_correct': maximum number of CORRECT trials to run before stopping.
+	'max_ui': maximum number of SEQUENTIAL ui trials before stopping.
+  In all cases, setting these values to zero means they won't be used.
+  Either max_ntrials should be set OR max_correct, but not both!
+
+  'uimax' still exists and all the associated code, but this is
+     really used only by the task -- user's responsible for coding
+     up the handler. the max_* parameters are handled directly by
+	 pype and the run is terminated automatically when the stopping
+	 conditions are met.
 """
 
 #####################################################################
@@ -578,8 +595,8 @@ class PypeApp:
 			console = book.add('console')
 			info = book.add('info')
 			tally = book.add('tally')
-			setables = book.add('eyeStuff')
 			stats = book.add('stats')
+			setables = book.add('eyeStuff')
 
 			cpane = Frame(f2, borderwidth=3, relief=GROOVE)
 			cpane.grid(row=0, column=0, sticky=N+S)
@@ -612,7 +629,15 @@ class PypeApp:
 				("maxreward",	"500", is_gteq_zero, "maximum reward duration (hard limits of variance dist)"),
 				("minreward",	"0", is_gteq_zero, "minimum reward duration (hard limits of variance dist)"),
 				
-				("Block Params", None, None),
+				("Blocking Params", None, None),
+				# these are handled automatically by pype!
+				("max_ntrials",	"0",   is_int, "# correct+error trials to stop at (0 for no limit)"),
+				("max_correct",	"0",   is_int, "# correct trials to stop at (0 for no limit)"),
+				("max_ui",		"0",   is_int, "# UI trials to stop at (0 for no limit)"),
+				
+				("Old Blocking Params", None, None),
+				# these need to be handled by the task!
+				("uimax",		"3",   is_int, "maximum # conseq. UI trial's before halting"),
 				("nreps",		"100", is_int, "number of blocks per rep"),
 				("blocksize",	"100", is_int, "number of trials per block"),
 
@@ -631,7 +656,6 @@ class PypeApp:
 				("iti",			"4000+-20%", is_iparam, "inter-trial interval (ms)"),
 				("timeout",		"10000+-20%", is_iparam, "penalty timeout for errors (ms)"),
 				("uitimeout",	"20000+-20%", is_iparam, "uninitiated trial timeout (ms)"),
-				("uimax",		"3", is_iparam, "maximum # conseq. UI trial's before halting"),
 				), file='subject.par', altfile='common-%s.par' % hostname)
 
 			b = Checkbutton(cpane, text='rig params', relief=RAISED, pady=4)
@@ -804,6 +828,10 @@ class PypeApp:
 			self.info = Info(parent=info, height=40, width=55)
 
 			# TALLY WINDOW ######################################
+			self.statsw = Label(stats, text='', anchor=W, justify=LEFT)
+			self.statsw.pack(expand=0, fill=BOTH, side=TOP)
+
+			# TALLY WINDOW ######################################
 			self.tallyw = Label(tally, text='', anchor=W, justify=LEFT)
 			self.tallyw.pack(expand=0, fill=BOTH, side=TOP)
 			
@@ -817,11 +845,7 @@ class PypeApp:
 			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
 			self.balloon.bind(b, "clear tally statistics")
 			
-			# MISC STATS WINDOW ######################################
-			self.stats = Label(stats, text='', anchor=W, justify=LEFT)
-			self.stats.pack(expand=0, fill=BOTH, side=TOP)
-			
-			self._block_update(clear=1)
+			self._runstats_update(clear=1)
 			self.tally(type=None)
 
 			# EYE COIL PARAMS ######################################
@@ -1208,13 +1232,7 @@ class PypeApp:
 		# combination of self.tally() and self.history()
 		self.history(type[0])
 		self.tally(type=type)
-		if type:
-			if type[0] == 'C':
-				self._block_update(correct=1)
-			elif type[0] == 'E':
-				self._block_update(error=1)
-			else:
-				self._block_update(other=1)
+		self._runstats_update(type[0])
 	
 	def tally(self, type=None, clear=None, cleartask=None):
 		ctask = self.task_name
@@ -1262,13 +1280,6 @@ class PypeApp:
 		
 		self.tallyw.configure(text=s)
 
-		self.stats.configure(\
-			text='ncorrect = %d / %d\nnerrors = %d\nnother = %d' % \
-			(self.blockstats['ncorrect'],
-			 self.sub_common.queryv('blocksize'),
-			 self.blockstats['nerrors'],
-			 self.blockstats['nother']))
-		
 	def testad(self, n):
 		t = Timer()
 		sn = 0.0
@@ -1612,40 +1623,78 @@ class PypeApp:
 		except IOError:
 			return None
 
-	def _block_update(self, clear=None, \
-					  correct=None, error=None, other=None):
-		if clear:
-			self.blockstats = {}
-			self.blockstats['ncorrect'] = 0
-			self.blockstats['nerrors'] = 0
-			self.blockstats['nother'] = 0
-		else:
-			if correct is not None:
-				self.blockstats['ncorrect'] = self.blockstats['ncorrect'] + 1
-			elif error is not None:
-				self.blockstats['nerrors'] = self.blockstats['nerrors'] + 1
-			elif other is not None:
-				self.blockstats['nother'] = self.blockstats['nother'] + 1
+	def _runstats_update(self, clear=None, resultcode=None):
+		if clear is not None:
+			self._runstats = {}
+			self._runstats['ncorrect'] = 0
+			self._runstats['nerror'] = 0
+			self._runstats['nother'] = 0
+			# this is really sequential ui's
+			self._runstats['nui'] = 0
+		elif resultcode is not None:
+			r = resultcode[0]
+			
+			if r is 'C':
+				self._runstats['ncorrect'] = self._runstats['ncorrect'] + 1
+				self._runstats['nui'] = 0
+			elif r is 'E':
+				self._runstats['nerror'] = self._runstats['nerror'] + 1
+				self._runstats['nui'] = 0
+			elif r is 'U':
+				self._runstats['nui'] = self._runstats['nui'] + 1
+			else:
+				self._runstats['nother'] = self._runstats['nother'] + 1
 
-			# If blocksize > 0, then blocking mode is engaged. The block
-			# is done when (ncorrect >= blocksize), at which time we set
-			# the run flag to 0 so task will halt by itself:
-
-			bs = self.sub_common.queryv('blocksize')
-			if (bs > 0) and self.blockstats['ncorrect'] >= bs:
+			nmax = self.sub_common.queryv('max_trials')
+			n = self._runstats['ncorrect'] + self._runstats['nerror']
+			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('Block Complete',
-					 '%d correct trials. Block done.' % bs, wait=0)
+				warn('Run Complete',
+					 '%d total trials trials. Stopping.' % n, wait=0)
 
-	def trial_ui(self, uimax=1000):
+			nmax = self.sub_common.queryv('max_correct')
+			n = self._runstats['ncorrect']
+			if (nmax > 0) and n > nmax:
+				self.set_state(running=0)
+				warn('Run Complete',
+					 '%d correct trials trials. Stopping.' % n, wait=0)
+
+			nmax = self.sub_common.queryv('max_ui')
+			n = self._runstats['max_ui'] 
+			if (nmax > 0) and n > nmax:
+				self.set_state(running=0)
+				warn('Run Aborted',
+					 '%d sequential UI trials. Stopping.' % n, wait=0)
+
+		s = ''
+		s = s + 'ncorrect    = %d\n' % self._runstats['ncorrect']
+		s = s + 'nerror      = %d\n' % self._runstats['nerror']
+		s = s + 'nui         = %d\n' % self._runstats['nui']
+		s = s + 'ntrials     = %d\n' % (self._runstats['ncorrect'] + self._runstats['nerror'])
+		
+		s = s + '\n'
+		s = s + 'max_ntrials = %d\n' % self.sub_common.queryv('max_ntrials')
+		s = s + 'max_correct = %d\n' % self.sub_common.queryv('max_correct')
+		s = s + 'max_ui      = %d\n' % self.sub_common.queryv('max_ui')
+
+		s = s + '\n'
+		s = s + 'running     = %d' % self.isrunning()
+
+		self.statsw.configure(text=s)
+				
+
+
+	def trial_ui(self, uimax=None):
 		"""This trial was un-initiated.."""
+		if uimax is None:
+			uimax = self.sub_common.queryv('uimax')
+			
 		self.tiralstats['uicount'] = self.trialstats['uicount'] + 1
 		if uimax and (self.trialstats['uicount']  > uimax):
 			warn('Warning',
 				 'UI Count exceeded.\nTime: %s\nPlease intervene.\n' %
 				 Timestamp(), wait=1)
 			self.trialstats['uicount'] = 0
-		
 
 	def trial_clear(self):
 		# runset stats
@@ -1664,15 +1713,6 @@ class PypeApp:
 			self.trialstats['ncorrect'] = self.trialstats['ncorrect'] + 1
 		self.trialstats['ntrials'] = self.trialstats['ntrials'] + 1
 		self.trialstats['uicount'] = 0
-
-	def trial_ui(self, uimax=1000):
-		"""This trial was un-initiated.."""
-		self.trialstats['uicount'] = self.trialstats['uicount'] + 1
-		if uimax and (self.trialstats['uicount']  > uimax):
-			warn('Warning',
-				 'UI Count exceeded.\nTime: %s\nPlease intervene.\n' %
-				 Timestamp(), wait=1)
-			self.trialstats['uicount'] = 0
 
 	def new_cell(self):
 		try:
@@ -1738,7 +1778,7 @@ class PypeApp:
 						self.fb.show()
 
 					# clear block state before starting a run
-					self._block_update(clear=1)
+					self._runstats_update(clear=1)
 
 					# call start function, giving up control until end
 					# of run...
