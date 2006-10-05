@@ -22,21 +22,21 @@ all-nodacq: install-nodacq wrapper
 
 install:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install);\
+		do (cd $$i ; $(MAKE) install);\
 		done
 	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
 	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
 install-nodacq:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install-nodacq);\
+		do (cd $$i ; $(MAKE) install-nodacq);\
 		done
 	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
 	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
 install-shared:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install-shared);\
+		do (cd $$i ; $(MAKE) install-shared);\
 		done
 	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
 	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
@@ -47,7 +47,7 @@ pycompile:
 
 wrapper:
 ifeq ($(WHO),root)
-	(cd src/wrapper ; make install)
+	(cd src/wrapper ; $(MAKE) install)
 else
 	@echo "Must be root to install wrapper."
 endif
@@ -57,9 +57,9 @@ clean:
 	@find . -name core | xargs rm -f
 	@find . -name \*.pyc | xargs rm -f
 	for i in $(SUBDIRS); \
-		do (cd $$i ; make clean);\
+		do (cd $$i ; $(MAKE) clean);\
 		done
-	cd src/wrapper ; make clean
+	cd src/wrapper ; $(MAKE) clean
 
 # clobber: pype srcs clean + external directories
 clobber: clean x-clean
@@ -69,13 +69,13 @@ clobber: clean x-clean
 ###############################################################
 
 x-rig:
-	cd External; make rig-install
+	cd External; $(MAKE) rig-install
 
 x-workstation:
-	cd External; make workstation-install
+	cd External; $(MAKE) workstation-install
 
 x-clean:
-	cd External; make clean
+	cd External; $(MAKE) clean
 
 ###############################################################
 
@@ -87,7 +87,7 @@ uninstall:
 
 docs:
 	# note: this requires happydoc to be installed!
-	(cd src/pype; make happydoc)
+	(cd src/pype; $(MAKE) happydoc)
 
 .PHONY: install
 

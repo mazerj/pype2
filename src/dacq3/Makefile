@@ -33,7 +33,7 @@ procname.o: procname.c procname.h
 
 comedi:
 	if [ -f /usr/include/comedi.h -o -f /usr/local/include/comedi.h ]; then \
-		make comedi_server; \
+		$(MAKE) comedi_server; \
 	fi;
 
 SERVER_SRCS = das_common.c das_common.h procname.h procname.c
@@ -57,7 +57,7 @@ das08_server: das08_server.o $(SERVER_OBJS)
 	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
 
 libezV24-0.0.3/libezV24-0.a:
-	(cd libezV24-0.0.3 ; make static)
+	(cd libezV24-0.0.3 ; $(MAKE) static)
 
 dacq.c: dacq.h
 
@@ -95,7 +95,7 @@ comedi_test:
 clean:
 	@rm -f *.o _dacqmodule.so *.i *.pyc _dacqmodule \
 		*_server *_wrap.* .*~ dacq.py
-	(cd libezV24-0.0.3 ; make clean)
+	(cd libezV24-0.0.3 ; $(MAKE) clean)
 	@rm -f libezV24-0.0.3/libezV24-0.a
 	@rm -f das16_server comedi_server das08_server _dacqmodule.so 
 

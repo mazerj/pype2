@@ -10,6 +10,7 @@ function [t, x, y, dx, dy, d, v, a, p] = p2mGetEyetrace(pf, recno, ...
 %    recno = record number (starting at 1)
 %    (optional) ns = half-length of smoothing filter
 %    (optional) sigma = std of Gaussian used for smoothing
+%    (optional) tinterp = sampling interval for eye position data (-1=auto)
 %
 %  OUTPUT
 %    t = time vector (in secs)

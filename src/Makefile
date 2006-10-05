@@ -18,22 +18,22 @@ install-subdirs:
 	@mkdir -p $(PYPEDIR)/Tasks
 	@mkdir -p $(PYPEDIR)/../p2m
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make install);\
+		do (cd $$i ; $(MAKE) install);\
 		done
 	@rm -rf $(PYPEDIR)/lib/Pmw
 	@(x=`pwd`; cd $(PYPEDIR)/lib; tar xfz $$x/Pmw.1.2.tar.gz)
 
 install-py:
-	@(cd $(PYDIR); make install)
+	@(cd $(PYDIR); $(MAKE) install)
 
 install-py-shared:
-	@(cd $(PYDIR); make install-shared)
+	@(cd $(PYDIR); $(MAKE) install-shared)
 
 install-dacq:
-	@(cd $(DACQDIR); make install)
+	@(cd $(DACQDIR); $(MAKE) install)
 
 install-dummydacq:
-	@(cd $(DUMMYDIR); make install)
+	@(cd $(DUMMYDIR); $(MAKE) install)
 
 build: build-dacq build-subdirs
 
@@ -41,15 +41,15 @@ build-nodacq: build-subdirs
 
 build-subdirs:
 	@for i in $(SUBDIRS); \
-		do (cd $$i ; make);\
+		do (cd $$i ; $(MAKE));\
 		done
 
 build-dacq:
-	@(cd $(DACQDIR); make)
+	@(cd $(DACQDIR); $(MAKE))
 
 clean:
 	@for i in $(DACQDIR) $(DUMMYDIR) $(SUBDIRS); \
-		do (cd $$i ; make clean);\
+		do (cd $$i ; $(MAKE) clean);\
 		done
 
 tags:

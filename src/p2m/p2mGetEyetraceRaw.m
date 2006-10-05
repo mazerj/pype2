@@ -14,6 +14,7 @@ function [t, x, y, dx, dy, ...
 %    recno = record number (starting at 1)
 %    (optional) ns = half-length of smoothing filter
 %    (optional) sigma = std of Gaussian used for smoothing
+%    (optional) tinterp = sampling interval for eye position data (-1=auto)
 %    (optional) primary = type of RAW data to return:
 %		 1: use eyex/y data as recorded
 %		-1: use uncorrected (remove gain and offset) recorded eyepos
