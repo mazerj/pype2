@@ -37,9 +37,25 @@ Mon Sep 18 10:00:05 2006 mazer
   SUBJECT       subject id (for subject-specific config files)
 """
 
+debug = 0
+
 import sys, posixpath, os, glob, string
 
-__debug = 0
+
+original_argv = sys.argv[:]
+av = []
+for a in sys.argv:
+    if a == '--debug':
+        debug = 1
+    elif a[:2] == 's=':
+        os.environ['SUBJECT'] = a[2:]
+    else:
+        av.append(a)
+sys.argv = av
+
+if debug:
+    sys.stderr.write('orig argv: %s\n' % original_argv)
+    sys.stderr.write('     argv: %s\n' % sys.argv)
 
 def addpath(d, end=None):
     """
@@ -50,7 +66,7 @@ def addpath(d, end=None):
     else:
         sys.path = [d] + sys.path + [d]
 
-def run_python_script(fullname):
+def run_python_script(fullname, debug):
     """
     Run module as script -- script name SHOULD have .py extension!!
     """
@@ -75,6 +91,9 @@ def run_python_script(fullname):
 
 		sys.argv[0] = pathname
         try:
+            if debug:
+                sys.stderr.write("[script '%s' from '%s']\n" % \
+                                 (fullname, pathname))
             mod = imp.load_module('__main__', fp, pathname, description)
         finally:
             fp.close()
@@ -84,17 +103,6 @@ def run_python_script(fullname):
 if not os.environ.has_key('HOME'):
 	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
 	sys.exit(1)
-
-new_argv = []
-for a in sys.argv:
-    if a[:2] == 's=':
-        os.environ['SUBJECT'] = a[2:]
-    else:
-        new_argv.append(a)
-sys.argv = new_argv
-
-if __debug:
-    sys.stderr.write('argv: %s\n' % sys.argv)
 
 #
 # NOTE: \%\%PYPEDIR\%\% gets expanded by the Buildfile system!
@@ -160,7 +168,8 @@ for d in glob.glob(pype.pyperc('Tasks/*')):
     if os.path.isdir(d):
         addpath(d)
 
-if __debug:
+if debug:
+    import importer
     sys.stderr.write('Search Path:\n')
     for d in sys.path:
         if len(d) > 0:
@@ -199,7 +208,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
         # and let run_python_script() replace the -s with the module
         # name and then go ahead and load+run the module.
         sys.argv = sys.argv[2:]
-        if run_python_script(sys.argv[0]) == 0:
+        if run_python_script(sys.argv[0], debug) == 0:
             sys.stderr.write("Can't find module '%s'\n" % sys.argv[0])
             sys.exit(1)
 else:
