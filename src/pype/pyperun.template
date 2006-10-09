@@ -168,8 +168,9 @@ for d in glob.glob(pype.pyperc('Tasks/*')):
     if os.path.isdir(d):
         addpath(d)
 
+import importer
+
 if debug:
-    import importer
     importer.importer(on=1)
     sys.stderr.write('Search Path:\n')
     for d in sys.path:

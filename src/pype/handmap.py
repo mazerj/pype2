@@ -357,8 +357,14 @@ class _Probe:
 			dt = t - self.drift;
 			d = self.drift_amp * \
 				math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.)
-			y = y + d * math.sin(-math.pi * (90. + self.a) / 180.)
-			x = x + d * math.cos(-math.pi * (90. + self.a) / 180.)
+
+			# This was WRONG. Not sure why it ever worked!!!
+			#y = y + d * math.sin(-math.pi * (90. + self.a) / 180.)
+			#x = x + d * math.cos(-math.pi * (90. + self.a) / 180.)
+			
+			# This should now be correct:
+			y = y + d * math.sin(math.pi * self.a / 180.)
+			x = x + d * math.cos(math.pi * self.a / 180.)
 
 		if self.jitter:
 			x = x + (2 * uniform(-3, 3, integer=1))
