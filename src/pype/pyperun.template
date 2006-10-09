@@ -170,6 +170,7 @@ for d in glob.glob(pype.pyperc('Tasks/*')):
 
 if debug:
     import importer
+    importer.importer(on=1)
     sys.stderr.write('Search Path:\n')
     for d in sys.path:
         if len(d) > 0:
@@ -240,10 +241,12 @@ else:
     # startup pype with gui
 	from pype import *
 
+    istate = importer.importer(on=0)
 	try:
 		app = PypeApp(psych=psych)
 	except FatalPypeError:
 		sys.exit(1)
+    importer.importer(on=istate)
 
     if len(av) > 0:
         taskname = posixpath.splitext(av[0])[0]

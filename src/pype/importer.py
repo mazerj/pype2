@@ -20,11 +20,24 @@ def __new_import__(*args):
             fp.close()
             # only report non-python imports
             if not pathname.startswith('/usr/lib/python'):
-                sys.stderr.write("{'%s' from '%s'}\n" % (args[0], pathname))
+                sys.stderr.write("{import '%s' <- '%s'}\n" % \
+                                 (args[0], pathname))
         __data__[args[0]] = 1
     return apply(__original_import__, args)
 
 
 __data__ = {}
 __original_import__ = __builtin__.__import__
-__builtin__.__import__ = __new_import__
+
+def importer(on=1):
+    if __builtin__.__import__ == __new_import__:
+        was = 1
+    else:
+        was = 0
+        
+    if on:
+        __builtin__.__import__ = __new_import__
+    else:
+        __builtin__.__import__ = __original_import__
+
+    return was
