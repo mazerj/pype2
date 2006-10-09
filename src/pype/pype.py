@@ -293,8 +293,8 @@ class PypeApp:
 		# by the user before going any further:
 		f, ok = self._statefile(accesscheck=1)
 		if not ok:
-			sys.stderr.write("No access to %s\n" % f)
-			sys.stderr.write("Check config dir permissions: %s \n" % pyperc())
+			sys.stderr.write("pype: No access to %s\n" % f)
+			sys.stderr.write(" Check config dir permissions: %s \n" % pyperc())
 			raise FatalPypeError
 
 		n = npypes()
@@ -502,7 +502,7 @@ class PypeApp:
 						   label='Save state', command=self._savestate)
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command', 
-						   label='Keyboard', command=self._keyboard)
+						   label='Keyboard', command=self.keyboard)
 			mb.addmenuitem('File', 'command', 
 						   label='plex=1',
 						   command=lambda s=self: s.plexon_state(1))
@@ -1063,7 +1063,7 @@ class PypeApp:
 		if len(pport) == 5 and pport[0:2] == '0x':
 			ppbase = eval(pport)
 			if pp_init(ppbase):
-				sys.stderr.write('Parallel Port Enabled\n')
+				sys.stderr.write('pype: Parallel Port Enabled\n')
 				self.pport = 1
 		else:
 			self.pport = None
@@ -1198,7 +1198,7 @@ class PypeApp:
 		self.console.writenl('cwd: <%s>' % os.getcwd())
 		self.console.writenl('pyperc: <%s>' % pyperc())
 
-	def _keyboard(self):
+	def keyboard(self):
 		app = self
 		sys.stderr.write('Dropping into keyboard shell\n')
 		sys.stderr.write('"app" should be defined!\n')
@@ -2453,7 +2453,7 @@ class PypeApp:
 
 		if self.plex is not None:
 			self.plex.drain(terminate=1)
-			sys.stderr.write('Closed connection to plexon.\n')
+			sys.stderr.write('pype: closed connection to plexon.\n')
 			
 		try:
 			self.udpy.fidinfo(file=subjectrc('last.fid'))
@@ -2464,7 +2464,9 @@ class PypeApp:
 		if self.tk:
 			# only do the state thing if in GUI mode
 			self._savestate()
+			sys.stderr.write('pype: saved state\n')
 
+		sys.stderr.write('pype: cleaning up sprites\n')
 		# added 28-feb-2004 to make sure that sprites are getting
 		# properly del'ed and garbage collected
 		n = len(Sprite.__list__)
@@ -2472,6 +2474,8 @@ class PypeApp:
 			sys.stderr.write('Warning: %d sprites left in memory:\n' % n)
 			for sname in Sprite.__list__:
 				sys.stderr.write(' name="%s"\n' % sname)
+				
+		sys.stderr.write('pype: bye bye.\n')
 				
 
 	def repinfo(self, msg=None):

@@ -40,7 +40,8 @@ class PlexNet:
 		self.__db_header_size = struct.calcsize(self.__db_header)
 		self.__db_size = struct.calcsize(Plex.fPL_DataBlockHeader)
 
-		self.__lock = threading.Lock()		
+		self.__lock = threading.Lock()
+		sys.stderr.write('starting plexnet thread\n')
 		threading.Thread(target=self.run).start()
 
 	def __del__(self):
@@ -127,14 +128,23 @@ class PlexNet:
 	def run(self):
 		self.start_data()
 		while 1:
-			for e in self.pump():
+			# query the socket for a new set of plexon evens
+			eventlist = self.pump()
+
+			# Now crunch through the events. The appended None dummy event
+			# will force a check on the tank status w/o requiring an
+			# additional acquire/release cylce on the lock. This allows
+			# the thread to correctly terminate and allow pype to cleanly
+			# exit when no spike data is coming in.
+			for e in eventlist + [None]:
 				try:
 					self.__lock.acquire()
 					if self.__tank is None:
 						# this is the termination signal from the main thread
 						return
-					self.__tank.append(e)
-					self.__neurons[(e[1],e[2])] = 1
+					if e is not None:
+						self.__tank.append(e)
+						self.__neurons[(e[1],e[2])] = 1
 				finally:
 					if self.__tank is not None:
 						self.__status = "[%05d]" % len(self.__tank)
@@ -173,3 +183,4 @@ if __name__ == '__main__':
 		events, ndrops = p.drain()
 		print "%d events (%d)" % (len(events), ndrops)
 	p.drain(terminate=1)
+	print "drained."
