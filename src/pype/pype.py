@@ -831,9 +831,6 @@ class PypeApp:
 			self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
 			# TALLY WINDOW ######################################
-			self.tallyw = Label(tally, text='', anchor=W, justify=LEFT)
-			self.tallyw.pack(expand=0, fill=BOTH, side=TOP)
-			
 			b = Button(tally, text="clear task tally",
 					   command=lambda s=self: s.tally(cleartask=1))
 			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
@@ -843,6 +840,8 @@ class PypeApp:
 					   command=lambda s=self: s.tally(clear=1))
 			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
 			self.balloon.bind(b, "clear tally statistics")
+
+			self.tallyw = Info(parent=tally, height=40, width=55)
 			
 			self._runstats_update(clear=1)
 			self.tally(type=None)
@@ -1276,8 +1275,9 @@ class PypeApp:
 				s = s + '%d: %s\n' % (-(N-n), self.tally_recent[n])
 		except AttributeError:
 			pass
-		
-		self.tallyw.configure(text=s)
+
+		self.tallyw.clear()
+		self.tallyw.write(s)
 
 	def testad(self, n):
 		t = Timer()
@@ -2176,6 +2176,8 @@ class PypeApp:
 		"""
 		Deliver a squirt of juice based on the dropsize slider and
 		the current state of the reward schedule settings
+
+		Returns the actual size of the reward (ms open) delivered
 		"""
 
 		# if var==0, then ms is the exact time of the drop, if var>0
@@ -2215,6 +2217,7 @@ class PypeApp:
 				thread.start_new_thread(self.__reward2, (t,))
 			if self.tk:
 				self.console.writenl("[ran-reward=%dms]" % t, color='black')
+			actual_reward_size = t
 		else:
 			if dobeep:
 				beep(1000, 100)
@@ -2222,7 +2225,10 @@ class PypeApp:
 				self.juice_drip(ms)
 			if self.tk:
 				self.console.writenl("[reward=%dms]" % ms, color='black')
+			actual_reward_size = ms
 		self.dropcount = self.dropcount + 1
+		
+		return actual_reward_size
 
 	def __reward2(self, t):
 		"""

@@ -8,4 +8,4 @@ rig-install:
 	./INSTALL -rig
 
 clean:
-	echo "nothing to clean anymore!"
+	@echo "nothing to clean anymore!"

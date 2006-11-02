@@ -29,7 +29,15 @@ endif
 #
 set d=`../pydetect -r`
 cd rpms
-  sudo rpm -Uvh --force *.rpm $d/*.rpm
+  if ( "$d" == "FC5") then
+    rpm -q freeglut-devel
+    if ($status == 1) then
+      yum -y install freeglut-devel
+    endif
+    rpm -Uvh --force $d/*.rpm
+  else
+    rpm -Uvh --force *.rpm $d/*.rpm
+  endif
 cd ..
 
 ###########################################################################
