@@ -56,7 +56,7 @@ end
 
 fname2 = p2m_fname(fname);
 
-if ~exist(fname2,'file') & exist([fname2 '.gz'],'file')
+if ~p2mExist(fname2) & p2mExist([fname2 '.gz'])
   gz = 1;
 end
   
@@ -66,6 +66,14 @@ if ~strcmp(fname2, fname)
 end
 if gz
   fprintf('gzip: automatic\n');
+end
+
+fname0 = fname;
+fname = cannonicalfname(fname);
+if strcmp(fname0, fname) == 0
+  % only print warning if cannonical name doesn't match the
+  % name specified by user
+  fprintf('loading: %s\n', fname);
 end
   
 

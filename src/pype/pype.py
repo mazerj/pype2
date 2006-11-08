@@ -1336,8 +1336,14 @@ class PypeApp:
 			g = glob.glob(dir+'/*.py')
 		tasks = []
 		for i in range(0, len(g)):
-			x = posixpath.basename(g[i])
-			tasks.append(x[:-3])
+			# query the type for each "task" and only add to the
+			# task menu if it's really a task, with the !TASK! flag
+			# in the header
+			type = pyfile_type(g[i])
+			# print g[i], 'is', type
+			if type is 'task' or type is None:
+				x = posixpath.basename(g[i])
+				tasks.append(x[:-3])
 		tasks.sort()
 
 		menubar.addmenuitem(dropname, 'command', 
@@ -3287,6 +3293,32 @@ def gethostname():
 	except:
 		return 'NOHOST'
 
+def pyfile_type(fname):
+	"""
+	Scan a python file looking in the comments for a tag that indicated
+	whether this particular file is a "task" or a "module".
+
+	returns: "task", "module" or None
+	"""
+	import re
+	
+	re_task = re.compile('.*#.*!TASK!.*')
+	re_module = re.compile('.*#.*!MODULE!.*')		
+	try:
+		f = open(fname, 'r')
+		# read up to about 50 lines from the file
+		lines = f.readlines(80*50)
+		f.close()
+		for l in lines:
+			if re_task.search(l):
+				return 'task'
+			if re_module.search(l):
+				return 'module'
+		return None
+	except:
+		return None
+			
+
 class FixWin:
 	def __init__(self, x=0, y=0, size=10, app=None, vbias=1.0):
 		self.app = app
@@ -3534,7 +3566,7 @@ class DancingBear:
 				sys.stderr.write('\n')
 				DancingBear._pos = 0
 			sys.stderr.flush()
-			
+
 def dance(s='.'):
 	DancingBear().dance(s)
 

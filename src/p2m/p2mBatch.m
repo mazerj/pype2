@@ -68,7 +68,7 @@ for n = 1:length(files)
   end
   matfile = strrep(matfile, '.gz', '');
   
-  if exist(matfile, 'file')
+  if p2mExist(matfile)
     oldpf = p2mLoad(matfile);
   else
     oldpf = [];
