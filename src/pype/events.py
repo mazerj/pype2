@@ -10,6 +10,8 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
+Wed Nov 15 10:32:20 2006 mazer
+  added NA_RESPONSE
 """
 
 ####################################################################
@@ -27,6 +29,10 @@ UNINITIATED_TRIAL		= 'U'
 MAXRT_EXCEEDED			= 'M'
 EARLY_RELEASE			= 'E'
 ERROR_RESPONSE			= 'X'
+
+# this is for trials where there's really no 'correct' or 'incorrect'
+# response possible -- like spontaneous data or freeviewing..
+NA_RESPONSE				= 'N'
 
 rcodes = {
 	'C': 'CORRECT_RESPONSE',

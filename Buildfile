@@ -55,6 +55,7 @@ endif
 # clean: all the pype src directories
 clean: 
 	@find . -name core | xargs rm -f
+	@find . -name music.raw | xargs rm -f
 	@find . -name \*.pyc | xargs rm -f
 	for i in $(SUBDIRS); \
 		do (cd $$i ; $(MAKE) clean);\

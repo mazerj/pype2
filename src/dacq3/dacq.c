@@ -168,10 +168,11 @@ static unsigned long timestamp(int init)
   struct timeval now, delta;
   struct timezone tz;
   static struct timeval first;
+  static int initted = 0;
 
-  if (init) {
+  if (init || initted == 0) {
     gettimeofday(&first, &tz);
-
+    initted = 1;
     return(0);
   } else {
     gettimeofday(&now, &tz);
@@ -469,7 +470,8 @@ unsigned long dacq_ts(void)
      NOTE: it's in msec
   */
   LOCK(semid);
-  if (dacq_data->das_ready) {
+
+  if (dacq_data && dacq_data->das_ready) {
     i = dacq_data->timestamp;
   } else {
     i = timestamp(0);
