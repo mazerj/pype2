@@ -27,6 +27,10 @@
 ** Thu Apr 13 09:40:47 2006 mazer 
 **   eliminated iscan_server specific members from the main data
 **   structures.
+**
+** Tue Nov 28 16:58:07 2006 mazer 
+**   added support for a ms-resolution alarm that sends interupts
+**   the client/parent process
 */
 
 #define SHMKEY	0xDA01
@@ -44,6 +48,7 @@
 /* pseudo-interupt codes */
 #define INT_DIN		1
 #define INT_FIXWIN	2
+#define INT_ALARM	3
 
 typedef struct {
   int active;			/* active or idle flag */
@@ -109,6 +114,11 @@ typedef struct {
 
   /* joystick button states (usb joystick) */
   int		js[NJOYBUT];
+
+  /* interupt generating elapsed time counter/alarm
+   * tracks in ms -- same as timestamp(). 0 for no alarm
+   */
+  unsigned long		alarm_time;
 
   /* 'interrupt' classes & arguments */
   int int_class;

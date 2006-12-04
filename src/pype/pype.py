@@ -182,6 +182,17 @@ Thu Sep 28 10:16:02 2006 mazer
      up the handler. the max_* parameters are handled directly by
 	 pype and the run is terminated automatically when the stopping
 	 conditions are met.
+
+Mon Dec  4 09:26:10 2006 mazer
+
+- added set_alarm() method -- this provides a mechanism to generate
+  an alarm signal after a fixed # of ms. Use in conjunction with
+  app.allow_ints (must be true to alarm to get raised). When the
+  alarm goes off an 'Alarm' exception is raised the next time idlefn()
+  gets called, just like Bar events..
+  
+  usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
+  
 """
 
 #####################################################################
@@ -1160,6 +1171,7 @@ class PypeApp:
 		# you can FixBreak and BarTransition to work..
 		self._post_fixbreak = 0
 		self._post_bartransition = 0
+		self._post_alarm = 0
 
 		# catch interupts from the das_server process indicating
 		# bar state transitions and fixation breaks
@@ -1946,6 +1958,9 @@ class PypeApp:
 		if self._post_bartransition:
 			self._post_bartransition = 0
 			raise BarTransition
+		if self._post_alarm:
+			self._post_alarm = 0
+			raise Alarm
 
 		if fast:
 			return
@@ -2324,7 +2339,22 @@ class PypeApp:
 			# in theory you could loose a pending interupt here, but it
 			# should be unlikely.
 			self._post_bartransition = 0
-			
+
+
+	def set_alarm(self, ms=None, clear=None):
+		"""
+		Set an alarm to go off in "ms" milliseconds. When the
+		alarm goes off it will generate an Alarm exception AT THE NEXT
+		CALL TO idlefn(). To clear the alarm (before it goes off), call
+		with no args. There is only ONE alarm/timer per dacq process!
+
+		Note: this requires app.allow_ints to be true in order to
+		      work!
+		"""
+		if ms:
+			dacq_set_alarm(ms_from_now)
+		elif clear:
+			dacq_set_alarm(0)
 
 	def int_handler(self, signal, frame):
 		"""This is for catching SIGUSR1's from the dacq process"""
@@ -2363,6 +2393,9 @@ class PypeApp:
 				# within idlefn().
 				self._post_fixbreak = 1
 				# raise FixBreak
+			elif iclass == 3:
+				dacq_release()
+				self._post_alarm = 1
 			else:
 				self.allow_ints = 1
 				return

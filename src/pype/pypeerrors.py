@@ -22,5 +22,7 @@ class UserAbort(Exception): pass
 class UserExit(Exception): pass
 class TaskAbort(Exception): pass
 class GuiOnlyFunction(Exception): pass
+
 class BarTransition(Exception): pass
 class FixBreak(Exception): pass
+class Alarm(Exception): pass

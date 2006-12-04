@@ -2206,8 +2206,11 @@ class PolySprite:
 	with.
 	"""
 	
+	__id__ = 0
+	
 	def __init__(self, points, color, fb,
-				 line=0, closed=0, width=1, on=1):
+				 line=0, closed=0, width=1, on=1,
+				 depth=0, name=None):
 		"""PolySprite instantiation method
 
 		**points** (pixels) -- polygon vertices. List of (x,y) pairs, where
@@ -2224,7 +2227,21 @@ class PolySprite:
 		**width** (pixesl) -- line width
 		
 		**on** (boolean) -- just like regular Sprite class
+
+		**depth** -- depth of sprite (for DisplayList below). The DisplayList
+		class draws sprites in depth order, with large depths being
+		draw first (ie, 0 is the top-most layer of sprites)
+
+		**name** -- debugging name (string) of the sprite; if not set, then
+		either the filename or a unique random name is used instead.
 		"""
+
+		if name:
+			self.name = name
+		else:
+			self.name = "PolySprite%d" % PolySprite.__id__
+		PolySprite.__id__ = PolySprite.__id__ + 1
+
 
 		self.fb = fb
 		self.points = []
@@ -2239,6 +2256,7 @@ class PolySprite:
 		self.close = closed
 		self.width = width
 		self._on = on
+		self.depth = depth
 
 	def blit(self, flip=None):
 		"""Draw PolySprite

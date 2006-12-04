@@ -48,6 +48,10 @@
 ** Thu May 25 11:40:58 2006 mazer 
 **   changed z from int to float in mainloop() to avoid overflow
 **   errors on (x*x)+(y*y) with ISCAN...
+**
+** Tue Nov 28 16:58:07 2006 mazer 
+**   added support for a ms-resolution alarm that sends interupts
+**   the client/parent process
 */
 
 #include <unistd.h>
@@ -565,7 +569,19 @@ static void mainloop(void)
     LOCK(semid);
     dacq_data->timestamp = ts;
     k = dacq_data->adbuf_on;
+
+    /* check alarm status */
+    if (dacq_data->alarm_time && ts < dacq_data->alarm_time) {
+      /* alarm set and expired -- clean and send interupt to
+       * client (ie, parent)
+       */
+      dacq_data->alarm_time = 0;
+      dacq_data->int_class = INT_ALARM;
+      dacq_data->int_arg = 0;
+      kill(getppid(), SIGUSR1);
+    }
     UNLOCK(semid);
+
 
     /* Stash the data, if recording is on:
      *  adbuf_t,x,y <- calibrated eye signal

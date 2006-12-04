@@ -129,6 +129,10 @@
 **   This involved changing the syntax for dacq_boot(), dacq_set_pri()
 **     and messing with the DACQINFO structure to remove iscan_server
 **     specific members.
+**
+** Tue Nov 28 16:58:07 2006 mazer 
+**   added support for a ms-resolution alarm that sends interupts
+**   the client/parent process: dacq_set_alarm(int ms_from_now)
 */
 
 #include <sys/types.h>
@@ -316,6 +320,9 @@ int dacq_start(int boot, int testmode, char *tracker_type,
     dacq_data->dacq_pri = 0;
 
     dacq_data->fixbreak_tau = 5;
+
+    /* alarm timer (same units as timestamp); 0 for no alarm */
+    dacq_data->alarm_time = 0;
 
     if (testmode) {
       dacq_data->din[2] = 1;
@@ -965,4 +972,15 @@ int dacq_jsbut(int n)
   i = (n < NJOYBUT) ? dacq_data->js[n] : -1;
   UNLOCK(semid);
   return(i);
+}
+
+void dacq_set_alarm(int ms_from_now)
+{
+  LOCK(semid);
+  if (ms_from_now) {
+    dacq_data->alarm_time = dacq_data->timestamp + ms_from_now;
+  } else {
+    dacq_data->alarm_time = 0;
+  }
+  UNLOCK(semid);
 }
