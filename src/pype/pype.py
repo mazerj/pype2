@@ -2248,6 +2248,11 @@ class PypeApp:
 				self.console.writenl("[reward=%dms]" % ms, color='black')
 			actual_reward_size = ms
 		self.dropcount = self.dropcount + 1
+
+		# Fri Dec  8 14:02:49 2006 mazer
+		#  automatically encode the actual reward size (ms open) in
+		#  the data file
+		app.encode('ACT_' + REWARD + '%d' % actual_reward_size)
 		
 		return actual_reward_size
 

@@ -2245,32 +2245,52 @@ class PolySprite:
 
 		self.fb = fb
 		self.points = []
+		self.color = color
+		self.line = line
+		self.closed = closed
+		self.width = width
+		self._on = on
+		self.depth = depth
+
 		self.screen_points = []
 		for (x,y) in points:
 			self.screen_points.append((x,y))
 			x = (self.fb.w/2) + x
 			y = (self.fb.h/2) - y
 			self.points.append((x,y))
-		self.color = color
-		self.line = line
-		self.close = closed
-		self.width = width
-		self._on = on
-		self.depth = depth
-
+			
+		
 	def blit(self, flip=None):
 		"""Draw PolySprite
 		"""
 		
 		if not self._on:
 			return
-		
-		if self.line:
-			pygame.draw.lines(self.fb.screen, self.color, self.close,
-							  self.points, self.width);
+
+		if self.fb and self.fb.opengl:
+			if self.line:
+				glLineWidth(self.width)
+			glColor3d(float(self.color[0])/255,
+					  float(self.color[1])/255,
+					  float(self.color[2])/255)
+			if self.line:
+				if self.closed:
+					glBegin(GL_LINE_LOOP)
+				else:
+					glBegin(GL_LINE_STRIP)
+			else:
+				glBegin(GL_POLYGON)
+			for xy in self.screen_points:
+				xy = self.fb._xy(xy, sflip=1)
+				glVertex2f(xy[0], self.fb.h-xy[1])
+			glEnd()
 		else:
-			pygame.draw.polygon(self.fb.screen, self.color,
-							  self.points, self.width);
+			if self.line:
+				pygame.draw.lines(self.fb.screen, self.color, self.closed,
+								  self.points, self.width);
+			else:
+				pygame.draw.polygon(self.fb.screen, self.color,
+								  self.points, self.width);
 		if flip:
 			self.fb.flip()
 	
