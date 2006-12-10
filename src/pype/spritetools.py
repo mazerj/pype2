@@ -90,8 +90,7 @@ def pixelize(a, rgb=None, norm=1):
     else:
         return g2rgb(a)
 
-def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
-			center=None):
+def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0)
     """
 	2D sine grating generator (odd symmetric)
 	
@@ -99,6 +98,7 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 		s = Sprite object
 		frequency = frequency in cycles/sprite
 		phase_deg = phase in degrees
+	      (nb: 0deg phase centers the sine function at sprite ctr)
 		ori_deg = grating orientation in degrees
 		R = red channel value (0-1) or standard pype RGB color triple
 		G = green channel value (0-1)
@@ -114,9 +114,6 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
     t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
 	x, y = (r * cos(t), r * sin(t))
 
-	#	if center is not None:
-	#	p0 = s.w
-
 	i = 127.0 * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
     s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
                            axes=[1,2,0])
@@ -129,6 +126,7 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 		s = Sprite object
 		frequency = frequency in cycles/sprite
 		phase_deg = phase in degrees
+	      (nb: 0deg phase centers the cosine function at sprite ctr)
 		ori_deg = grating orientation in degrees
 		R = red channel value (0-1) or standard pype RGB color triple
 		G = green channel value (0-1)
