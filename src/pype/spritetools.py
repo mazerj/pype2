@@ -90,7 +90,7 @@ def pixelize(a, rgb=None, norm=1):
     else:
         return g2rgb(a)
 
-def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0)
+def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
     """
 	2D sine grating generator (odd symmetric)
 	

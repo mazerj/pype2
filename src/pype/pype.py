@@ -386,6 +386,10 @@ class PypeApp:
 		#  sw1 acts a reward delivery with JUICESWITCH=1
 		self.config.set('JUICESWITCH',	'1',			override=None)
 
+		# Thu Jan 11 15:25:06 2007 mazer
+		# if ENABLE_SW1==0, just turn off all remote control of rewards
+		self.config.set('ENABLE_SW1',	'1',			override=None)
+
 		# 12-jul-2005 willmore
 		# removed default video/audio driver settings; let
 		# FrameBuffer.__init__ figure them out
@@ -2012,6 +2016,7 @@ class PypeApp:
 					self.status('[UserAbort]')
 					raise UserAbort
 			elif c == 'F4':
+				self.console.writenl("F4", color='red')
 				self.reward()
 			elif c == 'F5':
 				if self.running:
@@ -2028,28 +2033,31 @@ class PypeApp:
 				sys.stderr.write('User requested exit.\n')
 				sys.exit(0)
 
-			if self.running:
-				# added JUICEBUTTON for Ben Willmore 20-sep-2003:
-				if self.sw1() and self.config.iget('JUICEBUTTON'):
-					self.reward()
-			elif self.sw1():
-				# added JUICESWITCH 27-feb-2005 JAM
-				if not self.config.iget('JUICESWITCH'):
-					# give squirt (vs. constant on) and wait for switch
-					# to get released before continuing
-					self.reward()
-					while self.sw1():
-						self.idlefn()
-				else:
-					self.juice_on()
-					self.status('juice on')
-					while self.sw1():
-						self.tk.update()
-						if self.terminate:
-							sys.stderr.write("WARNING: juice switch open\n")
-							break
-					self.juice_off()
-					self.status('')
+			if self.config.iget('ENABLE_SW1'):
+				if self.running:
+					# added JUICEBUTTON for Ben Willmore 20-sep-2003:
+					if self.sw1() and self.config.iget('JUICEBUTTON'):
+						self.console.writenl("sw1 running", color='red')
+						self.reward()
+				elif self.sw1():
+					# added JUICESWITCH 27-feb-2005 JAM
+					if not self.config.iget('JUICESWITCH'):
+						# give squirt (vs. constant on) and wait for switch
+						# to get released before continuing
+						self.console.writenl("sw1 not running", color='red')
+						self.reward()
+						while self.sw1():
+							self.idlefn()
+					else:
+						self.juice_on()
+						self.status('juice on')
+						while self.sw1():
+							self.tk.update()
+							if self.terminate:
+								sys.stderr.write("WARNING: juice switch open\n")
+								break
+						self.juice_off()
+						self.status('')
 
 			x, y = self.eyepos()
 			try:
@@ -2252,7 +2260,7 @@ class PypeApp:
 		# Fri Dec  8 14:02:49 2006 mazer
 		#  automatically encode the actual reward size (ms open) in
 		#  the data file
-		app.encode('ACT_' + REWARD + '%d' % actual_reward_size)
+		self.encode('ACT_' + REWARD + '%d' % actual_reward_size)
 		
 		return actual_reward_size
 
