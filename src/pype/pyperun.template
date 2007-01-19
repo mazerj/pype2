@@ -73,7 +73,7 @@ def run_python_script(fullname, debug):
     import imp
 
     name = posixpath.basename(fullname)
-
+    
     # strip the .py off, if it's there..
     if name[(len(name)-3):] == '.py':
         name = name[:-3]
@@ -98,6 +98,20 @@ def run_python_script(fullname, debug):
         finally:
             fp.close()
         return 1
+
+    if 0:
+        # one last try: skip the find_module (for scripts with no .py extension)
+        # this ALMOST works, but leaves a XXXc pyc file in place... ugh..
+        if posixpath.exists(fullname):
+            fp = open(fullname, 'r')
+            try:
+                mod = imp.load_module('__main__',
+                                      fp, fullname,
+                                      ('.foo', 'U', imp.PY_SOURCE))
+            finally:
+                fp.close()
+            return 1
+    
     return 0
 	
 if not os.environ.has_key('HOME'):

@@ -33,6 +33,8 @@ import pype_aux
 from guitools import *
 from filebox import Open, SaveAs
 
+KEEPLOCKED = -1
+
 # these are made available for custom validation functions,
 # so the user doesn't have to know how Pmw works (it's just
 # too ugly/complicated for the average user & me).
@@ -494,7 +496,8 @@ def _unpack_slot(slot):
 	return (name, default, validate, descr, runlock)
 
 class ParamTable:
-	def __init__(self, parent, table, file=None, altfile=None):
+	def __init__(self, parent, table, file=None, altfile=None,
+				 decorate=1, locks=1):
 		"""Parameter management table class"""
 		self._table = table
 		self._entries = {}
@@ -519,8 +522,10 @@ class ParamTable:
 		if self._file:
 			Button(f, text='Save',
 				   command=self.save).pack(expand=0, fill=X, side=LEFT)
-		Button(f, text="View",
-			   command=self.view).pack(expand=0, fill=X, side=LEFT)
+
+		if decorate:
+			Button(f, text="View",
+				   command=self.view).pack(expand=0, fill=X, side=LEFT)
 
 		f = Pmw.ScrolledFrame(parent, usehullsize=1)
 		
@@ -567,19 +572,20 @@ class ParamTable:
 				xxx = Frame(lf, height=12, width=12)
 				xxx.pack_propagate(0)
 				xxx.pack(side=LEFT)
-				if runlock == -1:
-					lockbut = Label(xxx, text = '')
-				else:
-					lockbut = Button(xxx, text = '',\
-									 command=lambda n=name: \
-									 self.lockfield(n, toggle=1))
-				lockbut.pack(fill=BOTH, expand=1)
-				
-				if runlock == -1:
-					# runlock==-1: user can NEVER set this value!
-					e.component('entry').configure(state=DISABLED)
-					e.component('label').configure(fg='red')
-					lockbut.configure(state=DISABLED)
+				if locks:
+					if runlock == KEEPLOCKED:
+						lockbut = Label(xxx, text = '')
+					else:
+						lockbut = Button(xxx, text = '',\
+										 command=lambda n=name: \
+										 self.lockfield(n, toggle=1))
+					lockbut.pack(fill=BOTH, expand=1)
+
+					if runlock == KEEPLOCKED:
+						# runlock==KEEPLOCKED(-1): usr can NEVER set this value!
+						e.component('entry').configure(state=DISABLED)
+						e.component('label').configure(fg='red')
+						lockbut.configure(state=DISABLED)
 				self._entries[name] = e
 				entries.append(e)
 				self.names.append(e)
@@ -596,7 +602,7 @@ class ParamTable:
 		if self._file:
 			self.load()
 
-	def get(self, evaluate=1, mergewith=None):
+	def get(self, evaluate=1, mergewith=None, readonly=1):
 		"""
 		Returns a dictionary containing all the values in
 		the parameter table.  Dictionary keys are the slot
@@ -613,6 +619,8 @@ class ParamTable:
 		- mergewith=<dict> -> pass in an existing dictionary and
 		results will be merged into the existing dictionary, new
 		merged dictionary is returned.
+
+		- readonly=1 -> validate readonly fields?
 		
 		NOTE: THIS DICTIONARY WILL HAVE PRIORITY
 		"""
@@ -630,7 +638,9 @@ class ParamTable:
 			if evaluate:
 				if not (type(validate) is types.TupleType) and validate:
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
-					if r != VALID:
+					if (runlock == KEEPLOCKED) and not readonly:
+						continue
+					elif r != VALID:
 						return (0, name)
 			d[name] = v
 		return (1, d)
@@ -644,6 +654,9 @@ class ParamTable:
 				state = DISABLED
 		w.configure(state=state)
 		self._locks[name] = state
+
+	def keys(self):
+		return self._entries.keys()
 
 	def query(self, name):
 		"""
@@ -667,8 +680,7 @@ class ParamTable:
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
 					if r != VALID:
 						(r, v) = apply(validate, (default,), {"evaluate": 1})
-						warn('Warning',
-							 'Using default for slot "%s".' % qname)
+						#warn('Warning', 'Using default for slot "%s".' % qname)
 				return v
 		warn('Warning',
 			 'No parameter value associated with slot "%s".' % qname)
