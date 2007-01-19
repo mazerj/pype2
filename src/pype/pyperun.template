@@ -38,6 +38,7 @@ Mon Sep 18 10:00:05 2006 mazer
 """
 
 debug = 0
+showdir = 0
 
 import sys, posixpath, os, glob, string
 
@@ -50,8 +51,7 @@ for a in sys.argv:
     elif a[:2] == 's=':
         os.environ['SUBJECT'] = a[2:]
     elif a == '--dir':
-        print os.environ['PYPEDIR']
-        sys.exit(0)
+        showdir = 1
     else:
         av.append(a)
 sys.argv = av
@@ -114,6 +114,10 @@ if not os.environ.has_key('PYPEDIR'):
     os.environ['PYPEDIR'] = "%%PYPEDIR%%"
     sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
                      os.environ['PYPEDIR'])
+
+if showdir:
+    print os.environ['PYPEDIR']
+    sys.exit(0)
 
 # rest of this section sets up the python search path to find
 # all the pype modules and tasks
