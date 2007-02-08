@@ -433,23 +433,25 @@ class PypeRecord:
 		return pattern, ts
 
 class PypeFile:
-	def __init__(self, fname, filter=None, status=None):
+	def __init__(self, fname, filter=None, status=None, quiet=None):
 		flist = string.split(fname, '+')
 		if len(flist) > 1:
 			import posix
 			if flist[0][-3:] == '.gz':
-				cmd = 'gunzip -c %s ' % string.join(flist,' ')
+				cmd = 'gunzip --quiet -c %s ' % string.join(flist,' ')
 			else:
 				cmd = 'cat %s ' % string.join(flist,' ')
 			self.fp = posix.popen(cmd, 'r')
-			sys.stderr.write('compositing: %s\n' % fname)
+			if not quiet:
+				sys.stderr.write('compositing: %s\n' % fname)
 			self.fname = fname
 		elif fname[-3:] == '.gz':
 			# it appears MUCH faster to open a pipe to gunzip
 			# than to use the zlib/gzip module..
 			import posix
-			self.fp = posix.popen('gunzip <%s' % fname, 'r')
-			sys.stderr.write('decompressing: %s\n' % fname)
+			self.fp = posix.popen('gunzip --quiet <%s 2>/dev/null' % fname, 'r')
+			if not quiet:
+				sys.stderr.write('decompressing: %s\n' % fname)
 			self.fname = fname[:-3]
 			self.zfname = fname[:]
 		elif not posixpath.exists(fname) and \
@@ -459,8 +461,10 @@ class PypeFile:
 			# try using the .gz file instead...
 			self.fname = fname
 			self.zfname = fname+'.gz'
-			self.fp = posix.popen('gunzip <%s' % self.zfname, 'r')
-			sys.stderr.write('decompressing: %s\n' % self.zfname)
+			self.fp = posix.popen('gunzip --quiet <%s 2>/dev/null' %
+								  self.zfname, 'r')
+			if not quiet:
+				sys.stderr.write('decompressing: %s\n' % self.zfname)
 		else:
 			self.fname = fname
 			self.zfname = None
