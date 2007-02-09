@@ -1341,7 +1341,7 @@ class Sprite(_ImageBase):
 		"""
 		self.alpha[:] = a
 	
-	def line(self, x1, y1, x2, y2, color):
+	def line(self, x1, y1, x2, y2, color, width=1):
 		"""Draw line of specified color in sprite
 		  
 		**x1,y1** -- starting coords of line in world coords
@@ -1362,7 +1362,7 @@ class Sprite(_ImageBase):
 		x2 = self.X(x2)
 		y1 = self.Y(y1)
 		y2 = self.Y(y2)
-		pygame.draw.line(self.im, color, (x1, y1), (x2, y2))
+		pygame.draw.line(self.im, color, (x1, y1), (x2, y2), width=width)
 
 	def clear(self, color=(1,1,1)):
 		"""Clear sprite to specified color
