@@ -34,8 +34,14 @@ mkdir $d
 gunzip < comedilib-*.tar.gz | (cd $d; tar xf -)
 pushd $d/comedilib-*
 ./configure --prefix=/usr
+
+# something wrong with ruby junk in 7.22:
+echo "all:" > swig/ruby/Makefile
 make
+
+echo "install:" > swig/ruby/Makefile
 make install
+
 popd
 /bin/rm -rf $d
   
