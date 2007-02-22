@@ -1273,7 +1273,9 @@ class PypeApp:
 		ks.sort()
 		
 		(ntot, s) = (0, '')
-		for (task,type) in self.tallycount.keys():
+		keys = self.tallycount.keys()
+		keys.sort()
+		for (task,type) in keys:
 			d = string.split(type)
 			if len(d) > 1:
 				d = "%s (%s)" % (d[0], string.join(d[1:]))
