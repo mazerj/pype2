@@ -33,14 +33,10 @@ popd
 mkdir $d
 gunzip < comedilib-*.tar.gz | (cd $d; tar xf -)
 pushd $d/comedilib-*
-./configure --prefix=/usr
 
-# something wrong with ruby junk in 7.22:
-echo "all:" > swig/ruby/Makefile
-make
-
-echo "install:" > swig/ruby/Makefile
-make install
+# --disable-ext-bindings is needed because ruby stuff in the library
+# doesn't compile on most systems. And we don't use any of this junk..
+./configure --disable-ext-bindings --prefix=/usr
 
 popd
 /bin/rm -rf $d
