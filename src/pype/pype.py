@@ -415,6 +415,20 @@ class PypeApp:
 		# sanity check to make sure framerate is correct
 		self.config.set('FPS',			'0',			override=None)
 
+		# Thu Mar  1 20:53:51 2007 mazer
+		# started hooking pype into elog-sql system
+		#   $ELOG should be set to point to the path for the elog
+		#   library or source code for elog (wherever elogapi.py
+		#   lives). By default use the tradition method..
+		self.use_elog = 0
+		if os.environ.has_key('ELOG'):
+			sys.path = sys.path + [os.environ['ELOG']]
+			try:
+				import elogapi
+				self.use_elog = 1
+				sys.stderr.write("**** Using ELOG system ***\n")
+			except ImportError:
+				sys.stderr.write("Warning: can't import ELOG api.\n")
 
 		# these MUST be set from now on..
 		monw = self.config.fget('MONW', -1)
@@ -671,6 +685,12 @@ class PypeApp:
 				("timeout",		"10000+-20%", is_iparam, "penalty timeout for errors (ms)"),
 				("uitimeout",	"20000+-20%", is_iparam, "uninitiated trial timeout (ms)"),
 				), file='subject.par', altfile='common-%s.par' % hostname)
+
+			if self.use_elog:
+				# the cell field (exper in elog database) is not
+				# user setable in elog mode!
+				self.sub_common.lockfield('cell')
+			
 
 			b = Checkbutton(cpane, text='rig params', relief=RAISED, pady=4)
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -1788,6 +1808,24 @@ class PypeApp:
 					if self.record_selectfile(train=train) is None:
 						sys.stderr.write('run aborted\n')
 						return
+					
+				# If elog is in use, then at the end of each run insert
+				# (or update, since force=1) data on this file in the
+				# sql database.
+				# Do this at the START of the run so it can be seen right
+				# away..
+				if self.use_elog and not temp:
+					import elogapi
+					(ok, ecode) = elogapi.AddDatafile(
+						self._exper,
+						self.sub_common.queryv('subject'),
+						self.uname,
+						fname,
+						self.task_name,
+						force=1)
+					if not ok:
+						warn("elog", ecode)
+					del self._exper
 						
 				if self.tk:
 					self._startbut.config(text='stop')
@@ -1821,7 +1859,7 @@ class PypeApp:
 											  state=NORMAL)
 						self._loadmenu.enableall()
 					if self.psych:
-						self.fb.hide()					
+						self.fb.hide()						
 			else:
 				if self.tk:
 					self._startbut.config(state=DISABLED)
@@ -2933,7 +2971,7 @@ class PypeApp:
 			labeled_dump('note', rec, f, 1)
 			f.close()
 
-	def _guess(self, train=None):
+	def _guess_fallback(self, train=None):
 		import glob
 		
 		subject = self.sub_common.queryv('subject')
@@ -2965,6 +3003,43 @@ class PypeApp:
 			return "%s%s.%s.%03d" % (subject, cell,
 									   self.task_name, next)
 
+	def _guess_elog(self, train=None):
+		import glob, elogapi
+
+		animal = self.sub_common.queryv('subject')
+		exper = elogapi.GetExper(animal)
+		if exper is None:
+			warn("elog", "can't get exper info from database")
+		else:
+			# update cell slot in worksheets with exper
+			self.sub_common.set('cell', exper)
+		
+		self._exper = exper
+		if train:
+			exper = exper[:-4] + '0000'
+		pat = "%s.*.[0-9][0-9][0-9]" % (exper, )
+		# generate list of files (including zipped files)
+		flist = glob.glob(pat)+glob.glob(pat+'.gz')
+
+		next = 0
+		for f in flist:
+			try:
+				n = int(string.split(f, '.')[2])
+				if n >= next:
+					next = n + 1
+			except ValueError:
+				pass
+
+		return "%s.%s.%03d" % (exper, self.task_name, next)
+		
+
+	def _guess(self, train=None):
+		if self.use_elog:
+			return self._guess_elog(train=train)
+		else:
+			return self._guess_fallback(train=train)
+		
+		
 	def record_done(self):
 		self.record_note('pype', 'run ends')
 		self.record_file = None
