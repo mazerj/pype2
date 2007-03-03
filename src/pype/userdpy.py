@@ -866,12 +866,17 @@ Mouse-3 simulate bar up/down
 
 	def savefidmarks(self, file=None):
 		if self.app:
-			subj = self.app.sub_common.queryv('subject')
-			cell = self.app.sub_common.queryv('cell')
-			try:
-				initf = "%s%04d.fid" % (subj, int(cell))
-			except ValueError:
-				initf = "%s%s.fid" % (subj, cell)
+			if self.app.use_elog:
+				import elogapi
+				animal = self.app.sub_common.queryv('subject')
+				initf = "%s.fid" % (elogapi.GetExper(animal), )
+			else:
+				subj = self.app.sub_common.queryv('subject')
+				cell = self.app.sub_common.queryv('cell')
+				try:
+					initf = "%s%04d.fid" % (subj, int(cell))
+				except ValueError:
+					initf = "%s%s.fid" % (subj, cell)
 		else:
 			initf=nextfile('marks.%04d.fid')
 

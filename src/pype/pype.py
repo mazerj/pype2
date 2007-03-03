@@ -1820,7 +1820,7 @@ class PypeApp:
 						self._exper,
 						self.sub_common.queryv('subject'),
 						self.uname,
-						fname,
+						self.record_file,
 						self.task_name,
 						force=1)
 					if not ok:
