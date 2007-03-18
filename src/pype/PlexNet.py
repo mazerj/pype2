@@ -82,11 +82,14 @@ class PlexNet:
 
 		if (NumMMFDropped - self.__last_NumMMFDropped) > 0:
 			self.__last_NumMMFDropped = NumMMFDropped
-			sys.stderr.write("warning:MMF dropout\n")
+			sys.stderr.write("PlexNet: Warning, MMF dropout!!\n")
+			sys.stderr.write("PlexNet: Consider power cycling MAP box...\n")
 			self.__mmf_drops = self.__mmf_drops + 1
 
 		if NumServerDropped > 0:
-			sys.stderr.write("warning:NumServerDropped=%d\n" % NumServerDropped)
+			sys.stderr.write("PlexNet: NumServerDropped=%d\n" %
+							 NumServerDropped)
+			sys.stderr.write("PlexNet: This shouldn't happen; tell Jamie\n")
 
 		pos = 16
 		events = []

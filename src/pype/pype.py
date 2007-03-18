@@ -641,7 +641,8 @@ class PypeApp:
 				("show_noise", 1, is_boolean),
 				
 				("Session Data", None, None),
-				("subject",		"", is_any, "subject identification (name, number, etc)"),
+				("subject",		"", is_any, "subject id (prefix/partial)"),
+				("full_subject", "", is_any, "full subject name"),
 				("owner",		"", is_any, "datafile owner"),
 				("cell",		"", is_any, "cellid -- for reference to cellDB or notebook"),
 				("site.well",	"", is_any, "well number [recording only]"),
@@ -1077,11 +1078,6 @@ class PypeApp:
 		if len(self.config.get('USB_JS_DEV')) > 0:
 			os.environ['XXUSBJS'] = self.config.get('USB_JS_DEV')
 
-		print self.config.iget('DACQ_TESTMODE'), \
-			  self.config.get('EYETRACKER'), \
-				   self.config.get('DACQ_SERVER'),\
-				   self.config.get('EYETRACKER_DEV')
-				   
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),
 				   self.config.get('EYETRACKER'),
@@ -1818,7 +1814,7 @@ class PypeApp:
 					import elogapi
 					(ok, ecode) = elogapi.AddDatafile(
 						self._exper,
-						self.sub_common.queryv('subject'),
+						self.sub_common.queryv('full_subject'),
 						self.uname,
 						self.record_file,
 						self.task_name,
@@ -3007,12 +3003,16 @@ class PypeApp:
 		import glob, elogapi
 
 		animal = self.sub_common.queryv('subject')
+		full_animal = self.sub_common.queryv('full_subject')
+		if len(animal) == 0 or len(full_animal) == 0:
+			warn('elog', "Set both 'subject' and 'full_subject' first!")
+			return None
+			
 		exper = elogapi.GetExper(animal)
 		if exper is None:
-			warn("elog", "can't get exper info from database")
-		else:
-			# update cell slot in worksheets with exper
-			self.sub_common.set('cell', exper)
+			exper = "%s%04d" % (animal, 1)
+		# update cell slot in worksheets with exper
+		self.sub_common.set('cell', exper)
 		
 		self._exper = exper
 		if train:
@@ -3054,9 +3054,12 @@ class PypeApp:
 		else:
 			self.record_file = None
 			while 1:
+				g = self._guess(train=train)
+				if g is None:
+					return None
 				(file, mode) = SaveAs(initialdir=os.getcwd(),
-									  pattern='*.[0-9][0-9][0-9]*',
-									  initialfile=self._guess(train=train),
+									  pattern='*.[0-9][0-9][0-9]',
+									  initialfile=g,
 									  datafiles=1)
 				if file is None:
 					return None

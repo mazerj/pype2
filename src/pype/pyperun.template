@@ -131,8 +131,10 @@ if showdir:
 #  ...everything in original $PYTHONPATH...
 #  where, $PYPERC defaults to $HOME/.pyperc if it's not specified
 
+original_path = sys.path[:]
+
 pd = os.environ['PYPEDIR']+'/'
-for d in ['.', pd+'Tasks', pd+'lib', pd+'Modules']:
+for d in [pd+'Tasks', pd+'lib', pd+'Modules', '.']:
     addpath(d)
 
 # PREFIX specific user-defined paths that can contain. PYPEPATH should
@@ -182,7 +184,10 @@ if debug:
     sys.stderr.write('Search Path:\n')
     for d in sys.path:
         if len(d) > 0:
-            sys.stderr.write('  %s\n' % d)
+            if d in original_path:
+                sys.stderr.write('   %s\n' % d)
+            else:
+                sys.stderr.write(' + %s\n' % d)
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
     # *** Invoked as pypenv ***

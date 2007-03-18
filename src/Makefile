@@ -48,7 +48,7 @@ build-dacq:
 	@(cd $(DACQDIR); $(MAKE))
 
 clean:
-	@for i in $(DACQDIR) $(DUMMYDIR) $(SUBDIRS); \
+	@for i in $(DACQDIR) $(DUMMYDIR) $(SUBDIRS) $(PYDIR); \
 		do (cd $$i ; $(MAKE) clean);\
 		done
 

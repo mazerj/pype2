@@ -13,9 +13,10 @@ install-pypelib:
 		done
 	@echo ""
 	@cp cour.ttf $(PYPEDIR)/lib
-
 	@cp pypeversion.py $(PYPEDIR)/lib
 	@rm pypeversion.py
+	@(cd ./icons ; $(MAKE) install)
+	
 
 install-pyperun:
 	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.template | \
@@ -53,6 +54,7 @@ build:
 	@echo "nothing to do for build"
 
 clean:
+	(cd ./icons ; $(MAKE) clean)
 	@rm -f *.pyc pypeversion.py .*~ prun .happydoc*py
 
 happydoc:
