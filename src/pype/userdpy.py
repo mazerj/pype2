@@ -236,6 +236,20 @@ class UserDisplay:
 	def hide(self):
 		self.master.withdraw()
 
+	def stop(self, command=None):
+		if command:
+			from im_stop import stop
+			self._stop_f = Frame(self._canvas)
+			self._stop_win = self._canvas.create_window(0, 0,
+														window=self._stop_f,
+														anchor=NW)
+			self._stop_but = Button(self._stop_f, image=stop, command=command)
+			self._stop_but.pack()
+		else:
+			self._stop_but.destroy()
+			self._stop_f.destroy()
+			self._canvas.delete(self._stop_win)
+
 	def note(self, msg):
 		if msg is None or len(msg) == 0:
 			if self.msg_win:

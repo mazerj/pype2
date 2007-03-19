@@ -26,16 +26,15 @@ class AboutPype:
 	
 	_w = None
 	def __init__(self):
-		from pype import PyIcon
 		from guitools import undermouse
+		from im_splash import splash
 		
 		if AboutPype._w is None:
-			logo = PyIcon('splash.ppm').image()
 			AboutPype._w = Toplevel()
 			AboutPype._w.title('PypeAbout')
 			AboutPype._w.iconname('PypeAbout')
 			icon = Label(AboutPype._w,
-						 relief=FLAT, image=logo, pady=10)
+						 relief=FLAT, image=splash, pady=10)
 			icon.pack(expand=1, fill=BOTH)
 
 			t = """
@@ -61,8 +60,8 @@ def splash():
 	"""
 	Display a splash screen an destroy it after 10 secs.
 	"""
-	from pype import PyIcon
 	from guitools import screencenter
+	from im_splash import splash
 	
 	w = Toplevel()
 	w.overrideredirect(1)
@@ -70,8 +69,7 @@ def splash():
 	
 	f = Frame(w, borderwidth=20, background='blue')
 	f.pack(expand=1, fill=BOTH)
-	logo = PyIcon('splash.ppm').image()
-	icon = Label(f, relief=FLAT, image=logo)
+	icon = Label(f, relief=FLAT, image=splash)
 	icon.pack(expand=1, fill=BOTH)
 	w.update_idletasks()
 	screencenter(w)

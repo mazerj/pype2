@@ -486,6 +486,15 @@ class PypeApp:
 			self.tk = None
 		else:
 			self.tk = Tk()
+
+			import im_left, im_right, im_up, im_down, im_splash
+			self.icons = {}
+			self.icons['left'] = im_left.left
+			self.icons['right'] = im_right.right
+			self.icons['up'] = im_up.up
+			self.icons['down'] = im_down.down
+			self.icons['splash'] = im_splash.splash
+			
 			if self.config.iget('SPLASH'):
 				splash()
 		
@@ -901,21 +910,21 @@ class PypeApp:
 			b.pack(expand=0, fill=Y, side=LEFT)
 			self.balloon.bind(b, "reset offset's to 0,0 (immediate effect)")
 						
-			b = Button(f, image=PyIcon('left.gif').image(),
+			b = Button(f, image=self.icons['left'],
 					   command=lambda s=self: s.eyeshift(x=1, y=0))
 			b.pack(expand=0, side=LEFT)
 			self.balloon.bind(b, "shift offsets left (immediate effect)")			
-			b = Button(f, image=PyIcon('right.gif').image(),
+			b = Button(f, image=self.icons['right'],
 					   command=lambda s=self: s.eyeshift(x=-1, y=0))
 			b.pack(expand=0, side=LEFT)
-			self.balloon.bind(b, "shit offsets right (immediate effect)")
+			self.balloon.bind(b, "shift offsets right (immediate effect)")
 
-			b = Button(f, image=PyIcon('up.gif').image(),
+			b = Button(f, image=self.icons['up'],
 					   command=lambda s=self: s.eyeshift(x=0, y=-1))
 			b.pack(expand=0, side=LEFT)
 			self.balloon.bind(b, "shift offsets up (immediate effect)")
 			
-			b = Button(f, image=PyIcon('down.gif').image(),
+			b = Button(f, image=self.icons['down'],
 					   command=lambda s=self: s.eyeshift(x=0, y=1))
 			b.pack(expand=0, side=LEFT)
 			self.balloon.bind(b, "shift offsets down (immediate effect)")
@@ -1827,6 +1836,7 @@ class PypeApp:
 					self._startbut.config(text='stop')
 					self._startbut_tmp.config(text='stop')
 					self._trainbut.config(text='stop')
+					self.udpy.stop(command=self._start_helper)
 				self._allowabort = 1
 
 				self.console.clear()
@@ -1861,6 +1871,7 @@ class PypeApp:
 					self._startbut.config(state=DISABLED)
 					self._startbut_tmp.config(state=DISABLED)
 					self._trainbut.config(state=DISABLED)
+					self.udpy.stop(command=None)
 				self.running = 0
 				self.udpy.eye_clear()
 		else:
@@ -3093,11 +3104,15 @@ class PypeApp:
 					fname = pyperc('testpat');
 				else:
 					fname = libdir('testpat.pgm');
-				self._testpat = Sprite(x=0, y=0,
-									   fname=fname,
-									   fb=self.fb, depth=99, on=1)
+				try:
+					self._testpat = Sprite(x=0, y=0,
+										   fname=fname,
+										   fb=self.fb, depth=99, on=1)
+				except:
+					pass
 			self.fb.clear((1,1,1))
-			self._testpat.blit(force=1)
+			if self._testpat:
+				self._testpat.blit(force=1)
 			self.fb.sync(0)
 			self.fb.flip()
 
@@ -3752,6 +3767,7 @@ def bounce(app):
 		app._startbut.config(state=NORMAL)
 		app._startbut_tmp.config(state=NORMAL)
 		app._trainbut.config(state=NORMAL)
+		app.udpy.stop(command=None)
 		
 		app._candy = 0
 		app.udpy_note('')
@@ -3761,6 +3777,7 @@ def bounce(app):
 		app._startbut.config(state=DISABLED)
 		app._startbut_tmp.config(state=DISABLED)
 		app._trainbut.config(state=DISABLED)
+		app.udpy.stop(command=lambda app=app: bounce(app))
 
 		app._candy = 1
 		app.console.clear()
@@ -3820,15 +3837,17 @@ def slideshow(app):
 		app._startbut.config(state=NORMAL)
 		app._startbut_tmp.config(state=NORMAL)
 		app._trainbut.config(state=NORMAL)
-		
+		app.udpy.stop(command=None)
+
 		app._candy = 0
 		app.udpy_note('')
 		return
-	else:
+	else:		
 		app.led(1)
 		app._startbut.config(state=DISABLED)
 		app._startbut_tmp.config(state=DISABLED)
 		app._trainbut.config(state=DISABLED)
+		app.udpy.stop(command=lambda app=app: slideshow(app))
 		
 		try:
 			f = open(pyperc('candy.lst'), 'r')
@@ -3904,27 +3923,6 @@ def appbusy(t, busyflag=1):
 	if len(t.children.keys()) > 0:
 		for name in t.children.keys():
 			appbusy(t.children[name], busyflag=busyflag)
-
-class PyIcon:
-	"""
-	Hack class to avoid globals for caching icons.. usage:
-	   ... image=PyIcon('foo.gif').image() ...
-	The idea here is that Tk PhotoImages are lost through garbage
-	collection when they're built on the stack.  This caches a
-	global (class-var) reference to each icon to prevent such
-	lossage.
-	"""
-	_icons = {}
-	def __init__(self, name):
-		try:
-			self.icon = PyIcon._icons[name]
-		except KeyError:
-			i = PhotoImage(file=libdir(name))
-			PyIcon._icons[name] = i
-		self.icon = PyIcon._icons[name]
-
-	def image(self):
-		return self.icon
 
 def get_plexon_events(plex, fc=40000):
 	# drain tank an generate list of timestamps until you

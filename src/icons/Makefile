@@ -1,6 +1,6 @@
 include ../../make.defs
 
-FILES = *
+FILES = testpat.pgm
 
 install:
 	for i in $(FILES); \
