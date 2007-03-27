@@ -240,7 +240,7 @@ class UserDisplay:
 		if command:
 			from im_stop import stop
 			self._stop_f = Frame(self._canvas)
-			self._stop_win = self._canvas.create_window(0, 0,
+			self._stop_win = self._canvas.create_window(0, 200,
 														window=self._stop_f,
 														anchor=NW)
 			self._stop_but = Button(self._stop_f, image=stop, command=command)
