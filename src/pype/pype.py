@@ -192,6 +192,12 @@ Mon Dec  4 09:26:10 2006 mazer
   gets called, just like Bar events..
   
   usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
+
+Tue Apr  3 10:41:33 2007 mazer
+
+- Added support for setting "EYETRACKERDEV: NONE" in config file to
+  disable eyetracking in the comedi/das server. This is really to free
+  up analog channels 0 and 1 for other things (ie, acute data)
   
 """
 
@@ -708,8 +714,9 @@ class PypeApp:
 									title='rig (%s)' % hostname)
 			self.rig_common = ParamTable(rig_common,
 			(
-				("Debug State", None, None),
+				("Run Modes", None, None),
 				("testing",		0,				is_boolean),
+				("acute",		0,				is_boolean),
 				
 				("Monitor Info", None, None),
 				("mon_id",		"n/a",			is_any, "", -1),
@@ -798,6 +805,9 @@ class PypeApp:
 				self.rig_common.set('eyetracker', et)
 				self.rig_common.set('eyelag', '0')
 			elif et == 'ANALOG':
+				self.rig_common.set('eyetracker', et)
+				self.rig_common.set('eyelag', '0')
+			elif et == 'NONE':
 				self.rig_common.set('eyetracker', et)
 				self.rig_common.set('eyelag', '0')
 			else:

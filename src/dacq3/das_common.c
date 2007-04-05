@@ -52,6 +52,9 @@
 ** Tue Nov 28 16:58:07 2006 mazer 
 **   added support for a ms-resolution alarm that sends interupts
 **   the client/parent process
+**
+** Tue Apr  3 10:39:56 2007 mazer 
+**   added support for "-notracker" mode (for acutes)
 */
 
 #include <unistd.h>
@@ -78,11 +81,14 @@
 /* ez-serial library for iscan interface */
 #include "libezV24-0.0.3/ezV24.h"
 
-static char *_tmodes[] = { "ANALOG", "ISCAN", "EYELINK", "EYELINK_TEST" };
+static char *_tmodes[] = {
+  "ANALOG", "ISCAN", "EYELINK", "EYELINK_TEST", "NONE"
+};
 #define ANALOG		0
 #define ISCAN		1
 #define EYELINK		2
 #define EYELINK_TEST	3
+#define NONE		4
 
 #define INSIDE		1
 #define OUTSIDE		0
@@ -468,7 +474,9 @@ static void mainloop(void)
       UNLOCK(semid);
     }
 
-    if (tracker_mode == ISCAN) {
+    if (tracker_mode == NONE) {
+      x = y = pa = 0;
+    } else if (tracker_mode == ISCAN) {
       x = iscan_x;
       y = iscan_y;
       pa = iscan_p;
@@ -762,6 +770,9 @@ int main(int ac, char **av, char **envp)
     iscan_init(av[2]);
   } else if (av[1] && (strcmp(av[1], "-eyelink") == 0)) {
     eyelink_init(av[2]);
+  } else if (av[1] && (strcmp(av[1], "-notracker") == 0)) {
+    tracker_mode = NONE;
+    fprintf(stderr, "%s: no tracker mode\n", progname);
   } else if (getenv("EYELINK_TEST") != NULL) {
     eyelink_init(getenv("EYELINK_TEST"));
     if (tracker_mode == EYELINK) {

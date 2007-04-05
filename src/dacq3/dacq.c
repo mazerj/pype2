@@ -133,6 +133,11 @@
 ** Tue Nov 28 16:58:07 2006 mazer 
 **   added support for a ms-resolution alarm that sends interupts
 **   the client/parent process: dacq_set_alarm(int ms_from_now)
+**
+** Tue Apr  3 10:39:56 2007 mazer 
+**   added support for "-notracker" mode (for acutes)
+**   activate by setting trakdev to "NONE" when calling dacq_start(). happens
+**     in pype.py
 */
 
 #include <sys/types.h>
@@ -342,6 +347,9 @@ int dacq_start(int boot, int testmode, char *tracker_type,
 	} else if (strcmp(tracker_type, "ANALOG") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting analog\n");
 	  execlp(dacq_server, dacq_server, NULL);
+	} else if (strcmp(tracker_type, "NONE") == 0) {
+	  //fprintf(stderr, "dacqmodule: starting w/o tracker\n");
+	  execlp(dacq_server, dacq_server, "-notracker", NULL);
 	}
 
 	perror(dacq_server);

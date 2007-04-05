@@ -15,6 +15,10 @@
 **
 ** Wed Nov  3 15:02:41 2004 mazer 
 **   added support for the DAS08 board (no 8255!!)
+**
+** Tue Apr  3 08:37:59 2007 mazer 
+**   cleaned up error messages for comedit to make it easier to track
+**   down problems with non-DAS/ComputerBoards cards (like NI-6025E).
 */
 
 #include <sys/types.h>
@@ -50,12 +54,12 @@ static int pci_das08 = 0;	/* board is pci-das08? */
 
 static char *comedi_devname = "/dev/comedi0";
 static comedi_t *comedi_dev;	/* main handle to comedi lib */
-static int analog_in;		/* subdevice for analog input */
+static int analog_in = -1;	/* subdevice for analog input */
 
 static int use8255;		/* 0 for ISA, 1 for PCI */
-static int dig_io;		/* combined digital I/O subdevice */
-static int dig_i;		/* digital IN only subdevice (ISA) */
-static int dig_o;		/* digital OUT only subdevice (ISA)*/
+static int dig_io = -1;		/* combined digital I/O subdevice */
+static int dig_i = -1;		/* digital IN only subdevice (ISA) */
+static int dig_o = -1;		/* digital OUT only subdevice (ISA)*/
 static int analog_range;
 
 // for the ISA cards, we have 4 bits of digital input and 4 of output
@@ -111,7 +115,10 @@ static int comedi_init()
   analog_in  = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_AI,0);
   if (analog_in == -1) {
     comedi_perror("analog_in");
+  } else {
+    fprintf(stderr, "%s: analog input OK\n", progname);
   }
+
 
   n = comedi_get_n_channels(comedi_dev, analog_in);
   fprintf(stderr, "%s: %d analog inputs available.\n", progname, n);
@@ -139,15 +146,23 @@ static int comedi_init()
     dig_io = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_DIO,0);
     if (dig_io == -1) {
       comedi_perror("dig_io");
+    } else {
+      fprintf(stderr, "%s: digitial IO OK\n", progname);
+      dig_i = -1;
+      dig_o = -1;
     }
   } else {
     dig_i  = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_DI,0);
     if (dig_i == -1) {
       comedi_perror("dig_i");
+    } else {
+      fprintf(stderr, "%s: digitial input OK\n", progname);
     }
     dig_o = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_DO,0);
     if (dig_o == -1) {
       comedi_perror("dig_o");
+    } else {
+      fprintf(stderr, "%s: digitial output OK\n", progname);
     }
   }
 
@@ -284,10 +299,18 @@ static int init()
     dummymode = 1;
   }
   fprintf(stderr, "%s: comedi initialized.\n", progname);
-  fprintf(stderr, "%s: d_io=%d\n", progname, dig_io);
-  fprintf(stderr, "%s: d_i=%d\n", progname, dig_i);
-  fprintf(stderr, "%s: d_o=%d\n", progname, dig_o);
-  fprintf(stderr, "%s: analog_in=%d\n", progname, analog_in);
+  if (dig_io >= 0) {
+    fprintf(stderr, "%s: dig_io=subdev #%d\n", progname, dig_io);
+  }
+  if (dig_i >= 0) {
+    fprintf(stderr, "%s: dig_i=subdev #%d\n", progname, dig_i);
+  }
+  if (dig_o >= 0) {
+    fprintf(stderr, "%s: ddig_o=subdev #%d\n", progname, dig_o);
+  }
+  if (analog_in >= 0) {
+    fprintf(stderr, "%s: analog_in=subdev #%d\n", progname, analog_in);
+  }
 
   if ((shmid = shmget((key_t)SHMKEY,
 		      sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
