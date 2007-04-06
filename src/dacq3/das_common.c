@@ -390,7 +390,7 @@ static void resched(int rt)
 
 static void mainloop(void)
 {
-  register int i, lastpri, setpri;
+  register int i, ii, lastpri, setpri;
   register float x, y, z, pa, tmp, calx, caly;
   float tx, ty, tp;
   unsigned long last_ts = 0, ts;
@@ -614,26 +614,22 @@ static void mainloop(void)
 	/* in test mode, analog channels 0,1,4 are filled with
 	 * the eyelink data (x,y,pupil area)
 	 */
-	dacq_data->adbuf_c0[k] = (int)(tx > 0 ? tx+0.5 : tx-0.5);
-	dacq_data->adbuf_c1[k] = (int)(ty > 0 ? ty+0.5 : ty-0.5);
-	dacq_data->adbuf_c2[k] = (int)((x > 0) ? (x+0.5) : (x-0.5));
-	dacq_data->adbuf_c3[k] = (int)((y > 0) ? (y+0.5) : (y-0.5));
-	dacq_data->adbuf_c4[k] = (int)(tp > 0 ? tp+0.5 : tp-0.5);
+	dacq_data->adbufs[0][k] = (int)(tx > 0 ? tx+0.5 : tx-0.5);
+	dacq_data->adbufs[1][k] = (int)(ty > 0 ? ty+0.5 : ty-0.5);
+	dacq_data->adbufs[2][k] = (int)((x > 0) ? (x+0.5) : (x-0.5));
+	dacq_data->adbufs[3][k] = (int)((y > 0) ? (y+0.5) : (y-0.5));
+	dacq_data->adbufs[4][k] = (int)(tp > 0 ? tp+0.5 : tp-0.5);
       } else {
 	/* otherwise, the raw analog values are stuffed in, which
 	 * are usually raw x,y values off the coil, unless you're
 	 * using them for something else (and have iscan/eyelink)
 	 */
-	dacq_data->adbuf_c0[k] = dacq_data->adc[0];
-	dacq_data->adbuf_c1[k] = dacq_data->adc[1];
-	dacq_data->adbuf_c2[k] = dacq_data->adc[2];
-	dacq_data->adbuf_c3[k] = dacq_data->adc[3];
-
+	for (ii=0; ii < NADC; ii++) {
+	  dacq_data->adbufs[ii][k] = dacq_data->adc[ii];
+	}
 	/* Mon Jan 16 09:25:34 2006 mazer 
 	 *  set up saving EDF-time to c4 channel for debugging
-
 	 dacq_data->adbuf_c4[k] = eyelink_t;
-
 	 */
       }
       if (++dacq_data->adbuf_ptr > ADBUFLEN) {

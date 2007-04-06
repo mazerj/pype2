@@ -138,6 +138,37 @@
 **   added support for "-notracker" mode (for acutes)
 **   activate by setting trakdev to "NONE" when calling dacq_start(). happens
 **     in pype.py
+**
+** Thu Apr  5 10:29:16 2007 mazer 
+**   About NADC and A/D channels in general... {das,comedi}_server etc all
+**   work by sampling two sources of data:
+**     - A/D channels 0-NADC are sampled continuously at 1kHz and the
+**       data are inserted into dacq_data->adbuf[channel][time] (this used
+**       to by a bunch of individual arrays: adbuf_c0, adbuf_c1 etc..
+**     - In addition, a network or serial based eyetracker is also sampled
+**       at an appropriate sampling rate. These data are inserted into
+**       dacq_data->x,y,pa.
+**
+**   In the case of a coil system or other analog eyetracker, the [x,y]
+**   eye position data should go into channels 0 & 1 respectively on the
+**   DACQ board. If the tracker mode is "ANALOG", then the 0&1 channels
+**   from dacq_data->adbuf are copied over into the data_data->x,y vectors
+**   automatically. This means that adbuf[0,1][] is now redundant. This is
+**   not a problem -- memory is cheap. Just don't enable saving to disk of
+**   the 0/1 channels in pype
+**
+**   A similar situation exists for the photo diode and TTL spike inputs
+**   lines. The photo_diode should go into ADC channel 2 and the TTL spike
+**   signal into channel 3. Pype collects these data and saves them
+**   automatically in the datafile on each trial. Again, memory is cheap,
+**   so we live with some redundancy -- just don't enable save of c2 and c3
+**   unless you're sure you know what you're doing.
+**
+**   To make a long story short, if you set the tracker to be EYELINK,
+**   ISCAN or NONE, then you are free to use channels 0 and 1 to save
+**   arbitary analog data at 1khz... into the datafile. Just make sure
+**   you set the channels to be saved in pype (see the rig parameter
+**   sheet down near the bottom).
 */
 
 #include <sys/types.h>
@@ -220,7 +251,7 @@ static void dacq_sigchld_handler(int signum)
 int dacq_start(int boot, int testmode, char *tracker_type,
 	       char *dacq_server, char *trakdev)
 {
-  int shmid;
+  int shmid, ii;
 
   /* init the internal timestamper, in case it's needed later */
   timestamp(1);
@@ -300,12 +331,9 @@ int dacq_start(int boot, int testmode, char *tracker_type,
       dacq_data->adbuf_t[i] = 0;
       dacq_data->adbuf_x[i] = 0;
       dacq_data->adbuf_y[i] = 0;
-
-      dacq_data->adbuf_c0[i] = 0;
-      dacq_data->adbuf_c1[i] = 0;
-      dacq_data->adbuf_photo[i] = 0;	/* aka c2 */
-      dacq_data->adbuf_spikes[i] = 0;	/* aka c3 */
-      dacq_data->adbuf_c4[i] = 0;
+      for (ii=0; ii < NADC; ii++) {
+	dacq_data->adbufs[ii][i] = 0;
+      }
     }
 
     for (i = 0; i < NDAC; i++) {
@@ -689,7 +717,7 @@ int dacq_adbuf_toggle(int on)
 
 void dacq_adbuf_clear()
 {
-  int i;
+  int i, ii;
 
   LOCK(semid);
   dacq_data->adbuf_on = 0;		/* turn off sampling */
@@ -699,11 +727,9 @@ void dacq_adbuf_clear()
     dacq_data->adbuf_t[i] = 0;
     dacq_data->adbuf_x[i] = 0;
     dacq_data->adbuf_y[i] = 0;
-    dacq_data->adbuf_c0[i] = 0;
-    dacq_data->adbuf_c1[i] = 0;
-    dacq_data->adbuf_photo[i] = 0;
-    dacq_data->adbuf_spikes[i] = 0;
-    dacq_data->adbuf_c4[i] = 0;
+    for (ii=0; ii < NADC; ii++) {
+      dacq_data->adbufs[ii][i] = 0;
+    }
   }
   UNLOCK(semid);
 }
@@ -758,59 +784,24 @@ int dacq_adbuf_pa(int ix)
   return(i);
 }
 
-int dacq_adbuf_c0(int ix)
+int dacq_adbuf(int n, int ix)
 {
   int i;
 
   LOCK(semid);
-  i = dacq_data->adbuf_c0[ix];
+  i = dacq_data->adbufs[n][ix];
   UNLOCK(semid);
   return(i);
 }
 
-int dacq_adbuf_c1(int ix)
-{
-  int i;
-
-  LOCK(semid);
-  i = dacq_data->adbuf_c1[ix];
-  UNLOCK(semid);
-  return(i);
-}
-
-int dacq_adbuf_c2(int ix)
-{
-  int i;
-
-  LOCK(semid);
-  i = dacq_data->adbuf_photo[ix];
-  UNLOCK(semid);
-  return(i);
-}
-
-int dacq_adbuf_c3(int ix)
-{
-  int i;
-
-  LOCK(semid);
-  i = dacq_data->adbuf_spikes[ix];
-  UNLOCK(semid);
-  return(i);
-}
-
-int dacq_adbuf_c4(int ix)
-{
-  int i;
-
-  LOCK(semid);
-  i = dacq_data->adbuf_c4[ix];	/* 04-feb-2003: fixed, was _c1... */
-  UNLOCK(semid);
-  return(i);
-}
-
-int dacq_adbuf_photo(int ix) {return dacq_adbuf_c2(ix);}
-int dacq_adbuf_spikes(int ix) {return dacq_adbuf_c3(ix);}
-
+/*
+ * these functions are just for backward compatibility
+ */
+int dacq_adbuf_c0(int ix) { return(dacq_adbuf(0, ix)); }
+int dacq_adbuf_c1(int ix) { return(dacq_adbuf(1, ix)); }
+int dacq_adbuf_c2(int ix) { return(dacq_adbuf(2, ix)); }
+int dacq_adbuf_c3(int ix) { return(dacq_adbuf(3, ix)); }
+int dacq_adbuf_c4(int ix) { return(dacq_adbuf(4, ix)); }
 
 int dacq_eye_smooth(int kn)
 {

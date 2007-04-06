@@ -101,11 +101,7 @@ typedef struct {
   int		adbuf_x[ADBUFLEN];	/* eye x position trace */
   int		adbuf_y[ADBUFLEN];	/* eye y position trace */
   int		adbuf_pa[ADBUFLEN];	/* pupil area, if available */
-  int		adbuf_c0[ADBUFLEN];	/* channel 0/x */
-  int		adbuf_c1[ADBUFLEN];	/* channel 1/y */
-  int		adbuf_c2[ADBUFLEN];	/* channel 2/photo diode*/
-  int		adbuf_c3[ADBUFLEN];	/* channel 3/spike input)*/
-  int		adbuf_c4[ADBUFLEN];	/* channel 4/extra analog chanel */
+  int		adbufs[NADC][ADBUFLEN];
 
   /* automatic fixation windows */
   FIXWIN fixwin[NFIXWIN];
@@ -126,5 +122,5 @@ typedef struct {
 } DACQINFO;
 
 /* these are for backwards compatibility: */
-#define adbuf_photo	adbuf_c2
-#define adbuf_spikes	adbuf_c3
+// #define adbuf_photo	adbuf_c2
+// #define adbuf_spikes	adbuf_c3

@@ -763,16 +763,15 @@ class PypeApp:
 				("spike_polarity",	"1",		is_int,
 				 "sign of threshold for spike detection"),
 				("save_chn_0",		"0",		is_int,
-				 "boolean -- save/don't save this analog input channel"),
+				 "analog horizontal eye pos (coil only)"),
 				("save_chn_1",		"0",		is_int,
-				 "boolean -- save/don't save this analog input channel"),
+				 "analog vertical eye pos (coil only)"),
 				("save_chn_2",		"0",		is_int,
-				 "boolean -- save/don't save this analog input channel"),
+				 "analog photodiode signal (redundant!)"),
 				("save_chn_3",		"0",		is_int,
-				 "boolean -- save/don't save this analog input channel"),
+				 "analog TTL psike signal (redundant!)"),
 				("save_chn_4",		"0",		is_int,
-				 "boolean -- save/don't save this analog input channel"),
-
+				 "un used analog channel"),
 			), file='rig-%s.par' % hostname,
 			   altfile='common-%s.par' % hostname)
 
@@ -2781,7 +2780,7 @@ class PypeApp:
 
 		for i in range(0,n):
 			t[i] = dacq_adbuf_t(i)
-			s0[i] = dacq_adbuf_spikes(i)
+			s0[i] = dacq_adbuf_c3(i)
 
 		spike_thresh = int(self.rig_common.queryv('spike_thresh'))
 		spike_polarity = int(self.rig_common.queryv('spike_polarity'))
@@ -2822,7 +2821,7 @@ class PypeApp:
 
 		for i in range(0,n):
 			t[i] = dacq_adbuf_t(i)
-			p[i] = dacq_c2(i)
+			p[i] = dacq_adbuf_c2(i)
 
 		return (t, p)
 
@@ -2878,8 +2877,8 @@ class PypeApp:
 			self.eyebuf_x[i] = dacq_adbuf_x(i)
 			self.eyebuf_y[i] = dacq_adbuf_y(i)
 			self.eyebuf_pa[i] = dacq_adbuf_pa(i)
-			p0[i] = dacq_adbuf_photo(i)
-			s0[i] = dacq_adbuf_spikes(i)
+			p0[i] = dacq_adbuf_c2(i)
+			s0[i] = dacq_adbuf_c3(i)
 			if not c0 is None:
 				c0[i] = dacq_adbuf_c0(i)
 			if not c1 is None:

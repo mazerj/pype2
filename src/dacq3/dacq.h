@@ -70,14 +70,12 @@ extern unsigned long dacq_adbuf_t(int ix);
 extern int dacq_adbuf_x(int ix);
 extern int dacq_adbuf_y(int ix);
 extern int dacq_adbuf_pa(int ix);
+extern int dacq_adbuf(int n, int ix);
 extern int dacq_adbuf_c0(int ix);
 extern int dacq_adbuf_c1(int ix);
 extern int dacq_adbuf_c2(int ix);
 extern int dacq_adbuf_c3(int ix);
 extern int dacq_adbuf_c4(int ix);
-
-extern int dacq_adbuf_photo(int ix);	/* aka c2 */
-extern int dacq_adbuf_spikes(int ix);	/* aka c3 */
 
 extern int dacq_eye_smooth(int kn);
 extern void dacq_set_pri(int dacq_pri);

@@ -1,0 +1,14 @@
+When you do:
+
+ sudo ./build install wrapper clobber
+
+pype will get installed into PYPEDIR, which is usually a shared
+installation directory.
+
+If you want to install a local copy on your machine, do this:
+
+ env PYPEDIR=/usr/local/pype2 sudo ./build install wrapper clobber 
+
+This will install into /usr/local -- make sure /usr/local/pype2/bin
+is on your path and PYPEDIR is set to /usr/local/pype2 and you should
+be good to go (running standalone or off-network).
