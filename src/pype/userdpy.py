@@ -159,6 +159,10 @@ class UserDisplay:
 		self.info = Label(f, text="", fg='red')
 		self.info.pack(side=RIGHT, padx=20)
 
+		self._stopbutton = Button(f, bg='red', fg='white', text='STOP')
+		self._stopbutton.pack(side=RIGHT, padx=20)
+		self._stopbutton.forget()
+
 		self._canvas = Canvas(self.frame)
 		self._canvas.pack()
 		self._canvas.configure(width=cwidth, height=cheight,
@@ -238,17 +242,11 @@ class UserDisplay:
 
 	def stop(self, command=None):
 		if command:
-			from im_stop import stop
-			self._stop_f = Frame(self._canvas)
-			self._stop_win = self._canvas.create_window(0, 200,
-														window=self._stop_f,
-														anchor=NW)
-			self._stop_but = Button(self._stop_f, image=stop, command=command)
-			self._stop_but.pack()
+			self._stopbutton.configure(command=command)
+			self._stopbutton.pack()
 		else:
-			self._stop_but.destroy()
-			self._stop_f.destroy()
-			self._canvas.delete(self._stop_win)
+			self._stopbutton.forget()
+			self._stopbutton.configure(command=None)
 
 	def note(self, msg):
 		if msg is None or len(msg) == 0:
