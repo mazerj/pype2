@@ -198,6 +198,19 @@ Tue Apr  3 10:41:33 2007 mazer
 - Added support for setting "EYETRACKERDEV: NONE" in config file to
   disable eyetracking in the comedi/das server. This is really to free
   up analog channels 0 and 1 for other things (ie, acute data)
+
+Mon May 21 10:28:23 2007 mazer
+
+- Added 'acute' parameter to the sub_common worksheet for experiments
+  going in collaboration with the mccormick lab. Note that this is in
+  a worksheet, instead othe Config file so that it's easy for tasks to
+  be conditionalize based on the current setting!
+  
+Sun May 27 15:08:51 2007 mazer
+
+- Added 'save_tmp' to sub_common worksheet -- this will let you write
+  the temp files to /dev/null, which should massively accelerate
+  handmappng with the acutes (long trials)
   
 """
 
@@ -660,6 +673,9 @@ class PypeApp:
 				("full_subject", "", is_any, "full subject name"),
 				("owner",		"", is_any, "datafile owner"),
 				("cell",		"", is_any, "cellid -- for reference to cellDB or notebook"),
+				("acute",		"", is_bool, "acute experiment"),
+				("save_tmp",	"1", is_bool, "0 to write to /dev/null"),
+				
 				("site.well",	"", is_any, "well number [recording only]"),
 				("site.probe",	"", is_any, "probe time [recording only]"),
 				("site.depth",	"", is_any, "electrode depth in um [recording only]"),
@@ -716,7 +732,6 @@ class PypeApp:
 			(
 				("Run Modes", None, None),
 				("testing",		0,				is_boolean),
-				("acute",		0,				is_boolean),
 				
 				("Monitor Info", None, None),
 				("mon_id",		"n/a",			is_any, "", -1),
@@ -1387,15 +1402,20 @@ class PypeApp:
 		else:
 			g = glob.glob(dir+'/*.py')
 		tasks = []
+		comments = {}
 		for i in range(0, len(g)):
 			# query the type for each "task" and only add to the
 			# task menu if it's really a task, with the !TASK! flag
 			# in the header
-			type = pyfile_type(g[i])
+			type, comment = pyfile_type(g[i])
 			# print g[i], 'is', type
 			if type is 'task' or type is None:
 				x = posixpath.basename(g[i])
 				tasks.append(x[:-3])
+				if len(comment) > 0:
+					comments[tasks[-1]] = '  <%s>' % comment
+				else:
+					comments[tasks[-1]] = ''
 		tasks.sort()
 
 		menubar.addmenuitem(dropname, 'command', 
@@ -1404,8 +1424,8 @@ class PypeApp:
 		menubar.addmenuitem(dropname, 'separator')
 		
 		for i in range(0, len(tasks)):
-			menubar.addmenuitem(dropname, 'command', 
-								label=tasks[i],
+			menubar.addmenuitem(dropname, 'command',
+								label=tasks[i] + comments[tasks[i]],
 								command=lambda s=self,t=tasks[i],d=dir: \
 								s.newloadtask(t, d))
 
@@ -1814,9 +1834,12 @@ class PypeApp:
 					if ask("pype", "testing mode ok?", ("yes", "no")) == 1:
 						return
 				if temp:
-					fname = './%s.tmp' % self.uname
-					if posixpath.exists(fname):
-						posix.unlink(fname)
+					if self.sub_common.queryv('save_tmp'):
+						fname = './%s.tmp' % self.uname
+						if posixpath.exists(fname):
+							posix.unlink(fname)
+					else:
+						fname = '/dev/null'
 					self.record_selectfile(fname)
 				else:
 					if self.record_selectfile(train=train) is None:
@@ -1849,6 +1872,12 @@ class PypeApp:
 				self._allowabort = 1
 
 				self.console.clear()
+
+				if not temp:
+					warn('paused',
+						 "Start saving on other computers and continue",
+						 wait=1)
+				
 				try:
 					if self.psych:
 						self.fb.show()
@@ -3448,12 +3477,13 @@ def pyfile_type(fname):
 	Scan a python file looking in the comments for a tag that indicated
 	whether this particular file is a "task" or a "module".
 
-	returns: "task", "module" or None
+	returns: (["task" or "module" or None], comment-string)
 	"""
 	import re
 	
 	re_task = re.compile('.*#.*!TASK!.*')
-	re_module = re.compile('.*#.*!MODULE!.*')		
+	re_module = re.compile('.*#.*!MODULE!.*')
+	comment = None
 	try:
 		f = open(fname, 'r')
 		# read up to about 50 lines from the file
@@ -3461,13 +3491,15 @@ def pyfile_type(fname):
 		f.close()
 		for l in lines:
 			if re_task.search(l):
-				return 'task'
+				comment = re.split('!TASK!', l)[-1].strip()
+				return 'task', comment
 			if re_module.search(l):
-				return 'module'
-		return None
+				comment = re.split('!MODULE!', l)[-1].strip()
+				return 'module', comment
+		return None, ''
 	except:
-		return None
-			
+		return None, ''
+
 
 class FixWin:
 	def __init__(self, x=0, y=0, size=10, app=None, vbias=1.0):

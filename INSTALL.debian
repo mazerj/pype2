@@ -11,6 +11,11 @@ basis, but for kubuntu 5.04:
  apt-get -yq install libsdl-mixer1.2-dev python2.4-dev python2.4-pygame
  apt-get -yq install python2.4-biggles grace
 
+ jamie added:
+
+ apt-get -yq install python-opengl
+
+
 Then:
  sudo ./build install wrapper clean
 

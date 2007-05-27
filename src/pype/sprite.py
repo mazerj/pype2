@@ -671,7 +671,7 @@ class FrameBuffer:
 		if flip:
 			self.flip()
 
-	def flip(self):
+	def flip(self, doflip=1):
 		"""Flip framebuffer (sync'd to vert-retrace, if possible)
 		
 		Draw the syncpulse sprite (if enabled) with the appropriate
@@ -689,6 +689,13 @@ class FrameBuffer:
 				self._sync_high.blit()
 			elif self._sync_state == 0:
 				self._sync_low.blit()
+				
+		if not doflip:
+			# this is in case you just want to update the sync pulse
+			# but not actually do the flip (ie, if you're using the
+			# MpegMovie object, or something similar, that writes
+			# directly to the frame buffer and does it's own flip..)
+			return
 
 		if self.opengl:
 			glFinish()

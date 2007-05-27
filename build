@@ -6,10 +6,10 @@ if [ $(whoami) != "root" ]; then
   read
 fi
 
-export PYTHONVER=$(csh ./pydetect -v)
-export PYTHONFULLVER=$(csh ./pydetect -vv)
-export PYTHONEXE=$(csh ./pydetect -f)
-export PYTHONPREFIX=$(csh ./pydetect -p)
+export PYTHONVER=$(./pydetect -v)
+export PYTHONFULLVER=$(./pydetect -vv)
+export PYTHONEXE=$(./pydetect -f)
+export PYTHONPREFIX=$(./pydetect -p)
 
 export WHO=`/usr/bin/whoami`
 

@@ -431,7 +431,10 @@ def is_cdf(s, evaluate=None):
 
 def is_list(s, evaluate=None):
 	"""
-	entry must be a list/vector
+	Entry must be a list/vector or range:
+		'=start:stop:step' (inclusive: both start and stop in list)
+		'start:stop:step' (stop is not included in the list)
+		[1,2,3,...4]
 	"""
 
 	try:
