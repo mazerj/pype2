@@ -200,8 +200,8 @@ class _Probe:
 		s =	s +     "(1-6) color______%s\n" % self.colorname
 		s =	s +     " q/w: len________%d\n" % self.length
 		s =	s +     " e/r: wid________%d\n" % self.width
-		s =	s +     "   d: drft_______%s\n" % _bool(self.drift)
-		s =	s +     " t/T: drft_amp___%d pix\n" % self.drift_amp
+		s =	s +     "   d: drift______%s\n" % _bool(self.drift)
+		s =	s +     " t/T: drift_amp__%d pix\n" % self.drift_amp
 		s =	s +     " y/Y: drft_freq__%.1f Hz\n" % self.drift_freq
 		s =	s +     "   b: blink______%s\n" % _bool(self.blink)
 		s =	s +     "   B: clr blink__%s\n" % _bool(self.cblink)
@@ -305,7 +305,7 @@ class _Probe:
 			bc = 1.0
 		self.colorshow = color
 		self.colorname = name
-		if self.s is None:
+		if (self.s is None) or (self.drift and (self.drift_amp < 1)):
 			if self.barmode == 0:
 				self.s = Sprite(width=self.width, height=self.length,
 								fb=self.app.fb, depth=99)
@@ -318,17 +318,23 @@ class _Probe:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
 								fb=self.app.fb, depth=99)
-				if (rc+gc+bc) == 0.0:
-					rc,gc,bc = 1.0,1.0,1.0
-				singrat(self.s, abs(self.p1), 90.0, self.a,
+				if sum(color) < 3:
+					# 'black' is just 90deg phase shift of 'white'
+					rc,gc,bc = -1.0,-1.0,-1.0
+				if self.drift_amp < 1:
+					phase = self.drift_freq * 180.0 * (t - self.drift) / 1000.0
+				else:
+					phase = 90.0;
+				singrat(self.s, abs(self.p1), phase, self.a,
 						1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
 			elif self.barmode == 2:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
 								fb=self.app.fb, depth=99)
-				if (rc+gc+bc) == 0.0:
-					rc,gc,bc = 1.0,1.0,1.0
+				if sum(color) < 3:
+					# 'black' is just 90deg phase shift of 'white'
+					rc,gc,bc = -1.0,-1.0,-1.0
 				hypergrat(self.s, abs(self.p1), 0.0, self.a,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
@@ -340,8 +346,9 @@ class _Probe:
 					pol = -1
 				else:
 					pol = 1
-				if (rc+gc+bc) == 0.0:
-					rc,gc,bc = 1.0,1.0,1.0
+				if sum(color) < 3:
+					# 'black' is just 90deg phase shift of 'white'
+					rc,gc,bc = -1.0,-1.0,-1.0
 				polargrat(self.s, abs(self.p1), abs(self.p2), 0.0, pol,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
@@ -558,9 +565,9 @@ def _key_handler(app, c, ev):
 	elif c == 'j':
 		p.jitter = not p.jitter
 	elif c == 'T':
-		p.drift_amp = _incr(p.drift_amp, 10)
+		p.drift_amp = _incr(p.drift_amp, 10, 0)
 	elif c == 't':
-		p.drift_amp = _incr(p.drift_amp, -10)
+		p.drift_amp = _incr(p.drift_amp, -10, 0)
 	elif c == 'Y':
 		p.drift_freq = _incr(p.drift_freq, 0.1, min=0.1)
 	elif c == 'y':

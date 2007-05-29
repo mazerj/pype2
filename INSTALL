@@ -55,3 +55,6 @@ the steps in order..
 6. check to make sure pype works -- don't forget you need a
    ~/.pyperc/Config.<hostname> for the new machine...
 
+
+Tue May 29 14:06:16 2007 mazer 
+  - fedora FC5 -- need to "yum install tk-devel" for _imagingtk

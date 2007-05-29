@@ -673,7 +673,7 @@ class PypeApp:
 				("full_subject", "", is_any, "full subject name"),
 				("owner",		"", is_any, "datafile owner"),
 				("cell",		"", is_any, "cellid -- for reference to cellDB or notebook"),
-				("acute",		"", is_bool, "acute experiment"),
+				("acute",		"0", is_bool, "acute experiment"),
 				("save_tmp",	"1", is_bool, "0 to write to /dev/null"),
 				
 				("site.well",	"", is_any, "well number [recording only]"),
@@ -1873,11 +1873,6 @@ class PypeApp:
 
 				self.console.clear()
 
-				if not temp:
-					warn('paused',
-						 "Start saving on other computers and continue",
-						 wait=1)
-				
 				try:
 					if self.psych:
 						self.fb.show()
