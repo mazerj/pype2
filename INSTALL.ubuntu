@@ -1,0 +1,25 @@
+6.06.01 LTS (Dapper Drake)
+-----------------------------
+
+1. enable 'universe' and 'multiverse' in /etc/apt/sources.list
+2. sudo apt-get update    <----- THIS MATTERS!!!!!
+3. follow instructions in INSTALL.debbian 
+
+
+7.04 (Feisty Fawn)
+-----------------------------
+
+0. no need to enable universe/multiverse...
+1. install following following pacakges:
+
+sudo apt-get install -yq \
+	csh libcomedi-0.7.22 libcomedi-dev \
+	comedi-source swig python-pygame python-biggles python-tk grace \
+	python-dev python-opengl \
+	libsmpeg-dev  libsdl-ttf2.0-dev libsdl-image1.2-dev libsdl-image1.2-dev
+
+2. the do a local install:
+
+env PYTHONPATH=/usr/local/pype2 sudo ./build install wrapper clobber
+
+and you should be good to go..

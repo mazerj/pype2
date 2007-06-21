@@ -306,6 +306,12 @@ class _Probe:
 		self.colorshow = color
 		self.colorname = name
 		if (self.s is None) or (self.drift and (self.drift_amp < 1)):
+			if self.drift_amp < 1:
+				phase = 10.0 * \
+						self.drift_freq * 180.0 * (t - self.drift) / 1000.0
+			else:
+				phase = 90.0;
+
 			if self.barmode == 0:
 				self.s = Sprite(width=self.width, height=self.length,
 								fb=self.app.fb, depth=99)
@@ -321,10 +327,6 @@ class _Probe:
 				if sum(color) < 3:
 					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
-				if self.drift_amp < 1:
-					phase = self.drift_freq * 180.0 * (t - self.drift) / 1000.0
-				else:
-					phase = 90.0;
 				singrat(self.s, abs(self.p1), phase, self.a,
 						1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
@@ -335,7 +337,7 @@ class _Probe:
 				if sum(color) < 3:
 					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
-				hypergrat(self.s, abs(self.p1), 0.0, self.a,
+				hypergrat(self.s, abs(self.p1), phase, self.a,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
 			elif self.barmode == 3:
@@ -349,7 +351,7 @@ class _Probe:
 				if sum(color) < 3:
 					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
-				polargrat(self.s, abs(self.p1), abs(self.p2), 0.0, pol,
+				polargrat(self.s, abs(self.p1), abs(self.p2), phase, pol,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
 			if self.barmode > 0:

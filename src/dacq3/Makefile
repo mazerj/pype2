@@ -51,7 +51,7 @@ das16_server: das16_server.o $(SERVER_OBJS)
 	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
 
 comedi_server: comedi_server.o $(SERVER_OBJS)
-	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK) -lcomedi
+	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK) -lcomedi -lm
 
 das08_server: das08_server.o $(SERVER_OBJS)
 	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)

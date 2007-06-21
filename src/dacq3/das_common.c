@@ -55,6 +55,9 @@
 **
 ** Tue Apr  3 10:39:56 2007 mazer 
 **   added support for "-notracker" mode (for acutes)
+**
+** Fri Jun 15 15:09:05 2007 mazer 
+**   added arange (analog input range) for comedi drivers
 */
 
 #include <unistd.h>
@@ -101,6 +104,7 @@ static int swap_xy = 0;
 static int usbjs_dev = -1;
 static v24_port_t *iscan_port = NULL;
 static int iscan_x, iscan_y, iscan_p;
+static double arange = 10.0;
 
 static double find_clockfreq()	/* get clock frequency in Hz */
 {
@@ -757,6 +761,14 @@ int main(int ac, char **av, char **envp)
     perror("psem_init");
     fprintf(stderr, "%s: can't init semaphore\n", progname);
     exit(1);
+  }
+
+  // get requested analog input range for comedi device (+- ARANGE volts)
+  if ((p = getenv("XXARANGE")) != NULL) {
+    double d;
+    if (sscanf(p, "%lf", &d) == 1) {
+      arange = d;
+    }
   }
 
   init();

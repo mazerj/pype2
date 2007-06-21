@@ -80,11 +80,17 @@ x-clean:
 
 ###############################################################
 
+# This is WAY to dangerous -- as Matt Krause can tell you. I'm
+# taking it away..
+#
+#uninstall: 
+#	rm -rf $(PYPEDIR)/bin
+#	rm -rf $(PYPEDIR)/lib
+#	rm -rf $(PYPEDIR)/Tasks
+#	rmdir $(PYPEDIR)
+
 uninstall: 
-	rm -rf $(PYPEDIR)/bin
-	rm -rf $(PYPEDIR)/lib
-	rm -rf $(PYPEDIR)/Tasks
-	rmdir $(PYPEDIR)
+	echo  "Uninstall must be done manually!"
 
 docs:
 	# note: this requires happydoc to be installed!

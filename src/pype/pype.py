@@ -434,6 +434,10 @@ class PypeApp:
 		# sanity check to make sure framerate is correct
 		self.config.set('FPS',			'0',			override=None)
 
+		# added Fri Jun 15 15:10:27 2007 mazer 
+		self.config.set('ARANGE',	'10.0',				override=None)
+		
+
 		# Thu Mar  1 20:53:51 2007 mazer
 		# started hooking pype into elog-sql system
 		#   $ELOG should be set to point to the path for the elog
@@ -1110,6 +1114,8 @@ class PypeApp:
 		# possibly have the dacq module initialize a usb joystick device
 		if len(self.config.get('USB_JS_DEV')) > 0:
 			os.environ['XXUSBJS'] = self.config.get('USB_JS_DEV')
+
+		os.environ['XXARANGE'] = self.config.get('ARANGE')
 
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),
@@ -2036,6 +2042,7 @@ class PypeApp:
 		*****************************************************
 		"""
 
+
 		if self._post_fixbreak:
 			self._post_fixbreak = 0
 			raise FixBreak
@@ -2048,6 +2055,9 @@ class PypeApp:
 
 		if fast:
 			return
+
+		#intime = Timer()
+		#sys.stderr.write("<"); sys.stderr.flush()
 
 		if (not self.recording) and (self.plex is not None):
 			# drawin the plexon buffer to prevent overflow when
@@ -2154,6 +2164,8 @@ class PypeApp:
 			t = Timer()
 			while t.ms() < ms:
 				self.idlefn()
+				
+		#sys.stderr.write("%d>" % intime.ms()); sys.stderr.flush()
 
 	def history(self, c=None):
 		"""

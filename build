@@ -13,7 +13,7 @@ export PYTHONPREFIX=$(./pydetect -p)
 
 export WHO=`/usr/bin/whoami`
 
-if [ "$1" == "-dir" ]; then
+if [ "$1" = "-dir" ]; then
   export PYPEDIR=$2
   shift; shift
 fi

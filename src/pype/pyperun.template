@@ -167,6 +167,7 @@ try:
 	import pype
 except ImportError:
     sys.stderr.write("""Error on 'import pype'. Check $PYPEDIR\n""")
+	sys.stderr.write("""path=%s\n""" % sys.path)
 	sys.exit(1)
 
 # add the ~/.pyperc directories to the python search path

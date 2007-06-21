@@ -127,7 +127,8 @@ static int comedi_init()
   if (n > 1) {
     // try to find the +/- 10V range.  the 4th parm means 'volts'.
     // BW: I THINK THIS ASSUMES ALL CHANNELS ARE THE SAME
-    analog_range = comedi_find_range(comedi_dev,analog_in,0,0,-10,10);
+    //analog_range = comedi_find_range(comedi_dev,analog_in,0,0,-10,10);
+    analog_range = comedi_find_range(comedi_dev,analog_in,0,0,-arange,arange);
     if (analog_range == -1) {
       comedi_perror("analog_range");
     }

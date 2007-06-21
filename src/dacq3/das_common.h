@@ -12,6 +12,7 @@ static void perror2(char *s, char *file, int line);
 static void mainloop(void);
 static void iscan_halt(void);
 static int semid;
+static double arange;
 
 
 

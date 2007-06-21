@@ -26,9 +26,10 @@ if ( -f /etc/issue ) then
   if ( ("$distname" == "Red Hat Linux") | ("$distname" == "Fedora Core") ) then
     set rh_or_fc=true
   endif
+  set ubuntu=`cat /etc/issue | head -1 | awk '{print $1}'`
 endif
 
-if ( $rh_or_fc == "true" ) then
+if ( $rh_or_fc == "true" || "$ubuntu" == "Ubuntu" ) then
   # get distribution # from the /etc/issue file:
   set distname=`cat /etc/issue | head -1 | sed 's/ release.*//g'`
 
@@ -61,6 +62,22 @@ if ( $rh_or_fc == "true" ) then
       echo "Can't identify distribution number."
       exit 1
     endif
+  else if ("$ubuntu" == "Ubuntu") then
+    set distname='Ubuntu'
+    set distno=`cat /etc/issue | head -1 | awk '{print $2}'`
+
+    if ("$distno" == "7.04") then
+	# feisty fawn
+	set major=2 minor=5
+    else if ("$distno" == "6.10") then
+	# edgey eft
+	set major=2 minor=4
+    else
+      echo "Can't identify Ubuntu distribution number."
+      exit 1
+    endif
+
+
   else
     echo "Can't identify distribution."
     exit 1
@@ -71,9 +88,19 @@ if ( $rh_or_fc == "true" ) then
   if ("$1" ==  "-e") then
     echo python$major
   else if ("$1" ==  "-f") then
-    echo `which python$major`
+    if ("$distname" == "Ubuntu") then
+      # ubuntu doesn't have the pythonX, only python and pythonX.Y
+      echo `which python$major.$minor`
+    else
+      echo `which python$major`
+    endif
   else if ("$1" ==  "-p") then
-    echo `which python$major` | sed 's/\(.*\)\/bin.*/\1/'
+    if ("$distname" == "Ubuntu") then
+      # ubuntu doesn't have the pythonX, only python and pythonX.Y
+      echo `which python$major.$minor` | sed 's/\(.*\)\/bin.*/\1/'
+    else
+      echo `which python$major` | sed 's/\(.*\)\/bin.*/\1/'
+    endif
   else if ("$1" ==  "-v") then
     echo $major
   else if ("$1" ==  "-vv") then
