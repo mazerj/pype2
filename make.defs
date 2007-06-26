@@ -19,3 +19,4 @@ GLOBAL_CFLAGS = -O -Wall -D_REENTRANT
 PYTHONINC ?= -I$(PYTHONPREFIX)/include/python$(PYTHONFULLVER)
 PYCOMPILE ?= $(PYTHONEXE) $(PYTHONPREFIX)/lib/python$(PYTHONFULLVER)/compileall.py
 
+#post python2.3?? PYCOMPILE ?= $(PYTHONEXE) -mcompileall

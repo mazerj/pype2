@@ -13,6 +13,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
  
  - renamed UserParams to Config
 
+- Tue Jun 26 14:20:10 2007 mazer
+
+ - added show() method
+
 """
 
 import sys
@@ -52,6 +56,12 @@ class Config:
 		k = self.dict.has_key(key)
 		if (k and override) or (not k):
 			self.dict[key] = value
+
+	def show(self, f):
+		keys = self.dict.keys()
+		keys.sort()
+		for k in keys:
+			f.write('%s=%s\n' % (k, self.dict[k]))
 
 	def load(self, fname):
 		d = {}

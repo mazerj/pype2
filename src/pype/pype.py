@@ -258,7 +258,6 @@ from beep import *
 from sprite import *
 from events import *
 from guitools import *
-from config import *
 from dacq import *
 from blt import *
 from filebox import Open, SaveAs
@@ -338,105 +337,21 @@ class PypeApp:
 
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
-		self.config = pype_hostconfig()
-		self.config.set('DEBUG',		'0',			override=None)
+		
+		import configvars
+		cfile = pyperc('Config.%s' % gethostname())
+		sys.stderr.write('configfile: %s\n' % cfile)
+		self.config = configvars.defaults(cfile)
+
+		if os.environ.has_key('PYPEDEBUG'):
+			sys.stderr.write('command line forced debug mode')
+			self.config.set('DEBUG', '1', override=1)
+		
 		debug(self.config.iget('DEBUG'))
-		
-		self.config.set('DACQ_SERVER',	'das16_server',	override=None)
-		self.config.set('EYETRACKER_DEV','',			override=None)
-		self.config.set('PPORT',		'-1',			override=None)
-		self.config.set('BLOCKED',		'',				override=None)
-		self.config.set('FLIP_BAR',		'0',			override=None)
-		self.config.set('FLIP_SW1',		'0',			override=None)
-		self.config.set('FLIP_SW2',		'0',			override=None)
-		self.config.set('DPYW',			'1024',			override=None)
-		self.config.set('DPYH',			'768',			override=None)
-		self.config.set('GAMMA',		'1.0',			override=None)
-		self.config.set('FULLSCREEN',	'1',			override=None)
 
-		# Mon Aug  8 10:00:25 2005 mazer 
-		# this can be used to disable beeping with rewards, which
-		# is causing problems with the SDL sound drivers
-		self.config.set('REWARD_BEEP',	'1',			override=None)
-		
-		if os.environ.has_key('DISPLAY'):
-			self.config.set('SDLDPY', os.environ['DISPLAY'], override=None)
-		else:
-			self.config.set('SDLDPY', ':0.1',                override=None)
-			#os.environ['DISPLAY']=self.config.get('SDLDPY')
-
-		# NB DGA is now obsolete; use VIDEODRIVER instead
-		# willmore 13-jun-2005
-		# self.config.set('DGA',         '1',           override=None)
-
-		self.config.set('DACQ_TESTMODE','0',			override=None)
-		self.config.set('DPYBITS',		'32',			override=None)
-		self.config.set('SYNCSIZE',		'50',			override=None)
-		self.config.set('SYNCX',		'-10000',		override=None)
-		self.config.set('SYNCY',		'-10000',		override=None)
-		self.config.set('SYNCLEVEL',	'255',			override=None)
-		self.config.set('NO_AUDIO',		'0',			override=None)
-		self.config.set('SPLASH',		'1',			override=None)
-		self.config.set('EYETRACKER',	'ANALOG',		override=None)
-
-		# JAM added 07-feb-2003:
-		self.config.set('MONW',			'-1',			override=None)
-		self.config.set('MONH',			'-1',			override=None)
-		self.config.set('VIEWDIST',		'-1',			override=None)
-
-		# JAM added 16-apr-2003:
-		# this is for the eyelink -- (0,-0.001) is the default
-		# according to Sol Simpson
-		
-		self.config.set('PUPILXTALK',		'0,-0.001',	override=None)
-		self.config.set('EYELINK_OPTS',		'',			override=None)
-		self.config.set('EYELINK_CAMERA',	'1',		override=None)
-
-		# Mon Nov  7 13:23:36 2005 mazer 
-		self.config.set('SWAP_XY',			'0',		override=None)
-
-		# JAM added 13-jan-2004:
-		self.config.set('MON_ID',		'',				override=None)
-
-		# added 20-sep-2003 for Ben Willmore:
-		self.config.set('JUICEBUTTON',	'1',			override=None)
-
-		# added 27-feb-2005 for jamie:
-		#  sw1 acts a reward delivery with JUICESWITCH=1
-		self.config.set('JUICESWITCH',	'1',			override=None)
-
-		# Thu Jan 11 15:25:06 2007 mazer
-		# if ENABLE_SW1==0, just turn off all remote control of rewards
-		self.config.set('ENABLE_SW1',	'1',			override=None)
-
-		# 12-jul-2005 willmore
-		# removed default video/audio driver settings; let
-		# FrameBuffer.__init__ figure them out
-
-		# added 12-jul-2005 willmore
-		if not self.config.iget('FULLSCREEN'):
-			self.config.set('SDLDPY', os.environ['DISPLAY'], override=True)
-
-		# added 28-oct-2005 mazer
-		#  support for plexon direct network access via PlexNet
-		#  if this is set, then we'll try to connect to the plexon on
-		#  startup..
-		self.config.set('PLEXHOST',	'',					override=None)
-		self.config.set('PLEXPORT',	'6000',				override=None)
-
-		# added 17-jan-2006 shinji
-		self.config.set('OPENGL',	 '0',				override=None)
-
-		# added 09-mar-2006 mazer
-		self.config.set('USB_JS_DEV',	'',				override=None)
-
-		# Thu Apr 13 14:21:40 2006 mazer
-		# sanity check to make sure framerate is correct
-		self.config.set('FPS',			'0',			override=None)
-
-		# added Fri Jun 15 15:10:27 2007 mazer 
-		self.config.set('ARANGE',	'10.0',				override=None)
-		
+		if debug():
+			sys.stderr.write('\nCONFIG TABLE:\n')
+			self.config.show(sys.stderr)
 
 		# Thu Mar  1 20:53:51 2007 mazer
 		# started hooking pype into elog-sql system
@@ -2099,7 +2014,7 @@ class PypeApp:
 			if c == 'F1':				
 				if not self.running:
 					self.juice_on()
-					w = beepwarn("JUICE", "Juicer is OPEN!!!")
+					w = warn("JUICE", "Juicer is OPEN!!!", audible=1)
 					self.juice_off()
 			elif c == 'F3' or c == 'Escape':
 				if self._allowabort:

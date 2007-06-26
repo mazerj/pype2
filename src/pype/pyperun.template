@@ -57,6 +57,7 @@ for a in sys.argv:
 sys.argv = av
 
 if debug:
+    os.environ['PYPEDEBUG'] = "yes"
     sys.stderr.write('orig argv: %s\n' % original_argv)
     sys.stderr.write('     argv: %s\n' % sys.argv)
 
