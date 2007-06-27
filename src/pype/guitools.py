@@ -21,9 +21,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 - Mon Jun 25 12:21:40 2007 mazer
 
- - got rid of beepwarn() and added 'audible' optional arg to warn()
- 
  - Container() class is obsolete... deleted it..
+
+ - Added SimpleDialog() class to replace use of the Tk builtin Dialog
+   class (which is opaque and unchangable). This is much simpler..
 
 """
 
@@ -105,23 +106,31 @@ class TaskNotebook(DockWindow):
 		self.notebook.lift(name)
 
 class SimpleDialog(Toplevel):
-	def __init__(self, msg, responses=('Ok',),
-				 default=None, title=None, iconname=None, **kw):
+	def __init__(self, msg, responses=('Ok',), default=None,
+				 astext=None, title=None, iconname=None, **kw):
 
 		apply(Toplevel.__init__, (self,), kw)
 
 		if title:
 			self.title(title)
 		if iconname:
-			self.iconname(title)
+			self.iconname(iconname)
 
-		parent = self._nametowidget(self.winfo_parent())
-		self.transient(parent)
+		self.parent = self._nametowidget(self.winfo_parent())
+		
+		self.transient(self.parent)
 		
 		f = Frame(self, relief=GROOVE, borderwidth=3)
 		f.pack(side=TOP, expand=1, fill=BOTH)
-		l = Label(f, text=msg)
-		l.pack(padx=25, pady=25)
+		
+		if astext:
+			# use text box so message is copyable with mouse...
+			m = Text(f, relief=RIDGE, borderwidth=3)
+			m.insert(END, msg)
+		else:
+			m = Label(f, text=msg)
+			
+		m.pack(padx=25, pady=25)
 		
 		f = Frame(self)
 		f.pack(side=TOP, expand=1, fill=X)
@@ -139,11 +148,15 @@ class SimpleDialog(Toplevel):
 			self.default = default
 			self.bind('<Return>', self._return_event)
 
-	def go(self):
+	def go(self, wait=1):
 		screencenter(self)
-		self.grab_set()
-		self.wait_window(self)
-		return self._choice
+		self.parent.bell()
+			
+		if wait:
+			# don't grab, if we're not waiting!
+			self.grab_set()
+			self.wait_window(self)
+			return self._choice
 
 	def _respond(self, n):
 		self._choice = n
@@ -224,75 +237,24 @@ class EventQueue:
 		self.buffer = []
 
 def warn(title, message, wait=None, action=None, astext=0,
-		 fixed=None, audible=None):
+		 fixed=None):
 	"""
 	Popup a dialog box and warn the user abotu something. Lots of
-	options, but only one possible response: "Ok"
+	options, but only one possible response: "Continue" or "Close"
 	
-	return: if wait=1, then nothing is returned, otherwise, the toplevel
-		   widget containing the dialogbox is returned so you can kill
-		   or close it manually
+	return: nothing.
 	"""
 
-	from Dialog import DIALOG_ICON
-	from beep import beep
-
-	dialog = Toplevel()
-	dialog.title(title)
-	dialog.iconname('PypeDialog')
-	dialog.protocol("WM_DELETE_WINDOW", dialog.destroy)
-
-	parent = dialog._nametowidget(dialog.winfo_parent())
-
-	f = Frame(dialog)
-	f.pack(expand=1, fill=BOTH)
-
-	icon = Label(f, bitmap=DIALOG_ICON)
-
-	if astext:
-		text = Text(f, relief=RIDGE, borderwidth=3)
-		text.insert(END, message)
-	else:
-		if fixed:
-			font="-*-courier-*-r-*-*-12-*-*-*-*-*-*-*"
-		else:
-			font="-*-helvetica-*-r-*-*-12-*-*-*-*-*-*-*"
-		text = Label(f, text=message,
-					 justify=LEFT, relief=GROOVE, borderwidth=10, font=font)
-	icon.grid(row=0, column=0, padx=10, pady=10)
-	text.grid(row=0, column=1, padx=5, pady=5, ipadx=5, ipady=5)
-
-	if wait:
-		if action is None:
+	if action is None:
+		if wait:
 			action = 'Continue'
-		b = Button(dialog, text=action, command=dialog.destroy)
-	else:
-		if action is None:
+		else:
 			action = 'Close'
-		b = Button(dialog, text=action, command=dialog.destroy)
-	b.pack(expand=1, fill=X)
-
-	b.bind('<Return>', lambda e, w=dialog: w.destroy())
-	b.bind('<Escape>', lambda e, w=dialog: w.destroy())
-	b.focus_set()
-
-	# position the widget under the mouse
+	dialog = SimpleDialog(message,
+						  title=title, iconname='warning', astext=astext,
+						  default=0, responses=(action,))
 	undermouse(dialog)
-
-	if wait:
-		dialog.update()
-		dialog.tkraise()
-		if audible:
-			while not dialog.done:
-				beep(1000, 10)
-				dialog.update()		
-		dialog.wait_window(dialog)
-	else:
-		if audible:
-			while not dialog.done:
-				beep(1000, 10)
-				dialog.update()
-		return dialog
+	dialog.go(wait=wait)
 
 def ask(title, message, strings):
 	"""

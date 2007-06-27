@@ -307,7 +307,7 @@ static int init()
     fprintf(stderr, "%s: dig_i=subdev #%d\n", progname, dig_i);
   }
   if (dig_o >= 0) {
-    fprintf(stderr, "%s: ddig_o=subdev #%d\n", progname, dig_o);
+    fprintf(stderr, "%s: dig_o=subdev #%d\n", progname, dig_o);
   }
   if (analog_in >= 0) {
     fprintf(stderr, "%s: analog_in=subdev #%d\n", progname, analog_in);

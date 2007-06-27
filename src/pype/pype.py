@@ -995,7 +995,7 @@ class PypeApp:
 
 		check = self.config.get('ISCAN_DEV')
 		if check and len(check) == 0:
-			warn('serious warning', \
+			warn('Error', \
 				 'ISCAN_DEV in config is obsolete, change to EYETRACKER_DEV')
 
 		# EYELINK_OPTS can be defined in the pyperc config file and should
@@ -1377,7 +1377,7 @@ class PypeApp:
 
 		if taskname is None:
 			if self.task_name is None:
-				warn("Error", "Nothing loaded to reload")
+				warn('Error', "Nothing loaded to reload")
 				return None
 			taskname = self.task_name
 			dir = self.task_dir
@@ -1647,21 +1647,21 @@ class PypeApp:
 			n = self._runstats['ncorrect'] + self._runstats['nerror']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('Run Complete',
+				warn('Warning',
 					 '%d total trials trials. Stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_correct')
 			n = self._runstats['ncorrect']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('Run Complete',
+				warn('Warning',
 					 '%d correct trials trials. Stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_ui')
 			n = self._runstats['max_ui'] 
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
-				warn('Run Aborted',
+				warn('Warning',
 					 '%d sequential UI trials. Stopping.' % n, wait=0)
 
 		s = ''
@@ -1718,7 +1718,7 @@ class PypeApp:
 			n = n + 1
 			self.sub_common.set('cell', "%d" % n)
 		except ValueError:
-			warn("Duh", "cell field is non-numeric, can't increment.")
+			warn('Warning', "cell field is non-numeric, can't increment.")
 
 	def set_fxfy(self):
 		self.sub_common.set('fix_x', "%d" % self.udpy.fix_x)
@@ -1782,7 +1782,7 @@ class PypeApp:
 						self.task_name,
 						force=1)
 					if not ok:
-						warn("elog", ecode)
+						warn('Warning (elog)', ecode)
 					del self._exper
 						
 				if self.tk:
@@ -1931,7 +1931,7 @@ class PypeApp:
 
 	def drain(self):
 		if not self.running:
-			warn('Task is running.',
+			warn('Warning',
 				 "I'm sorry Ben, but I can't do that (drain juice).", wait=0)
 
 	def idlefn(self, ms=None, update=1, toplevel=None, fast=None):
@@ -2014,7 +2014,7 @@ class PypeApp:
 			if c == 'F1':				
 				if not self.running:
 					self.juice_on()
-					w = warn("JUICE", "Juicer is OPEN!!!", audible=1)
+					w = warn('Warning', "Juicer is OPEN!!!")
 					self.juice_off()
 			elif c == 'F3' or c == 'Escape':
 				if self._allowabort:
@@ -2687,7 +2687,7 @@ class PypeApp:
 			if dacq_adbuf_toggle(0):
 				self.encode(EYE_OVERFLOW)
 				sys.stderr.write('warning: eyetrace overflowed\n')
-				warn('warning', 'eye trace overflow')
+				warn('Warning', 'eye trace overflow')
 			self._eyetrace = 0
 
 	def encode(self, code):
@@ -2976,7 +2976,8 @@ class PypeApp:
 		animal = self.sub_common.queryv('subject')
 		full_animal = self.sub_common.queryv('full_subject')
 		if len(animal) == 0 or len(full_animal) == 0:
-			warn('elog', "Set both 'subject' and 'full_subject' first!")
+			warn('Warning (elog)',
+				 "Set both 'subject' and 'full_subject' first!")
 			return None
 			
 		exper = elogapi.GetExper(animal)
@@ -3817,7 +3818,7 @@ def slideshow(app):
 			l = f.readlines()
 			f.close()
 		except IOError:
-			warn('error',
+			warn('Error',
 				 'make %s to use this feature.' % pyperc('candy.lst'))
 			return
 		app._candy = 1
