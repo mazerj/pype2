@@ -37,8 +37,7 @@ extern void dacq_dig_out(int n, int val);
 extern int dacq_eye_x(void);
 extern int dacq_eye_y(void);
 
-extern int dacq_eye_params(float xgain, float ygain,
-			   int xoff, int yoff);
+extern int dacq_eye_params(double xgain, double ygain, int xoff, int yoff);
 extern int dacq_eye_read(int which);
 
 
@@ -55,7 +54,7 @@ extern void dacq_juice(int on);
 extern int dacq_juice_drip(int ms);
 
 extern void dacq_fixbreak_tau(int n);
-extern int dacq_fixwin(int n, int cx, int cy, int radius, float vbias);
+extern int dacq_fixwin(int n, int cx, int cy, int radius, double vbias);
 extern int dacq_fixwin_genint(int n, int b);
 extern int dacq_fixwin_reset(int n);
 extern int dacq_fixwin_state(int n);

@@ -65,6 +65,7 @@ from spritetools import *
 
 from rootperm import *
 from pypedebug import keyboard
+from guitools import Logger
 
 #Shinji added 17-Jan-2006:
 try:
@@ -222,6 +223,8 @@ class FrameBuffer:
 
 		**fopengl** -- boolean flag indicating whether or not to run
 		in OpenGL mode  (added 17-jan-2006 shinji)
+
+		**pype** -- optional pype app handle
 			
 		**returns** --
 		None.
@@ -231,26 +234,26 @@ class FrameBuffer:
 		"""
 
 		if not dga == -1:
-			sys.stderr.write('****************************************\n')
-			sys.stderr.write('FrameBuffer: dga option is now obsolete!\n')
-			sys.stderr.write('****************************************\n')
+			Logger('****************************************\n')
+			Logger('FrameBuffer: dga option is now obsolete!\n')
+			Logger('****************************************\n')
 
 		self.keystack = []
 		self.do_sync = sync
 
 		if flags is None:
 			flags = FULLSCREEN | DOUBLEBUF
-			sys.stderr.write("Defaulted to FULLSCREEN|DOUBLEBUF mode.\n")
+			Logger("Defaulted to FULLSCREEN|DOUBLEBUF mode.\n")
 
 
 		# you can't have fullscreen unless you're root
 		if (not _got_root()) and (flags & FULLSCREEN):
-			sys.stderr.write('sprite: fullscreen only for root, ignored.\n')
+			Logger('sprite: fullscreen only for root, ignored.\n')
 			flags = flags & (~FULLSCREEN)
 
 		self.opengl = 0
 		if not GL_OK and fopengl:
-			sys.stderr.write('PyOpenGL not available -- disabled GL mode.\n')
+			Logger('PyOpenGL not available -- disabled GL mode.\n')
 			fopengl = 0
 			
 		if fopengl:
@@ -261,25 +264,25 @@ class FrameBuffer:
 			os.environ['__GL_SYNC_TO_VBLANK'] = '1'
 			flags = flags | OPENGL
 			self.opengl = 1
-			sys.stderr.write('sprite: running in OPENGL mode\n')
+			Logger('sprite: running in OPENGL mode\n')
 			# added OpenGL mode 12-jan-2006 shinji
 		elif os.environ.has_key('SDL_VIDEODRIVER'):
 			if os.environ['SDL_VIDEODRIVER']=='dga' and not (flags & FULLSCREEN):
-				sys.stderr.write('sprite/vid: dga from $SDL_VIDEODRIVER\n')
-				sys.stderr.write('sprite/vid: dga only w/ FULLSCREEN mode\n')
-				sys.stderr.write('sprite/vid: Falling back to <x11>\n')
+				Logger('sprite/vid: dga from $SDL_VIDEODRIVER\n')
+				Logger('sprite/vid: dga only w/ FULLSCREEN mode\n')
+				Logger('sprite/vid: Falling back to <x11>\n')
 				os.environ['SDL_VIDEODRIVER'] = 'x11'
 			else:
-				sys.stderr.write('sprite/vid: <%s> from $SDL_VIDEODRIVER\n' %
-								 os.environ['SDL_VIDEODRIVER'])
+				Logger('sprite/vid: <%s> from $SDL_VIDEODRIVER\n' %
+					   os.environ['SDL_VIDEODRIVER'])
 		elif videodriver:
 			if videodriver=='dga' and not (flags & FULLSCREEN):
-				sys.stderr.write('sprite/vid: dga from config file...\n')
-				sys.stderr.write('sprite/vid: dga only w/ FULLSCREEN mode.\n')
-				sys.stderr.write('sprite/vid: Falling back to <x11>\n')
+				Logger('sprite/vid: dga from config file...\n')
+				Logger('sprite/vid: dga only w/ FULLSCREEN mode.\n')
+				Logger('sprite/vid: Falling back to <x11>\n')
 				videodriver = 'x11'
 			else:
-				sys.stderr.write('sprite/vid: <%s> from config file\n' %
+				Logger('sprite/vid: <%s> from config file\n' %
 								 videodriver)
 			os.environ['SDL_VIDEODRIVER'] = videodriver
 		else:
@@ -290,7 +293,7 @@ class FrameBuffer:
 			else:
 				videodriver = 'x11'
 
-			sys.stderr.write('sprite/vid: <%s> by default\n' %
+			Logger('sprite/vid: <%s> by default\n' %
 								 videodriver)
 			os.environ['SDL_VIDEODRIVER'] = videodriver
 
@@ -311,10 +314,10 @@ class FrameBuffer:
 			if len(modes) > 0:
 				width = modes[0][0]
 				height = modes[0][1]
-				sys.stderr.write('sprite: autodetected %dx%d display size\n' %
-								 (width, height))
+				Logger('sprite: autodetected %dx%d display size\n' %
+					   (width, height))
 			else:
-				sys.stderr.write('sprite: can''t autodetected display size\n')
+				log(self, 'sprite: can''t autodetected display size\n')
 				sys.exit(1)
 			
 		self.w = width
@@ -325,14 +328,14 @@ class FrameBuffer:
 		try:
 			maxbpp = pygame.display.mode_ok((self.w, self.h), flags, bpp)
 		except pygame.error:
-			sys.stderr.write("Error: Can't initialize pygame!\n")
-			sys.stderr.write("       Usually this means the X server's dead!\n")
+			Logger("Error: Can't initialize pygame!\n")
+			Logger("       Usually this means the X server's dead!\n")
 			sys.exit(1)
 			
 		if maxbpp == 0:
-			sys.stderr.write('sprite: requested w=%d h=%d bpp=%d\n' % \
+			Logger('sprite: requested w=%d h=%d bpp=%d\n' % \
 							 (self.w, self.h, bpp))
-			sys.stderr.write('sprite: no joy -- mode not available\n')
+			Logger('sprite: no joy -- mode not available\n')
 			sys.exit(1)
 		else:
 			self.font = None
@@ -341,9 +344,8 @@ class FrameBuffer:
 			self.fopengl = fopengl
 			self.opendisplay()
 
-		sys.stderr.write('sprite/vid: dev=<%s> (%dx%d; %d bbp)\n' % \
-						 (os.environ['SDL_VIDEODRIVER'],
-						  self.w, self.h, maxbpp))
+		Logger('sprite/vid: dev=<%s> (%dx%d; %d bbp)\n' % \
+			   (os.environ['SDL_VIDEODRIVER'], self.w, self.h, maxbpp))
 
 		# note: for historical reasons, bg is a scalar -- grayscale only..
 		self.bg = bg
@@ -425,25 +427,25 @@ class FrameBuffer:
 		
 	def printinfo(self):
 		vi = pygame.display.Info()
-		sys.stderr.write('Video Info (driver=%s)\n' % \
+		Logger('Video Info (driver=%s)\n' % \
 						 pygame.display.get_driver())
-		sys.stderr.write('  hardware accelerated=%s\n' % vi.hw)
-		sys.stderr.write('  windowed modes available=%s\n' % vi.wm)
-		sys.stderr.write('  video_mem=%s MB\n' % vi.video_mem)
-		sys.stderr.write('  accel hardware blit=%s\n' % vi.blit_hw)
-		sys.stderr.write('  accel hardware alpha blit=%s\n' % vi.blit_hw_A)
-		sys.stderr.write('  accel hardware colorkey blit=%s\n' % vi.blit_hw_CC)
+		Logger('  hardware accelerated=%s\n' % vi.hw)
+		Logger('  windowed modes available=%s\n' % vi.wm)
+		Logger('  video_mem=%s MB\n' % vi.video_mem)
+		Logger('  accel hardware blit=%s\n' % vi.blit_hw)
+		Logger('  accel hardware alpha blit=%s\n' % vi.blit_hw_A)
+		Logger('  accel hardware colorkey blit=%s\n' % vi.blit_hw_CC)
 		
-		sys.stderr.write('  accel software blit=%s\n' % vi.blit_sw)
-		sys.stderr.write('  accel software alpha blit=%s\n' % vi.blit_sw_A)
-		sys.stderr.write('  accel software colorkey blit=%s\n' % vi.blit_sw_CC)
+		Logger('  accel software blit=%s\n' % vi.blit_sw)
+		Logger('  accel software alpha blit=%s\n' % vi.blit_sw_A)
+		Logger('  accel software colorkey blit=%s\n' % vi.blit_sw_CC)
 		
-		sys.stderr.write('  bits per pixel=%s\n' % vi.bitsize)
+		Logger('  bits per pixel=%s\n' % vi.bitsize)
 		
-		sys.stderr.write('  bytes per pixel=%s\n' % vi.bytesize)
-		sys.stderr.write('  RGBA masks=(0x%x, 0x%x, 0x%x, 0x%x)\n' % vi.masks)
-		sys.stderr.write('  RGBA shifts=(0x%x, 0x%x, 0x%x, 0x%x)\n' % vi.shifts)
-		sys.stderr.write('  RGBA losses=(0x%x, 0x%x, 0x%x, 0x%x)\n' % vi.losses)
+		Logger('  bytes per pixel=%s\n' % vi.bytesize)
+		Logger('  RGBA masks=(0x%x, 0x%x, 0x%x, 0x%x)\n' % vi.masks)
+		Logger('  RGBA shifts=(0x%x, 0x%x, 0x%x, 0x%x)\n' % vi.shifts)
+		Logger('  RGBA losses=(0x%x, 0x%x, 0x%x, 0x%x)\n' % vi.losses)
 
 		
 	def calcfps(self, duration=1000):
@@ -465,13 +467,15 @@ class FrameBuffer:
 		exact frame rate and keep track of in with your data.
 		"""
 		from pype import Timer
+
+		duration=5000
 		
 		# try to estimate current frame rate
 		oldsync = self.do_sync
 		self.do_sync = 0
 		self.clear((1,1,1))
 		self.flip()
-		self.clear((1,1,1))
+		self.clear((2,2,2))
 		self.flip()
 
 		intervals = []
@@ -486,11 +490,13 @@ class FrameBuffer:
 			b = t.ms()
 			intervals.append(b-a)
 			a = b
+
+		print intervals
 			
 		self.do_sync = oldsync
 
 		if len(intervals)<=1:
-			sys.stderr.write('sprite: calcfps -- no photodiode? Assuming 60\n')
+			Logger('sprite: calcfps -- no photodiode? Assuming 60\n')
 			return 60
 
 		# compute estimated frame rate (Hz) based on median inter-frame
@@ -502,14 +508,13 @@ class FrameBuffer:
 		m = mean(intervals)
 		k = []
 		for i in intervals:
-			if abs(i-m) < (2*sd):
+			if sd == 0 or abs(i-m) < (2*sd):
 				k.append(i)
-		km = mean(k)
-		if km == 0.0:
-			sys.stderr.write('sprite: calcfps -- no photodiode? Assuming 60\n')
+		if len(k) < 1:
+			Logger('sprite: calcfps -- no photodiode? Assuming 60\n')
 			return 60
-		else:
-			return round(1000.0 / km)
+		km = mean(k)
+		return round(1000.0 / km)
 
 	def set_gamma(self, r, g=None, b=None):
 		"""Set hardware gamma correction values (if possible).
@@ -709,7 +714,7 @@ class FrameBuffer:
 			elapsed = self.fliptimer.ms()
 			self.fliptimer.reset()
 			if (self.maxfliptime > 0) and (elapsed > self.maxfliptime):
-				sys.stderr.write('warning: %dms flip\n' % elapsed)
+				Logger('warning: %dms flip\n' % elapsed)
 			
 		
 		# JAM 12/10/2002 -- something on the sdl newsgroup suggested that
@@ -845,8 +850,8 @@ class FrameBuffer:
 					c = 0
 		if c == 19:
 			# ESCAPE key for emergency exit..
-			sys.stderr.write('User Requested Emergency Abort\n')
-			sys.stderr.write('remember to run: pypekill\n')
+			Logger('User Requested Emergency Abort\n')
+			Logger('remember to run: pypekill\n')
 			sys.exit(1)
 			
 		return c
@@ -880,10 +885,10 @@ class FrameBuffer:
 							   pygame.image.tostring(self.screen, 'RGBA'))
 		if size:
 			pil.resize(size).save(filename)
-			sys.stdout.write("Wrote %s screen to: %s\n" % (size,filename))
+			Logger("Wrote %s screen to: %s\n" % (size,filename))
 		else:
 			pil.save(filename)
-			sys.stdout.write("Wrote screen to: %s\n" % filename)
+			Logger("Wrote screen to: %s\n" % filename)
 
 	def rectangle(self, cx, cy, w, h, color, width=0):
 		"""Draw rectangle directly on framebuffer
@@ -1892,7 +1897,7 @@ class Sprite(_ImageBase):
 			fb = self.fb
 			
 		if self.fb is None:
-			sys.stderr.write("No fb associated with sprite on blit\n")
+			Logger("No fb associated with sprite on blit\n")
 			return None
 
 		# save position, if specified, else used saved position
@@ -2078,7 +2083,7 @@ class Sprite(_ImageBase):
 			file.write(pygame.image.tostring(self.im, 'RGB'))
 			file.close()
 		except IOError:
-			sys.stderr.write("Can't write %s.\n" % fname)
+			Logger("Can't write %s.\n" % fname)
 			return None
 
 	def save_alpha_pgm(self, fname, mode='w'):
@@ -2089,7 +2094,7 @@ class Sprite(_ImageBase):
 			file.write(a.tostring())
 			file.close()
 		except IOError:
-			sys.stderr.write("Can't write %s.\n" % fname)
+			Logger("Can't write %s.\n" % fname)
 			return None
 
 
@@ -2196,7 +2201,7 @@ class MpegMovie(_ImageBase):
 		try:
 			nout = self.m.render_frame(n)
 		except AttributeError:
-			sys.stderr.write("No MPEG in this version of pygame.\n")
+			Logger("No MPEG in this version of pygame.\n")
 			sys.exit(1)
 			
 		if nout == n:
@@ -2430,7 +2435,7 @@ class DisplayList:
 		"""INTERNAL -- for debugging only
 		"""
 		for s in self.sprites:
-			sys.stderr.write("%s\n" % s)
+			Logger("%s\n" % s)
 
 def _is_seq(x):
 	"""INTERNAL

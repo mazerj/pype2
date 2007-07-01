@@ -81,13 +81,15 @@ class UserDisplay:
 			self.master = master
 		else:
 			self.master = Toplevel()
-			self.master.title('Scope')
-			self.master.iconname('Scope')
+			self.master.title('UserDisplay')
+			self.master.iconname('UserDisplay')
 			if sys.platform == 'darwin':
 				self.master.geometry('-0+20')
 			else:
 				self.master.geometry('-0-0')
-			self.master.protocol("WM_DELETE_WINDOW", app.shutdown)
+				
+			self.visible = 1
+			self.master.protocol("WM_DELETE_WINDOW", self.showhide)
 
 		self.frame = Frame(self.master)
 		self.frame.pack(expand=1, fill=BOTH)
@@ -237,8 +239,13 @@ class UserDisplay:
 		self.bind_but3(fn=None, arg=None)
 		self._canvas.bind("<Button-3>", self.invoke_but3)
 
-	def hide(self):
-		self.master.withdraw()
+	def showhide(self):
+		if self.visible:
+			self.master.withdraw()
+			self.visible = 0
+		else:
+			self.master.deiconify()
+			self.visible = 1
 
 	def stop(self, command=None):
 		if command:
@@ -340,7 +347,7 @@ Mouse-3 simulate bar up/down
 	def showsprites(self):
 		from sprite import Sprite
 		for n in range(0, len(Sprite.__list__)):
-			sys.stderr.write('%d: "%s"\n' % (n, Sprite.__list__[n]))
+			Logger('%d: "%s"\n' % (n, Sprite.__list__[n]))
 
 	def fb2can(self, x, y=None):
 		"""convert frame buffer coords to canvas coords"""

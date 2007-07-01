@@ -7,6 +7,8 @@ import socket
 import threading
 import time, random
 
+from guitools import Logger
+
 from PlexHeaders import *
 
 class PlexNet:
@@ -41,7 +43,7 @@ class PlexNet:
 		self.__db_size = struct.calcsize(Plex.fPL_DataBlockHeader)
 
 		self.__lock = threading.Lock()
-		sys.stderr.write('starting plexnet thread\n')
+		Logger('starting plexnet thread\n')
 		threading.Thread(target=self.run).start()
 
 	def __del__(self):
@@ -82,14 +84,14 @@ class PlexNet:
 
 		if (NumMMFDropped - self.__last_NumMMFDropped) > 0:
 			self.__last_NumMMFDropped = NumMMFDropped
-			sys.stderr.write("PlexNet: Warning, MMF dropout!!\n")
-			sys.stderr.write("PlexNet: Consider power cycling MAP box...\n")
+			Logger("PlexNet: Warning, MMF dropout!!\n")
+			Logger("PlexNet: Consider power cycling MAP box...\n")
 			self.__mmf_drops = self.__mmf_drops + 1
 
 		if NumServerDropped > 0:
-			sys.stderr.write("PlexNet: NumServerDropped=%d\n" %
-							 NumServerDropped)
-			sys.stderr.write("PlexNet: This shouldn't happen; tell Jamie\n")
+			Logger("PlexNet: NumServerDropped=%d\n" %
+				   NumServerDropped)
+			Logger("PlexNet: This shouldn't happen; tell Jamie\n")
 
 		pos = 16
 		events = []

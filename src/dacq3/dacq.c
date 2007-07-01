@@ -468,7 +468,7 @@ int dacq_eye_y(void)
   return(i);
 }
 
-int dacq_eye_params(float xgain, float ygain,
+int dacq_eye_params(double xgain, double ygain,
 		    int xoff, int yoff)
 {
   LOCK(semid);
@@ -491,6 +491,7 @@ int dacq_eye_read(int which)
     i = dacq_data->eye_y;
   }
   UNLOCK(semid);
+  //printf("[%d, %d]\n", which, i);
   return(i);
 }
 
@@ -596,7 +597,7 @@ void dacq_fixbreak_tau(int n)
   UNLOCK(semid);
 }
   
-int dacq_fixwin(int n, int cx, int cy, int radius, float vbias)
+int dacq_fixwin(int n, int cx, int cy, int radius, double vbias)
 {
   if (n < 0) {
     return(NFIXWIN);

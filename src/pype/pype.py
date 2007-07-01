@@ -211,6 +211,18 @@ Sun May 27 15:08:51 2007 mazer
 - Added 'save_tmp' to sub_common worksheet -- this will let you write
   the temp files to /dev/null, which should massively accelerate
   handmappng with the acutes (long trials)
+
+Wed Jun 27 11:01:12 2007 mazer
+
+- Moved all the default Config.$HOST stuff to configvars.py; this should
+  make it easier to keep track of the options and defaults for users.
+
+Thu Jun 28 10:40:41 2007 mazer
+
+- Converted almost everything over to using Logger() class for logging
+  error message. This will put things in a scrollable console window,
+  (if available) and also log to sys.stderr. The Logger class is in
+  guitools.py
   
 """
 
@@ -269,6 +281,7 @@ from iplot import *
 import userdpy
 from PlexNet import *
 from info import *
+import configvars
 
 class PypeApp:
 	"""Pype Application Class.
@@ -314,43 +327,48 @@ class PypeApp:
 		collision.
 		"""
 
+		# no console window to start with..
+		self.conwin = None
+
 		# save handle for this instance as a pseudo-global (this
 		# is really just for the functions in helper.py
 		PypeApp.handle = self
 
 		# check to see if ~/.pyperc or $PYPERC is accessible
 		# by the user before going any further:
-		f, ok = self._statefile(accesscheck=1)
-		if not ok:
-			sys.stderr.write("pype: No access to %s\n" % f)
-			sys.stderr.write(" Check config dir permissions: %s \n" % pyperc())
+		try:
+			statefile = self._get_statefile_name(accesscheck=1)
+		except IOError:
+			Logger("pype: no access to statefile '%s'\n" % statefile)
+			Logger("Check permissions in %s\n" % pyperc())
 			raise FatalPypeError
 
 		n = npypes()
 		if n > 0:
-			sys.stderr.write("Fatal Error\n")
-			sys.stderr.write(" pype appears to be running:\n")
-			sys.stderr.write("  %d processes are attached to the SHM.\n" % n);
-			sys.stderr.write("  (>1 processes/pype instance)\n");
-			sys.stderr.write("*** try running pypekill ***\n")
+			Logger("Fatal Error\n")
+			Logger(" pype appears to be running:\n")
+			Logger("  %d processes are attached to the SHM.\n" % n);
+			Logger("  (>1 processes/pype instance)\n");
+			Logger("*** try running pypekill ***\n")
 			raise FatalPypeError
 
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
+
+		# start pype logging output with blank line..
+		sys.stderr.write('\n')
 		
-		import configvars
 		cfile = pyperc('Config.%s' % gethostname())
-		sys.stderr.write('configfile: %s\n' % cfile)
+		Logger('configfile: %s\n' % cfile)
 		self.config = configvars.defaults(cfile)
 
 		if os.environ.has_key('PYPEDEBUG'):
-			sys.stderr.write('command line forced debug mode')
+			Logger('command line forced debug mode')
 			self.config.set('DEBUG', '1', override=1)
 		
 		debug(self.config.iget('DEBUG'))
 
 		if debug():
-			sys.stderr.write('\nCONFIG TABLE:\n')
 			self.config.show(sys.stderr)
 
 		# Thu Mar  1 20:53:51 2007 mazer
@@ -364,32 +382,32 @@ class PypeApp:
 			try:
 				import elogapi
 				self.use_elog = 1
-				sys.stderr.write("**** Using ELOG system ***\n")
+				Logger("**** Using ELOG system ***\n")
 			except ImportError:
-				sys.stderr.write("Warning: can't import ELOG api.\n")
+				Logger("Warning: can't import ELOG api.\n")
 
 		# these MUST be set from now on..
 		monw = self.config.fget('MONW', -1)
 		if monw < 0:
-			sys.stderr.write('pype: set MONW in Config file\n')
+			Logger('pype: set MONW in Config file\n')
 			sys.exit(1)
 		monh = self.config.fget('MONH', -1)
 		if monh < 0:
-			sys.stderr.write('pype: set MONH in Config file\n')
+			Logger('pype: set MONH in Config file\n')
 			sys.exit(1)
 		viewdist = self.config.fget('VIEWDIST', -1)
 		if viewdist < 0:
-			sys.stderr.write('pype: set VIEWDIST in Config file\n')
+			Logger('pype: set VIEWDIST in Config file\n')
 			sys.exit(1)		
 
 		mon_id = self.config.get('MON_ID', '')
 		if len(mon_id) == 0:
-			sys.stderr.write('WARNING: MON_ID field in Config file unset.\n')
+			Logger('WARNING: MON_ID field in Config file unset.\n')
 
 		# GFX_TESTMODE is now obsolete, replaced by FULLSCREEN
 		if self.config.iget('GFX_TESTMODE', default=666) != 666:
-			sys.stderr.write('WARNING: GFX_TESTMODE is obsolete.\n')
-			sys.stderr.write('         assuming you mean FULLSCREEN=0\n')
+			Logger('WARNING: GFX_TESTMODE is obsolete.\n')
+			Logger('         assuming you mean FULLSCREEN=0\n')
 
 		if gui:
 			state = self._readstate()
@@ -424,7 +442,8 @@ class PypeApp:
 			self.tk = None
 		else:
 			self.tk = Tk()
-
+			self.tk.resizable(0, 0)
+			
 			import im_left, im_right, im_up, im_down, im_splash
 			self.icons = {}
 			self.icons['left'] = im_left.left
@@ -435,9 +454,12 @@ class PypeApp:
 			
 			if self.config.iget('SPLASH'):
 				splash()
+
+			font = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
+			#font = '-*-helvetica-bold-r-*-*-12-*-*-*-*-*-iso8859-*'
+			fixed = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
 		
-			self.tk.option_add('*Font',
-				   '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*')
+			self.tk.option_add('*Font', font)
 
 			if sys.platform == 'darwin':
 				self.tk.geometry("+0+20")
@@ -449,6 +471,15 @@ class PypeApp:
 
 		
 			Pmw.initialise(self.tk, useTkOptionDb=1)
+
+			self.conwin = ConsoleWindow()
+			self.conwin.showhide()
+
+			# setup global log/console window (see guitools.py)
+			# all queued (ie, old) Logger messages will get pushed
+			# into the console window are this point..
+			Logger(window=self.conwin)
+
 			f1 = Frame(self.tk, borderwidth=1, relief=GROOVE)
 			f1.pack(expand=0, fill=X)
 			
@@ -464,11 +495,11 @@ class PypeApp:
 						   label='About Pype', command=AboutPype)
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command', 
-						   label='hide updy',
-						   command=lambda s=self: s.hide())
+						   label='show/hide console',
+						   command=self.conwin.showhide)
 			mb.addmenuitem('File', 'command', 
-						   label='show updy',
-						   command=lambda s=self: s.hide(restore=1))
+						   label='show/hide user display',
+						   command=self.udpy_showhide)
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command', 
 						   label='Load task from file',
@@ -545,7 +576,7 @@ class PypeApp:
 			if os.environ.has_key('LOGNAME'):
 				self.uname = os.environ['LOGNAME']
 			else:
-				self.uname = 'luser'
+				self.uname = '???'
 			self.userinfo = Label(tmp, text="U=%s  S=%s" % \
 								  (self.uname, subject()))
 			self.userinfo.pack(side=RIGHT)
@@ -554,8 +585,8 @@ class PypeApp:
 			f = Frame(f1b, borderwidth=1, relief=GROOVE)
 			f.pack(expand=1, fill=X)
 
-			self.__recfile = Entry(f, relief=FLAT)
-			self.__recfile.pack(side=LEFT, expand=1, fill=X)
+			self.__recfile = Label(f)
+			self.__recfile.pack(side=LEFT)
 			self._recfile()
 
 			self.__repinfo = Label(f, text=None)
@@ -744,7 +775,7 @@ class PypeApp:
 				self.rig_common.set('eyetracker', et)
 				self.rig_common.set('eyelag', '0')
 			else:
-				sys.stderr.write('%s is not a valid EYETRACKER.\n' % et)
+				Logger('%s is not a valid EYETRACKER.\n' % et)
 				sys.exit(1)
 
 			self._startbut = Button(cpane, text="start",
@@ -799,23 +830,26 @@ class PypeApp:
 					   bg='white')
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "following the bouncing ball")
+			self._button_bounce = b
 			
 			b = Button(cpane, text="slideshow",
 					   command=lambda s=self: slideshow(s),
 					   bg='white')
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "slide show from $(PYPERC)/candy.lst")
-
+			self._button_slideshow = b
+			
 			self.eyegraph = EyeGraph_dummy(self)
 
 			self._cpane = cpane
 
 			# INFO CONSOLES ######################################
-			self.console = Info(parent=console, height=40, width=55)
-			self.info = Info(parent=info, height=40, width=55)
+			self.console = Info(console, height=40, width=55, bg='white')
+			self.info = Info(info, height=40, width=55, bg='gray80')
 
-			# TALLY WINDOW ######################################
-			self.statsw = Label(stats, text='', anchor=W, justify=LEFT)
+			# STATS WINDOW ######################################
+			self.statsw = Label(stats, text='', anchor=W, justify=LEFT,
+								font=fixed)
 			self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
 			# TALLY WINDOW ######################################
@@ -829,7 +863,7 @@ class PypeApp:
 			b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
 			self.balloon.bind(b, "clear tally statistics")
 
-			self.tallyw = Info(parent=tally, height=40, width=55)
+			self.tallyw = Info(tally, height=40, width=55, bg='gray90')
 			
 			self._runstats_update(clear=1)
 			self.tally(type=None)
@@ -873,7 +907,7 @@ class PypeApp:
 			self.balloon.bind(b, "shift offsets down (immediate effect)")
 
 			Label(setables,
-				  text='Control-<arrow keys> in Scope window shift eye pos',
+				  text='Control-<arrow keys> in UserDisplay to tweak eye pos',
 				  fg='blue').pack(expand=0, fill=X, side=TOP, pady=5)
 			
 			v = safeLookup(state, 'eye_tweak', 1)
@@ -956,17 +990,19 @@ class PypeApp:
 				try:
 					blk = (int(blk[0]),int(blk[1]))
 				except ValueError:
-					sys.stderr.write('Warning: BLOCKED config var should\n')
-					sys.stderr.write('         be a pair -- (x,y)\n')
+					Logger("Warning: Config 'BLOCKED' must be (x,y)\n")
 					blk = None
 			else:
 				blk = None
+				
+			self.udpy_visible = 1
 			self.udpy = userdpy.UserDisplay(None,
 											cwidth=self.config.iget('DPYW'),
 											cheight=self.config.iget('DPYH'),
 											pix_per_dva=self.pix_per_dva,
 											blocked=blk, app=self,
 											callback=self.marktime)
+
 
 			if posixpath.exists(subjectrc('last.fid')):
 				self.udpy.loadfidmarks(file=subjectrc('last.fid'))
@@ -981,10 +1017,10 @@ class PypeApp:
 			self.balloon.bind(self._status, 'plain old status line')
 			
 			# history info
-			self._hist = Label(f2, text="", anchor=W)
+			self._hist = Label(f2, text="", anchor=W, font=fixed)
 			self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
 			self._histstr = ""
-			self._histlen = 25
+			self._histlen = 40
 			self.balloon.bind(self._hist, "recent trial result codes")
 
 			self.led(0)
@@ -1047,7 +1083,7 @@ class PypeApp:
 		if len(pport) == 5 and pport[0:2] == '0x':
 			ppbase = eval(pport)
 			if pp_init(ppbase):
-				sys.stderr.write('pype: Parallel Port Enabled\n')
+				Logger('pype: Parallel Port Enabled\n')
 				self.pport = 1
 		else:
 			self.pport = None
@@ -1078,7 +1114,7 @@ class PypeApp:
 		if self.config.iget('NO_AUDIO'):
 			# disable the beep subsystem:
 			nobeep()
-			sys.stderr.write('pype/snd: audio disabled (NO_AUDIO in config)\n')
+			Logger('pype/snd: audio disabled (NO_AUDIO in config)\n')
 		else:
 			# Wed Dec  7 08:59:14 2005 mazer 
 			# initialize pygame sound subsystem now.. the SDL_AUDIODRIVER
@@ -1100,8 +1136,7 @@ class PypeApp:
 					#audiodriver = 'alsa'
 					audiodriver = (None, 'default')
 					
-			sys.stderr.write('pype/snd: audiodriver=%s (from %s)\n' %
-									 audiodriver)
+			Logger('pype/snd: audiodriver=%s (from %s)\n' % audiodriver)
 			
 			if audiodriver[0] is not None:
 				os.environ['SDL_AUDIODRIVER'] = audiodriver[0]
@@ -1117,11 +1152,11 @@ class PypeApp:
 		# added automatic detection of framerate (13-jan-2004 JAM):
 		fps = self.fb.calcfps(duration=250)
 		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
-			sys.stderr.write('pype: error! fps does not match requested rate\n')
+			Logger('pype: error! fps does not match requested rate\n')
 			sys.exit(1)
 		self.rig_common.set('mon_fps', '%g' % fps)
 		self.idlefb()
-		sys.stderr.write('pype: estimated fps = %g\n' % fps)
+		Logger('pype: estimated fps = %g\n' % fps)
 		
 		# drop root access
 		# Tue Jul 12 10:01:53 2005 mazer --
@@ -1129,7 +1164,7 @@ class PypeApp:
 		#  not sure what the problem is, but we're generally having
 		#  also of sound problems recently..
 		root_drop()
-		sys.stderr.write('dropped root access\n')
+		Logger('dropped root access\n')
 
 		self.recording = 0
 		self.plexon_state(0)
@@ -1167,21 +1202,23 @@ class PypeApp:
 		if len(plexhost) > 0:
 			try:
 				self.plex = PlexNet(plexhost, self.config.iget('PLEXPORT'))
-				sys.stderr.write('plexnet: Connected to %s.\n' % plexhost)
+				Logger('plexnet: Connected to %s.\n' % plexhost)
 			except socket.error:
-				sys.stderr.write('plexnet: failed connect to %s.\n' % plexhost)
+				Logger('plexnet: failed connect to %s.\n' % plexhost)
 
 		if debug():
-			sys.stderr.write('pype build: %s by %s\n' %
-							 (PypeBuildDate, PypeBuildBy))
+			Logger('pype build: %s by %s\n' % (PypeBuildDate, PypeBuildBy))
 			print_version_info()
 
 		if self.psych:
 			self.fb.hide()
-			self.hide()
+			self.udpy_showhide()
 
-		self.console.writenl('cwd: <%s>' % os.getcwd())
-		self.console.writenl('pyperc: <%s>' % pyperc())
+		Logger('PYPERC=%s\n' % pyperc())
+		Logger('CWD=%s\n' % os.getcwd())
+
+	def udpy_showhide(self):
+		self.udpy.showhide()
 
 	def keyboard(self):
 		app = self
@@ -1192,7 +1229,7 @@ class PypeApp:
 	def marktime(self, c, ev):
 		if self.isrunning():
 			t = self.encode(MARK)
-			sys.stderr.write('<MARK at %d>\n' % t)
+			Logger('<MARK at %d>\n' % t)
 
 	def set_state(self, running=-1, paused=-1, led=-1):
 		"""
@@ -1404,8 +1441,7 @@ class PypeApp:
 
 		try:
 			if debug():
-				sys.stderr.write("Loading <%s> from <%s>:\n" % \
-								 (taskname, pathname))
+				Logger("Loading <%s> from <%s>:\n" % (taskname, pathname))
 			task = imp.load_module(taskname, file, pathname, descr)
 		finally:
 			# in case loading throws an exception:
@@ -1415,15 +1451,13 @@ class PypeApp:
 		try:
 			main = task.main
 		except AttributeError:
-			sys.stderr.write("Warning: %s doesn't have 'main' function\n" \
-							 % taskname)
+			Logger("Warning: no 'main' in %s\n" % taskname)
 			main = None
 
 		try:
 			cleanup = task.cleanup
 		except AttributeError:
-			sys.stderr.write("Warning: %s doesn't have 'cleanup' function\n" \
-							 % taskname)
+			Logger("Warning: no 'cleanup' in %s\n" % taskname)
 			clean = None
 
 		self.taskmod = task
@@ -1467,8 +1501,6 @@ class PypeApp:
 
 		k = self.rig_common.queryv('fixbreak_tau')
 		k = dacq_fixbreak_tau(k)
-
-		#print xgain, ygain, xoff, yoff
 
 		try:
 			self.eye_tweak = self._eye_tweak.component('entry').get()
@@ -1522,9 +1554,7 @@ class PypeApp:
 		yg = self.eye_ygain * self.rig_common.queryv("mon_v_ppd")
 
 		# send these along to the DACQ modules for fast calculation..
-		dacq_eye_params(xg, yg,
-						int(round(self.eye_xoff)),
-						int(round(self.eye_yoff)))
+		dacq_eye_params(xg, yg, self.eye_xoff, self.eye_yoff)
 
 	def init_framebuffer(self):
 		if self.config.iget('FULLSCREEN'):
@@ -1548,9 +1578,9 @@ class PypeApp:
 
 		g = self.config.fget('GAMMA')
 		if self.fb.set_gamma(g):
-			print "pype: gamma set to %f" % g
+			Logger("pype: gamma set to %f\n" % g)
 		else:
-			print "pype: hardware does not support gamma correction"
+			Logger("pype: hardware does not support gamma correction\n")
 
 		# turn off the xserver's audible bell and screensaver!
 		d = self.config.get('SDLDPY')
@@ -1561,26 +1591,19 @@ class PypeApp:
 		except:
 			pass
 
-	def _statefile(self, accesscheck=None):
+	def _get_statefile_name(self, accesscheck=None):
 		hostname = gethostname()
 		fname = subjectrc('pypestate.%s' % hostname)
 		if accesscheck:
 			if not posixpath.exists(fname):
 				# statefile doesn't exist, make sure we can write it
-				# when we exit later..
-				try:
-					# open/close for write, then delete..
-					open(fname, 'w').close()
-					os.unlink(fname)
-					return (fname, 1)
-				except IOError:
-					return (fname, 0)
-			elif os.access(fname, os.W_OK):
-				return (fname, 1)
-			else:
-				return (fname, 0)
-		else:
-			return fname
+				# when we exit later, so open for write then delete.
+				# This will raise IOError if it's not accessible:
+				open(fname, 'w').close()
+				os.unlink(fname)
+			elif not os.access(fname, os.W_OK):
+				raise IOError
+		return fname
 
 	def _savestate(self):
 		import cPickle
@@ -1598,7 +1621,7 @@ class PypeApp:
 			d['eye_tweak'] = self.eye_tweak
 			d['tallycount'] = self.tallycount
 
-			file = open(self._statefile(), 'w')
+			file = open(self._get_statefile_name(), 'w')
 			cPickle.dump(d, file)
 			file.close()
 
@@ -1609,7 +1632,7 @@ class PypeApp:
 	def _readstate(self):
 		import cPickle
 		try:
-			file = open(self._statefile(), 'r')
+			file = open(self._get_statefile_name(), 'r')
 			d = cPickle.load(file)
 			file.close()
 			try:
@@ -1751,6 +1774,8 @@ class PypeApp:
 		if self.startfn:
 			if not self.running:
 				self._loadmenu.disableall()
+				self._button_bounce.config(state=DISABLED)
+				self._button_slideshow.config(state=DISABLED)
 				if int(self.rig_common.query('testing')):
 					if ask("pype", "testing mode ok?", ("yes", "no")) == 1:
 						return
@@ -1764,7 +1789,7 @@ class PypeApp:
 					self.record_selectfile(fname)
 				else:
 					if self.record_selectfile(train=train) is None:
-						sys.stderr.write('run aborted\n')
+						Logger('run aborted\n')
 						return
 					
 				# If elog is in use, then at the end of each run insert
@@ -1817,6 +1842,8 @@ class PypeApp:
 												  state=NORMAL)
 						self._trainbut.config(text='train',
 											  state=NORMAL)
+						self._button_bounce.config(state=NORMAL)
+						self._button_slideshow.config(state=NORMAL)
 						self._loadmenu.enableall()
 					if self.psych:
 						self.fb.hide()						
@@ -1843,7 +1870,7 @@ class PypeApp:
 				self.tk.bell()
 		else:
 			self._savestate()			# Do this NOW!
-			sys.stderr.write('user closed: terminating.\n')
+			Logger('user closed: terminating.\n')
 			self.terminate = 1
 
 	def ts(self):
@@ -1908,26 +1935,20 @@ class PypeApp:
 			x, y = 0, 0
 		elif zero:
 			(x, y) = (dacq_eye_read(0), dacq_eye_read(1))
-			x = int(self._eye_xoff.component('entry').get()) + x
-			y = int(self._eye_yoff.component('entry').get()) + y
+			x = float(self._eye_xoff.component('entry').get()) + x
+			y = float(self._eye_yoff.component('entry').get()) + y
 			x = x - self._eyetarg_x
 			y = y - self._eyetarg_y
 			self.status('[EYE_ZERO]')
 		else:
 			x = x * int(self._eye_tweak.component('entry').get())
 			y = y * int(self._eye_tweak.component('entry').get())
-			x = int(self._eye_xoff.component('entry').get()) + x
-			y = int(self._eye_yoff.component('entry').get()) + y
-		self._eye_xoff.setentry('%d' % x)
-		self._eye_yoff.setentry('%d' % y)
+			x = float(self._eye_xoff.component('entry').get()) + x
+			y = float(self._eye_yoff.component('entry').get()) + y
+		self._eye_xoff.setentry('%.0f' % x)
+		self._eye_yoff.setentry('%.0f' % y)
 		self.eyeset()
-
-	def eyeadjust(self, dx=0, dy=0):
-		x = int(self._eye_xoff.component('entry').get()) + dx
-		y = int(self._eye_yoff.component('entry').get()) + dy
-		self._eye_xoff.setentry('%d' % x)
-		self._eye_yoff.setentry('%d' % y)
-		self.eyeset()
+		self.encode(EYESHIFT)
 
 	def drain(self):
 		if not self.running:
@@ -1971,15 +1992,12 @@ class PypeApp:
 		if fast:
 			return
 
-		#intime = Timer()
-		#sys.stderr.write("<"); sys.stderr.flush()
-
 		if (not self.recording) and (self.plex is not None):
 			# drawin the plexon buffer to prevent overflow when
 			# pype is idle...
 			tank, ndropped = self.plex.drain()
 			if tank is None:
-				sys.stderr.write("oh no.. lost plexon signal..")
+				Logger('oh no.. lost plexon signal..')
 
 		if self.plex:
 			self.plexstate.configure(text=self.plex.status())
@@ -1996,7 +2014,7 @@ class PypeApp:
 				# an immediate emergency exit from pype. This is intended
 				# for when your running on a single-headed machine for
 				# psychophysics and lock up in fullscreen mode..
-				sys.stderr.write('\n***EMERGENCY EXIT***\n')
+				Logger('\n***EMERGENCY EXIT***\n')
 				self.close()
 				sys.exit(0)
 			elif dacq_jsbut(0) and dacq_jsbut(2):
@@ -2035,7 +2053,7 @@ class PypeApp:
 
 			if self.pport and pp_sw3():
 				self.close()
-				sys.stderr.write('User requested exit.\n')
+				Logger('User requested exit.\n')
 				sys.exit(0)
 
 			if self.config.iget('ENABLE_SW1'):
@@ -2059,7 +2077,7 @@ class PypeApp:
 						while self.sw1():
 							self.tk.update()
 							if self.terminate:
-								sys.stderr.write("WARNING: juice switch open\n")
+								Logger("WARNING: juice switch open\n")
 								break
 						self.juice_off()
 						self.status('')
@@ -2080,8 +2098,6 @@ class PypeApp:
 			while t.ms() < ms:
 				self.idlefn()
 				
-		#sys.stderr.write("%d>" % intime.ms()); sys.stderr.flush()
-
 	def history(self, c=None):
 		"""
 		Maintains a 'history stack' ala cortex.  Cortex did do somethings
@@ -2129,7 +2145,6 @@ class PypeApp:
 		beep(0, 10)
 
 	def warn_trial_start(self):
-		# self.console.writenl("----------------------", color='black')
 		self.console.writenl("------------------------trial-starts---",
 							 color='black')
 
@@ -2300,14 +2315,6 @@ class PypeApp:
 		else:
 			dacq_juice_drip(int(0.5+ms))
 
-	def hide(self, restore=None):
-		if restore is None:
-			#self.tk.withdraw()
-			self.udpy.master.withdraw()
-		else:
-			#self.tk.deiconify()
-			self.udpy.master.deiconify()
-
 	def lshiftdown(self):
 		"""
 		Check to see if the LEFT_SHIFT key is down in the framebuffer
@@ -2379,7 +2386,6 @@ class PypeApp:
 	def int_handler(self, signal, frame):
 		"""This is for catching SIGUSR1's from the dacq process"""
 		if self.allow_ints:
-			#sys.stderr.write('*');sys.stderr.flush()
 			# disable interupts until explicitly re-enabled..
 			# this acts like a latch and prevents re-entry as well..
 			self.allow_ints = 0
@@ -2420,11 +2426,6 @@ class PypeApp:
 				self.allow_ints = 1
 				return
 		else:
-			#sys.stderr.write('[*]');sys.stderr.flush()
-			#iclass = dacq_int_class()
-			#iarg = dacq_int_arg()
-			#sys.stderr.write('<unallowed int class=%d arg=%d>\n' % \
-			#				 (iclass, iarg))
 			pass
 			
 
@@ -2518,7 +2519,7 @@ class PypeApp:
 
 		if self.plex is not None:
 			self.plex.drain(terminate=1)
-			sys.stderr.write('pype: closed connection to plexon.\n')
+			Logger('pype: closed connection to plexon.\n')
 			
 		try:
 			self.udpy.fidinfo(file=subjectrc('last.fid'))
@@ -2529,18 +2530,18 @@ class PypeApp:
 		if self.tk:
 			# only do the state thing if in GUI mode
 			self._savestate()
-			sys.stderr.write('pype: saved state\n')
+			Logger('pype: saved state\n')
 
-		sys.stderr.write('pype: cleaning up sprites\n')
+		Logger('pype: cleaning up sprites\n')
 		# added 28-feb-2004 to make sure that sprites are getting
 		# properly del'ed and garbage collected
 		n = len(Sprite.__list__)
 		if n > 0:
-			sys.stderr.write('Warning: %d sprites left in memory:\n' % n)
+			Logger('Warning: %d sprites left in memory:\n' % n)
 			for sname in Sprite.__list__:
-				sys.stderr.write(' name="%s"\n' % sname)
+				Logger(' name="%s"\n' % sname)
 				
-		sys.stderr.write('pype: bye bye.\n')
+		Logger('pype: bye bye.\n')
 				
 
 	def repinfo(self, msg=None):
@@ -2564,16 +2565,15 @@ class PypeApp:
 
 	def _recfile(self):
 		if self.tk:
-			self.__recfile.delete(0, END)
 			if self.record_file is None:
-				self.__recfile.insert(0, "datafile: none")
+				self.__recfile.config(text="file: none")
 				self.balloon.bind(self.__recfile, None)
 			else:
 				if len(self.record_file) > 40:
 					spacer = "..."
 				else:
 					spacer = ""
-				self.__recfile.insert(0, "datafile: %s%s"
+				self.__recfile.config(text="file: %s%s"
 									  % (spacer, self.record_file[-25:]))
 				self.balloon.bind(self.__recfile, self.record_file)
 
@@ -2686,7 +2686,7 @@ class PypeApp:
 			self.encode(EYE_STOP)
 			if dacq_adbuf_toggle(0):
 				self.encode(EYE_OVERFLOW)
-				sys.stderr.write('warning: eyetrace overflowed\n')
+				Logger('warning: eyetrace overflowed\n')
 				warn('Warning', 'eye trace overflow')
 			self._eyetrace = 0
 
@@ -3040,12 +3040,10 @@ class PypeApp:
 
 					if posixpath.exists(self.record_file):
 						if mode == 'w':
-							sys.stderr.write('unlinking: %s\n' % \
-											 self.record_file)
+							Logger('unlinking: %s\n' % self.record_file)
 							posix.unlink(self.record_file)
 						elif mode == 'a':
-							sys.stderr.write('appending to: %s\n' % \
-											 self.record_file)
+							Logger('appending to: %s\n' % self.record_file)
 					break
 
 		self._recfile()
@@ -3224,12 +3222,14 @@ class PypeApp:
 				pnum = pnum + 1
 				
 			if raster:
-				raster = array(raster) - t0
-				subplot(nplots, 1, pnum)
-				plot(raster, 0.0 * raster, 'o')
-				yrange(-1,1)
-				ylabel('raster')
-				xrange(start - t0, stop - t0)
+				# stop xmgrace error message for empty rasters..
+				if len(raster) > 1:
+					raster = array(raster) - t0
+					subplot(nplots, 1, pnum)
+					plot(raster, 0.0 * raster, 'o')
+					yrange(-1,1)
+					ylabel('raster')
+					xrange(start - t0, stop - t0)
 
 			# restore previous graph window (even if it's None)
 			# attach() returns the current handle, so save it
@@ -3315,9 +3315,9 @@ class EyeGraph_dummy:
 
 	def show(self, start=None, stop=None):
 		if self.warn:
-			sys.stderr.write('warning: app.eyegraph.show() is obsolete!\n')
-			sys.stderr.write('change your code to call:\n')
-			sys.stderr.write('  app.plotEyetracesRange(start,stop).\n')
+			Logger('warning: app.eyegraph.show() is obsolete!\n')
+			Logger('change your code to call:\n')
+			Logger('  app.plotEyetracesRange(start,stop).\n')
 			self.warn = 0
 		self.app.plotEyetracesRange(start, stop)
 
@@ -3648,7 +3648,7 @@ class Timer:
 		return dacq_ts() - self._start_at
 
 	def us(self):
-		sys.stderr.write("Warning: timer.us method obsolete, faking it\n");
+		Logger("Warning: timer.us method obsolete, faking it\n");
 		return 1000 * (dacq_ts() - self._start_at)
 
 class Holder:
@@ -3698,10 +3698,10 @@ def loadwarn(fname):
 	if debug():
 		try:
 			from imp import find_module
-			sys.stderr.write('<imported %s {from "%s"}>\n' % \
-							 (fname, find_module(fname)[1]))
+			Logger('<imported %s {from "%s"}>\n' % \
+				   (fname, find_module(fname)[1]))
 		except:
-			sys.stderr.write('<imported %s {from unknown location}>\n' % fname)
+			Logger('<imported %s {from unknown location}>\n' % fname)
 
 def now(military=1):
 	"""
@@ -3829,7 +3829,6 @@ def slideshow(app):
 	beep(500, 100)
 	bg = Sprite(x=0, y=0, fb=app.fb,
 				width=app.fb.w, height=app.fb.h)
-	#bg.big = 1
 	if app.sub_common.queryv('show_noise'):
 		bg.noise(0.50)
 	
@@ -3847,7 +3846,7 @@ def slideshow(app):
 				if s.w > 10 and s.h > 10:
 					break
 			except:
-				sys.stderr.write('dud file: %s\n' % fname)
+				app.write('dud file: %s\n' % fname)
 		maxd = 512.0
 		if s.w > maxd:
 			m = maxd / s.w
@@ -3879,15 +3878,6 @@ def slideshow(app):
 		app.udpy.icon(itag)
 	beep(500, 100)
 
-def appbusy(t, busyflag=1):
-	if busyflag:
-		t.configure(cursor='watch')
-	else:
-		t.configure(cursor='')
-	if len(t.children.keys()) > 0:
-		for name in t.children.keys():
-			appbusy(t.children[name], busyflag=busyflag)
-
 def get_plexon_events(plex, fc=40000):
 	# drain tank an generate list of timestamps until you
 	# hit the StopExtChannel event.. at which point all events
@@ -3899,7 +3889,7 @@ def get_plexon_events(plex, fc=40000):
 	while not hit_stop:
 		tank, ndropped = plex.drain()
 		if tank is None:
-			sys.stderr.write("oh no.. lost plexon signal during run\n")
+			Logger("oh no.. lost plexon signal during run\n")
 			return None
 
 		for e in tank:
@@ -3907,7 +3897,7 @@ def get_plexon_events(plex, fc=40000):
 			if Type == Plex.PL_ExtEventType and \
 				   Channel == Plex.PL_StartExtChannel:
 				if events is not None:
-					sys.stderr.write("double trigger\n")
+					Logger("double trigger\n")
 					return None
 				events = []
 				zero_ts = ts
@@ -3932,7 +3922,7 @@ class SayOnce:
 	def __init__(self, msg):
 		if not SayOnce.msgs.has_key(msg):
 			SayOnce.msgs[msg] = 1
-			sys.stderr.write(msg)
+			Logger(msg)
 			
 
 if __name__ == '__main__':

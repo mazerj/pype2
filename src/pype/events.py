@@ -76,6 +76,10 @@ def isearly_release(code):
 # Event Codes -- timestamped and put in the encode buffer
 ####################################################################
 
+# internal use only by pype
+
+EYESHIFT = 'eyeshift'					# F8 key (or something similar)
+
 # for general (task) use:
 
 START_ITI				= 'start_iti'

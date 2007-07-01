@@ -134,7 +134,7 @@ static void iscan_init(char *dev)
   v24SetParameters(iscan_port, V24_B115200, V24_8BIT, V24_NONE);
 
   tracker_mode = ISCAN;
-  fprintf(stderr, "%s: opened iscan_port\n", progname);
+  fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
 }
 
 static void iscan_halt()
@@ -152,6 +152,9 @@ static void iscan_read()
   static short *ibuf;
   static int lastc = -1;
   int c;
+
+  // 2 bytes/param; 2 params/packet ==> 4 bytes/packet (XP, YP, XCR, YCR)
+  int packet_length = 8;
 
   /* initialize the read buffer */
   if (bp < 0) {
@@ -179,20 +182,25 @@ static void iscan_read()
   }
   if (bp >= 0) {
     buf[bp] = 0x00ff & c;
-    if (bp == 7) {
+    if (bp == (packet_length - 1)) {
       if (ibuf[0] || ibuf[1] || ibuf[2] || ibuf[3]) {
-	iscan_x = (float) (ibuf[0] - ibuf[2] + 4096);
-	iscan_y = (float) (ibuf[1] - ibuf[3] + 4096);
-	iscan_p = (float) (1000.0);
+	// currently packets should be:
+	///   <PUP_H1 PUP_V1 CR_H1 CR_V1>
+	iscan_x = (ibuf[0] - ibuf[2] + 4096);
+	iscan_y = (ibuf[1] - ibuf[3] + 4096);
+	iscan_p = 1000;
+	//fprintf(stderr, "  x=%d y=%d\n", iscan_x, iscan_y); fflush(stderr);
 	return;
       } else {
-	iscan_x = (float) 99999;
-	iscan_y = (float) 99999;
-	iscan_p = (float) 0;
+	// out of range or no pupil lock
+	iscan_x = 99999;
+	iscan_y = 99999;
+	iscan_p = 0;
+	//fprintf(stderr, "* x=%d y=%d\n", iscan_x, iscan_y); fflush(stderr);
 	return;
       }
     } else {
-      if (++bp > 7) {
+      if (++bp > (packet_length - 1)) {
 	fprintf(stderr, "something bad happened.\n");
       }
     }

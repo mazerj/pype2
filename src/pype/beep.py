@@ -33,6 +33,8 @@ import sys
 import pygame, pygame.mixer, pygame.sndarray
 from Numeric import *
 
+from guitools import Logger
+
 class _Beeper:
 	_init = 1
 	_disabled = None
@@ -42,11 +44,11 @@ class _Beeper:
 			return
 		elif disable:
 			_Beeper._disabled = 1
-			sys.stderr.write('_Beeper.init: audio disabled\n')
+			Logger('_Beeper.init: audio disabled\n')
 			return
 		elif _Beeper._init:
 			if pygame.mixer.get_init() is not None:
-				sys.stderr.write('_Beeper.init: audio was initialized!\n')
+				Logger('_Beeper.init: audio was initialized!\n')
 			try:
 				pygame.mixer.init(22050, -16, 1)
 			except:
@@ -55,7 +57,7 @@ class _Beeper:
 				return
 				
 			i = pygame.mixer.get_init()
-			sys.stderr.write('_Beeper.init: %d hz, %d bits, stereo=%d\n' % i)
+			Logger('_Beeper.init: %d hz, %d bits, stereo=%d\n' % i)
 			(_Beeper.daf, _Beeper.bits, _Beeper.stereo) = i
 			_Beeper.cache = {}
 			_Beeper._init = 0

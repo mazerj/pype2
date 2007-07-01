@@ -26,11 +26,17 @@ Author -- James A. Mazer (james.mazer@yale.edu)
  - Added SimpleDialog() class to replace use of the Tk builtin Dialog
    class (which is opaque and unchangable). This is much simpler..
 
+- Thu Jun 28 10:41:43 2007 mazer
+
+ - Switched use of ScrolledText to Pmw.ScrolledText -- didn't realize
+   there was a Tkinter version (that doesn't properly resize!). Hmmm,
+   actually this is a problem -- doesn't work for Tally window, so I
+   reverted back to Tkinter's version..
+
 """
 
 from Tkinter import *
 import Pmw
-from ScrolledText import ScrolledText
 
 class DockWindow(Toplevel):
 	"""
@@ -105,6 +111,76 @@ class TaskNotebook(DockWindow):
 	def lift(self, name):
 		self.notebook.lift(name)
 
+class Logger:
+	logwindow = None
+	buffered = []
+	def __init__(self, text=None, window=None):
+		import time
+
+		if not text is None:
+			(year, month, day,
+			 hour, min, sec, x1, x2, x3) = time.localtime(time.time())
+			text = '%02d:%02d:%02d -- %s' % (hour, min, sec, text)
+		
+		if window:
+			Logger.logwindow = window
+			# push buffered output into log window
+			for s in Logger.buffered:
+				Logger.logwindow.write(s)
+			Logger.buffered = []
+		else:
+			if Logger.logwindow:
+				Logger.logwindow.write(text)
+			else:
+				Logger.buffered.append(text)
+			sys.stderr.write(text)
+			sys.stderr.flush()
+
+class ConsoleWindow(Toplevel):
+	def __init__(self, title='ConsoleWindow', iconname='Console',
+				 font="-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-*-*",
+				 bg='gray75', **kw):
+		
+		apply(Toplevel.__init__, (self,), kw)
+		if title:
+			self.title(title)
+		if iconname:
+			self.iconname(iconname)
+		
+		f = Frame(self)
+		f.pack(expand=1, fill=BOTH)
+		
+		self.ptext = Pmw.ScrolledText(f)
+		self.ptext.pack(expand=1, side=TOP, fill=BOTH)
+		self.text = self.ptext.component('text')
+		self.text.config(state=DISABLED, font=font, bg=bg, height=10)
+		
+		clear = Button(f, text='clear', command=self.clear)
+		clear.pack(expand=0, side=TOP, anchor=W)
+
+		self.visible = 1
+		self.protocol("WM_DELETE_WINDOW", self.showhide)
+
+	def write(self, str):
+		self.text.config(state=NORMAL)
+		self.text.insert(END, str)
+		self.text.config(state=DISABLED)
+		self.text.update()
+		self.text.see(END)
+
+	def clear(self):
+		self.text.config(state=NORMAL)
+		self.text.delete(0.0, END)
+		self.text.config(state=DISABLED)
+
+	def showhide(self):
+		if self.visible:
+			self.withdraw()
+			self.visible = 0
+		else:
+			self.deiconify()
+			self.visible = 1
+
 class SimpleDialog(Toplevel):
 	def __init__(self, msg, responses=('Ok',), default=None,
 				 astext=None, title=None, iconname=None, **kw):
@@ -168,23 +244,24 @@ class SimpleDialog(Toplevel):
 			self.destroy()
 		
 class Info:
-	def __init__(self, parent=None, height=10, width=50, bg='white',
-				 font=None):
-		if parent is None:
-			self.parent = Tk()
-			self.parent.title('Info')
-		else:
-			self.parent = parent;
+	def __init__(self, parent, height=10, width=50, bg='white',
+				 font="-*-lucidatypewriter-medium-r-*-*-10-*-*-*-*-*-*-*"):
 
-		if font is None:
-			font = "-*-lucidatypewriter-medium-r-*-*-10-*-*-*-*-*-*-*"
-		self.text = ScrolledText(self.parent,
-								 height=height,
-								 width=width,
-								 bg=bg,
-								 font=font)
+		t = Pmw.ScrolledText(parent)
+		t.pack(expand=1, side=TOP, fill=BOTH)
+		self.text = t.component('text')
+		self.text.config(bg=bg, font=font,
+						 height=height,
+						 width=width)
+		
+		#from ScrolledText import ScrolledText
+		#self.text = ScrolledText(parent)
+		#self.text.config(height=height,
+		#					 width=width,
+		#					 bg=bg, font=font)
+		#self.text.pack(expand=1, fill=BOTH)
+			
 		self.text.config(state=DISABLED)
-		self.text.pack(expand=1, fill=BOTH)
 		self.next_tag = 0
 
 	def write(self, line, color=None, update=1):

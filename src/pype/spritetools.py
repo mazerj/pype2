@@ -45,6 +45,8 @@ import pygame.surfarray
 from pygame.constants import *
 import sprite
 
+from guitools import Logger
+
 ##########################################################################
 # new, faster, clean support functions added 04-mar-2004 JAM .. stop
 # using the old versions..
@@ -306,7 +308,7 @@ def Make_2D_Sine(freq, phase, rot, rc, gc, bc, im):
 	im			target image (typically sprite.im)
 	"""
 	
-	sys.stderr.write("Warning: use singrat instead of Make_2D_Sine!\n")
+	Logger("Warning: use singrat instead of Make_2D_Sine!\n")
 	
 	w, h = im.get_size()
 	x, y = sprite.genaxes(w, h, Float)
@@ -343,7 +345,7 @@ def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
 	im: target image (typically sprite.im)
 	"""
 
-	sys.stderr.write("Warning: use polargrat instead of Make_2D_Cnc_Rdl!\n")
+	Logger("Warning: use polargrat instead of Make_2D_Cnc_Rdl!\n")
 	
 	w, h = im.get_size()
 	x, y = sprite.genaxes(w, h, Float)
@@ -376,7 +378,7 @@ def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
 
 def Make_2D_Hyperbolic(Pf, Phase, Rot, rc, gc, bc, im):
 	
-	sys.stderr.write("Warning: use hypergrat instead of Make_2D_Hyperbolic!\n")
+	Logger("Warning: use hypergrat instead of Make_2D_Hyperbolic!\n")
 	
 	w, h = im.get_size()
 	x, y = sprite.genaxes(w, h, Float)
@@ -426,31 +428,31 @@ def surfinfo(img):
 	"""this used to be sprite::idump()"""
 	import sys
 	
-	sys.stderr.write("%s\n" % img)
-	sys.stderr.write(" colorkey:%s\n" %\
-					 img.get_colorkey())
-	sys.stderr.write(" get_alpha:%s\n" %\
-					 img.get_alpha())
-	sys.stderr.write(" HWSURFACE:%s\n" %\
-					 ['no','yes'][img.get_flags()&HWSURFACE!=0])
-	sys.stderr.write(" RESIZABLE:%s\n" %\
-					 ['no','yes'][img.get_flags()&RESIZABLE!=0])
-	sys.stderr.write(" ASYNCBLIT:%s\n" %\
-					 ['no','yes'][img.get_flags()&ASYNCBLIT!=0])
-	sys.stderr.write(" OPENGL:%s\n" %\
-					 ['no','yes'][img.get_flags()&OPENGL!=0])
-	sys.stderr.write(" OPENGLBLIT:%s\n" %\
-					 ['no','yes'][img.get_flags()&OPENGLBLIT!=0])
-	sys.stderr.write(" HWPALETTE:%s\n" %\
-					 ['no','yes'][img.get_flags()&HWPALETTE!=0])
-	sys.stderr.write(" DOUBLEBUF:%s\n" %\
-					 ['no','yes'][img.get_flags()&DOUBLEBUF!=0])
-	sys.stderr.write(" FULLSCREEN:%s\n" %\
-					 ['no','yes'][img.get_flags()&FULLSCREEN!=0])
-	sys.stderr.write(" RLEACCEL:%s\n" %\
-					 ['no','yes'][img.get_flags()&RLEACCEL!=0])
-	sys.stderr.write(" SRCALPHA:%s\n" %\
-					 ['no','yes'][img.get_flags()&SRCALPHA!=0])
+	Logger("%s\n" % img)
+	Logger(" colorkey:%s\n" %\
+		   img.get_colorkey())
+	Logger(" get_alpha:%s\n" %\
+		   img.get_alpha())
+	Logger(" HWSURFACE:%s\n" %\
+		   ['no','yes'][img.get_flags()&HWSURFACE!=0])
+	Logger(" RESIZABLE:%s\n" %\
+		   ['no','yes'][img.get_flags()&RESIZABLE!=0])
+	Logger(" ASYNCBLIT:%s\n" %\
+		   ['no','yes'][img.get_flags()&ASYNCBLIT!=0])
+	Logger(" OPENGL:%s\n" %\
+		   ['no','yes'][img.get_flags()&OPENGL!=0])
+	Logger(" OPENGLBLIT:%s\n" %\
+		   ['no','yes'][img.get_flags()&OPENGLBLIT!=0])
+	Logger(" HWPALETTE:%s\n" %\
+		   ['no','yes'][img.get_flags()&HWPALETTE!=0])
+	Logger(" DOUBLEBUF:%s\n" %\
+		   ['no','yes'][img.get_flags()&DOUBLEBUF!=0])
+	Logger(" FULLSCREEN:%s\n" %\
+		   ['no','yes'][img.get_flags()&FULLSCREEN!=0])
+	Logger(" RLEACCEL:%s\n" %\
+		   ['no','yes'][img.get_flags()&RLEACCEL!=0])
+	Logger(" SRCALPHA:%s\n" %\
+		   ['no','yes'][img.get_flags()&SRCALPHA!=0])
 
 
 if __name__ == '__main__':

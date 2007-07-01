@@ -104,7 +104,7 @@ class _Probe:
 			#pass
 
 	def __del__(self):
-		print "info: deleted probe"
+		#print "info: deleted probe"
 		self.clear()
 
 	def save(self):

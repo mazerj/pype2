@@ -724,8 +724,8 @@ class ParamTable:
 
 		if self.altfile:
 			if self._load(file=pype.subjectrc(self.altfile)) == 1:
-				sys.stderr.write('warning: loaded %s\n' % \
-								 pype.subjectrc(self.altfile))
+				Logger('warning: loaded %s\n' % \
+					   pype.subjectrc(self.altfile))
 				return
 
 		try:

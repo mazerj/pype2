@@ -44,6 +44,9 @@ comedi_server.o: comedi_server.c $(SERVER_SRCS)
 das16_server.o: das16_server.c $(SAVER_SRCS)
 das08_server.o: das08_server.c $(SERVER_SRCS)
 
+iscan_test: iscan_test.c iscan_test.o $(SERVER_OBJS)
+	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
+
 dummy_server: dummy_server.o dacq.h $(SERVER_OBJS)
 	$(CC) -o $@ $< $(SERVER_OBJS) $(LIBEYELINK)
 
