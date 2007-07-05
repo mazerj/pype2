@@ -468,8 +468,6 @@ class FrameBuffer:
 		"""
 		from pype import Timer
 
-		duration=5000
-		
 		# try to estimate current frame rate
 		oldsync = self.do_sync
 		self.do_sync = 0
@@ -491,12 +489,10 @@ class FrameBuffer:
 			intervals.append(b-a)
 			a = b
 
-		print intervals
-			
 		self.do_sync = oldsync
 
-		if len(intervals)<=1:
-			Logger('sprite: calcfps -- no photodiode? Assuming 60\n')
+		if len(intervals) <= 1:
+			Logger('sprite: failed to estimate frames per second, using 60Hz\n')
 			return 60
 
 		# compute estimated frame rate (Hz) based on median inter-frame

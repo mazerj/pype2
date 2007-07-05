@@ -183,7 +183,8 @@ class ConsoleWindow(Toplevel):
 
 class SimpleDialog(Toplevel):
 	def __init__(self, msg, responses=('Ok',), default=None,
-				 astext=None, title=None, iconname=None, **kw):
+				 astext=None, title=None, iconname=None, grab=1,
+				 **kw):
 
 		apply(Toplevel.__init__, (self,), kw)
 
@@ -220,6 +221,8 @@ class SimpleDialog(Toplevel):
 
 		self.protocol("WM_DELETE_WINDOW", lambda n=None: self._respond(n))
 
+		self.grab = grab
+
 		if default:
 			self.default = default
 			self.bind('<Return>', self._return_event)
@@ -230,7 +233,8 @@ class SimpleDialog(Toplevel):
 			
 		if wait:
 			# don't grab, if we're not waiting!
-			self.grab_set()
+			if self.grab:
+				self.grab_set()
 			self.wait_window(self)
 			return self._choice
 
@@ -314,7 +318,7 @@ class EventQueue:
 		self.buffer = []
 
 def warn(title, message, wait=None, action=None, astext=0,
-		 fixed=None):
+		 fixed=None, grab=1):
 	"""
 	Popup a dialog box and warn the user abotu something. Lots of
 	options, but only one possible response: "Continue" or "Close"
@@ -329,7 +333,7 @@ def warn(title, message, wait=None, action=None, astext=0,
 			action = 'Close'
 	dialog = SimpleDialog(message,
 						  title=title, iconname='warning', astext=astext,
-						  default=0, responses=(action,))
+						  default=0, responses=(action,), grab=grab)
 	undermouse(dialog)
 	dialog.go(wait=wait)
 

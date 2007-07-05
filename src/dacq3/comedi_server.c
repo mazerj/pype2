@@ -235,7 +235,13 @@ static void dig_in()
     for (i = 0; i < 4; i++) {
       LOCK(semid);
       last = dacq_data->din[i];
-      dacq_data->din[i] = ((bits & 1<<i) != 0);
+      if (usbjs_dev < 0) {
+	/* no joystick: use digital inputs */
+	dacq_data->din[i] = ((bits & 1<<i) != 0);
+      } else {
+	/* joystick present: replaces digital inputs */
+	dacq_data->din[i] = dacq_data->js[i];
+      }
       if (dacq_data->din[i] != last) {
 	dacq_data->din_changes[i] += 1;
 	if (dacq_data->din_intmask[i]) {

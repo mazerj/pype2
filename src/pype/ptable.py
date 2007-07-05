@@ -803,7 +803,7 @@ class ParamTable:
 				warn('Warning',
 				'Check parameter tables:\n'
 				'  Field "%s" contains invalid data.\n\n'
-				'Please fix before contining.' % P, wait=1)
+				'Please fix before contining.' % P, wait=1, grab=None)
 			else:
 				break
 		return P

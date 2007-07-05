@@ -13,6 +13,7 @@ static void mainloop(void);
 static void iscan_halt(void);
 static int semid;
 static double arange;
+static int usbjs_dev;
 
 
 

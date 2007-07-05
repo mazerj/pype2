@@ -2009,18 +2009,22 @@ class PypeApp:
 				while t.ms() < ms:
 					pass
 		elif ms is None:
-			if dacq_jsbut(0) and dacq_jsbut(1):
-				# pressing buttons 0 and 1 simultanously will generate
-				# an immediate emergency exit from pype. This is intended
-				# for when your running on a single-headed machine for
-				# psychophysics and lock up in fullscreen mode..
-				Logger('\n***EMERGENCY EXIT***\n')
-				self.close()
-				sys.exit(0)
-			elif dacq_jsbut(0) and dacq_jsbut(2):
-				self.fb.hide()
-			elif dacq_jsbut(0) and dacq_jsbut(3):
-				self.fb.show()
+			# 0 ==> response bar (like monkey bar)
+			# 4 + 0 ==> stop
+			# 4 + 1 ==> F8
+			# 4 + 2 ==> empty
+			# 4 + 3 ==> empty
+			if dacq_jsbut(4): 			# trigger...
+				if dacq_jsbut(0):
+					if self.running:
+						# stop now as if user his stop button
+						self._start_helper()
+				elif dacq_jsbut(1):
+					self.eyeshift(zero=1)
+				elif dacq_jsbut(2):
+					pass
+				elif dacq_jsbut(3):
+					pass
 				
 			(c, ev) = self.keyque.pop()
 			if 0 and (c is None) and self.fb:
