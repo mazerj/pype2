@@ -223,6 +223,11 @@ Thu Jun 28 10:40:41 2007 mazer
   error message. This will put things in a scrollable console window,
   (if available) and also log to sys.stderr. The Logger class is in
   guitools.py
+
+Wed Jul 18 08:20:22 2007 mazer
+
+- Getting rid of the "train" button in favor a per animal "training"
+  variable in the animal worksheet.
   
 """
 
@@ -519,7 +524,7 @@ class PypeApp:
 			mb.addmenuitem('File', 'command', 
 						   label='query plexnet',
 						   command=self.plexnet_query)
-			
+
 			if debug():
 				mb.addmenuitem('File', 'separator')
 				mb.addmenuitem('File', 'command', 
@@ -549,6 +554,15 @@ class PypeApp:
 			mb.addmenuitem('File', 'command', 
 						   label='Quit', command=self.shutdown)
 
+			mb.addmenu('Set', '', '')
+			mb.addmenuitem('Set', 'command', 
+						   label='toggle TRAINING mode',
+						   command=self.tog_training)
+			mb.addmenuitem('Set', 'command',
+						   label='toggle testing/debugging flag',
+						   command=self.tog_testing)
+			
+
 			# make top-level menubar for task loaders that can be
 			# disabled when it's not safe to load new tasks...
 			self._loadmenu = Pmw.MenuBar(f1)
@@ -577,10 +591,12 @@ class PypeApp:
 				self.uname = os.environ['LOGNAME']
 			else:
 				self.uname = '???'
-			self.userinfo = Label(tmp, text="U=%s  S=%s" % \
+			self.userinfo = Label(tmp, text="%s %s" % \
 								  (self.uname, subject()))
 			self.userinfo.pack(side=RIGHT)
-			self.balloon.bind(self.userinfo, 'who am i? and who am i testing?')
+			
+			self.training = Label(tmp, text="", fg='blue')
+			self.training.pack(side=RIGHT)
 
 			f = Frame(f1b, borderwidth=1, relief=GROOVE)
 			f.pack(expand=1, fill=X)
@@ -619,10 +635,11 @@ class PypeApp:
 				("show_noise", 1, is_boolean),
 				
 				("Session Data", None, None),
+				("training",	0, is_boolean, "training mode (#0000 files)"),
 				("subject",		"", is_any, "subject id (prefix/partial)"),
-				("full_subject", "", is_any, "full subject name"),
+				("full_subject", "", is_any, "full (unique) subject name"),
 				("owner",		"", is_any, "datafile owner"),
-				("cell",		"", is_any, "cellid -- for reference to cellDB or notebook"),
+				("cell",		"", is_any, "unique (per subj) cell id #"),
 				("acute",		"0", is_bool, "acute experiment"),
 				("save_tmp",	"1", is_bool, "0 to write to /dev/null"),
 				
@@ -672,7 +689,11 @@ class PypeApp:
 				# the cell field (exper in elog database) is not
 				# user setable in elog mode!
 				self.sub_common.lockfield('cell')
-			
+
+			# training field should be set via the menu...
+			self.sub_common.lockfield('training')
+			# set warning label if training mode
+			self.tog_training(toggle=0)
 
 			b = Checkbutton(cpane, text='rig params', relief=RAISED, pady=4)
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -682,7 +703,6 @@ class PypeApp:
 			(
 				("Run Modes", None, None),
 				("testing",		0,				is_boolean),
-				("training",	0,				is_boolean),
 				
 				("Monitor Info", None, None),
 				("mon_id",		"n/a",			is_any, "", -1),
@@ -790,12 +810,6 @@ class PypeApp:
 			self._startbut_tmp.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(self._startbut_tmp,
 							  "save data to temp file (ie, don't save)")
-
-			self._trainbut = Button(cpane, text="train",
-									command=self._train, fg='red')
-			self._trainbut.pack(expand=0, fill=X, side=TOP, pady=2)
-			self.balloon.bind(self._trainbut,
-							  "save data to training file (ie, unit#0000)")
 
 			if debug():
 				b = Button(cpane, text="synctest", command=self.synctest)
@@ -1218,6 +1232,22 @@ class PypeApp:
 		Logger('PYPERC=%s\n' % pyperc())
 		Logger('CWD=%s\n' % os.getcwd())
 
+	def tog_testing(self):
+		s = not self.rig_common.queryv('testing')
+		self.rig_common.set('testing', '%d' % s)
+		
+	def tog_training(self, toggle=1):
+		if toggle:
+			s = not self.sub_common.queryv('training')
+			self.sub_common.set('training', '%d' % s)
+		else:
+			s = self.sub_common.queryv('training')
+			
+		if s:
+			self.training.configure(text='TRAINING')
+		else:
+			self.training.configure(text='')
+		
 	def udpy_showhide(self):
 		self.udpy.showhide()
 
@@ -1753,11 +1783,9 @@ class PypeApp:
 		if self.startfn:
 			self._startbut.config(state=DISABLED)
 			self._startbut_tmp.config(state=DISABLED)
-			self._trainbut.config(state=DISABLED)
 		else:
 			self._startbut.config(state=NORMAL)
 			self._startbut_tmp.config(state=NORMAL)
-			self._trainbut.config(state=NORMAL)
 
 	def _start(self):
 		self._start_helper(temp=None)
@@ -1765,11 +1793,7 @@ class PypeApp:
 	def _starttmp(self):
 		self._start_helper(temp=1)
 
-	def _train(self):
-		# change id #...
-		self._start_helper(temp=None, train=1)
-
-	def _start_helper(self, temp=None, train=None):
+	def _start_helper(self, temp=None):
 		self._savestate()
 		
 		if self.startfn:
@@ -1789,7 +1813,7 @@ class PypeApp:
 						fname = '/dev/null'
 					self.record_selectfile(fname)
 				else:
-					if self.record_selectfile(train=train) is None:
+					if self.record_selectfile() is None:
 						Logger('run aborted\n')
 						return
 					
@@ -1814,7 +1838,6 @@ class PypeApp:
 				if self.tk:
 					self._startbut.config(text='stop')
 					self._startbut_tmp.config(text='stop')
-					self._trainbut.config(text='stop')
 					self.udpy.stop(command=self._start_helper)
 				self._allowabort = 1
 
@@ -1841,8 +1864,6 @@ class PypeApp:
 											  state=NORMAL)
 						self._startbut_tmp.config(text='tmp start',
 												  state=NORMAL)
-						self._trainbut.config(text='train',
-											  state=NORMAL)
 						self._button_bounce.config(state=NORMAL)
 						self._button_slideshow.config(state=NORMAL)
 						self._loadmenu.enableall()
@@ -1852,7 +1873,6 @@ class PypeApp:
 				if self.tk:
 					self._startbut.config(state=DISABLED)
 					self._startbut_tmp.config(state=DISABLED)
-					self._trainbut.config(state=DISABLED)
 					self.udpy.stop(command=None)
 				self.running = 0
 				self.udpy.eye_clear()
@@ -2943,10 +2963,12 @@ class PypeApp:
 			labeled_dump('note', rec, f, 1)
 			f.close()
 
-	def _guess_fallback(self, train=None):
+	def _guess_fallback(self):
 		import glob
-		
+
 		subject = self.sub_common.queryv('subject')
+		train = self.sub_common.queryv('training')
+		
 		if train:
 			cell = 0
 		else:
@@ -2975,10 +2997,12 @@ class PypeApp:
 			return "%s%s.%s.%03d" % (subject, cell,
 									   self.task_name, next)
 
-	def _guess_elog(self, train=None):
+	def _guess_elog(self):
 		import glob, elogapi
 
 		animal = self.sub_common.queryv('subject')
+		train = self.sub_common.queryv('training')
+
 		full_animal = self.sub_common.queryv('full_subject')
 		if len(animal) == 0 or len(full_animal) == 0:
 			warn('Warning (elog)',
@@ -3010,11 +3034,11 @@ class PypeApp:
 		return "%s.%s.%03d" % (exper, self.task_name, next)
 		
 
-	def _guess(self, train=None):
+	def _guess(self):
 		if self.use_elog:
-			return self._guess_elog(train=train)
+			return self._guess_elog()
 		else:
-			return self._guess_fallback(train=train)
+			return self._guess_fallback()
 		
 		
 	def record_done(self):
@@ -3023,7 +3047,7 @@ class PypeApp:
 		self._recfile()
 			
 
-	def record_selectfile(self, fname=None, train=None):
+	def record_selectfile(self, fname=None):
 		import posix
 		
 		if not fname is None:
@@ -3031,7 +3055,7 @@ class PypeApp:
 		else:
 			self.record_file = None
 			while 1:
-				g = self._guess(train=train)
+				g = self._guess()
 				if g is None:
 					return None
 				(file, mode) = SaveAs(initialdir=os.getcwd(),
@@ -3735,7 +3759,6 @@ def bounce(app):
 		app.led(0)
 		app._startbut.config(state=NORMAL)
 		app._startbut_tmp.config(state=NORMAL)
-		app._trainbut.config(state=NORMAL)
 		app.udpy.stop(command=None)
 		
 		app._candy = 0
@@ -3745,7 +3768,6 @@ def bounce(app):
 		app.led(1)
 		app._startbut.config(state=DISABLED)
 		app._startbut_tmp.config(state=DISABLED)
-		app._trainbut.config(state=DISABLED)
 		app.udpy.stop(command=lambda app=app: bounce(app))
 
 		app._candy = 1
@@ -3805,7 +3827,6 @@ def slideshow(app):
 		app.led(0)
 		app._startbut.config(state=NORMAL)
 		app._startbut_tmp.config(state=NORMAL)
-		app._trainbut.config(state=NORMAL)
 		app.udpy.stop(command=None)
 
 		app._candy = 0
@@ -3815,7 +3836,6 @@ def slideshow(app):
 		app.led(1)
 		app._startbut.config(state=DISABLED)
 		app._startbut_tmp.config(state=DISABLED)
-		app._trainbut.config(state=DISABLED)
 		app.udpy.stop(command=lambda app=app: slideshow(app))
 		
 		try:
