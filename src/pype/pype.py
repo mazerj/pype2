@@ -591,7 +591,7 @@ class PypeApp:
 				self.uname = os.environ['LOGNAME']
 			else:
 				self.uname = '???'
-			self.userinfo = Label(tmp, text="%s %s" % \
+			self.userinfo = Label(tmp, text="usr=%s sub=%s" % \
 								  (self.uname, subject()))
 			self.userinfo.pack(side=RIGHT)
 			
@@ -1833,7 +1833,7 @@ class PypeApp:
 						force=1)
 					if not ok:
 						warn('Warning (elog)', ecode)
-					del self._exper
+					#del self._exper
 						
 				if self.tk:
 					self._startbut.config(text='stop')
@@ -3002,22 +3002,26 @@ class PypeApp:
 
 		animal = self.sub_common.queryv('subject')
 		train = self.sub_common.queryv('training')
-
 		full_animal = self.sub_common.queryv('full_subject')
+		
 		if len(animal) == 0 or len(full_animal) == 0:
 			warn('Warning (elog)',
 				 "Set both 'subject' and 'full_subject' first!")
 			return None
-			
-		exper = elogapi.GetExper(animal)
+
+		# search database based on full_animal (animal=full_subject)
+		exper = elogapi.GetExper(full_animal)
 		if exper is None:
+			# create first experiment based on 'subject', ie, file prefix..
 			exper = "%s%04d" % (animal, 1)
 		# update cell slot in worksheets with exper
 		self.sub_common.set('cell', exper)
 		
-		self._exper = exper
 		if train:
 			exper = exper[:-4] + '0000'
+		self._exper = exper
+
+		# now find next avilable number in the sequence
 		pat = "%s.*.[0-9][0-9][0-9]" % (exper, )
 		# generate list of files (including zipped files)
 		flist = glob.glob(pat)+glob.glob(pat+'.gz')
