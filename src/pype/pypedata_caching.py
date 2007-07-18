@@ -105,7 +105,7 @@ Thu Dec 22 12:54:57 2005 mazer
 """
 
 import sys, types, string, thread, os
-import math, Numeric, MLab, time
+import math, Numeric, time
 from vectorops import *
 from pype import *
 import re

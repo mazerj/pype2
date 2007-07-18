@@ -682,6 +682,7 @@ class PypeApp:
 			(
 				("Run Modes", None, None),
 				("testing",		0,				is_boolean),
+				("training",	0,				is_boolean),
 				
 				("Monitor Info", None, None),
 				("mon_id",		"n/a",			is_any, "", -1),
