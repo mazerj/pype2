@@ -380,6 +380,62 @@ def screencenter(w):
 	x, y = (sw/2) - (w.winfo_reqwidth()/2), (sh/2) - (w.winfo_reqheight() / 2)
 	w.geometry("+%d+%d" % (x, y))
 
+class AboutPype:
+	"""
+	Class for the About box.  This is just to make sure
+	only one box per run gets built and reused.
+	"""
+	_w = None
+	def __init__(self):
+		from im_splash import splash
+		
+		if AboutPype._w is None:
+			AboutPype._w = Toplevel()
+			AboutPype._w.title('PypeAbout')
+			AboutPype._w.iconname('PypeAbout')
+			icon = Label(AboutPype._w,
+						 relief=FLAT, image=splash, pady=10)
+			icon.pack(expand=1, fill=BOTH)
+
+			t = """
+pype: python physiology environment
+Copyright (c) 1999 Jamie Mazer
+Version %s
+Installed: %s""" % (PypeVersion, PypeInstallDate)
+			text = Label(AboutPype._w, text=t)
+			text.pack(expand=1, fill=BOTH)
+
+			AboutPype._w.protocol("WM_DELETE_WINDOW", self._withdraw)
+			b = Button(AboutPype._w, text='Close', command=self._withdraw)
+			b.pack(expand=1, fill=X)
+			undermouse(AboutPype._w)
+		else:
+			undermouse(AboutPype._w)
+			AboutPype._w.deiconify()
+
+	def _withdraw(self):
+		AboutPype._w.withdraw()
+
+def splash():
+	"""
+	Display a splash screen an destroy it after 10 secs.
+	"""
+	from im_splash import splash
+	
+	w = Toplevel()
+	w.overrideredirect(1)
+	w.withdraw()
+	
+	f = Frame(w, borderwidth=20, background='blue')
+	f.pack(expand=1, fill=BOTH)
+	icon = Label(f, relief=FLAT, image=splash)
+	icon.pack(expand=1, fill=BOTH)
+	w.update_idletasks()
+	screencenter(w)
+	w.deiconify()
+	w.update_idletasks()
+	w.after(3000, w.destroy)
+
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)

@@ -26,7 +26,8 @@ import fnmatch
 dialogstates = {}
 
 def _comparedatafiles(a, b):
-    """
+    """Compare two datafile names for sorting (INTERNAL ONLY)
+    
     Try to sort pype datafiles in descending order by file number..
     This is highly PYPE-SPECIFIC and is activated by passing keyword
     argument datafiles=1 to the Open() and SaveAs() functions below

@@ -15,10 +15,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 **Revision History**
 
 Mon Aug 14 13:46:27 2006 mazer
-  - Added field locking buttons ('X' to left of entry fields) to let
-    user lock individual entries to avoid accidental changes.. For
-	Jon Touryan... should work ok with runlock'ing, but I haven't
-	tested it. Is anybody using runlock??
+
+- Added field locking buttons ('X' to left of entry fields) to let
+  user lock individual entries to avoid accidental changes.. For
+  Jon Touryan... should work ok with runlock'ing, but I haven't
+  tested it. Is anybody using runlock??
 
 """
 
@@ -396,7 +397,7 @@ def is_cdf(s, evaluate=None):
 	entry must describe a **cummulative distribution function**.
 	
 	Basically, ensure that value is an integer or a vector
-	describing a valid cummulative PDF.  If an integer, then
+	describing a valid cummulative PDF.	 If an integer, then
 	return a n-length cdf of uniform prob (eg, [1/n, 1/n .. 1/n])
 	Otherwise, normalize the vector to have unity area.
 	
@@ -606,17 +607,18 @@ class ParamTable:
 			self.load()
 
 	def get(self, evaluate=1, mergewith=None, readonly=1):
-		"""
+		"""Lookup value from parameter table.
+		
 		Returns a dictionary containing all the values in
 		the parameter table.  Dictionary keys are the slot
-		names.  Default is to evaluate the parameters, which
+		names.	Default is to evaluate the parameters, which
 		means they should come back correctly) typed (ie,
 		is_int's should come back as Integers).
 
 		optional arguments:
 		
 		- evaluate=1 --> Enable or disable calling of validation
-		functions.  All values will probaly be
+		functions.	All values will probaly be
 		strings if this is disabled.
 		
 		- mergewith=<dict> -> pass in an existing dictionary and
@@ -625,7 +627,7 @@ class ParamTable:
 
 		- readonly=1 -> validate readonly fields?
 		
-		NOTE: THIS DICTIONARY WILL HAVE PRIORITY
+		*NOTE* THIS DICTIONARY WILL HAVE PRIORITY
 		"""
 
 		if mergewith:
@@ -712,7 +714,7 @@ class ParamTable:
 		"""
 		Load pickled table database -- note that the pickled dictionary
 		will be unpickled, but only those values referenced in the table
-		will actually be used.  The rest (ie, obsolete) are discarded.
+		will actually be used.	The rest (ie, obsolete) are discarded.
 		This way you can safely inherit from previous modules w/o
 		accumulating excess garbage.
 		"""
@@ -830,7 +832,7 @@ if __name__ == '__main__':
 	exitButton.pack(side = 'bottom')
 	p = ParamTable(root,
 				   (('a', '500+-10%', is_param),
-				    ('l', '', is_list),
+					('l', '', is_list),
 					('b', '3', None),
 					('choice', 1, ('yes', 'no')),
 					('c', '4', None)), file='foobar')

@@ -22,11 +22,11 @@ except ImportError:
 
 def __crossproduct(a, b):
 	"""Compute cross product of two 3-d vectors (x,y,z)"""
-    if len(a) != 3 or len(b) != 3:
-        raise TypeError, "Cross product only for vectors of length 3"
-    v = [a[1]*b[2] - a[2]*b[1],
-         a[2]*b[0] - a[0]*b[2],
-         a[0]*b[1] - a[1]*b[0]]
+	if len(a) != 3 or len(b) != 3:
+		raise TypeError, "Cross product only for vectors of length 3"
+	v = [a[1]*b[2] - a[2]*b[1],
+		 a[2]*b[0] - a[0]*b[2],
+		 a[0]*b[1] - a[1]*b[0]]
 	return array(v)
 
 def __project(a, b, c, x, y):
@@ -47,26 +47,28 @@ def __project(a, b, c, x, y):
 		return (d - nv[0]*x - nv[1]*y) / nv[2]
 
 def griddata(xd, yd, zd, nx, ny):
-	"""
-	xd, yd, zd:	all vectors of same length describing the
+	"""Clone of matlab GRIDDATA function.
+	
+	xd, yd, zd: all vectors of same length describing the
 				surface to be interpolated in 3-space
 	nx, ny:		2 vectors indicating the *AXIS* grid points where new
 				z-values are to be computed. nx and ny must be same
 				length; (len(nx)*len(ny)) points will be computed.
-    return:		return in a 2d numeric matrix containing
+	return:		return in a 2d numeric matrix containing
 				intepolated z-values at the grid points defined
 				by nx,ny.
-  *NOTE*
-    griddata() should only be used to interpolate onto a regular grid.
+				
+    *NOTE*
+	griddata() should only be used to interpolate onto a regular grid.
 
-	Similar to the matlab griddata() function.  Takes a set of
-	XYZ triples that define a surface.  The sampling can be
-	irregular or gridded, order doesn't matter.  The surface is
+	Similar to the matlab griddata() function.	Takes a set of
+	XYZ triples that define a surface.	The sampling can be
+	irregular or gridded, order doesn't matter.	 The surface is
 	then resample on the grid defined by nx and ny using nearest
 	neighbor linear interpolation.
 	
 		xd: vector of x values			Note: xd,yd and zd should be
-		yd:	vector of y values				  1-d vectors, all the same
+		yd: vector of y values				  1-d vectors, all the same
 		zd: vector of z values				  length, not axis vectors!!
 
 		nx: vector of new x axis values
@@ -99,16 +101,17 @@ def griddata(xd, yd, zd, nx, ny):
 			
 def surfinterp(xd, yd, zd, new_xd, new_yd):
 	"""
-    xd, yd, zd:		all vectors of same length describing the
-				    surface to be interpolated in 3-space
-    new_xd, new_yd:	2 vectors indicating the new (x,y) points for which
+	xd, yd, zd:		all vectors of same length describing the
+					surface to be interpolated in 3-space
+	new_xd, new_yd: 2 vectors indicating the new (x,y) points for which
 					new z-values should be computed. Must be same length.
-    return:			return in a 1-d numeric vector containing
-				    intepolated z-values at the points defined
+	return:			return in a 1-d numeric vector containing
+					intepolated z-values at the points defined
 					by new_xd and new_yd. Result is same length
 					as new_xd and new_yd.
-  *NOTE*
-    Algorithm is identical to griddata(), but doesn't assume that the
+					
+    *NOTE*
+	Algorithm is identical to griddata(), but doesn't assume that the
 	inputs are on a regular grid.
 
 	
@@ -116,7 +119,7 @@ def surfinterp(xd, yd, zd, new_xd, new_yd):
 	to live on a regular grid.
 	
 		xd: vector of x values			Note: xd,yd and zd should be
-		yd:	vector of y values				  1-d vectors, all the same
+		yd: vector of y values				  1-d vectors, all the same
 		zd: vector of z values				  length, not axis vectors!!
 
 		nx: vector of new x values (NOT AXIS VALUES)

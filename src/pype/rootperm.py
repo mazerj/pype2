@@ -38,7 +38,7 @@ def root_take():
 
 	**NOTE** -- this is a dangerous toy; _use with caution!_
 	"""
-    return (dacq_seteuid(0) == 0)
+	return (dacq_seteuid(0) == 0)
 
 def root_drop():
 	"""Give of root access.
@@ -48,4 +48,4 @@ def root_drop():
 	root acces). Root access is given up by setting the effective
 	UID back to the user's original UID.
 	"""
-    return (dacq_seteuid(_realuid()) == 0)
+	return (dacq_seteuid(_realuid()) == 0)

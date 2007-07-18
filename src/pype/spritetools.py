@@ -17,22 +17,22 @@ Tue Aug 23 11:01:19 2005 mazer
   is that motion to left is 0deg, motion up is 90deg, orientation follow
   along orthogonally. Not sure alphaGaussian2() is correct now!!
 
-Tue Mar  7 09:28:03 2006 mazer
+Tue Mar	 7 09:28:03 2006 mazer
   change noted above was not correct. I changed the arctan2() calls:
-      t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
+	  t = arctan2(s.yy, s.xx) - (pi * (90-ori_deg)) / 180.0
   to
-      t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	  t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
   which should give the correct orientations now. Note that the
   real problem is that these functions have been broken from the
   very beginning, but handmap.py and spotmap.py (which uses the
   sprite rotate method) have corrected for this.
 
-Tue Aug  8 14:04:36 2006 mazer
+Tue Aug	 8 14:04:36 2006 mazer
   added alphabar() function -- generates a bar stimulus from a sprite
   by filling the sprite with the specified color and then setting the
   alpha channel to let the specified bar stimulus show through.
 
-Wed Aug  9 13:15:34 2006 mazer
+Wed Aug	 9 13:15:34 2006 mazer
   Added _unpack_rgb() to make all the stimulus generators use a common
   color specification. And documented all the grating generators.
 """
@@ -65,200 +65,255 @@ def _unpack_rgb(R, G, B):
 		pass
 
 	return R, G, B
-    
+	
 def g2rgb(a):
+	"""Convert a single grayscale image into a numeric array.
+
+	This converts a shape=(W,H) array into an RGB shape=(W, H, 3) array.
+	
 	"""
-	Covert a single plane (grayscale: shape=(W, H)) numeric array
-	into an RGB array (shape=(W, H, 3)).
-	"""
-    return transpose(array([a, a, a]), axes=[1,2,0])
+	return transpose(array([a, a, a]), axes=[1,2,0])
 
 def pixelize(a, rgb=None, norm=1):
+	"""Convert a floating point array into an UnsignedInt8 array.
+
+	Result is suitable for assigning to <sprite>.alpha or <sprite>.array.
+
+	INPUTS
+	  a =  array to be converted
+	  rgb =  if true, then promote from 1 plane to 3 planes using g2rgb
+	  norm =  if true, scale min-max into range 1-255
+
+    OUTPUTS
+	  array
+	  
 	"""
-	Convert a floating point array into an UnsignedInt8 array suitable
-	for assigning to <sprite>.alpha or <sprite>.array.
-	  a: array to be converted
-	  rgb: if true, then promote from 1 plane to 3 planes using g2rgb
-	  norm: if true, scale min-max into range 1-255
-	"""
-    if norm:
-        amin = min(ravel(a))
-        amax = max(ravel(a))
-        a = (1.0 + 254.0 * ((a - amin) / (amax - amin))).astype(UnsignedInt8)
-    else:
-        a = a.astype(UnsignedInt8)
-    if rgb is None:
-        return a
-    else:
-        return g2rgb(a)
+	if norm:
+		amin = min(ravel(a))
+		amax = max(ravel(a))
+		a = (1.0 + 254.0 * ((a - amin) / (amax - amin))).astype(UnsignedInt8)
+	else:
+		a = a.astype(UnsignedInt8)
+	if rgb is None:
+		return a
+	else:
+		return g2rgb(a)
 
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
-    """
-	2D sine grating generator (odd symmetric)
+	"""2D sine grating generator (odd symmetric)
 	
 	INPUT
+	
 		s = Sprite object
+		
 		frequency = frequency in cycles/sprite
+		
 		phase_deg = phase in degrees
-	      (nb: 0deg phase centers the sine function at sprite ctr)
+		  (nb: 0deg phase centers the sine function at sprite ctr)
+		  
 		ori_deg = grating orientation in degrees
+		
 		R = red channel value (0-1) or standard pype RGB color triple
+		
 		G = green channel value (0-1)
+		
 		B = blue channel value (0-1)
 	
 	OUTPUT
+	
 		None.
 
-    NB: verified frequency is really cycles/sprite JM 17-sep-2006
+	NB: verified frequency is really cycles/sprite JM 17-sep-2006
+	
 	"""
 	R, G, B = _unpack_rgb(R, G, B)
-    r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
+	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
+	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
 	x, y = (r * cos(t), r * sin(t))
 
 	i = 127.0 * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-    s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
-                           axes=[1,2,0])
+	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+						   axes=[1,2,0])
 
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
-    """
-	2D cosine grating generator (even symmetric)
+	"""2D cosine grating generator (even symmetric)
 	
 	INPUT
+	
 		s = Sprite object
+		
 		frequency = frequency in cycles/sprite
+		
 		phase_deg = phase in degrees
-	      (nb: 0deg phase centers the cosine function at sprite ctr)
+		  (nb: 0deg phase centers the cosine function at sprite ctr)
+		  
 		ori_deg = grating orientation in degrees
+		
 		R = red channel value (0-1) or standard pype RGB color triple
+		
 		G = green channel value (0-1)
+		
 		B = blue channel value (0-1)
 	
 	OUTPUT
 		None.
 		
-    NB: verified frequency is really cycles/sprite JM 17-sep-2006
+	NB: verified frequency is really cycles/sprite JM 17-sep-2006
+	
 	"""
 	R, G, B = _unpack_rgb(R, G, B)
-    r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
+	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 
 	i = 127.0 * cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-    s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
-                           axes=[1,2,0])
+	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+						   axes=[1,2,0])
 
 def polargrat(s, cfreq, rfreq, phase_deg, polarity, 
-             R=1.0, G=1.0, B=1.0, logpolar=0):
-	"""
-	2D polar (non-Cartesian) grating generator
+			 R=1.0, G=1.0, B=1.0, logpolar=0):
+	"""2D polar (non-Cartesian) grating generator
 	
 	INPUT
+	
 		s = Sprite object
+		
 		cfreq = concentric frequency (cycles/sprite)
+		
 		rfreq = concentric frequency (cycles/360deg)
+		
 		phase_deg = phase in degrees
+		
 		polarity = 0 or 1 -> really just a 180 deg phase shift
+		
 		R = red channel value (0-1) or standard pype RGB color triple
+		
 		G = green channel value (0-1)
+		
 		B = blue channel value (0-1)
 	
 	OUTPUT
+	
 		None.
-
 		
-    NB: verified frequencies are really cycles/sprite JM 17-sep-2006		
+	NB: verified frequencies are really cycles/sprite JM 17-sep-2006
+	
 	"""
 	R, G, B = _unpack_rgb(R, G, B)
-    if polarity < 0:
-        polarity = -1.0
-    else:
-        polarity = 1.0
-    x, y = (polarity * s.xx/s.w, s.yy/s.h)
+	if polarity < 0:
+		polarity = -1.0
+	else:
+		polarity = 1.0
+	x, y = (polarity * s.xx/s.w, s.yy/s.h)
 
-    if logpolar:
-        z = (log(hypot(x,y)) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
-    else:
-        z = (hypot(x,y) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
+	if logpolar:
+		z = (log(hypot(x,y)) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
+	else:
+		z = (hypot(x,y) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
 	i = 127.0 * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-    s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
-                           axes=[1,2,0])    
+	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+						   axes=[1,2,0])	
 
 def logpolargrat(s, cfreq, rfreq, phase_deg, polarity, 
-                 R=1.0, G=1.0, B=1.0):
-	"""
-	2D log polar (non-Cartesian) grating generator
+				 R=1.0, G=1.0, B=1.0):
+	"""2D log polar (non-Cartesian) grating generator
 	
 	INPUT
+	
 		s = Sprite object
+		
 		cfreq = concentric frequency (cycles/sprite)
+		
 		rfreq = concentric frequency (cycles/360deg)
+		
 		phase_deg = phase in degrees
+		
 		polarity = 0 or 1 -> really just a 180 deg phase shift
+		
 		R = red channel value (0-1) or standard pype RGB color triple
+		
 		G = green channel value (0-1)
+		
 		B = blue channel value (0-1)
 		
 	OUTPUT
+	
 		None.
 		
-	Note: frequencies are in cycles/sprite or cycles/360deg
+	NOTE: frequencies are in cycles/sprite or cycles/360deg
 
-    NB: verified frequenies are really cycles/sprite JM 17-sep-2006
+	NB: verified frequenies are really cycles/sprite JM 17-sep-2006
+	
 	"""
-    polargrat(s, cfreq, rfreq, phase_deg, polarity, 
-             R=R, G=G, B=B, logpolar=1)
+	polargrat(s, cfreq, rfreq, phase_deg, polarity, 
+			 R=R, G=G, B=B, logpolar=1)
 
 def hypergrat(s, freq, phase_deg, ori_deg,
-              R=1.0, G=1.0, B=1.0):
-	"""
-	2D hyperbolic (non-Cartesian) grating generator
+			  R=1.0, G=1.0, B=1.0):
+	"""2D hyperbolic (non-Cartesian) grating generator
 	
 	INPUT
+	
 		s = Sprite object
+		
 		freq = frequency (cycles/sprite)
+		
 		phase_deg = phase in degrees
+		
 		ori_deg = orientation in degrees
+		
 		polarity = 0 or 1 -> really just a 180 deg phase shift
+		
 		R = red channel value (0-1) or standard pype RGB color triple
+		
 		G = green channel value (0-1)
+		
 		B = blue channel value (0-1)
 	
 	OUTPUT
+	
 		None.
 
-	Note: frequencies are in cycles/sprite or cycles/360deg
-
-    NB: verified frequencies are really cycles/sprite JM 17-sep-2006
+	NOTE: frequencies are in cycles/sprite or cycles/360deg
+	
+	NOTE: verified frequencies are really cycles/sprite JM 17-sep-2006
+	
 	"""
 
 	R, G, B = _unpack_rgb(R, G, B)
-    r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
+	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 
 	z = sqrt(fabs((x * freq) ** 2 - (y * freq) ** 2))
 	i = 127.0 * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-    s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
-                           axes=[1,2,0])
+	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+						   axes=[1,2,0])
 
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
-	"""
-	Generate a bar stimulus in an existing sprite using the alpha channel.
+	"""Generate a bar stimulus in an existing sprite using the alpha channel.
 
 	This fills the sprite with 'color' and then puts a [bw x bh] transparent
 	bar of the specified orientation in the alpha channel.
 
 	INPUT
+	
 		s = Sprite()
+		
 		bw,bh = bar width and height in pixels
+		
 		ori_deg = bar orientation in degrees
+		
 		R = standard color triple (0-255) or R channel value (0-1)
+		
 		G = optional G channel value
+		
 		B = optional B channel value
 	
 	OUTPUT
+	
 		None.
+		
 	"""
 	R, G, B = (array(_unpack_rgb(R, G, B)) * 255.0).astype(Int)
 	r = sprite.genrad(s.w, s.h)
@@ -271,27 +326,34 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	
 
 def alphaGaussian(s, sigma):
-    """
-    Note: sigma in pixels
-    Note: alpha's have peak value of fully visible (255),
-          low end depends on sigma
-    """
-    r = ((s.xx**2) + (s.yy**2))**0.5
+	"""Put symmetric Gaussian envelope into sprite's alpha channel.
+	
+	NOTE: sigma in pixels
+	
+	NOTE: alpha's have peak value of fully visible (255),
+		  low end depends on sigma
+		  
+	"""
+	r = ((s.xx**2) + (s.yy**2))**0.5
 	i = 255.0 * exp(-((r) ** 2) / (2 * sigma**2))
-    s.alpha[:] = i[:].astype(UnsignedInt8)
+	s.alpha[:] = i[:].astype(UnsignedInt8)
 
 def alphaGaussian2(s, xsigma, ysigma, ori_deg):
-    """
-    Note: sigmas in pixels (xsigma and ysigma refer to x and y when ori=0)
-    Note: alpha's have peak value of fully visible (255),
-          low end depends on sigma
-    NOTE: this is a hack -- it's not quite a Gabor anymore..
-    """
-    r = ((s.xx**2) + (s.yy**2))**0.5
-    t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	"""Put non-symmetric Gaussian envelope into sprite's alpha channel.
+
+	NOTE: sigmas in pixels (xsigma and ysigma refer to x and y when ori=0)
+	
+	NOTE: alpha's have peak value of fully visible (255),
+		  low end depends on sigma
+		  
+	NOTE: this is a hack -- it's not quite a Gabor anymore..
+	
+	"""
+	r = ((s.xx**2) + (s.yy**2))**0.5
+	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 	i = 255.0 * exp(-(x**2) / (2*xsigma**2)) * exp(-(y**2) / (2*ysigma**2))
-    s.alpha[:] = i[:].astype(UnsignedInt8)    
+	s.alpha[:] = i[:].astype(UnsignedInt8)	  
 
 
 ##########################################################################
@@ -300,12 +362,18 @@ def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 ##########################################################################
 
 def Make_2D_Sine(freq, phase, rot, rc, gc, bc, im):
-	"""
+	"""OBSOLETE -- DO NOT USE
+	
 	freq		cycles/image
+	
 	phase		phase (0=cos; deg)
+	
 	rot			rotation angle (deg)
+	
 	rc,gc,bc	red, green, blue contrast (float)
+	
 	im			target image (typically sprite.im)
+	
 	"""
 	
 	Logger("Warning: use singrat instead of Make_2D_Sine!\n")
@@ -332,17 +400,21 @@ def Make_2D_Sine(freq, phase, rot, rc, gc, bc, im):
 
 def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
 					Logflag, rc, gc, bc, im):
-	"""
-	Cord: Concentric frequency
-	Rord: Radial frequendcy
+	"""OBSOLETE -- DO NOT USE
 	
-	NOTE: spirals have both Cord != & Rord != 0)
+	Cord: Concentric frequency
+	
+	Rord: Radial frequendcy (NOTE: spirals have both Cord != & Rord != 0)
 	
 	Phase: in degrees
+	
 	Logflag:
-	Polarity: -1 or +1.  This really only applies to spirals, +1
+	
+	Polarity: -1 or +1.	 This really only applies to spirals, +1
 				is CCW out from center.
+				
 	im: target image (typically sprite.im)
+	
 	"""
 
 	Logger("Warning: use polargrat instead of Make_2D_Cnc_Rdl!\n")
@@ -377,6 +449,9 @@ def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
 	pygame.surfarray.pixels_alpha(im)[:] = 255
 
 def Make_2D_Hyperbolic(Pf, Phase, Rot, rc, gc, bc, im):
+	"""OBSOLETE -- DO NOT USE
+	
+	"""
 	
 	Logger("Warning: use hypergrat instead of Make_2D_Hyperbolic!\n")
 	
@@ -425,7 +500,6 @@ def image_circmask(im, x, y, r, apply):
 		raise PygameIncompleteError, 'image_circmask: !apply not implemented'
 
 def surfinfo(img):
-	"""this used to be sprite::idump()"""
 	import sys
 	
 	Logger("%s\n" % img)

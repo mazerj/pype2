@@ -279,7 +279,6 @@ from dacq import *
 from blt import *
 from filebox import Open, SaveAs
 from pbar import *
-from about import *
 from pygame.constants import *
 from pypeerrors import *
 from iplot import *
@@ -449,13 +448,12 @@ class PypeApp:
 			self.tk = Tk()
 			self.tk.resizable(0, 0)
 			
-			import im_left, im_right, im_up, im_down, im_splash
+			import im_left, im_right, im_up, im_down
 			self.icons = {}
 			self.icons['left'] = im_left.left
 			self.icons['right'] = im_right.right
 			self.icons['up'] = im_up.up
 			self.icons['down'] = im_down.down
-			self.icons['splash'] = im_splash.splash
 			
 			if self.config.iget('SPLASH'):
 				splash()
@@ -1034,12 +1032,10 @@ class PypeApp:
 			# history info
 			self._hist = Label(f2, text="", anchor=W, font=fixed)
 			self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
-			self._histstr = ""
-			self._histlen = 40
 			self.balloon.bind(self._hist, "recent trial result codes")
+			self.history(init=1)
 
 			self.led(0)
-			self.history(None)
 
 		# make sure we're root, if possible
 		root_take()
@@ -1233,10 +1229,12 @@ class PypeApp:
 		Logger('CWD=%s\n' % os.getcwd())
 
 	def tog_testing(self):
+		"""INTERNAL"""
 		s = not self.rig_common.queryv('testing')
 		self.rig_common.set('testing', '%d' % s)
 		
 	def tog_training(self, toggle=1):
+		"""INTERNAL"""
 		if toggle:
 			s = not self.sub_common.queryv('training')
 			self.sub_common.set('training', '%d' % s)
@@ -1249,6 +1247,7 @@ class PypeApp:
 			self.training.configure(text='')
 		
 	def udpy_showhide(self):
+		"""INTERNAL"""
 		self.udpy.showhide()
 
 	def keyboard(self):
@@ -1258,6 +1257,7 @@ class PypeApp:
 		keyboard()
 
 	def marktime(self, c, ev):
+		"""INTERNAL"""
 		if self.isrunning():
 			t = self.encode(MARK)
 			Logger('<MARK at %d>\n' % t)
@@ -1275,16 +1275,43 @@ class PypeApp:
 			self.led(led)
 
 	def isrunning(self):
+		"""Query to see if a task is running.
+
+		Returns: 0 or 1
+		"""
 		return self.running
 
 	def ispaused(self):
+		"""Query to see if current task is paused.
+
+		Returns: 0 or 1
+		"""
 		return self.paused
 
-	def set_result(self, type):
+	def set_result(self, type=None):
+		"""Save the result of this trial (or clear saved results if called
+		with no arguments.
+		"""
+
 		# combination of self.tally() and self.history()
-		self.history(type[0])
-		self.tally(type=type)
-		self._runstats_update(type[0])
+		if type is None:
+			self._results = []
+		else:
+			self._results.append(type)
+			self.history(type[0])
+			self.tally(type=type)
+			self._runstats_update(type[0])
+
+	def get_result(self, nback=1):
+		"""Get the nth to last saved result.
+		
+		Note that get_result(1) is result from last trial, not get_result(0)
+		"""
+		if len(self._results):
+			return self._results[-nback]
+		else:
+			return None
+		
 	
 	def tally(self, type=None, clear=None, cleartask=None):
 		ctask = self.task_name
@@ -1842,6 +1869,9 @@ class PypeApp:
 				self._allowabort = 1
 
 				self.console.clear()
+				
+				# clear/reset result stack at the start of the run..
+				self.set_result()
 
 				try:
 					if self.psych:
@@ -2123,23 +2153,29 @@ class PypeApp:
 			while t.ms() < ms:
 				self.idlefn()
 				
-	def history(self, c=None):
+	def history(self, c=None, init=1):
 		"""
 		Maintains a 'history stack' ala cortex.  Cortex did do somethings
-		right.  The size of the history stack is about 20 trials; it's
+		right.  The size of the history stack is set by LEN below; it's
 		defined in the __init__() function above, you can overright it,
 		if you like..  Called with no arguments, history stack will be
 		cleared.
 		"""
-		if c is None:
-			self._histstr = '.' * self._histlen
+
+		LEN = 40
+		
+		if init:
+			self._histstr = ''
 		else:
-			if len(self._histstr) > self._histlen:
-				self._histstr = self._histstr[1:]+c
+			if c is None:
+				self._histstr = '.' * LEN
 			else:
-				self._histstr = self._histstr+c
+				if len(self._histstr) > LEN:
+					self._histstr = self._histstr[1:] + c
+				else:
+					self._histstr = self._histstr + c
 		if self.tk:
-			self._hist.config(text="trial hist: "+self._histstr)
+			self._hist.config(text="trial hist: " + self._histstr)
 
 	def alarm(self):
 		for i in range(1):
@@ -3952,7 +3988,7 @@ class SayOnce:
 		if not SayOnce.msgs.has_key(msg):
 			SayOnce.msgs[msg] = 1
 			Logger(msg)
-			
+
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

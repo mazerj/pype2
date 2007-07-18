@@ -33,7 +33,7 @@ It includes a few useful and interesting tricks.
 
  2. standardize on how to convert pix->dva
 
-Mon Feb  7 21:15:12 2000 mazer
+Mon Feb	 7 21:15:12 2000 mazer
 
 - split off from pview.py
 
@@ -48,7 +48,7 @@ Fri Sep 15 13:00:47 2000 mazer
 
 - Made extradata into a class for easier decoding..
 
-Tue Apr  3 12:31:51 2001 mazer
+Tue Apr	 3 12:31:51 2001 mazer
 
 - Removed pix_to_dva option for PypeRecord.compute() method
   I decided this must be done explicitly -- policy decision to
@@ -70,7 +70,7 @@ Fri Apr 13 11:52:19 2001 mazer
  > clocking out each scanline as it's aquired, like a normal tube
  > video camera, it acquires an entire video frame (8ms) and holds it.
  > That frame is then clocked out over the next 8ms while the next
- > frame is being acquired by the CCD.  Second, the frame grabber
+ > frame is being acquired by the CCD.	Second, the frame grabber
  > hardware on the iscan board (inside pc) takes another 8ms to
  > acquire each video frame.  Computation time is negliable.  These
  > 8ms values are actually frame periods (ie, at 240hz, assume 4ms etc)
@@ -79,7 +79,7 @@ Fri Apr 13 11:52:19 2001 mazer
  > lag at 240hz; Rikki is checking into this for me now).
  > 
  > This means that the eye trace is actually telling us where the eye
- > was 16-24ms BEFORE the actual time..  So the eye trace should be
+ > was 16-24ms BEFORE the actual time..	 So the eye trace should be
  > shifted forward (to the left) in time by at least 16ms.
 
 Thu Feb 27 17:27:36 2003 mazer
@@ -88,7 +88,7 @@ Thu Feb 27 17:27:36 2003 mazer
   lag-corrected time signal.  This allows you to use 'realt' to look
   at the photo diode and spike traces correctly..
 
-Sun Dec  4 19:17:27 2005 mazer
+Sun Dec	 4 19:17:27 2005 mazer
 
 - Added support for ~/.pyperc/spikepattern to select a spike channel
   on load -- programs must call spikes() method to get correct spike
@@ -104,13 +104,13 @@ Thu Dec 22 12:54:57 2005 mazer
 
 Sun May 21 13:30:18 2006 mazer
 
-- removed threading code, since this hasn't been used in years.  (I've
+- removed threading code, since this hasn't been used in years.	 (I've
   preserved the code as pypedata_th.py in case we ever need it).
 
 - in addition, the nth() function BY DEFAULT deletes the cached record
   number. If you always can forward in a file, this will prevent
   memory usage from exploring. If you want the cache to be maintained,
-  use keyword arg: free=0 to get the old behavior.  99.9% of the time
+  use keyword arg: free=0 to get the old behavior.	99.9% of the time
   the new behavior is actually what you want!
 
 - these changes should help speed things up
@@ -129,7 +129,7 @@ class PypedataTimeError(Exception):
 	"""Serious bad voodoo in the datafile!
 
 	This error gets raised when time seems to run
-	backwards.  This represents a SERIOUS problem
+	backwards.	This represents a SERIOUS problem
 	with the datafile...
 	"""
 	pass
@@ -170,7 +170,7 @@ class PypeRecord:
 		#				this vector to save space. c5 and c6 aren't
 		#				currently implemented
 		#  rec[12]		pupil area data (if available) in same format
-		#			    as the eye [xy]-position data above. This is new
+		#				as the eye [xy]-position data above. This is new
 		#				as of 08-feb-2003 (JAM)
 		# 
 		#  ** added rec[13] 31-oct-2005 (JAM) **
@@ -214,7 +214,7 @@ class PypeRecord:
 				dt = t - lastt
 			else:
 				dt = 0
-			fp.write("   %6dms\t(%6dms)\t%s\n" % (t, dt, e))
+			fp.write("	 %6dms\t(%6dms)\t%s\n" % (t, dt, e))
 			lastt = t
 
 	def pp(self, file=sys.stdout):
@@ -225,7 +225,7 @@ class PypeRecord:
 		from pypedebug import ppDict
 		
 		file.write("================================\n")
-		file.write("taskname='%s'\n  %s\n" % (self.taskname,
+		file.write("taskname='%s'\n	 %s\n" % (self.taskname,
 											  type(self.taskname)))
 		file.write("trialtime='%s'\n  %s\n" % (self.trialtime,
 											   type(self.trialtime)))
@@ -237,13 +237,13 @@ class PypeRecord:
 			klist = self.userparams.keys()
 			klist.sort()
 			for k in klist:
-				file.write("userparams['%s']=<%s>\n  %s\n" % \
+				file.write("userparams['%s']=<%s>\n	 %s\n" % \
 						   (k, self.userparams[k], type(self.userparams[k])))
 			file.write("--------------------------------\n")
 			klist = self.params.keys()
 			klist.sort()
 			for k in klist:
-				file.write("params['%s']=<%s>\n  %s\n" %\
+				file.write("params['%s']=<%s>\n	 %s\n" %\
 					  (k, self.params[k], type(self.params[k])))
 		if rest:
 			file.write("--------------------------------\n")
@@ -290,7 +290,7 @@ class PypeRecord:
 	def compute(self, velocity=None, gaps=None, raw=None, nooffset=None):
 		"""
 		Note: All eye info is maintained here in PIXELS.
-		      Use pix2deg() and deg2pix() below to convert.
+			  Use pix2deg() and deg2pix() below to convert.
 		"""
 		if not self.computed:
 			# this is new 13-apr-2001:
@@ -306,7 +306,7 @@ class PypeRecord:
 				raise PypedataTimeError
 			self.realt = Numeric.array(self.rec[3], 'f') # ms
 			self.eyex = Numeric.array(self.rec[4], 'f') # dva
-			self.eyey = Numeric.array(self.rec[5], 'f')	# dva
+			self.eyey = Numeric.array(self.rec[5], 'f') # dva
 			if lag > 0:
 				# correct for eye tracker delay, if any..
 				self.eyet = self.eyet - lag
@@ -407,8 +407,8 @@ class PypeRecord:
 		# select spikes from specified channel; channel is specified
 		# in ~/.pyperc/spikechannel (users should use the 'pypespike'
 		# sh script to select a channel)
-		#   None --> TTL input (old style)
-		#   regexp --> PlexNet datastream (001a, 001b, 002b etc..)
+		#	None --> TTL input (old style)
+		#	regexp --> PlexNet datastream (001a, 001b, 002b etc..)
 		if pattern is None:
 			try:
 				pattern = string.strip(open(pyperc('spikepattern'),
@@ -500,9 +500,9 @@ class PypeFile:
 			except EOFError:
 				label, rec = None, None
 			except ImportError:
-                # this is usually caused by pickling a data structure,
-                # see commens in fatal_unpickle_error()
-                fatal_unpickle_error()
+				# this is usually caused by pickling a data structure,
+				# see commens in fatal_unpickle_error()
+				fatal_unpickle_error()
 				sys.exit(1)
 
 			if label == None:
@@ -549,7 +549,7 @@ class PypeFile:
 				# year, month, day, hour, min, sec, 1-7, 1-365, daylight sav?
 				trialtime2 = time.strptime(trialtime, '%d-%b-%Y %H:%M:%S')
 				# try to detect if this is an iscan file? Anything after
-				# 01-jun-2000.  After 13-apr-2001, there should be an
+				# 01-jun-2000.	After 13-apr-2001, there should be an
 				# eye tracker parameter stored in the datafile..
 				# only do this on first record.
 				year = trialtime2[0]
@@ -567,13 +567,13 @@ class PypeFile:
 	def nth(self, n, free=1):
 		"""Load or return (if cached) nth record."""
 
-        while len(self.cache) <= n:
-            if self._next() is None:
-                return None
-        rec = self.cache[n]
-        if free:
-            self.cache[n] = None
-        return rec
+		while len(self.cache) <= n:
+			if self._next() is None:
+				return None
+		rec = self.cache[n]
+		if free:
+			self.cache[n] = None
+		return rec
 
 
 	def freenth(self, n):
@@ -582,10 +582,10 @@ class PypeFile:
 			
 	def last(self):
 		"""Get last record."""
-        while 1:
-            d = self._next()
-            if d is None: break
-        return (self.cache[-1], len(self.cache)-1)
+		while 1:
+			d = self._next()
+			if d is None: break
+		return (self.cache[-1], len(self.cache)-1)
 
 def count_spikes(spike_times, start, stop):
 	n = 0
@@ -641,7 +641,7 @@ def deg2pix(d, deg):
 
 def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	"""
-	Thu Apr  5 13:33:12 2001 mazer
+	Thu Apr	 5 13:33:12 2001 mazer
 	
 	Find all saccades in a trial.
 	This function is carefully hand tuned. The steps are as follows:
@@ -650,18 +650,18 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	  3. smooth velocity with a running average (5pt)
 	  4. find velocity spikes that exceed thresh
 	  5. Two saccades within <mindur>ms are essentially considered to
-	     be one noisy saccade and the second one is discarded.
+		 be one noisy saccade and the second one is discarded.
 		 
-            /\                   /\                     /\
-     v: ___/  \_________________/  \___________________/  \_____....
-               <-------------------------------------->
-               |                |   |                 |
-               t0               t1  t2                t3
-                                    <-------------------------------
-                                    |                 |   |          
-                                    t0                t1  t2
+			/\					 /\						/\
+	 v: ___/  \_________________/  \___________________/  \_____....
+			   <-------------------------------------->
+			   |				|	|				  |
+			   t0				t1	t2				  t3
+									<-------------------------------
+									|				  |	  |			 
+									t0				  t1  t2
 
-    So, to compute a real fixation triggered PSTH, you allign
+	So, to compute a real fixation triggered PSTH, you allign
 	all the rasters up on 't2' and only count spikes from t0-t3.
 
 	The output of this function is a complicated list:
@@ -675,13 +675,13 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	while tNi's the indices of those events back into the
 	d.eye[xyt] arrays.
 	fx,fy are the mean x & y positions between t2-t3 and l_fx,
-	l_fy are the position of the last fixation.  fv and l_fv refer
+	l_fy are the position of the last fixation.	 fv and l_fv refer
 	to the calibration state of fx/fy and l_fx/l_fy respectively.
 	If fv is TRUE, then this is a 'calibrated' fixation.  Which
 	means inside the calibration field, or,
 		OR *NO* EYE CALIBRATION DATA WAS SUPPLIED.
 
-	Mon Oct  7 10:59:13 2002 mazer
+	Mon Oct	 7 10:59:13 2002 mazer
 	Added maxthresh -- if (vel > maxthresh), assume it's a blink and
 	don't put it in the list..
 	"""
@@ -770,7 +770,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 				mean(d.eyex[t2i:t3i]), mean(d.eyey[t2i:t3i]), v, fx, fy, fv
 			try:
 				if t3-t2 > 0:
-					SList.append((t0,  t1,  t2,  t3,
+					SList.append((t0,  t1,	t2,	 t3,
 								  t0i, t1i, t2i, t3i,
 								  fx, fy, fv, lfx, lfy, lfv))
 			except NameError:
@@ -798,7 +798,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 		t3i = realix
 		try:
 			if t3-t2 > 0:
-				SList.append((t0,  t1,  t2,  t3,
+				SList.append((t0,  t1,	t2,	 t3,
 							  t0i, t1i, t2i, t3i,
 							  fx, fy, fv, lfx, lfy, lfv))
 		except NameError:
@@ -819,10 +819,10 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 	Returns list of tuples:
 	  [(start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
 	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
-       .......
+	   .......
 	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos)]
 
-    Note: 100 deg/sec -> 1800pix/sec -> 1.8pix/ms
+	Note: 100 deg/sec -> 1800pix/sec -> 1.8pix/ms
 	"""
 
 	# calculate v (velocity profile from XY position)
@@ -864,28 +864,28 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 	return fixations
 
 def fatal_unpickle_error():
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('Missing module required for unpickling:\n')
-        sys.stderr.write('  %s\n' % exc_value)
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('You must find the original module that is\n')
-        sys.stderr.write('and add it to your PYTHONPATH in order to\n')
-        sys.stderr.write('access this datafile.\n')
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('This almost certainly means that the \n')
-        sys.stderr.write('missing module imported Numeric.  If you\n')
-        sys.stderr.write('can not find the original module, make\n')
-        sys.stderr.write('a dummy file of the same name containing:\n')
-        sys.stderr.write('\n')
-        sys.stderr.write('from Numeric import * \n')
-        sys.stderr.write('\n')
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write('Currently:\n')
-        sys.stderr.write(' PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
-        sys.stderr.write('***************************************\n')
-        sys.stderr.write(get_traceback())
-        
+		exc_type, exc_value, exc_traceback = sys.exc_info()
+		sys.stderr.write('***************************************\n')
+		sys.stderr.write('Missing module required for unpickling:\n')
+		sys.stderr.write('	%s\n' % exc_value)
+		sys.stderr.write('***************************************\n')
+		sys.stderr.write('You must find the original module that is\n')
+		sys.stderr.write('and add it to your PYTHONPATH in order to\n')
+		sys.stderr.write('access this datafile.\n')
+		sys.stderr.write('***************************************\n')
+		sys.stderr.write('This almost certainly means that the \n')
+		sys.stderr.write('missing module imported Numeric.	If you\n')
+		sys.stderr.write('can not find the original module, make\n')
+		sys.stderr.write('a dummy file of the same name containing:\n')
+		sys.stderr.write('\n')
+		sys.stderr.write('from Numeric import * \n')
+		sys.stderr.write('\n')
+		sys.stderr.write('***************************************\n')
+		sys.stderr.write('Currently:\n')
+		sys.stderr.write(' PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
+		sys.stderr.write('***************************************\n')
+		sys.stderr.write(get_traceback())
+		
 								 
 def parseargs(argv, **kw):
 	newargv = []

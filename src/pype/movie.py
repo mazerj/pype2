@@ -195,7 +195,7 @@ class Movie2:
 			
 
 if __name__ == '__main__':
-    sys.stderr.write('%s does nothing as main.\n' % __name__)
+	sys.stderr.write('%s does nothing as main.\n' % __name__)
 else:
 	try:
 		from pype import loadwarn
