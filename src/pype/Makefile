@@ -16,7 +16,6 @@ install-pypelib:
 	@cp pypeversion.py $(PYPEDIR)/lib
 	@rm pypeversion.py
 	@(cd ./icons ; $(MAKE) install)
-	
 
 install-pyperun:
 	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.template | \
@@ -39,8 +38,8 @@ install-pypebin:
 	@chmod +x pypespike
 	@cp pypespike $(PYPEDIR)/bin
 
-	@chmod +x pypeplex.py
-	@cp pypeplex.py $(PYPEDIR)/bin
+#	@chmod +x pypeplex.py
+#	@cp pypeplex.py $(PYPEDIR)/bin
 
 pypeversion:
 	@sed 's/%%INSTALLDATE%%/$(shell date)/' \

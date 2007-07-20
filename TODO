@@ -1,0 +1,3 @@
+- unify dacq stuff to get rid of different servers (one executable?)
+- remove dependency for comedi during compile -- should be able to
+  compile without comedi installed for psychophysics..

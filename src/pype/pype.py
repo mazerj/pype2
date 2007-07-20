@@ -556,9 +556,6 @@ class PypeApp:
 			mb.addmenuitem('Set', 'command', 
 						   label='toggle TRAINING mode',
 						   command=self.tog_training)
-			mb.addmenuitem('Set', 'command',
-						   label='toggle testing/debugging flag',
-						   command=self.tog_testing)
 			
 
 			# make top-level menubar for task loaders that can be
@@ -595,6 +592,8 @@ class PypeApp:
 			
 			self.training = Label(tmp, text="", fg='blue')
 			self.training.pack(side=RIGHT)
+			self.balloon.bind(self.plexstate,
+							  "training/recording mode")
 
 			f = Frame(f1b, borderwidth=1, relief=GROOVE)
 			f.pack(expand=1, fill=X)
@@ -1228,18 +1227,13 @@ class PypeApp:
 		Logger('PYPERC=%s\n' % pyperc())
 		Logger('CWD=%s\n' % os.getcwd())
 
-	def tog_testing(self):
-		"""INTERNAL"""
-		s = not self.rig_common.queryv('testing')
-		self.rig_common.set('testing', '%d' % s)
-		
 	def tog_training(self, toggle=1):
 		"""INTERNAL"""
 		if toggle:
 			s = not self.sub_common.queryv('training')
 			self.sub_common.set('training', '%d' % s)
 		else:
-			s = self.sub_common.queryv('training')
+			s = self.sub_common.queryv('RECORDING')
 			
 		if s:
 			self.training.configure(text='TRAINING')
@@ -2153,7 +2147,7 @@ class PypeApp:
 			while t.ms() < ms:
 				self.idlefn()
 				
-	def history(self, c=None, init=1):
+	def history(self, c=None, init=0):
 		"""
 		Maintains a 'history stack' ala cortex.  Cortex did do somethings
 		right.  The size of the history stack is set by LEN below; it's
