@@ -11,11 +11,11 @@ x=`pwd`
 
 mkdir /tmp/$$
 cd /tmp/$$
-tar xfz $1
+tar xfz $x/Pmw.1.2.patched.tgz
 ./Pmw/Pmw_1_2/bin/bundlepmw.py ./Pmw/Pmw_1_2/lib >/dev/null
-mv ./Pmw.py $2
-mv ./Pmw/Pmw_1_2/lib/PmwBlt.py $2
-mv ./Pmw/Pmw_1_2/lib/PmwColor.py $2
+mv ./Pmw.py $1
+mv ./Pmw/Pmw_1_2/lib/PmwBlt.py $1
+mv ./Pmw/Pmw_1_2/lib/PmwColor.py $1
 cd $x
 rm -rf /tmp/$$
 

@@ -21,7 +21,7 @@ install-subdirs:
 		do (cd $$i ; $(MAKE) install);\
 		done
 	@rm -rf $(PYPEDIR)/lib/Pmw*
-	@(x=`pwd`; sh pmw.sh $$x/Pmw.1.2.tar.gz $(PYPEDIR)/lib)
+	@sh pmw.sh $(PYPEDIR)/lib
 
 install-py:
 	@(cd $(PYDIR); $(MAKE) install)

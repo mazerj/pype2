@@ -58,7 +58,8 @@ def get_traceback():
 		# Handle python 1.5 class exceptions.
 		exc_type = exc_type.__name__
 
-	msg = exc_type + ' Exception\n'
+	# in python-2.5 exc_type is not a string, must be coerced into one..
+	msg = str(exc_type) + ' Exception\n'
 
 	# Add the traceback.
 	msg = msg + 'Traceback (innermost last):\n'
