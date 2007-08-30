@@ -1,0 +1,5 @@
+#!/bin/sh
+echo "Doing local install (/usr/local/pype2)"
+echo -n "Type Control-C to abort or return to continue NOW..."
+read x
+env PYPEDIR=/usr/local/pype2 sudo ./build $*
