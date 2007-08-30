@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id: pype.py 104 2006-01-25 21:16:55Z mazer $
 

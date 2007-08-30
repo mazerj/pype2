@@ -1078,6 +1078,12 @@ class PypeApp:
 
 		os.environ['XXARANGE'] = self.config.get('ARANGE')
 
+		print (1,
+			   self.config.iget('DACQ_TESTMODE'),
+			   self.config.get('EYETRACKER'),
+			   self.config.get('DACQ_SERVER'),
+			   self.config.get('EYETRACKER_DEV'))
+		
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),
 				   self.config.get('EYETRACKER'),
@@ -1233,7 +1239,7 @@ class PypeApp:
 			s = not self.sub_common.queryv('training')
 			self.sub_common.set('training', '%d' % s)
 		else:
-			s = self.sub_common.queryv('RECORDING')
+			s = self.sub_common.queryv('training')
 			
 		if s:
 			self.training.configure(text='TRAINING')

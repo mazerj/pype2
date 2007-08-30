@@ -17,7 +17,7 @@ CC = gcc
 
 all: build install
 
-build: das16_server das08_server _dacqmodule.so comedi
+build: das16_server das08_server _dacqmodule.so comedi 
 
 sigs.o: sigs.c sigs.h
 	$(CC) -c sigs.c
@@ -35,6 +35,7 @@ comedi:
 	if [ -f /usr/include/comedi.h -o -f /usr/local/include/comedi.h ]; then \
 		$(MAKE) comedi_server; \
 	fi;
+
 
 SERVER_SRCS = das_common.c das_common.h procname.h procname.c
 SERVER_OBJS = sigs.o psems.o procname.o usbjs.o libezV24-0.0.3/libezV24-0.a

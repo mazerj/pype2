@@ -360,8 +360,13 @@ int dacq_start(int boot, int testmode, char *tracker_type,
     if (testmode) {
       dacq_data->din[2] = 1;
       dacq_data->din[3] = 1;
+      fprintf(stderr, "dacq: testmode = 1 (no sub process!)\n");
     } else {
       signal(SIGCHLD, dacq_sigchld_handler);
+
+      fprintf(stderr, "dacq: testmode = 0\n");
+      fprintf(stderr, "dacq: tracker_type = %s\n", tracker_type);
+      fprintf(stderr, "dacq: dacq_server = %s\n", dacq_server);
 
       if ((dacq_server_pid = fork()) == 0) {
 	/* child process execs the dacq_server */
@@ -383,6 +388,7 @@ int dacq_start(int boot, int testmode, char *tracker_type,
 	perror(dacq_server);
 	exit(1);
       } else {
+
 	/* parent waits for server to become ready */
 	do {
 	  LOCK(semid);
