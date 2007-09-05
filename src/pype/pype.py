@@ -1217,14 +1217,20 @@ class PypeApp:
 		if debug():
 			Logger('pype build: %s by %s\n' % (PypeBuildDate, PypeBuildBy))
 			print_version_info()
+		Logger('PYPERC=%s\n' % pyperc())
+		Logger('CWD=%s\n' % os.getcwd())
+			
+		self.console.write('pype build: %s by %s\n' % \
+							 (PypeBuildDate, PypeBuildBy), 'blue')
+		self.console.write('PYPERC=%s\n' % pyperc(), 'blue')
+		self.console.write('CWD=%s\n' % os.getcwd(), 'blue')
+		self.console.write('\n')
+		
 
 		if self.psych:
 			self.fb.hide()
 			self.udpy_showhide()
 
-		Logger('PYPERC=%s\n' % pyperc())
-		Logger('CWD=%s\n' % os.getcwd())
-		
 		if dacq_jsbut(-1):
 			self.console.writenl("warning: joystick replaces bar input",
 								 color='blue')
