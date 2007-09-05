@@ -323,6 +323,9 @@ int dacq_start(int boot, int testmode, char *tracker_type,
     for (i = 0; i < NJOYBUT; i++) {
       dacq_data->js[i] = 0;
     }
+    dacq_data->js_x = 0;
+    dacq_data->js_y = 0;
+    dacq_data->js_enabled = 0;
 
     dacq_data->adbuf_on = 0;
     dacq_data->adbuf_ptr = 0;
@@ -431,6 +434,13 @@ int dacq_dig_in(int n)
   int i;
 
   LOCK(semid);
+#ifdef BUT_TEST
+  fprintf(stderr, "%d: ", n);
+  for (i=0; i < 4; i++) {
+    fprintf(stderr, "%d ", dacq_data->din[i]);
+  }
+  fprintf(stderr, "\n");
+#endif
   i = dacq_data->din[n];
   UNLOCK(semid);
 
@@ -565,14 +575,12 @@ int dacq_bar_transitions(int reset)
 
 int dacq_sw1(void)
 {
-  return (dacq_dig_in(1));
-  //return (dacq_dig_in(3));
+  return(dacq_dig_in(1));
 }
 
 int dacq_sw2(void)
 {
-  return (dacq_dig_in(2));
-  //return (dacq_dig_in(2));
+  return(dacq_dig_in(2));
 }
 
 void dacq_juice(int on)
@@ -973,9 +981,38 @@ int dacq_jsbut(int n)
 {
   int i;
 
-  /* read the nth joystick button */
+  /* read the nth joystick button; or if n < 0, query to see if
+   * joystick is available
+   */
   LOCK(semid);
-  i = (n < NJOYBUT) ? dacq_data->js[n] : -1;
+  if (n < 0) {
+    i = dacq_data->js_enabled;
+  } else {
+    i = (n < NJOYBUT) ? dacq_data->js[n] : -1;
+  }
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_js_x()
+{
+  int i;
+
+  /* read the joystick's x-axis value */
+  LOCK(semid);
+  i = dacq_data->js_x;
+  UNLOCK(semid);
+  return(i);
+}
+
+
+int dacq_js_y()
+{
+  int i;
+
+  /* read the joystick's y-axis value */
+  LOCK(semid);
+  i = dacq_data->js_y;
   UNLOCK(semid);
   return(i);
 }

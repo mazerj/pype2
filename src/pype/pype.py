@@ -556,7 +556,6 @@ class PypeApp:
 			mb.addmenuitem('Set', 'command', 
 						   label='toggle TRAINING mode',
 						   command=self.tog_training)
-			
 
 			# make top-level menubar for task loaders that can be
 			# disabled when it's not safe to load new tasks...
@@ -579,21 +578,19 @@ class PypeApp:
 
 			self.plexstate = Label(tmp, text="*", bg='white')
 			self.plexstate.pack(side=RIGHT)
-			self.balloon.bind(self.plexstate,
-							  "plexon state (green=record, red=paused)")
+			self.balloon.bind(self.plexstate, "plexon (green=record;red=pause)")
 
 			if os.environ.has_key('LOGNAME'):
 				self.uname = os.environ['LOGNAME']
 			else:
 				self.uname = '???'
-			self.userinfo = Label(tmp, text="usr=%s sub=%s" % \
+			self.userinfo = Label(tmp, text="user=%s subject=%s" % \
 								  (self.uname, subject()))
 			self.userinfo.pack(side=RIGHT)
 			
 			self.training = Label(tmp, text="", fg='blue')
 			self.training.pack(side=RIGHT)
-			self.balloon.bind(self.plexstate,
-							  "training/recording mode")
+			self.balloon.bind(self.training, "training/recording mode")
 
 			f = Frame(f1b, borderwidth=1, relief=GROOVE)
 			f.pack(expand=1, fill=X)
@@ -1078,17 +1075,12 @@ class PypeApp:
 
 		os.environ['XXARANGE'] = self.config.get('ARANGE')
 
-		print (1,
-			   self.config.iget('DACQ_TESTMODE'),
-			   self.config.get('EYETRACKER'),
-			   self.config.get('DACQ_SERVER'),
-			   self.config.get('EYETRACKER_DEV'))
-		
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),
 				   self.config.get('EYETRACKER'),
 				   self.config.get('DACQ_SERVER'),
 				   self.config.get('EYETRACKER_DEV'))
+
 		self.dacq_going = 1
 		self.eyeset()
 
@@ -1232,6 +1224,10 @@ class PypeApp:
 
 		Logger('PYPERC=%s\n' % pyperc())
 		Logger('CWD=%s\n' % os.getcwd())
+		
+		if dacq_jsbut(-1):
+			self.console.writenl("warning: joystick replaces bar input",
+								 color='blue')
 
 	def tog_training(self, toggle=1):
 		"""INTERNAL"""
@@ -2060,12 +2056,14 @@ class PypeApp:
 				while t.ms() < ms:
 					pass
 		elif ms is None:
-			# 0 ==> response bar (like monkey bar)
-			# 4 + 0 ==> stop
-			# 4 + 1 ==> F8
-			# 4 + 2 ==> empty
-			# 4 + 3 ==> empty
-			if dacq_jsbut(4): 			# trigger...
+			# emergency gamepad keys (ie, when display's not visible)
+			#              js#1 alone  ==> response bar (like monkey bar)
+			# axis-down + #1 (aka bar) ==> STOP TASK
+			#           axis-down + #2 ==> zero eyes
+			#           axis-down + #3 ==> emergency exit
+			#
+			
+			if not dacq_js_y < 0:
 				if dacq_jsbut(0):
 					if self.running:
 						# stop now as if user his stop button
@@ -2073,7 +2071,7 @@ class PypeApp:
 				elif dacq_jsbut(1):
 					self.eyeshift(zero=1)
 				elif dacq_jsbut(2):
-					pass
+					sys.exit(0)
 				elif dacq_jsbut(3):
 					pass
 				
@@ -2513,12 +2511,18 @@ class PypeApp:
 
 	def joybut(self, n):
 		"""
-		Query the nth joystick button.
+		Query the nth joystick button (starting with #0)
 		 -1: no such butten
 		  0: button up
 		  1: button down
 		"""
 		return dacq_jsbut(n)
+
+	def joyaxis(self):
+		"""
+		Query the joystick axis state. Returns (x,y)
+		"""
+		return (dacq_js_x(), dacq_js_y())
 
 	def sw1(self):
 		# if FLIP_SW1 < 0, disable switch 1 (for das08 problems)

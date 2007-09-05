@@ -239,7 +239,9 @@ static void dig_in()
 	/* no joystick: use digital inputs */
 	dacq_data->din[i] = ((bits & 1<<i) != 0);
       } else {
-	/* joystick present: replaces digital inputs */
+	/* joystick present: REPLACES digital inputs.
+	 * This means the dig in ports will be completely ignored!
+	 */
 	dacq_data->din[i] = dacq_data->js[i];
       }
       if (dacq_data->din[i] != last) {

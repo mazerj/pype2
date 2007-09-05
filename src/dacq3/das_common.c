@@ -568,8 +568,10 @@ static void mainloop(void)
 	  }
 	} else if (jsbut == 0 && jsnum == 0) {
 	  /* x-axis motion, jsval indicates the current value */
+	  dacq_data->js_x = jsval;
 	} else if (jsbut == 0 && jsnum == 1) {
 	  /* y-axis motion, jsval indicates the current value */
+	  dacq_data->js_y = jsval;
 	}
       }
     }
@@ -813,6 +815,9 @@ int main(int ac, char **av, char **envp)
       fprintf(stderr, "%s: can't open joystick %s\n", progname, p);
     } else {
       fprintf(stderr, "%s: joystick at %s configured\n", progname, p);
+      LOCK(semid);
+      dacq_data->js_enabled = 1;
+      UNLOCK(semid);
     }
   }
 

@@ -5,6 +5,8 @@
 ** info:    direct interface for a usb joystick device.
 ** history:
 **
+** NOTE:
+**   usbjs_query is 0-based; 1st button is #0..
 */
 
 #include <stdio.h>

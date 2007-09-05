@@ -109,7 +109,10 @@ typedef struct {
 					/* before it counts as a break */
 
   /* joystick button states (usb joystick) */
+  int		js_enabled;
   int		js[NJOYBUT];
+  int		js_x;
+  int		js_y;
 
   /* interupt generating elapsed time counter/alarm
    * tracks in ms -- same as timestamp(). 0 for no alarm

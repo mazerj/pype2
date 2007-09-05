@@ -98,6 +98,8 @@ extern int dacq_int_class(void);
 extern int dacq_int_arg(void);
 
 extern int dacq_jsbut(int n);
+extern int dacq_js_x();
+extern int dacq_js_y();
 
 /* new alarm function -- set to zero to clear alarm */
 extern void dacq_set_alarm(int ms_from_now);

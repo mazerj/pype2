@@ -188,33 +188,33 @@ class _Probe:
 		ry = self.y - self.app.udpy.fix_y
 
 		s =			"  key action	 value\n"
-		s = s +		"	z: lock_______%s\n" % _bool(self.lock)
-		s = s +		"	o: offset_____%s\n" % _bool(self.xoff)
-		s = s +		"	u: on/off_____%s\n" % _bool(self.on)
-		s = s +		"	M: bar mode___%s\n" % self.barmodes[self.barmode]
+		s = s +		"   z: lock_______%s\n" % _bool(self.lock)
+		s = s +		"   o: offset_____%s\n" % _bool(self.xoff)
+		s = s +		"   u: on/off_____%s\n" % _bool(self.on)
+		s = s +		"   M: bar mode___%s\n" % self.barmodes[self.barmode]
 		if self.barmode > 0:
-			s = s + "	   (p1 = %.1f)\n" % self.p1
-			s = s + "	   (p2 = %.1f)\n" % self.p2
+			s = s + "      (p1 = %.1f)\n" % self.p1
+			s = s + "      (p2 = %.1f)\n" % self.p2
 		s = s +		" 8,9: a__________%d/%d\n" % (a1, a2)
 		s = s +		" n/m: rgb________%s\n" % repr(self.colorshow)
 		s = s +		"(1-6) color______%s\n" % self.colorname
 		s = s +		" q/w: len________%d\n" % self.length
 		s = s +		" e/r: wid________%d\n" % self.width
-		s = s +		"	d: drift______%s\n" % _bool(self.drift)
+		s = s +		"   d: drift______%s\n" % _bool(self.drift)
 		s = s +		" t/T: drift_amp__%d pix\n" % self.drift_amp
 		s = s +		" y/Y: drft_freq__%.1f Hz\n" % self.drift_freq
-		s = s +		"	b: blink______%s\n" % _bool(self.blink)
-		s = s +		"	B: clr blink__%s\n" % _bool(self.cblink)
+		s = s +		"   b: blink______%s\n" % _bool(self.blink)
+		s = s +		"   B: clr blink__%s\n" % _bool(self.cblink)
 		s = s +		" p/P: blnk per___%d ms\n" % self.blinkper
 		s = s +		" i/I: inten______%d\n" % self.inten
-		s = s +		" RELPOS=(%4d,%4d)px\n" % (rx, ry)
-		s = s +		"	 ECC=%3dpx / %.1fd\n" % \
-			(round(math.sqrt(rx * rx + ry * ry)),
-			 math.sqrt(rx * rx + ry * ry) / self.app.udpy.gridinterval)
+		ecc1 = math.sqrt(rx * rx + ry * ry)
+		ecc2 = math.sqrt(rx * rx + ry * ry) / self.app.udpy.gridinterval
 		a = (180.0 * math.atan2(ry, rx) / math.pi)
 		if a < 0:
 			a = a + 360.0
-		s = s +		"	  THETA=%.0fdeg" % round(a)
+		s = s +		" RELPOS=(%4d,%4d)px\n" % (rx, ry)
+		s = s +		"    ECC=%3dpx / %.1fd\n" %  (round(ecc1), ecc2)
+		s = s +		"  THETA=%.0fdeg" % round(a)
 		return s
 	
 	def clear(self):
