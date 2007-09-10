@@ -228,6 +228,18 @@ Wed Jul 18 08:20:22 2007 mazer
 
 - Getting rid of the "train" button in favor a per animal "training"
   variable in the animal worksheet.
+
+Mon Sep 10 15:48:27 2007 mazer
+
+- loadwarn() was not correctly finding the source of the module
+  based on filename (aka __file__). It turns out this isn't really
+  possible, since tasks get loaded using an explicit combination
+  of (dir,file). This means that the actual source of 'file' may
+  NOT be the first one on the path, so loadwarn() was failing (ie,
+  it always reported the 1st module named 'file' on the path).
+
+  If you want to see where things are loaded from, you nee
+  
   
 """
 
@@ -1395,9 +1407,7 @@ class PypeApp:
 		for d in files:
 			m = posixpath.basename(d)
 			# Tue Jan  4 11:50:19 2005 mazer
-			#   If dirname starts with an underscore, it's not
-			#   listed -- this lets you keep stuff in the Task
-			#   directory, but in a disabled state.
+			#   skip names starting with an underscores (ie, disabled)
 			if os.path.isdir(d) and not (m[0] == '_'):
 				self.add_tasks(menubar, "~"+m, d)
 		self.add_tasks(menubar, 'cwd', '.')
@@ -1500,8 +1510,7 @@ class PypeApp:
 		self.unloadtask()				# unload current, if it exists..
 
 		try:
-			if debug():
-				Logger("Loading <%s> from <%s>:\n" % (taskname, pathname))
+			Logger("loading '%s' from '%s'\n" % (taskname, pathname))
 			task = imp.load_module(taskname, file, pathname, descr)
 		finally:
 			# in case loading throws an exception:
@@ -3770,17 +3779,10 @@ def debug(set=None):
 def loadwarn(fname):
 	"""
 	Print a warning on stderr to indicate a module has been
-	loaded.  This is REALLY useful, every task should include
-	a loadwarn() call to help tracking down errors and
-	dependency problems.
+	loaded.
 	"""
 	if debug():
-		try:
-			from imp import find_module
-			Logger('<imported %s {from "%s"}>\n' % \
-				   (fname, find_module(fname)[1]))
-		except:
-			Logger('<imported %s {from unknown location}>\n' % fname)
+		Logger("Warning: loading '%s'\n" % fname)
 
 def now(military=1):
 	"""

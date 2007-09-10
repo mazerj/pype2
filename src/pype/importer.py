@@ -11,6 +11,7 @@ to print debugging information each time a module gets imported.
 
 import __builtin__
 import imp, sys
+from guitools import Logger
 
 
 def __new_import__(*args):
@@ -20,8 +21,8 @@ def __new_import__(*args):
             fp.close()
             # only report non-python imports
             if not pathname.startswith('/usr/lib/python'):
-                sys.stderr.write("{import '%s' <- '%s'}\n" % \
-                                 (args[0], pathname))
+                Logger("{import '%s' <- '%s'}\n" % \
+                       (args[0], pathname))
         __data__[args[0]] = 1
     return apply(__original_import__, args)
 
