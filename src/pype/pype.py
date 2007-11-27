@@ -239,7 +239,15 @@ Mon Sep 10 15:48:27 2007 mazer
   it always reported the 1st module named 'file' on the path).
 
   If you want to see where things are loaded from, you nee
-  
+
+Thu Sep 27 17:16:55 2007 mazer
+
+- adding TDT support:
+
+o plexstate -> record_led (LED)
+o plexon_state() -> record_state()
+
+
   
 """
 
@@ -526,14 +534,17 @@ class PypeApp:
 			mb.addmenuitem('File', 'command', 
 						   label='Keyboard', command=self.keyboard)
 			mb.addmenuitem('File', 'command', 
-						   label='plex=1',
-						   command=lambda s=self: s.plexon_state(1))
+						   label='set record_state=1',
+						   command=lambda s=self: s.record_state(1))
 			mb.addmenuitem('File', 'command', 
-						   label='plex=0',
-						   command=lambda s=self: s.plexon_state(0))
+						   label='set record_state=0',
+						   command=lambda s=self: s.record_state(0))
 			mb.addmenuitem('File', 'command', 
 						   label='query plexnet',
 						   command=self.plexnet_query)
+			mb.addmenuitem('File', 'command', 
+						   label='query tdt',
+						   command=self.tdt_query)
 
 			if debug():
 				mb.addmenuitem('File', 'separator')
@@ -588,9 +599,11 @@ class PypeApp:
 			self.task_dir = None
 			self.taskname(None, None)
 
-			self.plexstate = Label(tmp, text="*", bg='white')
-			self.plexstate.pack(side=RIGHT)
-			self.balloon.bind(self.plexstate, "plexon (green=record;red=pause)")
+			# record state is the TTL line used to sync pype to
+			# and external recording system (plexon, etc)
+			self.record_led = Label(tmp, text="*", bg='white')
+			self.record_led.pack(side=RIGHT)
+			self.balloon.bind(self.record_led, "blue=record;red=pause)")
 
 			if os.environ.has_key('LOGNAME'):
 				self.uname = os.environ['LOGNAME']
@@ -1187,7 +1200,7 @@ class PypeApp:
 		Logger('dropped root access\n')
 
 		self.recording = 0
-		self.plexon_state(0)
+		self.record_state(0)
 
 
 		# Sat Sep  3 16:56:50 2005 mazer
@@ -1216,15 +1229,32 @@ class PypeApp:
 		# through until you do in your task:
 		#   (app/self).allow_ints = 1
 
-		plexhost = self.config.get('PLEXHOST')
 		self.plex = None
 		self.plex_data = None
+		self.tdt = None
+		
+		plexhost = self.config.get('PLEXHOST')
 		if len(plexhost) > 0:
 			try:
 				self.plex = PlexNet(plexhost, self.config.iget('PLEXPORT'))
-				Logger('plexnet: Connected to %s.\n' % plexhost)
+				Logger('plexnet: Connected to <%s>.\n' % plexhost)
 			except socket.error:
-				Logger('plexnet: failed connect to %s.\n' % plexhost)
+				self.plex = PlexNet(plexhost, self.config.iget('PLEXPORT'))
+				Logger('plexnet: failed connect to <%s>.\n' % plexhost)
+
+		tdthost = self.config.get('TDTHOST')
+		if len(tdthost) > 0:
+			import tdt
+			try:
+				self.tdt = tdt.Client(tdthost)
+				Logger('tdt: Connected to %s.\n' % tdthost)
+				(ok, tank) = self.tdt.send('TDevAcc.GetTankName()')
+				(ok, mode) = self.tdt.send('TDevAcc.GetSysMode()')
+				Logger('tdt: tank=%s\n' % self.tdt.tank())
+				Logger('tdt: mode=%d\n' % self.tdt.mode())
+			except:
+				self.tdt = None
+				Logger('tdtnet: failed connect to %s.\n' % tdthost)
 
 		if debug():
 			Logger('pype build: %s by %s\n' % (PypeBuildDate, PypeBuildBy))
@@ -2062,7 +2092,7 @@ class PypeApp:
 				Logger('oh no.. lost plexon signal..')
 
 		if self.plex:
-			self.plexstate.configure(text=self.plex.status())
+			self.record_led.configure(text=self.plex.status())
 
 
 		if self.tk is None:
@@ -2077,19 +2107,22 @@ class PypeApp:
 			#           axis-down + #2 ==> zero eyes
 			#           axis-down + #3 ==> emergency exit
 			#
-			
+
 			if not dacq_js_y < 0:
-				if dacq_jsbut(0):
+				# button 0 (labeled 1) is BAR
+				if dacq_jsbut(1):
+					# button 1 (labeled 2) is stop run
 					if self.running:
 						# stop now as if user his stop button
 						self._start_helper()
-				elif dacq_jsbut(1):
-					self.eyeshift(zero=1)
 				elif dacq_jsbut(2):
-					sys.exit(0)
+					# button 2 (labeled 3) is like F8
+					self.eyeshift(zero=1)
 				elif dacq_jsbut(3):
-					pass
-				
+					# button 2 (labeled 3) is emergency die...
+					sys.exit(0)
+
+
 			(c, ev) = self.keyque.pop()
 			if 0 and (c is None) and self.fb:
 				ks = self.fb.getkey(wait=None, down=1)
@@ -2700,7 +2733,7 @@ class PypeApp:
 		self.encode(START)
 
 		# tell plexon trial is BEGINNING
-		self.plexon_state(1)
+		self.record_state(1)
 		self.recording = 1
 
 		# start with fresh eye trace..
@@ -2717,7 +2750,7 @@ class PypeApp:
 
 		# tell plexon trial is OVER
 		self.recording = 0
-		self.plexon_state(0)
+		self.record_state(0)
 
 		# bump back down the data collect process priorities
 		dacq_set_pri(0)
@@ -2736,15 +2769,23 @@ class PypeApp:
 		else:
 			print "plexnet not enabled"
 
-	def plexon_state(self, state):
+	def tdt_query(self):
+		if self.tdt is not None:
+			print "server:", self.tdt.server
+			print "  tank:", self.tdt.tank()
+		else:
+			print "not connected to tdt"
+			
+
+	def record_state(self, state):
 		"""Enable or disable plexon recording state"""
 		if not self.config.iget('DACQ_TESTMODE'):
 			# this is causing a wedge!!!
 			dacq_dig_out(2, state)
 		if state:
-			self.plexstate.configure(fg='blue')
+			self.record_led.configure(fg='blue')
 		else:
-			self.plexstate.configure(fg='red')
+			self.record_led.configure(fg='red')
 
 	def plexon_psth_trigger(self, state):
 		"""change state on the plexon PSTH trigger input line"""
@@ -3435,7 +3476,7 @@ def subject():
 def subjectrc(s=""):
 	"""Get current subject's private .pyperc directory.
 
-	Each subject has a directory inside $HOME/.pyperc that's used to
+	Each subject has a directory inside ~/.pyperc that's used to
 	store subject-specific configuration data and state parameters.
 	"""
 	return pyperc('_' + subject() + '/' + s)
@@ -3444,14 +3485,15 @@ def subjectrc(s=""):
 def pyperc(s=""):
 	"""
 	If $(PYPERC) is set, then use $(PYPERC) as the base for the
-	user's .pyperc directory. Otherwise use "$HOME/.pyperc".
+	user's .pyperc directory. Otherwise use "~/.pyperc".
 	"""
 	if os.environ.has_key('PYPERC'):
 		rc = os.environ['PYPERC']
 		if rc[-1] != '/':
 			rc = rc + '/'
 	else:
-		rc = os.environ['HOME'] + '/.pyperc/'
+		# this is more portable than os.environ['HOME']
+		rc = os.path.expanduser('~') + '/.pyperc/'
 		
 	return rc+s
 

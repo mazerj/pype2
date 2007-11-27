@@ -11,7 +11,12 @@ function PF = p2mCombine(wildcard)
 %
 %Fri Jun  2 10:33:00 2006 mazer -- new
 
-files = p2m_dir(wildcard);
+% Check Input: Touryan 10.02.07 %
+if strcmp(class(wildcard),'cell')
+    files = wildcard;
+else
+    files = p2m_dir(wildcard);
+end
 
 for n = 1:length(files)
   fname = files{n};

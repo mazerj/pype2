@@ -510,7 +510,10 @@ class FrameBuffer:
 			Logger('sprite: calcfps -- no photodiode? Assuming 60\n')
 			return 60
 		km = mean(k)
-		return round(1000.0 / km)
+		if km > 0.0:
+			return round(1000.0 / km)
+		else:
+			return -1.0
 
 	def set_gamma(self, r, g=None, b=None):
 		"""Set hardware gamma correction values (if possible).

@@ -112,4 +112,10 @@ def defaults(srcfile):
     c.set('PLEXHOST', '')               # PlexNet Host IP number
     c.set('PLEXPORT', '6000')           # PlexNet Host Tcp Port
 
+    #####################################################
+    # TDT interface
+
+    c.set('TDTHOST', '')                # name or IP number of windows
+                                        # machine running tdt.py server
+
     return c

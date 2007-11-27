@@ -103,8 +103,8 @@ else
   error(['unknown file type: ' fname]);
 end
 
-if exist('plxchan', 'var')
-  r = p2mSelect(r, plxchan);
+if exist('plexchan', 'var')
+  r = p2mSelect(r, plexchan);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5

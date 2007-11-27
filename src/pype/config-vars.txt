@@ -41,3 +41,4 @@ SYNCX		(#)	x-location (pixels) of sync pulse sprite
 SYNCY		(#)	y-location (pixels) of sync pulse sprite
 VIDEODRIVER	(str)	name of SDL_VIDEODRIVER
 VIEWDIST	(#)	viewing distance (eye to monitor) in cm
+TDTHOST		(str)	name or IP number of machine running tdt.py

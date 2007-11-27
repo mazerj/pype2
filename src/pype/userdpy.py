@@ -673,10 +673,12 @@ Mouse-3 simulate bar up/down
 
 	def _mouse_motion(self, ev=None):
 		if ev is None:
-			s = "%4d,%4d" % (0, 0)
+			# for initialization ONLY...
+			(x, y, fx, fy) = (0, 0, 0, 0)
 		else:
 			(self.mousex, self.mousey) = self.can2fb(ev.x, ev.y)
-			s = "%4d,%4d" % (self.mousex, self.mousey)
+			(x, y, fx, fy) = (self.mousex, self.mousey, self.fix_x, self.fix_y)
+		s = "[ABS: %4d,%4d] [REL: %4d,%4d]" % (x, y, x-fx, y-fy)
 		self.xypos.configure(text=s)
 
 	def _mouse_enter(self, ev):
