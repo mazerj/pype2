@@ -264,6 +264,9 @@ import socket
 from types import *
 import math
 
+# for importing tasks and stack tracing
+import imp, traceback
+
 #####################################################################
 #  GUI imports -- required
 #####################################################################
@@ -1501,8 +1504,6 @@ class PypeApp:
 		task, if possible.  If ask is true, then pop up a dialog box to ask for
 		a filename..
 		"""
-		import imp
-
 		if ask:
 			(f, mode) = Open(pattern='*.py')
 			if f is None:
@@ -1542,28 +1543,32 @@ class PypeApp:
 		try:
 			Logger("loading '%s' from '%s'\n" % (taskname, pathname))
 			task = imp.load_module(taskname, file, pathname, descr)
+		except:
+			task = None
+			goto_error('Load Error')
 		finally:
 			# in case loading throws an exception:
 			if file:
 				file.close()
 
-		try:
-			main = task.main
-		except AttributeError:
-			Logger("Warning: no 'main' in %s\n" % taskname)
-			main = None
+		if task:
+			try:
+				main = task.main
+			except AttributeError:
+				Logger("Warning: no 'main' in %s\n" % taskname)
+				main = None
 
-		try:
-			cleanup = task.cleanup
-		except AttributeError:
-			Logger("Warning: no 'cleanup' in %s\n" % taskname)
-			clean = None
+			try:
+				cleanup = task.cleanup
+			except AttributeError:
+				Logger("Warning: no 'cleanup' in %s\n" % taskname)
+				clean = None
 
-		self.taskmod = task
-		self.taskname(taskname, dir)
-		
-		if main:
-			task.main(self)
+			self.taskmod = task
+			self.taskname(taskname, dir)
+
+			if main:
+				task.main(self)
 				
 		return task
 
@@ -1924,6 +1929,8 @@ class PypeApp:
 					# call start function, giving up control until end
 					# of run...
 					self.startfn(self)
+				except:
+					goto_error('Runtime Error')
 				finally:
 					dacq_set_pri(0)
 					dacq_set_mypri(0)
@@ -2538,7 +2545,6 @@ class PypeApp:
 
 	def debug_handler(self, signal, frame):
 		"""This is for catching SIGUSR2's for debugging.."""
-		import traceback
 		sys.stderr.write('\n------------------------------Recieved SIGUSR2:\n')
 		traceback.print_stack(frame)
 		keyboard()
@@ -4043,6 +4049,19 @@ class SayOnce:
 			SayOnce.msgs[msg] = 1
 			Logger(msg)
 
+def goto_error(title):
+	(etype, evalue, tb) = sys.exc_info()
+	stack = traceback.extract_tb(tb)
+	(fname, line, fn, text) = stack[-1]
+	if fn == '<module>':
+		fn = 'toplevel'
+	msg = 'file:%s line:%d [%s] "%s"' % (fname, line, fn, text)
+	Logger('%s: %s\n' % (title, msg))
+	r = ask(title, msg, ['Ignore', '-> editor'])
+	if r == 1:
+		# try emacs first, then fall back to gedit (should be everywhere)
+		os.system("(emacs +%d %s || gedit +%d %s) &" % \
+				  (line, fname, line, fname))
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
