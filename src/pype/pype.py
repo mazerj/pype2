@@ -1540,12 +1540,14 @@ class PypeApp:
 
 		self.unloadtask()				# unload current, if it exists..
 
+
 		try:
-			Logger("loading '%s' from '%s'\n" % (taskname, pathname))
-			task = imp.load_module(taskname, file, pathname, descr)
-		except:
-			task = None
-			goto_error('Load Error')
+			try:
+				Logger("loading '%s' from '%s'\n" % (taskname, pathname))
+				task = imp.load_module(taskname, file, pathname, descr)
+			except:
+				task = None
+				goto_error('Load Error')
 		finally:
 			# in case loading throws an exception:
 			if file:
@@ -1920,17 +1922,18 @@ class PypeApp:
 				self.set_result()
 
 				try:
-					if self.psych:
-						self.fb.show()
+					try:
+						if self.psych:
+							self.fb.show()
 
-					# clear block state before starting a run
-					self._runstats_update(clear=1)
+						# clear block state before starting a run
+						self._runstats_update(clear=1)
 
-					# call start function, giving up control until end
-					# of run...
-					self.startfn(self)
-				except:
-					goto_error('Runtime Error')
+						# call start function, giving up control until end
+						# of run...
+						self.startfn(self)
+					except:
+						goto_error('Runtime Error')
 				finally:
 					dacq_set_pri(0)
 					dacq_set_mypri(0)
