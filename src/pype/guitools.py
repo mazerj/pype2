@@ -37,6 +37,7 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 from Tkinter import *
 import Pmw
+import pypeversion
 
 class DockWindow(Toplevel):
 	"""
@@ -114,7 +115,7 @@ class TaskNotebook(DockWindow):
 class Logger:
 	logwindow = None
 	buffered = []
-	def __init__(self, text=None, window=None):
+	def __init__(self, text=None, window=None, popup=None):
 		import time
 
 		if not text is None:
@@ -135,6 +136,9 @@ class Logger:
 				Logger.buffered.append(text)
 			sys.stderr.write(text)
 			sys.stderr.flush()
+			
+		if popup:
+			warn('Logger', text)
 
 class ConsoleWindow(Toplevel):
 	def __init__(self, title='ConsoleWindow', iconname='Console',

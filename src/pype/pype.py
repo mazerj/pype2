@@ -306,9 +306,11 @@ from pygame.constants import *
 from pypeerrors import *
 from iplot import *
 import userdpy
-from PlexNet import *
 from info import *
 import configvars
+
+import PlexNet
+import tdt
 
 class PypeApp:
 	"""Pype Application Class.
@@ -542,29 +544,6 @@ class PypeApp:
 			mb.addmenuitem('File', 'command', 
 						   label='set record_state=0',
 						   command=lambda s=self: s.record_state(0))
-			mb.addmenuitem('File', 'command', 
-						   label='query plexnet',
-						   command=self.plexnet_query)
-			mb.addmenuitem('File', 'command', 
-						   label='query tdt',
-						   command=self.tdt_query)
-
-			if debug():
-				mb.addmenuitem('File', 'separator')
-				mb.addmenuitem('File', 'command', 
-							   label='test d/a 0',
-							   command=lambda s=self: s.testad(0))
-				mb.addmenuitem('File', 'command', 
-							   label='test d/a 1',
-							   command=lambda s=self: s.testad(1))
-				mb.addmenuitem('File', 'command', 
-							   label='test d/a 2',
-							   command=lambda s=self: s.testad(2))
-				mb.addmenuitem('File', 'command', 
-							   label='test d/a 3',
-							   command=lambda s=self: s.testad(3))
-				
-			mb.addmenuitem('File', 'separator')
 			
 			self.show_eyetrace_start = None
 			self.show_eyetrace_stop = None
@@ -1232,45 +1211,70 @@ class PypeApp:
 		# through until you do in your task:
 		#   (app/self).allow_ints = 1
 
-		self.plex = None
-		self.plex_data = None
-		self.tdt = None
-		
-		plexhost = self.config.get('PLEXHOST')
-		if len(plexhost) > 0:
-			try:
-				self.plex = PlexNet(plexhost, self.config.iget('PLEXPORT'))
-				Logger('plexnet: Connected to <%s>.\n' % plexhost)
-			except socket.error:
-				self.plex = PlexNet(plexhost, self.config.iget('PLEXPORT'))
-				Logger('plexnet: failed connect to <%s>.\n' % plexhost)
 
+		#
+		# External DACQ interface --
+		#  this is for multichannel recording systems:
+		#    - Plexon MAP box (via PlexNet API)
+		#	 - Tucker-Davis (via pype's tdt.py client-server module)
+		#    
+		self.xdacq = None
+		self.plex = None
+		self.tdt = None
+
+		plexhost = self.config.get('PLEXHOST')
 		tdthost = self.config.get('TDTHOST')
-		if len(tdthost) > 0:
-			import tdt
+
+		if len(plexhost) > 0 and len(tdthost) > 0:
+			Logger('xdacq: set either PLEXHOST or TDTHOST (disabled!!)\n',
+				   popup=1)
+		elif self.xdacq is None and len(plexhost) > 0:
+			try:
+				self.plex = PlexNet.PlexNet(plexhost,
+											self.config.iget('PLEXPORT'))
+				# add a storage object to the basic PlexNet object for
+				# caching data internally to the PlexNet object (it's
+				# cleaner this way, so .plex is the only 
+				# plexon-dependent thing hanging off the PypeApp)
+				self.plex.data_store = None
+				Logger('xdacq: connected to plexnet @ %s.\n' % plexhost)
+				self.xdacq = 'plexon'
+
+				mb.addmenu('PlexNet', '', '')
+				mb.addmenuitem('PlexNet', 'command', 
+							   label='query plexnet',
+							   command=self.status_plex)
+				mb.addmenuitem('PlexNet', 'separator')
+			except socket.error:
+				Logger('xdacq: failed connect to plexnet @ %s.\n' % plexhost,
+					   popup=1)
+		elif self.xdacq is None and len(tdthost) > 0:
 			try:
 				self.tdt = tdt.Client(tdthost)
-				Logger('tdt: Connected to %s.\n' % tdthost)
+				Logger('xdacq: connected to tdt @ %s.\n' % tdthost)
 				(ok, tank) = self.tdt.send('TDevAcc.GetTankName()')
 				(ok, mode) = self.tdt.send('TDevAcc.GetSysMode()')
-				Logger('tdt: tank=%s\n' % self.tdt.tank())
-				Logger('tdt: mode=%d\n' % self.tdt.mode())
+				Logger('xdacq: tdt tank=%s\n' % self.tdt.tank())
+				Logger('xdacq: tdt mode=%d\n' % self.tdt.mode())
+				self.xdacq = 'tdt'
+				mb.addmenu('TDT', '', '')
+				mb.addmenuitem('TDT', 'command', 
+							   label='query tdt',
+							   command=self.status_tdt)
+				mb.addmenuitem('TDT', 'separator')
 			except:
+				# this exception needs a case...
 				self.tdt = None
-				Logger('tdtnet: failed connect to %s.\n' % tdthost)
+				Logger('xdacq: failed connect to tdt @ %s.\n' % tdthost,
+					   popup=1)
 
-		if debug():
-			Logger('pype build: %s by %s\n' % (PypeBuildDate, PypeBuildBy))
-			print_version_info()
+
+
+		Logger('pype build: %s by %s\n' % (PypeBuildDate, PypeBuildBy))
 		Logger('PYPERC=%s\n' % pyperc())
 		Logger('CWD=%s\n' % os.getcwd())
-			
-		self.console.write('pype build: %s by %s\n' % \
-							 (PypeBuildDate, PypeBuildBy), 'blue')
-		self.console.write('PYPERC=%s\n' % pyperc(), 'blue')
-		self.console.write('CWD=%s\n' % os.getcwd(), 'blue')
-		self.console.write('\n')
-		
+		if debug():
+			print_version_info()
 
 		if self.psych:
 			self.fb.hide()
@@ -1409,16 +1413,6 @@ class PypeApp:
 		self.tallyw.clear()
 		self.tallyw.write(s)
 
-	def testad(self, n):
-		t = Timer()
-		sn = 0.0
-		v = 0.0
-		while t.ms() < 1000:
-			v = v + dacq_ad_n(n)
-			sn = sn + 1
-			self.idlefn(1)
-		print "#%d: %f" % (n, v / sn)
-
 	def getcommon(self):
 		"""Get common params, extend with eyecoil settings.."""
 		d = self.rig_common.check()
@@ -1429,6 +1423,14 @@ class PypeApp:
 		d['@eye_yoff'] = self.eye_yoff
 		d['@pwd'] = os.getcwd()
 		d['@host'] = gethostname()
+
+		# add flag for current notion of where spikes are really
+		# coming from (currently: 'None', 'plexon' or 'tdt')
+		if self.xdacq:
+			d['datasrc'] = self.xdacq
+		else:
+			d['datasrc'] = 'None'
+			
 		return d
 
 	def make_taskmenu(self, menubar):
@@ -2767,24 +2769,23 @@ class PypeApp:
 		dacq_set_rt(0)
 
 		if self.plex is not None:
-			self.plex_data = get_plexon_events(self.plex, fc=40000)
+			self.plex.data_store = get_plexon_events(self.plex, fc=40000)
 
-	def plexnet_query(self):
+	def status_plex(self):
 		if self.plex is not None:
-			print "-----"
+			Logger("-----")
 			for (chan, unit) in self.plex.neuronlist():
-				print "sig%03d%c" % (chan, chr(ord('a')+unit))
-			print "-----"
+				Logger("sig%03d%c" % (chan, chr(ord('a')+unit)))
+			Logger("-----")
 		else:
-			print "plexnet not enabled"
+			Logger("plexnet not enabled")
 
-	def tdt_query(self):
+	def status_tdt(self):
 		if self.tdt is not None:
-			print "server:", self.tdt.server
-			print "  tank:", self.tdt.tank()
+			Logger("server: " + self.tdt.server)
+			Logger("  tank: " + self.tdt.tank())
 		else:
-			print "not connected to tdt"
-			
+			Logger("not connected to tdt")
 
 	def record_state(self, state):
 		"""Enable or disable plexon recording state"""
@@ -3044,7 +3045,7 @@ class PypeApp:
 				   self.record_id, p0, s0,
 				   (c0, c1, c2, c3, c4, None, None),
 				   list(self.eyebuf_pa),
-				   self.plex_data]
+				   self.plex.data_store]
 			
 				   # note the None's in the line above are logical
 				   # place holders for c2,c3, which are hardcoded

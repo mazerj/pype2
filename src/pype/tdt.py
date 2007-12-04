@@ -243,23 +243,10 @@ class Client:
 		self.server = server
 		self.client = None
 		
-		self.keepalive(1)
+		self.open_conn()
+
 		(self.nchans, self.sniplen) = self.chaninfo()
 		(ok, self.fs) = self.send("TDevAcc.GetDeviceSF('Amp1')")
-		self.keepalive(0)
-
-	def keepalive(self, keep=1):
-		"""
-		Keep connection to server alive for a while.
-
-		keepalive(1) will keep connection open/alive (blocking other
-		client access until keepalive(0) is called. This should only
-		be used to sequentially request several bits of data in one
-		go to minimize setup/breakdown times for the sockets.
-		"""
-		if not keep:
-			self.close_conn()
-		self._keepalive = keep
 
 	def open_conn(self):
 		"""
@@ -279,11 +266,10 @@ class Client:
 		
 	def close_conn(self):
 		"""
-		Shut down connection, unless keepalive is set
+		Shut down connection.
 		"""
-		if not self._keepalive:
-			self.client.Close()
-			self.client = None
+		self.client.Close()
+		self.client = None
 
 	def send(self, cmd):
 		"""
@@ -309,7 +295,8 @@ class Client:
 				# debugging
 				print (ok, result), "<-", cmd
 		finally:
-			self.close_conn()
+			#self.close_conn()
+			pass
 		return (ok, result)
 
 	def mode(self, mode=None):
@@ -344,14 +331,12 @@ class Client:
 
 		Specify tankpath OR live, but not both!
 		"""
-		self.keepalive(1)
 		if tankpath:
 			(ok, r) = self.send('TDevAcc.SetTankName("%s")' % tankpath)
 		elif live:
 			(ok, r) = self.send('TTank.OpenTank(TDevAcc.GetTankName(), "R")')
 		else:
 			(ok, r) = self.send('TDevAcc.GetTankName()')
-		self.keepalive(0)
 		if ok is None:
 			sys.stderr.write('TDT Error!\n')
 			return None
@@ -362,13 +347,11 @@ class Client:
 		Read trial count, or if reset==1 reset the counter to zero. This
 		should really be done when OpenEx is in standby mode..
 		"""
-		self.keepalive(1)
 		if reset:
 			(ok, r) = self.send('TDevAcc.SetTargetVal("Amp1.TNumRst", 1)')
 			(ok, r) = self.send('TDevAcc.SetTargetVal("Amp1.TNumRst", 0)')
 		else:
 			(ok, r) = self.send('TDevAcc.GetTargetVal("Amp1.TNum")')
-		self.keepalive(0)
 		if ok is None:
 			sys.stderr.write('TDT Error!\n')
 			return None
@@ -455,7 +438,6 @@ class Client:
 
 	def sortparams(self, params=None):
 		if params is None:
-			self.keepalive(1)
 			params = {}
 			for n in range(1, self.nchans+1):
 				(ok, t) = \
@@ -466,10 +448,8 @@ class Client:
 							   (n, self.sniplen*3))
 				params[n, 'thresh'] = t
 				params[n, 'hoops'] = h
-			self.keepalive(0)
 			return params
 		else:
-			self.keepalive(1)
 			for n in range(1, self.nchans+1):
 				t = params[n, 'thresh']
 				h = params[n, 'hoops']
@@ -481,7 +461,6 @@ class Client:
 					 self.send("TDevAcc.WriteTargetVEX('Amp1.cSnip~%d', 0, 'F32', %s)" %
 							   (n, h))
 				self.send('type(%s)' % (h,))
-			self.keepalive(0)
 			
 if __name__ == '__main__':
 	try:
