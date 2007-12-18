@@ -125,7 +125,3 @@ def get_exception():
 	(etype, evalue, tb) = sys.exc_info()
 	return etype
 
-try:
-	x = 1/0
-except:
-	print get_exception()

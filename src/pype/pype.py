@@ -311,7 +311,7 @@ import userdpy
 from info import *
 import configvars
 
-import xdacq, PlexNet, tdt
+import PlexNet, tdt
 
 class PypeApp:
 	"""Pype Application Class.
@@ -2906,8 +2906,8 @@ class PypeApp:
 		Write the current record to the specified datafile.
 		"""
 
-		if (self.record_file is '/dev/null') and \
-			   not self.sub_common.queryv('fast_tmp'):
+		if (self.record_file == '/dev/null') and \
+			   self.sub_common.queryv('fast_tmp'):
 			fast_tmp = 1
 		else:
 			fast_tmp = 0

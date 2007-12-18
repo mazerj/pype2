@@ -40,7 +40,7 @@ Mon Sep 18 10:00:05 2006 mazer
 debug = 0
 showdir = 0
 
-import sys, posixpath, os, glob, string
+import sys, posixpath, os, glob, string, traceback
 
 
 original_argv = sys.argv[:]
@@ -167,8 +167,11 @@ for k in ('numeric', 'pygame'):
 try:
 	import pype
 except ImportError:
-    sys.stderr.write("""Error on 'import pype'. Check $PYPEDIR\n""")
-	sys.stderr.write("""path=%s\n""" % sys.path)
+	(etype, evalue, tb) = sys.exc_info()
+	stack = traceback.extract_tb(tb)
+	(fname, line, fn, text) = stack[-1]
+    sys.stderr.write("""Error when importing 'pype':\n""")
+    sys.stderr.write("file:%s line:%d --> %s\n" % (fname, line, evalue))
 	sys.exit(1)
 
 # add the ~/.pyperc directories to the python search path
