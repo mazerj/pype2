@@ -102,5 +102,30 @@ def ppDict(d):
 	for k in ks:
 		print '%-20s %15s=<%s>' % (type(d[k]), k, d[k])
 		
-	
+def get_exception():
+	"""
+	This returns the most recent exception -- useful for an
+	'except:' clause with no matching exception pattern (not
+	recommended!).
 
+	In general, the value turned by this function will be something
+	like <type 'exceptions.EXCEPTION_NAME'>, since exceptions are
+	supposed to be classes. For example:
+	    try:
+	         x = 1/0
+		except:
+		     print get_exception()
+	will yeild:
+      <type 'exceptions.ZeroDivisionError'>
+	which can be imported from the 'exceptions' module if you want
+	to check the value against something..
+	"""
+	import sys
+	
+	(etype, evalue, tb) = sys.exc_info()
+	return etype
+
+try:
+	x = 1/0
+except:
+	print get_exception()

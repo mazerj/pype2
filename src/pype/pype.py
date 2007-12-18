@@ -247,8 +247,10 @@ Thu Sep 27 17:16:55 2007 mazer
 o plexstate -> record_led (LED)
 o plexon_state() -> record_state()
 
+Tue Dec 11 16:20:50 2007 mazer
 
-  
+- got rid of synctest() built in -- never used and problematic..
+
 """
 
 #####################################################################
@@ -309,8 +311,7 @@ import userdpy
 from info import *
 import configvars
 
-import PlexNet
-import tdt
+import xdacq, PlexNet, tdt
 
 class PypeApp:
 	"""Pype Application Class.
@@ -643,6 +644,7 @@ class PypeApp:
 				("cell",		"", is_any, "unique (per subj) cell id #"),
 				("acute",		"0", is_bool, "acute experiment"),
 				("save_tmp",	"1", is_bool, "0 to write to /dev/null"),
+				("fast_tmp",	"1", is_bool, "super fast tmp mode -- "),
 				
 				("site.well",	"", is_any, "well number [recording only]"),
 				("site.probe",	"", is_any, "probe time [recording only]"),
@@ -811,10 +813,6 @@ class PypeApp:
 			self._startbut_tmp.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(self._startbut_tmp,
 							  "save data to temp file (ie, don't save)")
-
-			if debug():
-				b = Button(cpane, text="synctest", command=self.synctest)
-				b.pack(expand=0, fill=X, side=TOP, pady=2)
 
 			b = Button(cpane, text="new cell", command=self.new_cell)
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -1219,6 +1217,7 @@ class PypeApp:
 		#	 - Tucker-Davis (via pype's tdt.py client-server module)
 		#    
 		self.xdacq = None
+		self.xdacq_data_store = None
 		self.plex = None
 		self.tdt = None
 
@@ -1232,11 +1231,6 @@ class PypeApp:
 			try:
 				self.plex = PlexNet.PlexNet(plexhost,
 											self.config.iget('PLEXPORT'))
-				# add a storage object to the basic PlexNet object for
-				# caching data internally to the PlexNet object (it's
-				# cleaner this way, so .plex is the only 
-				# plexon-dependent thing hanging off the PypeApp)
-				self.plex.data_store = None
 				Logger('xdacq: connected to plexnet @ %s.\n' % plexhost)
 				self.xdacq = 'plexon'
 
@@ -1260,7 +1254,7 @@ class PypeApp:
 				mb.addmenu('TDT', '', '')
 				mb.addmenuitem('TDT', 'command', 
 							   label='query tdt',
-							   command=self.status_tdt)
+							   command=lambda s=self: status_tdt(s))
 				mb.addmenuitem('TDT', 'separator')
 			except:
 				# this exception needs a case...
@@ -2769,7 +2763,7 @@ class PypeApp:
 		dacq_set_rt(0)
 
 		if self.plex is not None:
-			self.plex.data_store = get_plexon_events(self.plex, fc=40000)
+			self.xdacq_data_store = get_plexon_events(self.plex, fc=40000)
 
 	def status_plex(self):
 		if self.plex is not None:
@@ -2779,13 +2773,6 @@ class PypeApp:
 			Logger("-----")
 		else:
 			Logger("plexnet not enabled")
-
-	def status_tdt(self):
-		if self.tdt is not None:
-			Logger("server: " + self.tdt.server)
-			Logger("  tank: " + self.tdt.tank())
-		else:
-			Logger("not connected to tdt")
 
 	def record_state(self, state):
 		"""Enable or disable plexon recording state"""
@@ -2919,6 +2906,12 @@ class PypeApp:
 		Write the current record to the specified datafile.
 		"""
 
+		if (self.record_file is '/dev/null') and \
+			   not self.sub_common.queryv('fast_tmp'):
+			fast_tmp = 1
+		else:
+			fast_tmp = 0
+			
 		# force taskinfo to be a tuple..
 		if type(taskinfo) != TupleType:
 			taskinfo = (taskinfo,)
@@ -2933,44 +2926,46 @@ class PypeApp:
 		self.eyebuf_pa = zeros(n)
 		p0 = zeros(n)
 		s0 = zeros(n)
-		if self.rig_common.queryv('save_chn_0'):
-			c0 = zeros(n)
-		else:
-			c0 = None
-		if self.rig_common.queryv('save_chn_1'):
-			c1 = zeros(n)
-		else:
-			c1 = None
-		if self.rig_common.queryv('save_chn_2'):
-			c2 = zeros(n)
-		else:
-			c2 = None
-		if self.rig_common.queryv('save_chn_3'):
-			c3 = zeros(n)
-		else:
-			c3 = None
-		if self.rig_common.queryv('save_chn_4'):
-			c4 = zeros(n)
-		else:
-			c4 = None
+		
+		if not fast_tmp:
+			if self.rig_common.queryv('save_chn_0'):
+				c0 = zeros(n)
+			else:
+				c0 = None
+			if self.rig_common.queryv('save_chn_1'):
+				c1 = zeros(n)
+			else:
+				c1 = None
+			if self.rig_common.queryv('save_chn_2'):
+				c2 = zeros(n)
+			else:
+				c2 = None
+			if self.rig_common.queryv('save_chn_3'):
+				c3 = zeros(n)
+			else:
+				c3 = None
+			if self.rig_common.queryv('save_chn_4'):
+				c4 = zeros(n)
+			else:
+				c4 = None
 
-		for i in range(0,n):
-			self.eyebuf_t[i] = dacq_adbuf_t(i)
-			self.eyebuf_x[i] = dacq_adbuf_x(i)
-			self.eyebuf_y[i] = dacq_adbuf_y(i)
-			self.eyebuf_pa[i] = dacq_adbuf_pa(i)
-			p0[i] = dacq_adbuf_c2(i)
-			s0[i] = dacq_adbuf_c3(i)
-			if not c0 is None:
-				c0[i] = dacq_adbuf_c0(i)
-			if not c1 is None:
-				c1[i] = dacq_adbuf_c1(i)
-			if not c2 is None:
-				c2[i] = dacq_adbuf_c2(i)
-			if not c3 is None:
-				c3[i] = dacq_adbuf_c3(i)
-			if not c4 is None:
-				c4[i] = dacq_adbuf_c4(i)
+			for i in range(0,n):
+				self.eyebuf_t[i] = dacq_adbuf_t(i)
+				self.eyebuf_x[i] = dacq_adbuf_x(i)
+				self.eyebuf_y[i] = dacq_adbuf_y(i)
+				self.eyebuf_pa[i] = dacq_adbuf_pa(i)
+				p0[i] = dacq_adbuf_c2(i)
+				s0[i] = dacq_adbuf_c3(i)
+				if not c0 is None:
+					c0[i] = dacq_adbuf_c0(i)
+				if not c1 is None:
+					c1[i] = dacq_adbuf_c1(i)
+				if not c2 is None:
+					c2[i] = dacq_adbuf_c2(i)
+				if not c3 is None:
+					c3[i] = dacq_adbuf_c3(i)
+				if not c4 is None:
+					c4[i] = dacq_adbuf_c4(i)
 
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
@@ -2996,13 +2991,12 @@ class PypeApp:
 								 (len(self.spike_times), len(self.photo_times)))
 
 
-
 		# Completely wipe the buffers -- don't let them accidently
 		# get read TWICE!!  They're saved as self/app.eyebuf_[xyt]
 		# in case you wawnt them for something..
 		dacq_adbuf_clear()
 
-		if self.record_file:
+		if not fast_tmp and self.record_file:
 			# dump the event stream
 			info = (result, rt, pdict) + taskinfo
 			# note: added p0. s0 raw trace saving, 16-mar-2002
@@ -3045,7 +3039,7 @@ class PypeApp:
 				   self.record_id, p0, s0,
 				   (c0, c1, c2, c3, c4, None, None),
 				   list(self.eyebuf_pa),
-				   self.plex.data_store]
+				   self.xdacq_data_store]
 			
 				   # note the None's in the line above are logical
 				   # place holders for c2,c3, which are hardcoded
@@ -3214,97 +3208,6 @@ class PypeApp:
 			self.fb.sync(0)
 			self.fb.flip()
 
-	def synctest(self):
-		"""
-		sync pulse and spike input test -- looks at the analog
-		waveforms..
-		"""
-		import iplot
-		
-		if self.running:
-			return
-
-		self.fb.sync(0)
-		self.fb.clear((128,128,128), flip=1)
-		self.eyetrace(1)
-		self.record_start()
-		for j in range(100):
-			self.fb.sync(0)
-			self.fb.clear((128,128,128), flip=1)
-		for j in range(100):
-			self.fb.sync_toggle(0)
-			self.fb.clear((128,128,128), flip=1)
-			self.encode('flip')
-		for j in range(100):
-			self.fb.sync(0)
-			self.fb.clear((128,128,128), flip=1)
-		self.record_stop()
-		self.eyetrace(0)
-		
-		(t, p, s) = self.record_write()
-		
-		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
-		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
-		photo_times = find_ttl(t, p, photo_thresh, photo_polarity)
-
-		spike_thresh = int(self.rig_common.queryv('spike_thresh'))
-		spike_polarity = int(self.rig_common.queryv('spike_polarity'))
-		spike_times = find_ttl(t, s, spike_thresh, spike_polarity)
-
-		t0 = t[0]
-
-		iplot.clf()
-		iplot.subplot(4,1,2)
-		iplot.plot(t-t0, p, '-')
-		iplot.hold_on()
-		pti = array(photo_times)
-		iplot.plot(pti-t0, photo_thresh+(0.0*pti)-20, 'o')
-		ti = []
-		for (et, en) in self.record_buffer:
-			if en == 'flip':
-				ti.append(et - t0)
-		iplot.plot(array(ti), photo_thresh+(0.0*array(ti)), 'o');
-		iplot.hold_off()
-		iplot.ylabel('raw diode');
-
-		iplot.subplot(4,1,1)
-		pre, post = 10, 20
-
-		x = None
-		y = []
-		for k in photo_times:
-			ix = nonzero(t == k)[0]
-			if (ix > pre) and (ix < (len(t)-post)):
-				if x is None:
-					x = t[(ix-pre):(ix+post)]-t[ix]
-				y.append(p[(ix-pre):(ix+post)])
-		if (y is None) or (len(y) <= 1):
-			iplot.ylabel('NO DATA')
-		else:
-			iplot.plot(x, transpose(y), '-')
-			iplot.ylabel('diode-trig')
-
-		iplot.subplot(4,1,3)
-		x = None
-		y = []
-		for k in spike_times:
-			ix = nonzero(t == k)[0]
-			if (ix > pre) and (ix < (len(t)-post)):
-				if x is None:
-					x = t[(ix-pre):(ix+post)]-t[ix]
-				y.append(s[(ix-pre):(ix+post)])
-		if (y is None) or (len(y) <= 1):
-			iplot.ylabel('NO DATA')
-		else:
-			iplot.plot(x, transpose(y), '-')
-			iplot.ylabel('spike-trig')
-
-		iplot.subplot(4,1,4)
-		iplot.plot(t-t0, s, 'k-')
-		iplot.hold_off()
-		iplot.ylabel('spikes-in')
-		iplot.xlabel('time')
-
 	def plotEyetracesRange(self, start=None, stop=None):
 		self.show_eyetrace_start = start
 		self.show_eyetrace_stop = stop
@@ -3377,6 +3280,7 @@ class PypeApp:
 			
 def pype_hostconfig():
 	"""Read $(PYPERC)/Config.$HOSTNAME"""
+	from config import Config
 	return Config(pyperc('Config.%s' % gethostname()))
 		
 def npypes():
@@ -4011,6 +3915,8 @@ def get_plexon_events(plex, fc=40000):
 	# drain tank an generate list of timestamps until you
 	# hit the StopExtChannel event.. at which point all events
 	# left in the tank will be discarded!!!
+
+	from PlexHeaders import Plex
 
 	events = None
 	

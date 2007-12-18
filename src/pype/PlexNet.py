@@ -91,7 +91,8 @@ class PlexNet:
 		if NumServerDropped > 0:
 			Logger("PlexNet: NumServerDropped=%d\n" %
 				   NumServerDropped)
-			Logger("PlexNet: This shouldn't happen; tell Jamie\n")
+			Logger("PlexNet: This shouldn't happen; tell Jamie & then\n")
+			Logger("         quit and restart Plexon programs.\n")
 
 		pos = 16
 		events = []
