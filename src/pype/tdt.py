@@ -59,75 +59,57 @@ RECORD = 3								# running and saving all data
 def Hostname():
 	return socket.gethostname()
 
-class _SocketError(Exception):
-	pass
-
-class _Socket:
+class _SocketServer:
 	def __init__(self, host = Hostname(), port = 10000):
-		self.host = host
-		self.port = port
-		self._SocketError = _SocketError()
-		try:
-			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		except socket.error, msg:
-			raise _SocketError, 'Error in _Socket Object Creation!!'
+		self.host, self.port = host, port
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.sock.bind((self.host, self.port))
+		self.remoteHost = None
 		
+	def Listen(self):
+		self.sock.listen(1)
+		self.conn, self.remoteHost = self.sock.accept()
+		self.remoteHost = self.remoteHost[0]
+			
+	def Send(self, data):
+		return self.conn.send(data)
+
+	def Receive(self, size = 1024):
+		return self.conn.recv(size)
+	
 	def Close(self):
 		self.sock.close()
 		
 	def __str__(self):
-		return '<_Socket '+str(self.host)+':'+str(self.port)+'>'
+		return '<_SocketServer '+\
+			   str(self.host)+':'+str(self.port)+'>'
 
-class _SocketServer(_Socket):
-	def __init__(self, host = Hostname(), port = 10000):
-		self.host, self.rhost = host, host
-		self.port, self.rport = port, port
-		try:
-			self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		except socket.error, msg:
-			raise _SocketError, 'Failed to create _SocketServer object!!'
-		try:
-			self.sock.bind((self.host, self.port))
-		except socket.error, msg:
-			raise _SocketError, msg
-		
-	def Listen(self):
-		self.sock.listen(1)
-		self.conn, self.rhost = self.sock.accept()
-		self.rhost = self.rhost[0]
-			
-	def Send(self, data):
-		self.conn.send(data)
+class _SocketClient:
+	def __init__(self):
+		self.host, self.port = None, None
+		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-	def Receive(self, size = 1024):
-		x = self.conn.recv(size)
-		return x
-	
-	def __str__(self):
-		return '<_SocketServer '+str(self.host)+':'+str(self.port)+'>'
-
-class _SocketClient(_Socket):
-	def Connect(self, rhost = Hostname(), rport = 10000):
-		self.rhost, self.rport = rhost, rport
-		try:
-			# timeout after 1 second trying to connect
-			self.sock.settimeout(1)
-			self.sock.connect((self.rhost, self.rport))
-		except socket.error, msg:
-			raise _SocketError, 'Connection refused to '+\
-				 str(self.rhost)+' on port '+str(self.rport)
+	def Connect(self, remoteHost = Hostname(), remotePort = 10000):
+		self.remoteHost, self.remotePort = remoteHost, remotePort
+		# 1 second timeout		
+		self.sock.settimeout(1)
+		# generates exception on failure-to-connect
+		self.sock.connect((self.remoteHost, self.remotePort))
 		
 	def Send(self, data):
-		self.sock.send(data)
+		return self.sock.send(data)
 		
 	def Receive(self, size = 1024):
-		x = self.sock.recv(size)
-		return x
+		return self.sock.recv(size)
 	
+	def Close(self):
+		self.sock.close()
+		
 	def __str__(self):
-		return '<_SocketClient '+str(self.host)+':'+str(self.port)+'>'
+		return '<_SocketClient '+\
+			   str(self.remoteHost)+':'+str(self.remotePort)+'>'
 
-class Server:
+class TDTServer:
 	"""
 	Wrapper object for the server. To setup a server, you simply
 	do something like this:
@@ -145,7 +127,7 @@ class Server:
 
 	** This should be instantiated on a Windows system ONLY **
 	"""
-	def __init__(self, Server='Local'):
+	def __init__(self, Server='Local', tk=None):
 		# importing win32com stuff will fail on a unix box, so be
 		# ready to print an error message and die..
 		import win32com.client
@@ -170,7 +152,6 @@ class Server:
 
 		(devConn, tankConn) = (0, 0)
 
-		# try 10 times (10s), then fail..
 		for tries in range(10):
 			try:
 				if not devConn:
@@ -190,11 +171,15 @@ class Server:
 				self.connected = 1
 				return 1
 			else:
-				sys.stderr.write('COM Failure #%d.\n' % tries)
 				time.sleep(1)
 
-		sys.stderr.write('TDevAcc or TTank.<%s> connect failed.\n' %
-						 self.Server)
+		if not devConn:
+			sys.stderr.write('No connect to %s.TDevAcc (%d tries)\n' %
+						 (self.Server, tries))
+		if not tankConn:
+			sys.stderr.write('No connect to %s.TTank (%d tries)\n' %
+						 (self.Server, tries))
+
 		return 0
 
 	def disconnect(self):
@@ -208,7 +193,8 @@ class Server:
 			server = _SocketServer()
 			sys.stderr.write("Waiting for client..\n")
 			server.Listen()
-			sys.stderr.write("Received connection from %s\n" % server.rhost)
+			sys.stderr.write("Received connection from %s\n" % \
+							 server.remoteHost)
 
 			if not self.connect():
 				server.Send(pickle.dumps(0))
@@ -230,15 +216,19 @@ class Server:
 						ok = None
 						result = None
 					server.Send(pickle.dumps((ok, result)))
-					sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
+					if 0:
+						sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
+					else:
+						sys.stderr.write('.');
+						sys.stderr.flush();
 					if ok is None:
-						print sys.exc_value
-			sys.stderr.write("Client closed connection.\n")
+						sys.stderr.write('%s\n' % sys.exc_value)
+			sys.stderr.write("\nClient closed connection.\n")
 			server.Close()
 			#this fails:
 			#self.disconnect()
 	
-class Client:
+class TDTClient:
 	def __init__(self, server):
 		self.server = server
 		self.client = None
@@ -299,7 +289,7 @@ class Client:
 			pass
 		return (ok, result)
 
-	def mode(self, mode=None):
+	def mode(self, mode=None, name=None):
 		"""
 		Query current run mode for the TDT device.
 
@@ -310,6 +300,7 @@ class Client:
 		  PREVIEW = 2	# running, not saving to tank
 		  RECORD = 3	# running and saving all data
 		"""
+
 		if not mode is None:
 			(ok, r) = self.send('TDevAcc.SetSysMode(%d)' % mode)
 			if ok is None:
@@ -320,6 +311,10 @@ class Client:
 			if ok is None:
 				sys.stderr.write("tdt: can't get mode\n")
 				return None
+			if name:
+				modes = { IDLE:'IDLE', STANDBY:'STANDBY',
+						  PREVIEW:'PREVIEW', RECORD:'RECORD'}
+				r = modes[r]
 		return r
 
 	def tank(self, tankpath=None, live=None):
@@ -328,6 +323,11 @@ class Client:
 		If tankpath is specified, it's the filename on the window's machine.
 		if live==1, then the tank server will automaticaly select the
 		active tank that OpenEx is writing to.
+
+		The live flag refers the the DataTank -- that is if you want to
+		access data from the tank (lagging behind a bit). If live=1, then
+		the selected READABLE DataTank will be pointed towards the
+		currently being WRITTEN Datatank..
 
 		Specify tankpath OR live, but not both!
 		"""
@@ -355,7 +355,7 @@ class Client:
 		if ok is None:
 			sys.stderr.write('TDT Error!\n')
 			return None
-		return r
+		return int(r)
 
 	def chaninfo(self):
 		"""
@@ -372,6 +372,15 @@ class Client:
 				hoopsize = s
 			n = n + 1
 		return (n-1, hoopsize/3)
+
+	def getblock(self):
+		"""
+		Query current block info -- this is enough info to find the current
+		data record later (assuming tank doesn't get deleted...)
+		"""
+		(ok, block) = self.send('TTank.GetHotBlock()')
+		return (self.server, self.tank(), block, self.tnum())
+		
 
 	def newblock(self, record=1):
 		"""
@@ -464,38 +473,16 @@ class Client:
 			
 if __name__ == '__main__':
 	try:
-		# server/windows side
-		s = Server()
-		try:
-			s.listen()
-		except:
-			sys.stderr.write('\n')
-			sys.stderr.write('*** Caught server-side fatal error ***\n')
-			sys.stderr.write('%s\n' % sys.exc_value)
-			sys.stderr.write('\n<hit return to close window and exit>')
-			sys.stdin.readline()
+		s = TDTServer()
 	except ImportError:
-		# client/linux side
-		if sys.argv[1] == '-save':
-			conn = Client('tdt1')
-			p = conn.sortparams()
-			sys.stdout.write(pickle.dumps(p))
-		elif sys.argv[1] == '-restore':
-			conn = Client('tdt1')
-			p = pickle.loads(sys.stdin.read())
-			conn.sortparams(params=p)
-		elif sys.argv[1] == '-dump':
-			p = pickle.loads(sys.stdin.read())
-			n = 1
-			while 1:
-				try:
-					t = p[n, 'thresh']
-					h = p[n, 'hoops']
-					print n, t, ':'
-					for k in range(0, len(h), 3):
-						if h[k+2] > 0:
-							print " hoop#%d %.2fmv-%.2fmv" % \
-								  (h[k+2], 1000*h[k], 1000*h[k+1],)
-					n = n + 1
-				except KeyError:
-					break
+		sys.stderr.write("Don't run me under linux!\n")
+		sys.exit(0)
+		
+	try:
+		s.listen()
+	except:
+		sys.stderr.write('\n\n')
+		sys.stderr.write('Server-side fatal error in read-eval loop:\n')
+		sys.stderr.write('%s\n' % sys.exc_value)
+		sys.stderr.write('\n\n<hit return to close window and exit>')
+		sys.stdin.readline()

@@ -913,7 +913,7 @@ class FrameBuffer:
 
 
 		if self.opengl:
-			s = pygame.Surface((w*2, h*2), 32)
+			s = pygame.Surface((w*2, h*2), flags=0, depth=32)
 			s.set_colorkey((0,0,0,0))
 			pygame.draw.rect(s, color, (0,0,w*2,h*2), width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
@@ -980,7 +980,7 @@ class FrameBuffer:
 		if self.opengl:
 			(cx, cy) = self._xy((cx, -cy), sflip=1)
 			surfsize = r*2+width
-			s = pygame.Surface((surfsize, surfsize), 32)
+			s = pygame.Surface((surfsize, surfsize), flags=0, depth=32)
 			s.set_colorkey((0,0,0,0))
 			pygame.draw.circle(s, color, (surfsize/2, surfsize/2), r, width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
@@ -1213,7 +1213,7 @@ class Sprite(_ImageBase):
 		else:
 			# new image from scratch
 			# image/sprites should have 32 bits (RGBA)
-			self.im = pygame.Surface((width, height), 0, 32)
+			self.im = pygame.Surface((width, height), flags=0, depth=32)
 			self.userdict = {}
 
 		self.im = self.im.convert(ALPHAMASKS)
@@ -1484,7 +1484,8 @@ class Sprite(_ImageBase):
 			y = self.Y(y)
 
 		# make a circle with center color, rest transparent
-		surf = pygame.Surface((r*2, r*2), 0, 8)
+		#  is this right? depth=8, not 32??
+		surf = pygame.Surface((r*2, r*2), flags=0, depth=8)
 		try:
 			surf.set_palette(((0, 0, 0), color))
 		except TypeError:

@@ -203,7 +203,7 @@ Mon May 21 10:28:23 2007 mazer
 
 - Added 'acute' parameter to the sub_common worksheet for experiments
   going in collaboration with the mccormick lab. Note that this is in
-  a worksheet, instead othe Config file so that it's easy for tasks to
+  a worksheet, instead of the Config file so that it's easy for tasks to
   be conditionalize based on the current setting!
   
 Sun May 27 15:08:51 2007 mazer
@@ -311,7 +311,7 @@ import userdpy
 from info import *
 import configvars
 
-import PlexNet, tdt
+import PlexNet
 
 class PypeApp:
 	"""Pype Application Class.
@@ -388,9 +388,9 @@ class PypeApp:
 		# start pype logging output with blank line..
 		sys.stderr.write('\n')
 		
-		cfile = pyperc('Config.%s' % gethostname())
+		cfile = pype_hostconfigfile()
 		Logger('configfile: %s\n' % cfile)
-		self.config = configvars.defaults(cfile)
+		self.config = pype_hostconfig()
 
 		if os.environ.has_key('PYPEDEBUG'):
 			Logger('command line forced debug mode')
@@ -516,58 +516,50 @@ class PypeApp:
 			#						   initwait=500, master=1)
 			self.balloon = Pmw.Balloon(self.tk, master=1, relmouse='both')
 		
-			mb = Pmw.MenuBar(f1)
-			mb.pack(side=LEFT, expand=0)
-
-			mb.addmenu('File', '', '')
-			mb.addmenuitem('File', 'command', 
-						   label='About Pype', command=AboutPype)
-			mb.addmenuitem('File', 'separator')
-			mb.addmenuitem('File', 'command', 
-						   label='show/hide console',
-						   command=self.conwin.showhide)
-			mb.addmenuitem('File', 'command', 
-						   label='show/hide user display',
-						   command=self.udpy_showhide)
-			mb.addmenuitem('File', 'separator')
-			mb.addmenuitem('File', 'command', 
-						   label='Load task from file',
-						   command=lambda s=self: s.newloadtask(ask=1))
-			mb.addmenuitem('File', 'separator')
-			mb.addmenuitem('File', 'command', 
-						   label='Save state', command=self._savestate)
-			mb.addmenuitem('File', 'separator')
-			mb.addmenuitem('File', 'command', 
-						   label='Keyboard', command=self.keyboard)
-			mb.addmenuitem('File', 'command', 
-						   label='set record_state=1',
-						   command=lambda s=self: s.record_state(1))
-			mb.addmenuitem('File', 'command', 
-						   label='set record_state=0',
-						   command=lambda s=self: s.record_state(0))
-			
 			self.show_eyetrace_start = None
 			self.show_eyetrace_stop = None
 			self.show_eyetraces = IntVar()
 			self.show_eyetraces.set(0)
 			self._eyetrace_window = None
-			mb.addmenuitem('File', 'checkbutton', 
-						   label='show analog/eye traces',
-						   variable=self.show_eyetraces)
+
+			mb = Pmw.MenuBar(f1)
+			mb.pack(side=LEFT, expand=0)
+
+			mb.addmenu('File', '', '')
+			mb.addmenuitem('File', 'command',
+						   label='Toggle console view', command=self.conwin.showhide)
+			mb.addmenuitem('File', 'command',
+						   label='Toggle user display view', command=self.udpy_showhide)
 			mb.addmenuitem('File', 'separator')
-			mb.addmenuitem('File', 'command', 
+			mb.addmenuitem('File', 'command',
+						   label='Keyboard debugger', command=self.keyboard)
+			mb.addmenuitem('File', 'command',
+						   label='Graphics info', command=lambda s=self: s.fb.printinfo())
+			mb.addmenuitem('File', 'separator')
+			mb.addmenuitem('File', 'command',
+						   label='Save state', command=self._savestate)
+			mb.addmenuitem('File', 'command',
 						   label='Quit', command=self.shutdown)
 
 			mb.addmenu('Set', '', '')
+			mb.addmenuitem('Set', 'checkbutton',
+						   label='Show traces',
+						   variable=self.show_eyetraces)
 			mb.addmenuitem('Set', 'command', 
-						   label='toggle TRAINING mode',
+						   label='Toggle TRAINING mode',
 						   command=self.tog_training)
+			
 
 			# make top-level menubar for task loaders that can be
 			# disabled when it's not safe to load new tasks...
 			self._loadmenu = Pmw.MenuBar(f1)
 			self._loadmenu.pack(side=RIGHT, expand=1, fill=X)
 			self.make_taskmenu(self._loadmenu)
+
+			self._loadmenu.addmenu('Help', '', side=RIGHT)
+			self._loadmenu.addmenuitem('Help', 'command', 
+									   label='About Pype', command=AboutPype)
+			
 
 			f1b = Frame(self.tk, borderwidth=1, relief=GROOVE)
 			f1b.pack(expand=0, fill=X)
@@ -830,13 +822,10 @@ class PypeApp:
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "trigger a reward (same as F4)")
 
-			b = Button(cpane, text="ring start", command=self.warn_run_start)
+			b = Button(cpane, text="start beep",
+					   command=lambda s=self: s.warningbeep(1))
 			b.pack(expand=0, fill=X, side=TOP, pady=2)
 			self.balloon.bind(b, "make start sound w/o starting")
-			
-			b = Button(cpane, text="ring stop", command=self.warn_run_stop)
-			b.pack(expand=0, fill=X, side=TOP, pady=2)
-			self.balloon.bind(b, "make stop sound w/o stopping")
 
 			self._candy = 0
 			b = Button(cpane, text="bounce",
@@ -1223,8 +1212,11 @@ class PypeApp:
 
 		plexhost = self.config.get('PLEXHOST')
 		tdthost = self.config.get('TDTHOST')
-
-		if len(plexhost) > 0 and len(tdthost) > 0:
+		
+		if self.sub_common.queryv('training'):
+			Logger('xdacq: xdacq disabled in training mode\n',
+				   popup=0)
+		elif len(plexhost) > 0 and len(tdthost) > 0:
 			Logger('xdacq: set either PLEXHOST or TDTHOST (disabled!!)\n',
 				   popup=1)
 		elif self.xdacq is None and len(plexhost) > 0:
@@ -1244,22 +1236,14 @@ class PypeApp:
 					   popup=1)
 		elif self.xdacq is None and len(tdthost) > 0:
 			try:
-				self.tdt = tdt.Client(tdthost)
+				import pype2tdt
+				self.tdt = pype2tdt.Controller(cpane, tdthost)
 				Logger('xdacq: connected to tdt @ %s.\n' % tdthost)
-				(ok, tank) = self.tdt.send('TDevAcc.GetTankName()')
-				(ok, mode) = self.tdt.send('TDevAcc.GetSysMode()')
-				Logger('xdacq: tdt tank=%s\n' % self.tdt.tank())
-				Logger('xdacq: tdt mode=%d\n' % self.tdt.mode())
 				self.xdacq = 'tdt'
-				mb.addmenu('TDT', '', '')
-				mb.addmenuitem('TDT', 'command', 
-							   label='query tdt',
-							   command=lambda s=self: status_tdt(s))
-				mb.addmenuitem('TDT', 'separator')
-			except:
-				# this exception needs a case...
+				self.tdt.update()
+			except socket.error:
 				self.tdt = None
-				Logger('xdacq: failed connect to tdt @ %s.\n' % tdthost,
+				Logger('xdacq: no connection to tdt @ %s.\n' % tdthost,
 					   popup=1)
 
 
@@ -1453,38 +1437,41 @@ class PypeApp:
 	def add_tasks(self, menubar, dropname, dir):
 		import glob
 		
-		menubar.addmenu(dropname, '', '')
 		if dir[-1] == '/':
 			g = glob.glob(dir+'*.py')
 		else:
 			g = glob.glob(dir+'/*.py')
-		tasks = []
-		comments = {}
-		for i in range(0, len(g)):
-			# query the type for each "task" and only add to the
-			# task menu if it's really a task, with the !TASK! flag
-			# in the header
-			type, comment = pyfile_type(g[i])
-			# print g[i], 'is', type
-			if type is 'task' or type is None:
-				x = posixpath.basename(g[i])
-				tasks.append(x[:-3])
-				if len(comment) > 0:
-					comments[tasks[-1]] = '  <%s>' % comment
-				else:
-					comments[tasks[-1]] = ''
-		tasks.sort()
 
-		menubar.addmenuitem(dropname, 'command', 
-							label='Reload current',
-							command=self.newloadtask)
-		menubar.addmenuitem(dropname, 'separator')
-		
-		for i in range(0, len(tasks)):
-			menubar.addmenuitem(dropname, 'command',
-								label=tasks[i] + comments[tasks[i]],
-								command=lambda s=self,t=tasks[i],d=dir: \
-								s.newloadtask(t, d))
+		# only add menu if there are really files in the directory..
+		if len(g) > 0:
+			menubar.addmenu(dropname, '', '')
+			tasks = []
+			comments = {}
+			for i in range(0, len(g)):
+				# query the type for each "task" and only add to the
+				# task menu if it's really a task, with the !TASK! flag
+				# in the header
+				type, comment = pyfile_type(g[i])
+				# print g[i], 'is', type
+				if type is 'task' or type is None:
+					x = posixpath.basename(g[i])
+					tasks.append(x[:-3])
+					if len(comment) > 0:
+						comments[tasks[-1]] = '  <%s>' % comment
+					else:
+						comments[tasks[-1]] = ''
+			tasks.sort()
+
+			menubar.addmenuitem(dropname, 'command', 
+								label='Reload current',
+								command=self.newloadtask)
+			menubar.addmenuitem(dropname, 'separator')
+
+			for i in range(0, len(tasks)):
+				menubar.addmenuitem(dropname, 'command',
+									label=tasks[i] + comments[tasks[i]],
+									command=lambda s=self,t=tasks[i],d=dir: \
+									s.newloadtask(t, d))
 
 	def unloadtask(self):
 		if self.taskmod:
@@ -1905,6 +1892,16 @@ class PypeApp:
 					if not ok:
 						warn('Warning (elog)', ecode)
 					#del self._exper
+
+				if self.xdacq == 'plexon':
+					warn("start the plexon now. I'll wait.", wait=1)
+				elif self.xdacq == 'tdt':
+					# start new block in current tank, this includes resting the
+					# trial counter..
+					(server, tank, block) = self.tdt.newblock(record=1)
+					Logger('tdt data: %s %s\n' % (tank, block))
+					self.tdt.update()
+
 						
 				if self.tk:
 					self._startbut.config(text='stop')
@@ -1918,19 +1915,21 @@ class PypeApp:
 				self.set_result()
 
 				try:
+					# make sure graphic display is visible
+					if self.psych: self.fb.show()
+					# clear block state before starting a run
+					self._runstats_update(clear=1)
+
 					try:
-						if self.psych:
-							self.fb.show()
-
-						# clear block state before starting a run
-						self._runstats_update(clear=1)
-
-						# call start function, giving up control until end
-						# of run...
+						# call task-specific start function.
 						self.startfn(self)
 					except:
+						# some error occured within the task code
 						goto_error('Runtime Error')
 				finally:
+					# either there was an error OR the task
+					# completed normally, ensure proper cleanup
+					# gets done:
 					dacq_set_pri(0)
 					dacq_set_mypri(0)
 					dacq_set_rt(0)
@@ -1945,7 +1944,15 @@ class PypeApp:
 						self._button_slideshow.config(state=NORMAL)
 						self._loadmenu.enableall()
 					if self.psych:
-						self.fb.hide()						
+						self.fb.hide()
+
+				if self.xdacq == 'plexon':
+					warn('Stop the plexon NOW', wait=0)
+				elif self.xdacq == 'tdt':
+					# recording's done -- direct output back to TempBlk
+					(server, tank, block) = self.tdt.newblock(record=0)
+					self.tdt.update()
+						
 			else:
 				if self.tk:
 					self._startbut.config(state=DISABLED)
@@ -2235,43 +2242,29 @@ class PypeApp:
 				beep(f, 10)
 			for f in range(3000, 1000, -1000):
 				beep(f, 10)
-				
 
+	def warningbeep(self, start=1):
+		if start:
+			for n in range(3):
+				beep(1000, 100)
+				beep(0, 10)
+		else:
+			beep(1000, 100)
+			beep(0, 10)
+			beep(500, 100)
+			beep(0, 10)
+			
 	def warn_run_start(self):
-		"""
-		Tell subject run's about to start.
-		"""
-		beep(1000, 100)
-		beep(0, 10)
-		beep(1000, 100)
-		beep(0, 10)
-		beep(1000, 100)
-		beep(0, 10)
-
+		self.warningbeep(1)
+		
 	def warn_run_stop(self):
-		"""
-		Tell subject run just ended.
-		"""
-		beep(1000, 100)
-		beep(0, 10)
-		beep(500, 100)
-		beep(0, 10)
-
-	def warn_trial_start(self):
-		self.console.writenl("------------------------trial-starts---",
-							 color='black')
-
-	def start_tone(self):
-		beep(1000, 100)
-		beep(2000, 100)
-		beep(1000, 100)
-		beep(2000, 100)
+		self.warningbeep(0)
 
 	def warn_trial_correct(self):
 		"""
 		Currently a NOP, but could be used for positive feedback.
 		"""
-		pass							# do nothing, juice is enough
+		pass
 
 	def warn_trial_incorrect(self, flash=1000):
 		"""
@@ -2314,10 +2307,10 @@ class PypeApp:
 			self.paused = 0
 			self.running = 1
 			self.led(1)
-			self.warn_run_start()
+			self.warningbeep(1)
 		else:
 			self.running = 0
-			self.warn_run_stop()
+			self.warningbeep(0)
 			self.record_done()
 			self.led(0)
 			self.repinfo()				# clear rep num display
@@ -3031,6 +3024,21 @@ class PypeApp:
 			#				a list of (timestamp, unit) pairs, with timestamps
 			#				in ms and unit's following the standard plexon
 			#				naming scheme (01a, 02a, 02b etc..)
+			
+
+			if self.xdacq == 'tdt':
+				# insert tdt tank info into the parameter table for this
+				# trial so we can recover the data later.
+				(server, tank, block, tnum) = self.tdt.getblock()
+				
+				# str() here convert UTF8 strings back to plain old ascii,
+				# which is the only thing the p2m can currently handle. small
+				# risk here -- don't use international chars for datafile names!
+				info[2]['tdt_server'] = server
+				info[2]['tdt_tank'] = str(tank.encode('ascii'))
+				info[2]['tdt_block'] = str(block.encode('ascii'))
+				info[2]['tdt_tnum'] = tnum
+				self.tdt.update()
 
 			rec = [ENCODE, info, self.record_buffer,
 				   list(self.eyebuf_t),
@@ -3278,10 +3286,24 @@ class PypeApp:
 			# (might be different if new or reopened window..)
 			self._eyetrace_window  = attach(oldgraph)
 			
+def pype_hostconfigfile():
+	"""
+	Return Read host-specfic Config file.
+	Config file lives in $(PYPERC)/Config.{HOST_NAME}
+	"""
+	return pyperc('Config.%s' % socket.gethostname())
+
 def pype_hostconfig():
-	"""Read $(PYPERC)/Config.$HOSTNAME"""
-	from config import Config
-	return Config(pyperc('Config.%s' % gethostname()))
+	"""
+	Read host-specific config file into a Config
+	object and return the object (looks like a
+	dictionary).
+	"""
+	cfile = pype_hostconfigfile()
+	return configvars.defaults(cfile)
+
+	#return Config(pype_hostconfigfile())
+
 		
 def npypes():
 	"""Count number of pype programs currently running.
