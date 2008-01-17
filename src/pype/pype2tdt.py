@@ -50,8 +50,8 @@ class Controller:
         self._info.config(text=text)
 
     def update(self):
-        (server, tank, block, tnum) = self.tdtconnx.getblock()
-        tank = self.tdtconnx.tank()
+        (server, tank, block, tnum) = self.tdtconnx.tdev_getblock()
+        tank = self.tdtconnx.tdev_tank()
         tank = tank.split('\\')[-1]
         
         t = ""
@@ -59,7 +59,7 @@ class Controller:
         t = t + "  tank:  %s\n" % tank
         t = t + " block:  %s\n" % block
         t = t + " trial:  %d\n" % tnum
-        t = t + "  mode:  %s\n" % self.tdtconnx.mode(name=1)
+        t = t + "  mode:  %s\n" % self.tdtconnx.tdev_mode(name=1)
         
         self.info(t)
     
@@ -71,7 +71,7 @@ class Controller:
                 f = int(f.split('-')[1].split('.')[0])
                 nmax = max(nmax, f)
             f = 'tmp-%03d.hoop' % (nmax + 1)
-            sortp = self.tdtconnx.sortparams()
+            sortp = self.tdtconnx.tdev_sortparams()
             fp = open(f, 'w')
             fp.write(pickle.dumps(sortp))
             fp.close()
@@ -92,7 +92,7 @@ class Controller:
                 f = 'tmp-%03d.hoop' % nmax
                 fp = open(f, 'r')
                 sortp = pickle.loads(fp.read())
-                self.tdtconnx.sortparams(sortp)
+                self.tdtconnx.tdev_sortparams(sortp)
                 fp.close()
                 self.text('%s -> hoops\n' % f)
         except:
@@ -101,11 +101,11 @@ class Controller:
 
     def newblock(self, record=1):
         """just a pass through to underlying tdt instance -- SUBCLASS ME!!"""
-        return self.tdtconnx.newblock(record=record)
+        return self.tdtconnx.tdev_newblock(record=record)
         
 	def getblock(self):
         """just a pass through to underlying tdt instance -- SUBCLASS ME!!"""
-        return self.tdtconnx.getblock()
+        return self.tdtconnx.tdev_getblock()
         
 
 if __name__ == '__main__':

@@ -49,6 +49,7 @@ try:
 except ImportError:
 	pass
 
+class TDTError(Exception): pass
 
 # OpenEx run modes
 IDLE = 0								# dsp completely idle
@@ -136,51 +137,30 @@ class TDTServer:
 		self.Server = Server
 		TDevAcc = win32com.client.Dispatch('TDevAcc.X')
 		TTank = win32com.client.Dispatch('TTank.X')
-		self.connected = None
 
 	def connect(self):
 		"""
 		Set up connections to the TDT COM server
 		"""
 		global TDevAcc, TTank
-
-		if self.connected:
-			sys.stderr.write('already connected to TDT servers...\n')
-			return 1
 			
 		sys.stderr.write('Connecting to TDT servers...\n')
 
-		(devConn, tankConn) = (0, 0)
-
-		for tries in range(10):
-			try:
-				if not devConn:
-					devConn = TDevAcc.ConnectServer(self.Server)
-			except:
-				pass
+		connections = 0
+		
+		if TDevAcc.ConnectServer(self.Server):
+			sys.stderr.write('..connect to %s:TDevAcc\n' % self.Server)
+			connections = connections + 1
+		else:
+			sys.stderr.write('..no connection to %s:TDevAcc\n' % self.Server)
 			
-			try:
-				if not tankConn:
-					tankConn = TTank.ConnectServer(self.Server, 'Me')
-			except:
-				pass
-
-			if devConn and tankConn:
-				sys.stderr.write('Connect to TDevAcc and TTank.<%s>.\n' %
-								 self.Server)
-				self.connected = 1
-				return 1
-			else:
-				time.sleep(1)
-
-		if not devConn:
-			sys.stderr.write('No connect to %s.TDevAcc (%d tries)\n' %
-						 (self.Server, tries))
-		if not tankConn:
-			sys.stderr.write('No connect to %s.TTank (%d tries)\n' %
-						 (self.Server, tries))
-
-		return 0
+		if TTank.ConnectServer(self.Server, 'Me'):
+			sys.stderr.write('..connect to %s:TTank.X\n' % self.Server)
+			connections = connections + 2
+		else:
+			sys.stderr.write('..no connection %s:TTank.X\n' % self.Server)
+			
+		return connections
 
 	def disconnect(self):
 		TDevAcc.CloseConnection()
@@ -196,33 +176,30 @@ class TDTServer:
 			sys.stderr.write("Received connection from %s\n" % \
 							 server.remoteHost)
 
-			if not self.connect():
-				server.Send(pickle.dumps(0))
-				sys.stderr.write("Abort.\n")
-			else:
-				server.Send(pickle.dumps(1))
-				sys.stderr.write("Ready.\n")
-				while 1:
-					try:
-						x = pickle.loads(server.Receive())
-					except EOFError:
-						# client closed connection
-						break
-					
-					try:
-						ok = 1
-						result = eval(x)
-					except:
-						ok = None
-						result = None
-					server.Send(pickle.dumps((ok, result)))
-					if 0:
-						sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
-					else:
-						sys.stderr.write('.');
-						sys.stderr.flush();
-					if ok is None:
-						sys.stderr.write('%s\n' % sys.exc_value)
+			connections = self.connect()
+			server.Send(pickle.dumps(connections))
+			sys.stderr.write("Ready.\n")
+			while 1:
+				try:
+					x = pickle.loads(server.Receive())
+				except EOFError:
+					# client closed connection
+					break
+
+				try:
+					ok = 1
+					result = eval(x)
+				except:
+					ok = None
+					result = None
+				server.Send(pickle.dumps((ok, result)))
+				if 0:
+					sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
+				else:
+					sys.stderr.write('.');
+					sys.stderr.flush();
+				if ok is None:
+					sys.stderr.write('%s\n' % sys.exc_value)
 			sys.stderr.write("\nClient closed connection.\n")
 			server.Close()
 			#this fails:
@@ -234,9 +211,16 @@ class TDTClient:
 		self.client = None
 		
 		self.open_conn()
+		
+		if self.gotTDevAcc:
+			(self.nchans, self.sniplen) = self.chaninfo()
+			(ok, self.fs) = self.tdev("GetDeviceSF('Amp1')")
+		else:
+			(self.nchans, self.sniplen, self.fs) = (None, None, None)
 
-		(self.nchans, self.sniplen) = self.chaninfo()
-		(ok, self.fs) = self.send("TDevAcc.GetDeviceSF('Amp1')")
+	def __repr__(self):
+		return '<TDTClient server=%s TDevAcc=%d TTank=%d>' % \
+			   (self.server, self.gotTDevAcc, self.gotTTank)
 
 	def open_conn(self):
 		"""
@@ -250,9 +234,9 @@ class TDTClient:
 		if self.client is None:
 			self.client = _SocketClient()
 			self.client.Connect(self.server)
-		ok = pickle.loads(self.client.Receive())
-		if not ok:
-			raise EOFError
+		c = pickle.loads(self.client.Receive())
+		self.gotTDevAcc = (1 & c) > 0
+		self.gotTTank = (2 & c) > 0
 		
 	def close_conn(self):
 		"""
@@ -289,7 +273,17 @@ class TDTClient:
 			pass
 		return (ok, result)
 
-	def mode(self, mode=None, name=None):
+	def tdev(self, cmd):
+		if not self.gotTDevAcc:
+			raise TDTError, 'No TDevAcc connection'
+		return self.send('TDevAcc.' + cmd)
+
+	def ttank(self, cmd):
+		if not self.gotTTank:
+			raise TDTError, 'No TTank.X connection'
+		return self.send('TTank.' + cmd)
+
+	def tdev_mode(self, mode=None, name=None):
 		"""
 		Query current run mode for the TDT device.
 
@@ -300,14 +294,13 @@ class TDTClient:
 		  PREVIEW = 2	# running, not saving to tank
 		  RECORD = 3	# running and saving all data
 		"""
-
 		if not mode is None:
-			(ok, r) = self.send('TDevAcc.SetSysMode(%d)' % mode)
+			(ok, r) = self.tdev('SetSysMode(%d)' % mode)
 			if ok is None:
 				sys.stderr.write("tdt: can't set mode\n")
 				return None			
 		else:
-			(ok, r) = self.send('TDevAcc.GetSysMode()')
+			(ok, r) = self.tdev('GetSysMode()')
 			if ok is None:
 				sys.stderr.write("tdt: can't get mode\n")
 				return None
@@ -317,47 +310,38 @@ class TDTClient:
 				r = modes[r]
 		return r
 
-	def tank(self, tankpath=None, live=None):
+	def tdev_tank(self, tankpath=None):
 		"""
 		Get or Set pathname for DataTank. This is where data gets saved.
 		If tankpath is specified, it's the filename on the window's machine.
 		if live==1, then the tank server will automaticaly select the
 		active tank that OpenEx is writing to.
-
-		The live flag refers the the DataTank -- that is if you want to
-		access data from the tank (lagging behind a bit). If live=1, then
-		the selected READABLE DataTank will be pointed towards the
-		currently being WRITTEN Datatank..
-
-		Specify tankpath OR live, but not both!
 		"""
 		if tankpath:
-			(ok, r) = self.send('TDevAcc.SetTankName("%s")' % tankpath)
-		elif live:
-			(ok, r) = self.send('TTank.OpenTank(TDevAcc.GetTankName(), "R")')
+			(ok, r) = self.tdev('SetTankName("%s")' % tankpath)
 		else:
-			(ok, r) = self.send('TDevAcc.GetTankName()')
+			(ok, r) = self.tdev('GetTankName()')
 		if ok is None:
 			sys.stderr.write('TDT Error!\n')
 			return None
 		return r
 
-	def tnum(self, reset=None):
+	def tdev_tnum(self, reset=None):
 		"""
 		Read trial count, or if reset==1 reset the counter to zero. This
 		should really be done when OpenEx is in standby mode..
 		"""
 		if reset:
-			(ok, r) = self.send('TDevAcc.SetTargetVal("Amp1.TNumRst", 1)')
-			(ok, r) = self.send('TDevAcc.SetTargetVal("Amp1.TNumRst", 0)')
+			(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 1)')
+			(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 0)')
 		else:
-			(ok, r) = self.send('TDevAcc.GetTargetVal("Amp1.TNum")')
+			(ok, r) = self.tdev('GetTargetVal("Amp1.TNum")')
 		if ok is None:
 			sys.stderr.write('TDT Error!\n')
 			return None
 		return int(r)
 
-	def chaninfo(self):
+	def tdev_chaninfo(self):
 		"""
 		Figure out number of analog channels and length of spike snippet.
 		The actual length of the snippet is hoopsize/3 points, since
@@ -365,7 +349,7 @@ class TDTClient:
 		"""
 		n = 1
 		while 1:
-			(ok, s) = self.send("TDevAcc.GetTargetSize('Amp1.cSnip~%d')" % n)
+			(ok, s) = self.tdev("GetTargetSize('Amp1.cSnip~%d')" % n)
 			if s == 0:
 				break
 			if n == 1:
@@ -373,16 +357,16 @@ class TDTClient:
 			n = n + 1
 		return (n-1, hoopsize/3)
 
-	def getblock(self):
+	def tdev_getblock(self):
 		"""
 		Query current block info -- this is enough info to find the current
 		data record later (assuming tank doesn't get deleted...)
 		"""
-		(ok, block) = self.send('TTank.GetHotBlock()')
-		return (self.server, self.tank(), block, self.tnum())
+		(ok, block) = self.ttank('GetHotBlock()')
+		return (self.server, self.tdev_tank(), block, self.tdev_tnum())
 		
 
-	def newblock(self, record=1):
+	def tdev_newblock(self, record=1):
 		"""
 		Start a new block in the current tank. Each block corresponds
 		to a single run. If record==1, then a new block is started for
@@ -399,28 +383,27 @@ class TDTClient:
 		RETURNS: (servername, tankname, blockname); this should be enough
 		info to track down the location of the record no matter what..
 		"""
-		
 		# make sure the live tank is selected
-		self.tank(live=1)
+		self.tdev_tank(live=1)
 
 		# set OpenEx to STANDBY and wait for this to register in the
 		# tank as a change in the block name to '' (or if it was already
 		# in STANDBY mode, we're good to go..
-		self.mode(STANDBY)
+		self.tdev_mode(STANDBY)
 		while 1:
-			(ok, oldblock) = self.send('TTank.GetHotBlock()')
+			(ok, oldblock) = self.ttank('GetHotBlock()')
 			if len(oldblock) == 0:
 				break
 
 		# reset the trial counter
-		self.tnum(reset=1)
+		self.tdev_tnum(reset=1)
 
 		# switch back to record mode and wait for this to get into the
 		# tank, so we can store the block name for easy access later..
 		if record:
-			self.mode(RECORD)
+			self.tdev_mode(RECORD)
 			while 1:
-				(ok, newblock) = self.send('TTank.GetHotBlock()')
+				(ok, newblock) = self.ttank('GetHotBlock()')
 				if not (newblock == oldblock):
 					break
 		else:
@@ -428,32 +411,23 @@ class TDTClient:
 			
 		# and return the tank & block name --> this is enough info to
 		# find the record later..
-		return (self.server, self.tank(), newblock)
+		return (self.server, self.tdev_tank(), newblock)
 
 
-	def count(self, d):
-		actchans = 0
-		actunits = 0
-		for n in range(1, self.nchans+1):
-			t = d[n, 'thresh']
-			h = d[n, 'hoops']
-
-			k = sum(not_equal(h[::3], 0.0))
-			if k > 0:
-				actchans = actchans + 1
-			actunits = actunits + k
-		print "%d active electrodes" % actchans
-		print "%d active units" % actunits
-
-	def sortparams(self, params=None):
+	def tdev_sortparams(self, params=None):
+		"""
+		Get or set current sort parameters (aka hoop settings). If called
+		with no arguments, current settings are returned. Otherwise, the
+		params arg specifies a new set of settings to setup
+		"""
 		if params is None:
 			params = {}
 			for n in range(1, self.nchans+1):
 				(ok, t) = \
-					 self.send("TDevAcc.GetTargetVal('Amp1.aSnip~%d')" %
+					 self.tdev("GetTargetVal('Amp1.aSnip~%d')" %
 									(n, ))
 				(ok, h) = \
-					 self.send("TDevAcc.ReadTargetV('Amp1.cSnip~%d', 0, %d)" %
+					 self.tdev("ReadTargetV('Amp1.cSnip~%d', 0, %d)" %
 							   (n, self.sniplen*3))
 				params[n, 'thresh'] = t
 				params[n, 'hoops'] = h
@@ -464,13 +438,34 @@ class TDTClient:
 				h = params[n, 'hoops']
 
 				(ok, r) = \
-					 self.send("TDevAcc.SetTargetVal('Amp1.aSnip~%d',%f)" %
+					 self.tdev("SetTargetVal('Amp1.aSnip~%d',%f)" %
 							   (n, t))
 				(ok, r) = \
-					 self.send("TDevAcc.WriteTargetVEX('Amp1.cSnip~%d', 0, 'F32', %s)" %
+					 self.tdev("WriteTargetVEX('Amp1.cSnip~%d', 0, 'F32', %s)" %
 							   (n, h))
-				self.send('type(%s)' % (h,))
+				#self.send('type(%s)' % (h,))
 			
+	def ttank_tank(self, tankpath=None):
+		"""
+		Open tank using TTank.X -- if no tankname is specified, try to
+		open the current live tank.
+		"""
+		if tankpath is None:
+			(server, tankpath, block, tnum) = self.tdev_getblock()
+		(ok, r) = self.ttank('OpenTank("%s", "R")' % tankpath)
+		return r
+	
+	def ttank_block(self, block=None):
+		"""
+		Select block from current tank -- no argument use hotblock on
+		current live tank.
+		"""
+		if block is None:
+			(server, tankpath, block, tnum) = self.tdev_getblock()
+		(ok, r) = self.ttank('SelectBlock("%s")' % block)
+		return r
+	
+
 if __name__ == '__main__':
 	try:
 		s = TDTServer()
