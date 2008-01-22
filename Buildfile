@@ -54,13 +54,13 @@ endif
 
 # clean: all the pype src directories
 clean: 
-	@find . -name core | xargs rm -f
-	@find . -name music.raw | xargs rm -f
-	@find . -name \*.pyc | xargs rm -f
-	for i in $(SUBDIRS); \
-		do (cd $$i ; $(MAKE) clean);\
+	@echo "Cleaning temp files..."
+	@find . -name core -o -name music.raw -o -name \*.pyc | xargs rm -f
+	@echo "Cleaning subdirs..."
+	@for i in $(SUBDIRS); \
+		do (cd $$i ; echo ...Cleaning $$i ; $(MAKE) clean);\
 		done
-	cd src/wrapper ; $(MAKE) clean
+	@cd src/wrapper ; $(MAKE) clean
 
 # clobber: pype srcs clean + external directories
 clobber: clean x-clean

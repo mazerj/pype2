@@ -8,7 +8,8 @@ install:
 		< pype_expander.template >pype_expander
 	chmod +x pype_expander p2m p2mupdate \
 		p2m-ical p2m-fixes p2m-spotmap affinecal \
-		plx2mat plx2asc.py
+		plx2mat plx2asc.py \
+		tdtspikes.py
 	cp README *.m \
 		p2m p2mupdate \
 		p2m-ical p2m-fixes p2m-spotmap \

@@ -171,7 +171,7 @@ class TDTServer:
 
 		while 1:
 			server = _SocketServer()
-			sys.stderr.write("Waiting for client..\n")
+			sys.stderr.write("tdt: Waiting for client..\n")
 			server.Listen()
 			sys.stderr.write("Received connection from %s\n" % \
 							 server.remoteHost)
@@ -213,7 +213,7 @@ class TDTClient:
 		self.open_conn()
 		
 		if self.gotTDevAcc:
-			(self.nchans, self.sniplen) = self.chaninfo()
+			(self.nchans, self.sniplen) = self.tdev_chaninfo()
 			(ok, self.fs) = self.tdev("GetDeviceSF('Amp1')")
 		else:
 			(self.nchans, self.sniplen, self.fs) = (None, None, None)
@@ -384,7 +384,14 @@ class TDTClient:
 		info to track down the location of the record no matter what..
 		"""
 		# make sure the live tank is selected
-		self.tdev_tank(live=1)
+		import time
+		
+		#import pypedebug
+		#pypedebug.keyboard()
+		
+
+		tstart = time.time()
+		self.ttank_livetank()
 
 		# set OpenEx to STANDBY and wait for this to register in the
 		# tank as a change in the block name to '' (or if it was already
@@ -394,6 +401,8 @@ class TDTClient:
 			(ok, oldblock) = self.ttank('GetHotBlock()')
 			if len(oldblock) == 0:
 				break
+
+		#print " standby in %.1f ms" % (1000.0 * (time.time() - tstart),)
 
 		# reset the trial counter
 		self.tdev_tnum(reset=1)
@@ -408,6 +417,8 @@ class TDTClient:
 					break
 		else:
 			newblock = oldblock
+			
+		print "newblock took: %.1f ms" % (1000.0 * (time.time() - tstart),)
 			
 		# and return the tank & block name --> this is enough info to
 		# find the record later..
@@ -445,36 +456,33 @@ class TDTClient:
 							   (n, h))
 				#self.send('type(%s)' % (h,))
 			
-	def ttank_tank(self, tankpath=None):
+	def ttank_livetank(self):
 		"""
 		Open tank using TTank.X -- if no tankname is specified, try to
 		open the current live tank.
 		"""
-		if tankpath is None:
-			(server, tankpath, block, tnum) = self.tdev_getblock()
-		(ok, r) = self.ttank('OpenTank("%s", "R")' % tankpath)
+		livetank = self.tdev_tank()
+		(ok, r) = self.ttank('OpenTank("%s", "R")' % livetank)
 		return r
-	
-	def ttank_block(self, block=None):
-		"""
-		Select block from current tank -- no argument use hotblock on
-		current live tank.
-		"""
-		if block is None:
-			(server, tankpath, block, tnum) = self.tdev_getblock()
-		(ok, r) = self.ttank('SelectBlock("%s")' % block)
-		return r
-	
 
 if __name__ == '__main__':
 	try:
 		s = TDTServer()
-	except ImportError:
-		sys.stderr.write("Don't run me under linux!\n")
-		sys.exit(0)
-		
-	try:
 		s.listen()
+	except ImportError:
+		if 1:
+			import pypedebug
+			t = TDTClient('tdt1.mlab.yale.edu')
+			t.tdev_newblock(record=1)
+			t.tdev_newblock(record=0)
+			t.tdev_newblock(record=1)
+			t.tdev_newblock(record=0)
+			t.tdev_newblock(record=1)
+			t.tdev_newblock(record=0)
+		else:
+			sys.stderr.write("Don't run me under linux!\n")
+			sys.exit(0)
+
 	except:
 		sys.stderr.write('\n\n')
 		sys.stderr.write('Server-side fatal error in read-eval loop:\n')
