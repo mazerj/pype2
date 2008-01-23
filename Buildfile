@@ -62,8 +62,8 @@ clean:
 		done
 	@cd src/wrapper ; $(MAKE) clean
 
-# clobber: pype srcs clean + external directories
 clobber: clean x-clean
+
 
 ###############################################################
 #      external programs/libraries

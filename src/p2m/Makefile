@@ -14,7 +14,8 @@ install:
 		p2m p2mupdate \
 		p2m-ical p2m-fixes p2m-spotmap \
 		pype_expander pype_expander.py affinecal \
-		plx2mat $(P2MDIR)
+		plx2mat plx2asc.py tdtspikes.py \
+		$(P2MDIR)
 	@date > $(P2MDIR)/LAST_UPDATE
 
 build:

@@ -3291,7 +3291,8 @@ def pype_hostconfigfile():
 	Return Read host-specfic Config file.
 	Config file lives in $(PYPERC)/Config.{HOST_NAME}
 	"""
-	return pyperc('Config.%s' % socket.gethostname())
+	h = string.split(socket.gethostname(), '.')[0]
+	return pyperc('Config.%s' % h)
 
 def pype_hostconfig():
 	"""

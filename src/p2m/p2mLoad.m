@@ -38,6 +38,9 @@ if ~ischar(fname)
   % if it's not a char, then assume it's an already loaded
   % pf structure and just return it..
   r = fname;
+  if exist('plexchan', 'var')
+    r = p2mSelect(r, plexchan);
+  end
   return
 end
 

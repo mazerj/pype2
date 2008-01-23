@@ -1,4 +1,4 @@
-#!/bin/env pypenv
+#!/usr/bin/env pypenv
 #
 # Retrieve spike timestamps from tdt datatank using network api
 #
@@ -14,19 +14,27 @@ class tdtspikes:
     # spikes, even for big datasets. Danger is if there's more than
     # 1e6 spikes...
     
-    def __init__(self, pypefile, chan=0, unit=0):
+    def __init__(self,
+                 pypefile=None,
+                 server=None, tank=None, block=None,
+                 chan=0, unit=0):
         
         # note: we're just looking at the first pype record in the
         # datafile to get the necessary tank info. That's all we need
         # to find the data..
-        
-        pf = pypedata.PypeFile(pypefile)
-        rec = pf.nth(0)
-        pf.close()
 
-        self.server = rec.params['tdt_server']
-        self.tank = rec.params['tdt_tank']
-        self.block = rec.params['tdt_block']
+        if pypefile:
+            pf = pypedata.PypeFile(pypefile)
+            rec = pf.nth(0)
+            pf.close()
+
+            self.server = rec.params['tdt_server']
+            self.tank = rec.params['tdt_tank']
+            self.block = rec.params['tdt_block']
+        else:
+            self.server = server
+            self.tank = tank
+            self.block = block
 
         tt = ttank.TTank(self.server)
         tt.invoke('OpenTank', self.tank, 'R')
@@ -69,7 +77,7 @@ class tdtspikes:
         self.ntrials = len(trl1)
 
     def dump(self, out):
-        out.write('#tnum time chan unit\n')
+        #out.write('#tnum time chan unit\n')
         for k in range(self.ntrials):
             (t, c, s) = self.sdata[k]
             for j in range(len(t)):
@@ -79,4 +87,28 @@ class tdtspikes:
                 #                                     chr(s[j]+ord('a')-1),))
 
 if __name__ == '__main__':
-    tdtspikes(sys.argv[1]).dump(sys.stdout)
+    from optparse import OptionParser
+    
+    p = OptionParser('usage: %prog [server/tank/block or pypefile]')
+    p.add_option('-s', '--server', dest='server',
+                 action='store', type='string', default=None,
+                 help='tdt server computer')
+    p.add_option('-t', '--tank', dest='tank',
+                 action='store', type='string', default=None,
+                 help='tdt data tank')
+    p.add_option('-b', '--block', dest='block',
+                 action='store', type='string', default=None,
+                 help='tdt block name')
+    
+    (options, args) = p.parse_args()
+    if len(args) > 0:
+        # user specified a pype data file
+        d = tdtspikes(pypefile=args[0])
+    elif options.server and options.tank and options.block:
+        d = tdtspikes(server=options.server,
+                      tank=options.tank,
+                      block=options.block)
+    else:
+        sys.stderr.write('extract from where??\n')
+        sys.exit(1)
+    d.dump(sys.stdout)

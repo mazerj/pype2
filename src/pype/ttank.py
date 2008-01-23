@@ -48,7 +48,7 @@ class _Socket:
 		self.sock.close()
 		
 class _SocketServer(_Socket):
-	def __init__(self, host = Hostname(), port = 10000):
+	def __init__(self, host = Hostname(), port = 10001):
 		self.host, self.port = host, port
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.sock.bind((self.host, self.port))
@@ -68,7 +68,7 @@ class _SocketClient(_Socket):
 		self.host, self.port = None, None
 		self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-	def Connect(self, remoteHost = Hostname(), remotePort = 10000):
+	def Connect(self, remoteHost = Hostname(), remotePort = 10001):
 		self.remoteHost, self.remotePort = remoteHost, remotePort
 		# set timeout to 100s - for long queries, the TTank component
 		# can churn for a LONG time before the packet comes back..
