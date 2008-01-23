@@ -1,20 +1,21 @@
-#!/usr/bin/env pypenv
+# -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
+# $Id$
 #
-# Retrieve spike timestamps from tdt datatank using network api
+# Retrieve spike timestamps from tdt datatank using network api (ttank.py)
 #
-
 
 import Numeric
 import pypedata, ttank
 #import time
 
-class tdtspikes:
+class TDTSpikes:
     # get all spikes at once, then sort into trials locally..
     # this is much faster -- seems about 1-2 secs to get all the
     # spikes, even for big datasets. Danger is if there's more than
     # 1e6 spikes...
     
     def __init__(self,
+                 rec=None,
                  pypefile=None,
                  server=None, tank=None, block=None,
                  chan=0, unit=0):
@@ -23,11 +24,11 @@ class tdtspikes:
         # datafile to get the necessary tank info. That's all we need
         # to find the data..
 
-        if pypefile:
-            pf = pypedata.PypeFile(pypefile)
-            rec = pf.nth(0)
-            pf.close()
-
+        if rec or pypefile :
+            if pypefile:
+                pf = pypedata.PypeFile(pypefile)
+                rec = pf.nth(0)
+                pf.close()
             self.server = rec.params['tdt_server']
             self.tank = rec.params['tdt_tank']
             self.block = rec.params['tdt_block']
@@ -87,28 +88,5 @@ class tdtspikes:
                 #                                     chr(s[j]+ord('a')-1),))
 
 if __name__ == '__main__':
-    from optparse import OptionParser
-    
-    p = OptionParser('usage: %prog [server/tank/block or pypefile]')
-    p.add_option('-s', '--server', dest='server',
-                 action='store', type='string', default=None,
-                 help='tdt server computer')
-    p.add_option('-t', '--tank', dest='tank',
-                 action='store', type='string', default=None,
-                 help='tdt data tank')
-    p.add_option('-b', '--block', dest='block',
-                 action='store', type='string', default=None,
-                 help='tdt block name')
-    
-    (options, args) = p.parse_args()
-    if len(args) > 0:
-        # user specified a pype data file
-        d = tdtspikes(pypefile=args[0])
-    elif options.server and options.tank and options.block:
-        d = tdtspikes(server=options.server,
-                      tank=options.tank,
-                      block=options.block)
-    else:
-        sys.stderr.write('extract from where??\n')
-        sys.exit(1)
-    d.dump(sys.stdout)
+    sys.stderr.write('%s should never be loaded as main.\n' % __file__)
+    sys.exit(1)
