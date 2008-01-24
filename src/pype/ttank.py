@@ -224,16 +224,23 @@ class TTank:
 		else:
 			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (cmd, result)
 
+def loopforever():
+	while 1:
+		try:
+			s = TTankServer()
+		except ImportError:
+			return 0
+		try:
+			s.listen()
+		except:
+			sys.stderr.write('-----------------------------\n')
+			sys.stderr.write('Server-side near fatal error in loopforever:\n')
+			sys.stderr.write('%s\n' % sys.exc_value)
+			sys.stderr.write('-----------------------------\n')
+			del s
+			
 if __name__ == '__main__':
-	try:
-		s = TTankServer()
-		s.listen()
-	except ImportError:
-		sys.stderr.write("Don't run me under linux!\n")
-		sys.exit(0)
-	except:
-		sys.stderr.write(prog() + '\n\n')
-		sys.stderr.write(prog() + 'Server-side fatal error in mainloop:\n')
-		sys.stderr.write(prog() + '%s\n' % sys.exc_value)
-		sys.stderr.write('\n\n<hit return to close window and exit>')
-		sys.stdin.readline()
+	loopforever()
+	sys.stderr.write("Don't run me under linux!\n")
+	sys.exit(0)
+

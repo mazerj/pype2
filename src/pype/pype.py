@@ -3034,6 +3034,9 @@ class PypeApp:
 				# str() here convert UTF8 strings back to plain old ascii,
 				# which is the only thing the p2m can currently handle. small
 				# risk here -- don't use international chars for datafile names!
+				#
+				# NOTE: first trial has tdt_tnum == 1, not zero!!!!
+				#
 				info[2]['tdt_server'] = server
 				info[2]['tdt_tank'] = str(tank.encode('ascii'))
 				info[2]['tdt_block'] = str(block.encode('ascii'))

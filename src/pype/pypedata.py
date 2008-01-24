@@ -333,7 +333,7 @@ class PypeRecord:
 				self.plex_ids = ids[:]
 			else:
 				self.plex_times = None
-				
+
 			t = find_events(self.events, START)
 			if len(t) == 0:
 				sys.stderr.write('warning: no START event, guessing..\n')
@@ -415,7 +415,7 @@ class PypeRecord:
 											'r').readline())
 			except IOError:
 				pattern = None
-				
+
 		if pattern is None or self.plex_times is None:
 			ts = self.spike_times[:]
 			pattern = 'TTL'
@@ -527,6 +527,10 @@ class PypeFile:
 							   tracker_guess=tracker_guess,
 							   userparams=self.userparams,
 							   taskname=self.taskname)
+				if p.params['tdt_tank']:
+					#p = self.tdtpull(p, n)
+					pass
+				
 				trialtime = None
 				if not self.filter or (p.result == self.filter):
 					if cache:
@@ -566,7 +570,6 @@ class PypeFile:
 
 	def nth(self, n, free=1):
 		"""Load or return (if cached) nth record."""
-
 		while len(self.cache) <= n:
 			if self._next() is None:
 				return None
@@ -575,7 +578,33 @@ class PypeFile:
 			self.cache[n] = None
 		return rec
 
-
+	def tdtpull(self, rec, n):
+		import tdtspikes, ttank
+		
+		try:
+			x = self.tdt
+		except AttributeError:
+			try:
+				self.tdt = tdtspikes.Spikes(rec=rec)
+				sys.stderr.write("Warning: pulled tdt spikes from tank\n")
+			except ttank.TDTError:
+				sys.stderr.write("Warning: can't connect to tank\n")
+				self.tdt = None
+		if self.tdt:
+			if n < len(self.tdt.sdata):
+				(t, c, s, sigs) = self.tdt.sdata[n]
+				rec.plex_times = around(t).astype(Numeric.Int)
+				rec.plex_channels = around(c).astype(Numeric.Int)
+				rec.plex_units = around(s).astype(Numeric.Int)
+				rec.plex_ids = sigs[:]
+			else:
+				rec.plex_times = array([]).astype(Numeric.Int)
+				rec.plex_channels = array([]).astype(Numeric.Int)
+				rec.plex_units = array([]).astype(Numeric.Int)
+				rec.plex_ids = []
+				sys.stderr.write('tdt file is short')
+		return rec
+			
 	def freenth(self, n):
 		if n < len(self.cache):
 			self.cache[n] = None

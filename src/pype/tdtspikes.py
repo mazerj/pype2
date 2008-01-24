@@ -8,7 +8,7 @@ import Numeric
 import pypedata, ttank
 #import time
 
-class TDTSpikes:
+class Spikes:
     # get all spikes at once, then sort into trials locally..
     # this is much faster -- seems about 1-2 secs to get all the
     # spikes, even for big datasets. Danger is if there's more than
@@ -71,7 +71,10 @@ class TDTSpikes:
             t = (Numeric.compress(mask, tall) - trl1[k]) * 1000.0
             c = Numeric.compress(mask, call)
             s = Numeric.compress(mask, sall)
-            self.sdata.append((t, c, s,))
+            sigs = []
+            for j in range(len(s)):
+                sigs.append('%03d%c' % (c[j], chr(int(s[j])+ord('a')-1),))
+            self.sdata.append((t, c, s, sigs,))
             
         #print '%.1fms' % ((time.time() - tstart) * 1000.0)
 
@@ -80,12 +83,10 @@ class TDTSpikes:
     def dump(self, out):
         #out.write('#tnum time chan unit\n')
         for k in range(self.ntrials):
-            (t, c, s) = self.sdata[k]
+            (t, c, s, sigs) = self.sdata[k]
             for j in range(len(t)):
                 out.write('%d\t%.1f\t%.0f\t%.0f\n' % (k, t[j], c[j], s[j],))
-                #out.write('%d\t%.1f\tsig%03d%s\n' % (k, t[j],
-                #                                     int(c[j]),
-                #                                     chr(s[j]+ord('a')-1),))
+                #out.write('%d\t%.1f\t%s\n' % (k, t[j], int(c[j]), sigs[j].))
 
 if __name__ == '__main__':
     sys.stderr.write('%s should never be loaded as main.\n' % __file__)

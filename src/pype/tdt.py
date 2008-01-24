@@ -45,6 +45,11 @@ import socket
 import pickle
 
 try:
+	from pypedebug import keyboard
+except ImportError:
+	pass
+		
+try:
 	from Numeric import *
 except ImportError:
 	pass
@@ -332,13 +337,18 @@ class TDTClient:
 		should really be done when OpenEx is in standby mode..
 		"""
 		if reset:
-			(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 1)')
-			(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 0)')
-		else:
-			(ok, r) = self.tdev('GetTargetVal("Amp1.TNum")')
+			(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 1.0)')
+			while 1:
+				(ok, r) = self.tdev('GetTargetVal("Amp1.TNum")')
+				if int(r) == 0:
+					(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 0)')
+					break
+		(ok, r) = self.tdev('GetTargetVal("Amp1.TNum")')
+		
 		if ok is None:
 			sys.stderr.write('TDT Error!\n')
 			return None
+		
 		return int(r)
 
 	def tdev_chaninfo(self):
@@ -386,26 +396,23 @@ class TDTClient:
 		# make sure the live tank is selected
 		import time
 		
-		#import pypedebug
-		#pypedebug.keyboard()
-		
-
 		tstart = time.time()
 		self.ttank_livetank()
 
 		# set OpenEx to STANDBY and wait for this to register in the
 		# tank as a change in the block name to '' (or if it was already
 		# in STANDBY mode, we're good to go..
-		self.tdev_mode(STANDBY)
+
+		self.tdev_mode(PREVIEW)
 		while 1:
 			(ok, oldblock) = self.ttank('GetHotBlock()')
-			if len(oldblock) == 0:
+			if str(oldblock) == 'TempBlk':
 				break
 
-		#print " standby in %.1f ms" % (1000.0 * (time.time() - tstart),)
-
+		# actually, I do not think this is necessary, as long as the
+		# tnum's are unique, so just let it count up continuously..
 		# reset the trial counter
-		self.tdev_tnum(reset=1)
+		# self.tdev_tnum(reset=1)
 
 		# switch back to record mode and wait for this to get into the
 		# tank, so we can store the block name for easy access later..
@@ -416,7 +423,8 @@ class TDTClient:
 				if not (newblock == oldblock):
 					break
 		else:
-			newblock = oldblock
+			self.tdev_mode(PREVIEW)
+			(ok, newblock) = self.ttank('GetHotBlock()')
 			
 		print "newblock took: %.1f ms" % (1000.0 * (time.time() - tstart),)
 			
@@ -465,27 +473,23 @@ class TDTClient:
 		(ok, r) = self.ttank('OpenTank("%s", "R")' % livetank)
 		return r
 
-if __name__ == '__main__':
-	try:
-		s = TDTServer()
-		s.listen()
-	except ImportError:
-		if 1:
-			import pypedebug
-			t = TDTClient('tdt1.mlab.yale.edu')
-			t.tdev_newblock(record=1)
-			t.tdev_newblock(record=0)
-			t.tdev_newblock(record=1)
-			t.tdev_newblock(record=0)
-			t.tdev_newblock(record=1)
-			t.tdev_newblock(record=0)
-		else:
-			sys.stderr.write("Don't run me under linux!\n")
-			sys.exit(0)
 
-	except:
-		sys.stderr.write('\n\n')
-		sys.stderr.write('Server-side fatal error in read-eval loop:\n')
-		sys.stderr.write('%s\n' % sys.exc_value)
-		sys.stderr.write('\n\n<hit return to close window and exit>')
-		sys.stdin.readline()
+def loopforever():
+	while 1:
+		try:
+			s = TDTServer()
+		except ImportError:
+			return 0
+		try:
+			s.listen()
+		except:
+			sys.stderr.write('-----------------------------\n')
+			sys.stderr.write('Server-side near fatal error in loopforever:\n')
+			sys.stderr.write('%s\n' % sys.exc_value)
+			sys.stderr.write('-----------------------------\n')
+			del s
+			
+if __name__ == '__main__':
+	loopforever()
+	sys.stderr.write("Don't run me under linux!\n")
+	sys.exit(0)
