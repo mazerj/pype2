@@ -1,8 +1,0 @@
-#!/bin/sh
-
-P2MDIR=%%P2MDIR%%
-exec env \
-  PYTHONPATH="${P2MDIR}:${PYTHONPATH:=}" \
-  MATLABPATH="${P2MDIR}:${MATLABPATH:=}" \
-  PATH="${P2MDIR}:$PATH" \
-	pypenv pype_expander.py $*

@@ -52,10 +52,10 @@ else
   n = length(oldpf.rec);
 end 
 
-cmd = sprintf('pype_expander %s %s %d >/dev/null', pypefile, f, n);
+cmd = sprintf('pype_expander.py %s %s %d >/dev/null', pypefile, f, n);
 status = unix(cmd);
 if status ~= 0
-  error('Can''t find pype_expander or datafile, check path');
+  error('Can''t find pype_expander.py or datafile, check path');
   return
 end
 
