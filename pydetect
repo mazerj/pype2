@@ -66,15 +66,12 @@ if ( $rh_or_fc == "true" || "$ubuntu" == "Ubuntu" ) then
     set distname='Ubuntu'
     set distno=`cat /etc/issue | head -1 | awk '{print $2}'`
 
-    if ("$distno" == "7.04") then
-	# feisty fawn
-	set major=2 minor=5
-    else if ("$distno" == "6.10") then
+    if ("$distno" == "6.10") then
 	# edgey eft
 	set major=2 minor=4
     else
-      echo "Can't identify Ubuntu distribution number."
-      exit 1
+	# feisty fawn or later.. (7.04, 7.10 etc..)
+	set major=2 minor=5
     endif
 
 

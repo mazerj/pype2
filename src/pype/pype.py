@@ -1894,7 +1894,7 @@ class PypeApp:
 					#del self._exper
 
 				if self.xdacq == 'plexon':
-					warn("start the plexon now. I'll wait.", wait=1)
+					warn('xdacq', "start the plexon now. I'll wait.", wait=1)
 				elif self.xdacq == 'tdt':
 					# start new block in current tank, this includes resting the
 					# trial counter..
@@ -1947,7 +1947,7 @@ class PypeApp:
 						self.fb.hide()
 
 				if self.xdacq == 'plexon':
-					warn('Stop the plexon NOW', wait=0)
+					warn('xdacq', 'Stop the plexon NOW', wait=0)
 				elif self.xdacq == 'tdt':
 					# recording's done -- direct output back to TempBlk
 					(server, tank, block) = self.tdt.newblock(record=0)

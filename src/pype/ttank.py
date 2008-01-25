@@ -6,11 +6,10 @@
 import sys
 import socket
 import pickle
-import struct
-import traceback
 
 class TDTError(Exception): pass
 
+# event-type codes from TDT docs
 WSIZE=1
 ETYPE=2
 ECODE=3
@@ -20,19 +19,14 @@ TIME=6
 DATAF=8
 RATE=9
 
-def prog():
-	import sys, os
-	return '<' + os.path.basename(sys.argv[0]) + '>'
-
-def Hostname():
-	return socket.gethostname()
-
 class _Socket:
 	def Send(self, data):
+		import struct
 		self.conn.send(struct.pack('!I', len(data)))
 		return self.conn.sendall(data)
 	
 	def Receive(self, size=8192):
+		import struct
 		buf = self.conn.recv(struct.calcsize('!I'))
 		if not len(buf):
 			raise EOFError, '_Socket.Receive()'
@@ -48,7 +42,7 @@ class _Socket:
 		self.sock.close()
 		
 class _SocketServer(_Socket):
-	def __init__(self, host = Hostname(), port = 10001):
+	def __init__(self, host = socket.gethostname(), port = 10001):
 		self.host, self.port = host, port
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.sock.bind((self.host, self.port))
@@ -68,7 +62,7 @@ class _SocketClient(_Socket):
 		self.host, self.port = None, None
 		self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-	def Connect(self, remoteHost = Hostname(), remotePort = 10001):
+	def Connect(self, remoteHost = socket.gethostname(), remotePort = 10001):
 		self.remoteHost, self.remotePort = remoteHost, remotePort
 		# set timeout to 100s - for long queries, the TTank component
 		# can churn for a LONG time before the packet comes back..
@@ -90,21 +84,26 @@ class TTankServer:
 		self.Server = Server
 		TTank = win32com.client.Dispatch('TTank.X')
 
+	def log(self, msg=None):
+		import sys, os, time
+		if msg is None:
+			sys.stderr.write('\n')
+		else:
+			sys.stderr.write('%02d:%02d:%02d ' % \
+							 time.localtime(time.time())[3:6])
+			sys.stderr.write('%s: %s\n' % (os.path.basename(sys.argv[0]), msg))
+
 	def connect(self):
 		"""
 		Set up connections to the TDT COM server
 		"""
 		global TTank
 			
-		sys.stderr.write(prog() + 'Connecting to TDT servers...\n')
-
 		if TTank.ConnectServer(self.Server, 'Me'):
-			sys.stderr.write(prog() + \
-							 '..connect to %s:TTank.X\n' % self.Server)
+			self.log('Connected to %s:TTank.X' % self.Server)
 			return 1
 		else:
-			sys.stderr.write(prog() + \
-							 '..no connection %s:TTank.X\n' % self.Server)
+			self.log('No connection %s:TTank.X' % self.Server)
 			return 0
 			
 
@@ -112,20 +111,20 @@ class TTankServer:
 		TTank.CloseConnection()
 
 	def listen(self):
+		import traceback
+		
 		global TTank
 
 		while 1:
 			server = _SocketServer()
-			sys.stderr.write(prog() + \
-							 "TTank: Waiting for client..\n")
+			self.log('Waiting for client connection')
 			server.Listen()
-			sys.stderr.write(prog() + \
-							 "Received connection from %s\n" % \
-							 server.remoteHost)
+			self.log('Received connection from %s' % server.remoteHost)
 
 			if not self.connect():
 				raise TDTError, 'TTank.X ActiveX control not installed'
-			sys.stderr.write(prog() + "Ready.\n")
+			
+			self.log('Recieving commands')
 			while 1:
 				try:
 					x = pickle.loads(server.Receive())
@@ -145,12 +144,11 @@ class TTankServer:
 					traceback.print_tb(tb)
 				server.Send(pickle.dumps((ok, result)))
 				if 0:
-					sys.stderr.write(prog() + \
-									 '(%s,"%s") <- %s\n' % (ok, result, x))
+					self.log('(%s,"%s") <- %s' % (ok, result, x))
 					if ok is None:
-						sys.stderr.write(prog() + '%s\n' % sys.exc_value)
-			sys.stderr.write('\n')
-			sys.stderr.write(prog() + "Client closed connection.\n")
+						self.log('%s' % sys.exc_value)
+			self.log()
+			self.log('Client closed connection.')
 			server.Close()
 			#this fails:
 			#self.disconnect()
@@ -225,11 +223,15 @@ class TTank:
 			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (cmd, result)
 
 def loopforever():
+	try:
+		import win32com
+		# we're running on windows, start up the read-eval-print loop
+	except ImportError:
+		# we're running on linux, return now!
+		return 0
+	
 	while 1:
-		try:
-			s = TTankServer()
-		except ImportError:
-			return 0
+		s = TTankServer()
 		try:
 			s.listen()
 		except:

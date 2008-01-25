@@ -207,7 +207,15 @@ def expandRecord(fname, prefix, n, d, xd):
 	# note: 'times' is timestamp in ms re standard pype time
 	#       'channels' is electrode #, starting with 0
 	#       'units' is sorted unit # on this electrode, starting with 0
-	if len(d.rec) > 13:
+	#
+	# Fri Jan 25 13:02:10 2008 mazer 
+	#   modified to work with both plexon and tdt data
+	# 
+	if d.plex_times:
+		writeVector(fp, objname, 'plx_times', d.plex_times, '%d')
+		writeVector(fp, objname, 'plx_channels', d.plex_channels, '%d')
+		writeVector(fp, objname, 'plx_units', d.plex_units, '%d')
+	elif len(d.rec) > 13:
 		plist = d.rec[13]
 		if plist is not None:
 			times = []
@@ -220,6 +228,7 @@ def expandRecord(fname, prefix, n, d, xd):
 			writeVector(fp, objname, 'plx_times', times, '%d')
 			writeVector(fp, objname, 'plx_channels', channels, '%d')
 			writeVector(fp, objname, 'plx_units', units, '%d')
+		
 
 	# handle analog data channels:
 	for chn in range(0, 7):

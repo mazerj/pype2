@@ -142,7 +142,7 @@ class Note:
 class PypeRecord:
 	_reportcorrection = 1
 	_reportchannel = 1
-	def __init__(self, rec, taskname=None,
+	def __init__(self, file, recnum, rec, taskname=None,
 				 trialtime=None, parsed_trialtime=None,
 				 userparams=None,
 				 tracker_guess=('iscan', 120, 24)):
@@ -178,7 +178,9 @@ class PypeRecord:
 		#				a list of (timestamp, unit) pairs, with timestamps
 		#				in ms and unit's following the standard plexon
 		#				naming scheme (01a, 02a, 02b etc..)
-		
+
+		self.file = file
+		self.recnum = recnum
 		self.rec = rec
 		self.taskname = taskname
 		self.trialtime = trialtime
@@ -331,8 +333,15 @@ class PypeRecord:
 				self.plex_channels = Numeric.array(channels, 'i')
 				self.plex_units = Numeric.array(units, 'i')
 				self.plex_ids = ids[:]
+			elif self.params.has_key('tdt_tank'):
+				(times, channels, units, ids) = self.file.tdtpull(self)
+				self.plex_times = times
+				self.plex_channels = channels
+				self.plex_units = units
+				self.plex_ids = ids
 			else:
 				self.plex_times = None
+			
 
 			t = find_events(self.events, START)
 			if len(t) == 0:
@@ -475,6 +484,7 @@ class PypeFile:
 		self.userparams = None
 		self.taskname = None
 		self.extradata = []
+		self.counter = 0
 
 	def __repr__(self):
 		return '<PypeFile:%s (%d recs)>' % (self.fname, len(self.cache))
@@ -522,15 +532,13 @@ class PypeFile:
 					xxx=tracker_guess
 				except UnboundLocalError:
 					tracker_guess = ('unknown', -1, -1)
-				p = PypeRecord(rec, trialtime=trialtime,
+				p = PypeRecord(self, self.counter,
+							   rec, trialtime=trialtime,
 							   parsed_trialtime=trialtime2,
 							   tracker_guess=tracker_guess,
 							   userparams=self.userparams,
 							   taskname=self.taskname)
-				if p.params['tdt_tank']:
-					#p = self.tdtpull(p, n)
-					pass
-				
+				self.counter = self.counter + 1
 				trialtime = None
 				if not self.filter or (p.result == self.filter):
 					if cache:
@@ -578,32 +586,32 @@ class PypeFile:
 			self.cache[n] = None
 		return rec
 
-	def tdtpull(self, rec, n):
+	def tdtpull(self, rec):
 		import tdtspikes, ttank
-		
+
+		n = rec.recnum
+
 		try:
 			x = self.tdt
 		except AttributeError:
 			try:
+				sys.stderr.write("Warning: pulling tdt spikes from tank\n")
 				self.tdt = tdtspikes.Spikes(rec=rec)
-				sys.stderr.write("Warning: pulled tdt spikes from tank\n")
 			except ttank.TDTError:
 				sys.stderr.write("Warning: can't connect to tank\n")
 				self.tdt = None
-		if self.tdt:
-			if n < len(self.tdt.sdata):
-				(t, c, s, sigs) = self.tdt.sdata[n]
-				rec.plex_times = around(t).astype(Numeric.Int)
-				rec.plex_channels = around(c).astype(Numeric.Int)
-				rec.plex_units = around(s).astype(Numeric.Int)
-				rec.plex_ids = sigs[:]
-			else:
-				rec.plex_times = array([]).astype(Numeric.Int)
-				rec.plex_channels = array([]).astype(Numeric.Int)
-				rec.plex_units = array([]).astype(Numeric.Int)
-				rec.plex_ids = []
-				sys.stderr.write('tdt file is short')
-		return rec
+		if self.tdt is None:
+			return (None, None, None, None)
+		elif n < len(self.tdt.sdata):
+			(t, c, s, sigs) = self.tdt.sdata[n]
+			times = around(t).astype(Numeric.Int)
+			channels = around(c).astype(Numeric.Int)
+			units = around(s).astype(Numeric.Int)
+			ids = sigs[:]
+			return (times, channels, units, ids)
+		else:
+			sys.stderr.write('Warning: tdt tank appears short!')
+			return (None, None, None, None)
 			
 	def freenth(self, n):
 		if n < len(self.cache):
