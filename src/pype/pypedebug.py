@@ -38,7 +38,7 @@ def keyboard(banner='Type EOF/^D to continue'):
 
 	code.interact(banner=banner, local=namespace)
 
-def get_traceback():
+def get_traceback(show=None):
 	"""Stack dump to stdout.
 	
 	Collect the current exception information (after catching
@@ -59,15 +59,20 @@ def get_traceback():
 		exc_type = exc_type.__name__
 
 	# in python-2.5 exc_type is not a string, must be coerced into one..
-	msg = str(exc_type) + ' Exception\n'
+	msg = 'Exception: %s\n' % exc_value
 
 	# Add the traceback.
-	msg = msg + 'Traceback (innermost last):\n'
-	for tr in traceback.extract_tb(exc_traceback):
-		msg = msg + '  File "%s", line %s, in %s\n' % (tr[0], tr[1], tr[2])
-		msg = msg + '    %s\n' % tr[3]
-	msg = msg + '%s: %s\n' % (exc_type, exc_value)
-	sys.stderr.write(msg)
+	stack = traceback.extract_tb(exc_traceback)
+
+	depth = 1
+	for frame in stack:
+		(file, line, fn, text) = frame
+		prefix = '>' * depth + ' '
+		msg = msg + prefix + 'File "%s", line %s, in %s:\n' % (file, line, fn)
+		msg = msg + prefix + ' %s\n' % text
+		depth = depth + 1
+	if show:
+		sys.stderr.write(msg)
 	return msg
 
 
@@ -82,14 +87,11 @@ def reporterror(gui=None):
 	import sys
 	if gui:
 		from pype import warn
-		warn('Python Evaluation Error', get_traceback(), 1)
+		warn('Python Error', get_traceback(), 1)
 	else:
-		sys.stderr.write('------------------------------------------\n')
-		sys.stderr.write('                    Error\n')
-		sys.stderr.write('pypdebug.reporterror() generated traceback\n')
-		sys.stderr.write('------------------------------------------\n')
+		sys.stderr.write('-' * 70 + '\n')
 		sys.stderr.write(get_traceback())
-		sys.stderr.write('------------------------------------------\n')
+		sys.stderr.write('-' * 70 + '\n')
 
 
 def ppDict(d):

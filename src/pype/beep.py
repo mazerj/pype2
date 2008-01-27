@@ -52,6 +52,8 @@ class _Beeper:
 			try:
 				pygame.mixer.init(22050, -16, 1)
 			except:
+				import pypedebug
+				pypedebug.get_traceback(1)
 				sys.stderr.write('_Beeper.init: audio disabled -- no access!\n')
 				_Beeper._disabled = 1
 				return

@@ -77,6 +77,10 @@ class Controller:
             fp.close()
             self.text('hoops -> %s\n' % f)
         except:
+			# [[effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
+			# effort to remove all unnamed exceptions:]]
             reporterror()
             warn('Control.save', 'Error saving TDT hoops');
 
@@ -96,6 +100,11 @@ class Controller:
                 fp.close()
                 self.text('%s -> hoops\n' % f)
         except:
+			# [[effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
+			# effort to remove all unnamed exceptions:]]
+            
             reporterror()
             warn('Control.restore', 'Error restoring TDT hoops');
 

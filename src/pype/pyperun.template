@@ -208,7 +208,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
         # IPython packages is installed for a fancier shell..
         # interactive mode, drop into an interactive shell
         try:
-            from IPython.Shell import IPShellEmbed
+            from IPython.Shell import xxIPShellEmbed
             ipshell = IPShellEmbed([])
             ipshell()
         except ImportError:

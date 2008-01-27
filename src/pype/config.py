@@ -31,26 +31,28 @@ class Config:
 	def get(self, name, default=None):
 		try:
 			return self.dict[name]
-		except:
+		except KeyError:
 			return default
 
 	def iget(self, name, default=None):
 		try:
-			return int(self.dict[name])
-		except:
-			if default is None:
-				return None
-			else:
-				return int(default)
+			value = self.dict[name]
+		except KeyError:
+			value = default
+		try:
+			return int(value)
+		except ValueError:
+			return None
 
 	def fget(self, name, default=None):
 		try:
-			return float(self.dict[name])
-		except:
-			if default is None:
-				return None
-			else:
-				return float(default)
+			value = self.dict[name]
+		except KeyError:
+			value = default
+		try:
+			return float(value)
+		except ValueError:
+			return None
 
 	def set(self, key, value, override=None):
 		k = self.dict.has_key(key)

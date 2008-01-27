@@ -27,7 +27,7 @@ class Config:
 	def get(self, name, default=None):
 		try:
 			return self.dict[name]
-		except:
+		except KeyError:
 			return default
 
 	def set(self, key, value, override=None):

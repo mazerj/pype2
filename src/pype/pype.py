@@ -1529,6 +1529,7 @@ class PypeApp:
 				Logger("loading '%s' from '%s'\n" % (taskname, pathname))
 				task = imp.load_module(taskname, file, pathname, descr)
 			except:
+				get_traceback(1)
 				task = None
 				goto_error('Load Error')
 		finally:
@@ -1594,6 +1595,7 @@ class PypeApp:
 		try:
 			self.eye_tweak = self._eye_tweak.component('entry').get()
 		except:
+			get_traceback(1)
 			self.eye_tweak = 1
 
 		if not xgain is None:
@@ -1602,6 +1604,7 @@ class PypeApp:
 			try:
 				self.eye_xgain = float(self._eye_xgain.component('entry').get())
 			except:
+				get_traceback(1)
 				self.eye_xgain = 1.0
 		self._eye_xgain.setentry(self.eye_xgain)
 		
@@ -1611,6 +1614,7 @@ class PypeApp:
 			try:
 				self.eye_ygain = float(self._eye_ygain.component('entry').get())
 			except:
+				get_traceback(1)
 				self.eye_ygain = 1.0
 		self._eye_ygain.setentry(self.eye_ygain)
 		
@@ -1620,6 +1624,7 @@ class PypeApp:
 			try:
 				self.eye_xoff = int(self._eye_xoff.component('entry').get())
 			except:
+				get_traceback(1)
 				self.eye_xoff = 0
 		self._eye_xoff.setentry(self.eye_xoff)
 		
@@ -1629,6 +1634,7 @@ class PypeApp:
 			try:
 				self.eye_yoff = int(self._eye_yoff.component('entry').get())
 			except:
+				get_traceback(1)
 				self.eye_yoff = 0
 		self._eye_yoff.setentry(self.eye_yoff)
 		
@@ -1675,10 +1681,7 @@ class PypeApp:
 		d = self.config.get('SDLDPY')
 		os.system("xset -display %s b off" % d)
 		os.system("xset -display %s s off" % d)
-		try:
-			os.system("xset -display %s -dpms" % d)
-		except:
-			pass
+		os.system("xset -display %s -dpms" % d)
 
 	def _get_statefile_name(self, accesscheck=None):
 		hostname = gethostname()
@@ -1924,6 +1927,7 @@ class PypeApp:
 						# call task-specific start function.
 						self.startfn(self)
 					except:
+						get_traceback(1)
 						# some error occured within the task code
 						goto_error('Runtime Error')
 				finally:
@@ -3212,6 +3216,7 @@ class PypeApp:
 										   fname=fname,
 										   fb=self.fb, depth=99, on=1)
 				except:
+					get_traceback(1)
 					pass
 			self.fb.clear((1,1,1))
 			if self._testpat:
@@ -3463,6 +3468,7 @@ def gethostname():
 	try:
 		return string.split(socket.gethostname(), '.')[0]
 	except:
+		get_traceback(1)
 		return 'NOHOST'
 
 def pyfile_type(fname):
@@ -3491,6 +3497,7 @@ def pyfile_type(fname):
 				return 'module', comment
 		return None, ''
 	except:
+		get_traceback(1)
 		return None, ''
 
 
@@ -3905,6 +3912,7 @@ def slideshow(app):
 				if s.w > 10 and s.h > 10:
 					break
 			except:
+				get_traceback(1)
 				app.write('dud file: %s\n' % fname)
 		maxd = 512.0
 		if s.w > maxd:

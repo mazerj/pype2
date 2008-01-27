@@ -48,11 +48,11 @@ def _loadblt(root):
 		try:
 			root.tk.call('load', '', 'Blt')
 			_BLT._bltloaded = 1
-		except:
+		except TclError:
 			try:
 				root.tk.call('package', 'require', 'BLT')
 				_BLT._bltloaded = 1
-			except:
+			except TclError:
 				raise ImportError, 'BLT class requires BLT extensions'
 
 
@@ -82,11 +82,11 @@ class _BLT(Widget):
 			try:
 				root.tk.call('load', '', 'Blt')
 				_BLT._bltloaded = 1
-			except:
+			except TclError:
 				try:
 					root.tk.call('package', 'require', 'BLT')
 					_BLT._bltloaded = 1
-				except:
+				except TclError:
 					raise ImportError, 'BLT class requires BLT extensions'
 
 
@@ -97,7 +97,7 @@ class _BLT(Widget):
 	def _up(self, ev):
 		try:
 			foo = self._x_axis
-		except:
+		except AttributeError:
 			self._x_axis = self.axis_limits(XAXIS)
 			self._y_axis = self.axis_limits(YAXIS)
 		(x, y) = self.invtransform(ev.x, ev.y)
@@ -118,6 +118,10 @@ class _BLT(Widget):
 								min=float(self._y_axis[0]),
 								max=float(self._y_axis[1]))
 		except:
+			# effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
+			
 			self.axis_configure(XAXIS, min='', max='')
 			self.axis_configure(YAXIS, min='', max='')
 
@@ -343,6 +347,9 @@ class Histogram(_BLT):
 		try:
 			apply(bargraph.element_configure, (name,), kw)
 		except:
+			# effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
 			apply(bargraph.element_create, (name,), kw)
 
 	def stats(self):
@@ -370,6 +377,9 @@ class _Quick:
 		try:
 			self.g.wait_window(self.g)
 		except:
+			# effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
 			pass
 		
 

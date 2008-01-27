@@ -51,6 +51,10 @@ def _comparedatafiles(a, b):
         else:
             return -1
     except:
+        # [[effort to remove all unnamed exceptions:
+        import pypedebug
+        pypedebug.get_traceback(1)
+        # effort to remove all unnamed exceptions:]]
         if a > b:
             return 1
         else:

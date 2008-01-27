@@ -174,12 +174,22 @@ class GraceProcess:
                 try:
                     os.execvp('xmgrace', cmd)
                 except:
+                    # [[effort to remove all unnamed exceptions:
+                    import pypedebug
+                    pypedebug.get_traceback(1)
+                    # effort to remove all unnamed exceptions:]]
+                    
                     # we have to be careful in the child process.  We
                     # don't want to throw an exception because that would
                     # allow two threads to continue running.
                     sys.stderr.write('GraceProcess: Could not start xmgrace\n')
                     os._exit(1) # exit this forked process but not the parent
             except:
+                # [[effort to remove all unnamed exceptions:
+                import pypedebug
+                pypedebug.get_traceback(1)
+                # effort to remove all unnamed exceptions:]]
+        
                 sys.stderr.write('Unexpected exception in child!\n')
                 os._exit(2) # exit child but not parent
 

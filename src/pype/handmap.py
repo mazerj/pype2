@@ -100,6 +100,10 @@ class _Probe:
 		try:
 			self.load()
 		except:
+			# [[effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
+			# effort to remove all unnamed exceptions:]]
 			reporterror()
 			#pass
 

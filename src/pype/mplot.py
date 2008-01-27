@@ -138,6 +138,10 @@ def drawnow(width=None, height=None):
         try:
             TABLE.show(width=width, height=height)
         except:
+			# [[effort to remove all unnamed exceptions:
+			import pypedebug
+			pypedebug.get_traceback(1)
+			# effort to remove all unnamed exceptions:]]
             return None
 
 def xlabel(s):
