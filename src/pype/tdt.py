@@ -198,7 +198,7 @@ class TDTServer:
 					ok = None
 					result = None
 				server.Send(pickle.dumps((ok, result)))
-				if 0:
+				if 1:
 					sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
 				else:
 					sys.stderr.write('.');

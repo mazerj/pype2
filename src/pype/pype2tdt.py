@@ -115,6 +115,24 @@ class Controller:
 	def getblock(self):
         """just a pass through to underlying tdt instance -- SUBCLASS ME!!"""
         return self.tdtconnx.tdev_getblock()
+
+    def settank(self, dirname, name):
+        dirname = dirname.replace('\\', '\\\\')
+        # this will only work in IDLE or STANDBY mode, so do it 1st!
+        (ok, result) = self.tdtconnx.ttank("CheckTank('%s%s')" % \
+                                          (dirname, name))
+        if result == 0:
+            # it's a new tank, create it now
+            (ok, result) = self.tdtconnx.ttank("AddTank('%s', '%s')" %
+                                                   (name, dirname))
+            if not result:
+                return None
+        (ok, result) = self.tdtconnx.tdev("SetTankName('%s%s')" % \
+                                          (dirname, name))
+        if result:
+            return self.tdtconnx.tdev_tank()
+        else:
+            return None
         
 
 if __name__ == '__main__':

@@ -1235,10 +1235,21 @@ class PypeApp:
 				Logger('xdacq: failed connect to plexnet @ %s.\n' % plexhost,
 					   popup=1)
 		elif self.xdacq is None and len(tdthost) > 0:
+			tankdir = self.config.get('TDTTANKDIR')
+			if len(tankdir) == 0:
+				Logger('xdacq: no TDTANKDIR set, using C:\\', popup=1)
+				tankdir = 'C:\\'
+			if not tankdir[-1] == '\\':
+				# dir must have trailing \
+				tankdir = tankdir + '\\'
+			tankname = subject() + \
+					   '%04d%02d%02d' % time.localtime(time.time())[0:3]
 			try:
 				import pype2tdt
 				self.tdt = pype2tdt.Controller(cpane, tdthost)
 				Logger('xdacq: connected to tdt @ %s.\n' % tdthost)
+				t = self.tdt.settank(tankdir, tankname)
+				Logger('xdacq: tank = %s\n' % t)
 				self.xdacq = 'tdt'
 				self.tdt.update()
 			except socket.error:
