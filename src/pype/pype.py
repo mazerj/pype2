@@ -527,14 +527,17 @@ class PypeApp:
 
 			mb.addmenu('File', '', '')
 			mb.addmenuitem('File', 'command',
-						   label='Toggle console view', command=self.conwin.showhide)
+						   label='Toggle console view',
+						   command=self.conwin.showhide)
 			mb.addmenuitem('File', 'command',
-						   label='Toggle user display view', command=self.udpy_showhide)
+						   label='Toggle user display view',
+						   command=self.udpy_showhide)
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command',
 						   label='Keyboard debugger', command=self.keyboard)
 			mb.addmenuitem('File', 'command',
-						   label='Graphics info', command=lambda s=self: s.fb.printinfo())
+						   label='Graphics info',
+						   command=lambda s=self: s.fb.printinfo())
 			mb.addmenuitem('File', 'separator')
 			mb.addmenuitem('File', 'command',
 						   label='Save state', command=self._savestate)
@@ -1249,9 +1252,17 @@ class PypeApp:
 				self.tdt = pype2tdt.Controller(cpane, tdthost)
 				Logger('xdacq: connected to tdt @ %s.\n' % tdthost)
 				t = self.tdt.settank(tankdir, tankname)
-				Logger('xdacq: tank = %s\n' % t)
-				self.xdacq = 'tdt'
-				self.tdt.update()
+				if t is None:
+					Logger("Can't set tdt tank -- is circuit running?\n",
+						   popup=1)
+					self.tdt = None
+				else:
+					Logger('xdacq: tank = %s\n' % t)
+					self.xdacq = 'tdt'
+					self.tdt.tdtconnx.tdev_mode(0, wait=1)
+					self.tdt.tdtconnx.tdev_mode(3, wait=1)
+					self.tdt.tdtconnx.tdev_mode(2, wait=1)
+					self.tdt.update()
 			except socket.error:
 				self.tdt = None
 				Logger('xdacq: no connection to tdt @ %s.\n' % tdthost,
@@ -1690,9 +1701,12 @@ class PypeApp:
 
 		# turn off the xserver's audible bell and screensaver!
 		d = self.config.get('SDLDPY')
-		os.system("xset -display %s b off" % d)
-		os.system("xset -display %s s off" % d)
-		os.system("xset -display %s -dpms" % d)
+		if os.system("xset -display %s b off" % d):
+			Logger("Can't run xset to turn off bell!\n")
+		if os.system("xset -display %s s off" % d):
+			Logger("Can't run xset to turn off screen saver!\n")
+		if os.system("xset -display %s -dpms" % d):
+			Logger("Can't run xset to turn off DPMS!\n")
 
 	def _get_statefile_name(self, accesscheck=None):
 		hostname = gethostname()
@@ -2934,8 +2948,10 @@ class PypeApp:
 		self.eyebuf_pa = zeros(n)
 		p0 = zeros(n)
 		s0 = zeros(n)
-		
-		if not fast_tmp:
+
+		# be careful here -- if you're trying to look at the photodiode
+		# signals, you'd better not set fast_tmp=1...
+		if not fast_tmp or self.show_eyetraces.get():
 			if self.rig_common.queryv('save_chn_0'):
 				c0 = zeros(n)
 			else:
@@ -2994,7 +3010,7 @@ class PypeApp:
 							   others=((p0, 'photos'),
 									   (s0, 'spikes')),
 							   raster=self.spike_times)
-
+				
 		self.udpy.info.configure(text= "%d spk // %d sync" %
 								 (len(self.spike_times), len(self.photo_times)))
 
@@ -3240,6 +3256,7 @@ class PypeApp:
 		self.show_eyetrace_stop = stop
 
 	def plotEyetraces(self, t=None, x=None, y=None, others=None, raster=None):
+		keyboard()
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
 			oldgraph = attach(self._eyetrace_window)

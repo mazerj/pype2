@@ -6,14 +6,14 @@ from guitools import *
 
 import pickle
 import glob
-from tdt import TDTClient
+import tdt
 
 #from pype import *
 from pypedebug import *
 
 class Controller:
     def __init__(self, buttonpane, tdthost):
-        self.tdtconnx = TDTClient(tdthost)
+        self.tdtconnx = tdt.TDTClient(tdthost)
         
         button = Checkbutton(buttonpane, text='tdt control',
                              relief=RAISED, pady=4)
@@ -51,7 +51,9 @@ class Controller:
 
     def update(self):
         (server, tank, block, tnum) = self.tdtconnx.tdev_getblock()
-        tank = self.tdtconnx.tdev_tank()
+        (ok, tank) = self.tdtconnx.tdev("GetTankName()")
+        if not ok:
+            tank = '???'
         tank = tank.split('\\')[-1]
         
         t = ""
@@ -127,13 +129,19 @@ class Controller:
                                                    (name, dirname))
             if not result:
                 return None
+
+        # it's critical to select the right tank for both the
+        # TDevAcc.X and TTank.X components, otherwise using
+        # GetHotBlock() to keep things synchronized won't work!
         (ok, result) = self.tdtconnx.tdev("SetTankName('%s%s')" % \
                                           (dirname, name))
+        (ok, result) = self.tdtconnx.ttank("OpenTank('%s%s', 'R')" % \
+                                           (dirname, name))
         if result:
-            return self.tdtconnx.tdev_tank()
+            (ok, result) = self.tdtconnx.tdev("GetTankName()")
+            return result
         else:
             return None
-        
 
 if __name__ == '__main__':
     tk = Tk()

@@ -8,9 +8,9 @@ ps -Al --width=1000 2>/dev/null | \
 	awk '{print $4}' | xargs -r pypeboot kill -9
 
 # free up semaphores
-ipcs -s | tee /dev/tty | grep ^0x | awk '{print $2}' | \
-	xargs -r pypeboot ipcrm sem
+ipcs -s | grep ^0x | awk '{print $2}' | \
+	xargs -r pypeboot ipcrm sem > /dev/null
 
 # free up shared memory segments
-ipcs -m | tee /dev/tty | grep ^0x | awk '{print $2}' | \
-	xargs -r pypeboot ipcrm shm
+ipcs -m | grep ^0x | awk '{print $2}' | \
+	xargs -r pypeboot ipcrm shm >/dev/null

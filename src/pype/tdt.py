@@ -62,11 +62,32 @@ STANDBY = 1								# running, no display, no tank..
 PREVIEW = 2								# running, not saving to tank
 RECORD = 3								# running and saving all data
 
-def Hostname():
-	return socket.gethostname()
+PORT=10000
 
-class _SocketServer:
-	def __init__(self, host = Hostname(), port = 10000):
+class _Socket:
+	def Send(self, data):
+		import struct
+		self.conn.send(struct.pack('!I', len(data)))
+		return self.conn.sendall(data)
+	
+	def Receive(self, size=8192):
+		import struct
+		buf = self.conn.recv(struct.calcsize('!I'))
+		if not len(buf):
+			raise EOFError, '_Socket.Receive()'
+		else:
+			N = struct.unpack('!I', buf)[0]
+			data = ''
+			while len(data) < N:
+				packet = self.conn.recv(size)
+				data = data + packet
+			return data
+
+	def Close(self):
+		self.sock.close()
+		
+class _SocketServer(_Socket):
+	def __init__(self, host = socket.gethostname(), port = PORT):
 		self.host, self.port = host, port
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.sock.bind((self.host, self.port))
@@ -77,39 +98,22 @@ class _SocketServer:
 		self.conn, self.remoteHost = self.sock.accept()
 		self.remoteHost = self.remoteHost[0]
 			
-	def Send(self, data):
-		return self.conn.send(data)
-
-	def Receive(self, size = 1024):
-		return self.conn.recv(size)
-	
-	def Close(self):
-		self.sock.close()
-		
 	def __str__(self):
 		return '<_SocketServer '+\
 			   str(self.host)+':'+str(self.port)+'>'
 
-class _SocketClient:
+class _SocketClient(_Socket):
 	def __init__(self):
 		self.host, self.port = None, None
-		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-	def Connect(self, remoteHost = Hostname(), remotePort = 10000):
+	def Connect(self, remoteHost = socket.gethostname(), remotePort = PORT):
 		self.remoteHost, self.remotePort = remoteHost, remotePort
-		# 1 second timeout		
-		self.sock.settimeout(1)
+		# set timeout to 100s - for long queries, the TTank component
+		# can churn for a LONG time before the packet comes back..
+		self.conn.settimeout(100)
 		# generates exception on failure-to-connect
-		self.sock.connect((self.remoteHost, self.remotePort))
-		
-	def Send(self, data):
-		return self.sock.send(data)
-		
-	def Receive(self, size = 1024):
-		return self.sock.recv(size)
-	
-	def Close(self):
-		self.sock.close()
+		self.conn.connect((self.remoteHost, self.remotePort))
 		
 	def __str__(self):
 		return '<_SocketClient '+\
@@ -173,6 +177,7 @@ class TDTServer:
 
 	def listen(self):
 		global TDevAcc, TTank
+		import traceback
 
 		while 1:
 			server = _SocketServer()
@@ -191,12 +196,32 @@ class TDTServer:
 					# client closed connection
 					break
 
-				try:
-					ok = 1
-					result = eval(x)
-				except:
-					ok = None
-					result = None
+				if type(x) is str:
+					# original string-based mode..
+					try:
+						ok = 1
+						result = eval(x)
+					except:
+						# send error info back to client for debugging..
+						ok = None
+						result = sys.exc_info()
+						traceback.print_tb(result[2])
+						result = result[0:1]
+				else:
+					try:
+						# new original string-based mode..
+						ok = 1
+						sys.stderr.write('[')
+						(obj, method, args) = x
+						fn = eval('%s.%s' % (obj, method))
+						result = apply(fn, args)
+						sys.stderr.write(']')
+					except:
+						# send error info back to client for debugging..
+						ok = None
+						result = sys.exc_info()
+						traceback.print_tb(result[2])
+						result = result[0:1]
 				server.Send(pickle.dumps((ok, result)))
 				if 1:
 					sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
@@ -219,7 +244,7 @@ class TDTClient:
 		
 		if self.gotTDevAcc:
 			(self.nchans, self.sniplen) = self.tdev_chaninfo()
-			(ok, self.fs) = self.tdev("GetDeviceSF('Amp1')")
+			self.fs = self.tdev_invoke('GetDeviceSF', 'Amp1')
 		else:
 			(self.nchans, self.sniplen, self.fs) = (None, None, None)
 
@@ -288,7 +313,52 @@ class TDTClient:
 			raise TDTError, 'No TTank.X connection'
 		return self.send('TTank.' + cmd)
 
-	def tdev_mode(self, mode=None, name=None):
+	def _sendtuple(self, cmdtuple):
+		"""
+		Send a command string for remove evaluation to the server.
+		Command string (cmd) should be a valid python expression
+		that can be eval'ed in the remote envrionment. Access to
+		the Tucker-Davis API is via:
+		  TDevAcc (for the direct DSP interface), or,
+		  TTank (for access to the data tank)
+
+		The return value is a pair: (statusFlag, resultValue), where
+		statusFlag is 1 for normal evaluation and 0 for an error and
+		resultValue is the actual value returned by the function
+		call (the value is pickled on the Server side and returns, so
+		data typing should be correctly preserved and propagated.
+		"""
+		try:
+			self.client.Send(pickle.dumps(cmdtuple))
+			p = self.client.Receive()
+			(ok, result) = pickle.loads(p)
+			if 0:
+				# debugging
+				print (ok, result), "<-", cmd
+		finally:
+			#self.close_conn()
+			pass
+		return (ok, result)
+
+	def tdev_invoke(self, method, *args):
+		import types
+
+		(ok, result) = self._sendtuple(('TDevAcc', method, args,))
+		if ok:
+			return result
+		else:
+			raise TDTError, 'TDev Error; cmd=<%s>; err=<%s>' % (method, result)
+
+	def ttank_invoke(self, method, *args):
+		import types
+
+		(ok, result) = self._sendtuple(('TTank', method, args,))
+		if ok:
+			return result
+		else:
+			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (method, result)
+
+	def tdev_mode(self, mode=None, name=None, wait=None):
 		"""
 		Query current run mode for the TDT device.
 
@@ -303,7 +373,12 @@ class TDTClient:
 			(ok, r) = self.tdev('SetSysMode(%d)' % mode)
 			if ok is None:
 				sys.stderr.write("tdt: can't set mode\n")
-				return None			
+				return None
+			if wait:
+				while 1:
+					x = self.tdev_invoke('GetSysMode')
+					if x == mode:
+						break
 		else:
 			(ok, r) = self.tdev('GetSysMode()')
 			if ok is None:
@@ -313,22 +388,6 @@ class TDTClient:
 				modes = { IDLE:'IDLE', STANDBY:'STANDBY',
 						  PREVIEW:'PREVIEW', RECORD:'RECORD'}
 				r = modes[r]
-		return r
-
-	def tdev_tank(self, tankpath=None):
-		"""
-		Get or Set pathname for DataTank. This is where data gets saved.
-		If tankpath is specified, it's the filename on the window's machine.
-		if live==1, then the tank server will automaticaly select the
-		active tank that OpenEx is writing to.
-		"""
-		if tankpath:
-			(ok, r) = self.tdev('SetTankName("%s")' % tankpath)
-		else:
-			(ok, r) = self.tdev('GetTankName()')
-		if ok is None:
-			sys.stderr.write('TDT Error!\n')
-			return None
 		return r
 
 	def tdev_tnum(self, reset=None):
@@ -373,7 +432,8 @@ class TDTClient:
 		data record later (assuming tank doesn't get deleted...)
 		"""
 		(ok, block) = self.ttank('GetHotBlock()')
-		return (self.server, self.tdev_tank(), block, self.tdev_tnum())
+		(ok, tank) = self.tdev("GetTankName()")
+		return (self.server, tank, block, self.tdev_tnum())
 		
 
 	def tdev_newblock(self, record=1):
@@ -393,20 +453,19 @@ class TDTClient:
 		RETURNS: (servername, tankname, blockname); this should be enough
 		info to track down the location of the record no matter what..
 		"""
-		# make sure the live tank is selected
-		import time
-		
-		tstart = time.time()
-		self.ttank_livetank()
-
 		# set OpenEx to STANDBY and wait for this to register in the
 		# tank as a change in the block name to '' (or if it was already
 		# in STANDBY mode, we're good to go..
 
 		self.tdev_mode(PREVIEW)
+
+		(ok, tank) = self.tdev("GetTankName()")
+		tank = str(tank).replace('\\', '\\\\')
+		(ok, err) = self.ttank("OpenTank('%s', 'R')" % tank)
+
 		while 1:
 			(ok, oldblock) = self.ttank('GetHotBlock()')
-			if str(oldblock) == 'TempBlk':
+			if str(oldblock) == 'TempBlk' or len(oldblock) == 0:
 				break
 
 		# actually, I do not think this is necessary, as long as the
@@ -420,17 +479,16 @@ class TDTClient:
 			self.tdev_mode(RECORD)
 			while 1:
 				(ok, newblock) = self.ttank('GetHotBlock()')
-				if not (newblock == oldblock):
+				if not (newblock == oldblock) and len(newblock) > 0:
 					break
 		else:
 			self.tdev_mode(PREVIEW)
 			(ok, newblock) = self.ttank('GetHotBlock()')
 			
-		print "newblock took: %.1f ms" % (1000.0 * (time.time() - tstart),)
-			
 		# and return the tank & block name --> this is enough info to
 		# find the record later..
-		return (self.server, self.tdev_tank(), newblock)
+		(ok, tank) = self.tdev('GetTankName()')
+		return (self.server, str(tank), str(newblock))
 
 
 	def tdev_sortparams(self, params=None):
@@ -464,16 +522,6 @@ class TDTClient:
 							   (n, h))
 				#self.send('type(%s)' % (h,))
 			
-	def ttank_livetank(self):
-		"""
-		Open tank using TTank.X -- if no tankname is specified, try to
-		open the current live tank.
-		"""
-		livetank = self.tdev_tank()
-		(ok, r) = self.ttank('OpenTank("%s", "R")' % livetank)
-		return r
-
-
 def loopforever():
 	while 1:
 		try:

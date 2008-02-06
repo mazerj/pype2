@@ -377,6 +377,9 @@ class FrameBuffer:
 										 name='sync_high',
 										 on=1, fb=self)
 			self._sync_high.fill((synclevel, synclevel, synclevel))
+			
+			self._sync_low.render()
+			self._sync_high.render()
 		else:
 			self._sync_low = None
 			self._sync_high = None
@@ -1915,10 +1918,16 @@ class Sprite(_ImageBase):
 		# blit and optional page flip..
 		if fb.opengl:
 			scy = fb.hh + y - (self.h / 2)
-			blitstr = pygame.image.tostring(self.im, 'RGBA', 1)
 			fb.pygl_setxy(scx, scy)
-			glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
-                         blitstr)
+			try:
+				# fastim precomputed by render()?
+				glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
+							 self.fastim)
+			except AttributeError:
+				# nope, go ahead and render then blit..
+				blitstr = pygame.image.tostring(self.im, 'RGBA', 1)
+				glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
+							 blitstr)
 		else:
 			fb.screen.blit(self.im, (scx, scy))
 
@@ -2045,6 +2054,12 @@ class Sprite(_ImageBase):
 		s.depth = self.depth
 		s.fb = self.fb 
 		s._on = self._on
+
+		try:
+			s.fastim = self.fastim
+		except AttributeError:
+			# not accelerated..
+			pass
 		
 		# copy the alpha mask too..
 		s.alpha[:] = self.alpha[:]
@@ -2408,7 +2423,7 @@ class DisplayList:
 		"""
 		self.delete(None)
 
-	def update(self, flip=None):
+	def update(self, flip=None, preclear=1):
 		"""Draw sprites on framebuffer
 
 		1. Clear screen to background color (if specified)
@@ -2418,10 +2433,11 @@ class DisplayList:
 		3. Optionally do a page flip.
 		"""
 		# clear screen to background..
-		if self.bg:
-			self.fb.clear(color=self.bg)
-		else:
-			self.fb.clear()
+		if preclear:
+			if self.bg:
+				self.fb.clear(color=self.bg)
+			else:
+				self.fb.clear()
 
 		# draw sprites in depth order
 		for s in self.sprites:

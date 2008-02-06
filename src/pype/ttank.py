@@ -16,8 +16,10 @@ ECODE=3
 CHANNUM=4
 SORTNUM=5
 TIME=6
-DATAF=8
+DATAFMT=8
 RATE=9
+
+TTank=None
 
 class _Socket:
 	def Send(self, data):
@@ -78,10 +80,11 @@ class TTankServer:
 	def __init__(self, Server='Local', tk=None):
 		# this throws ImportError under linxu; should be caught
 		import win32com.client
-		
-		global TTank
 
+		# only need global decl to Modify TTank!
+		global TTank
 		self.Server = Server
+		
 		TTank = win32com.client.Dispatch('TTank.X')
 
 	def log(self, msg=None):
@@ -97,8 +100,6 @@ class TTankServer:
 		"""
 		Set up connections to the TDT COM server
 		"""
-		global TTank
-			
 		if TTank.ConnectServer(self.Server, 'Me'):
 			self.log('Connected to %s:TTank.X' % self.Server)
 			return 1
@@ -113,8 +114,6 @@ class TTankServer:
 	def listen(self):
 		import traceback
 		
-		global TTank
-
 		while 1:
 			server = _SocketServer()
 			self.log('Waiting for client connection')
@@ -135,7 +134,9 @@ class TTankServer:
 				try:
 					ok = 1
 					sys.stderr.write('[')
-					result = eval(x)
+					(obj, method, args) = x
+					fn = eval('%s.%s' % (obj, method))
+					result = apply(fn, args)
 					sys.stderr.write(']')
 				except:
 					# send error info back to client for debugging..
@@ -172,7 +173,7 @@ class TTank:
 		self.client.Close()
 		self.client = None
 
-	def _send(self, cmd):
+	def _send(self, cmdtuple):
 		"""
 		Send a command string for remove evaluation to the server.
 		Command string (cmd) should be a valid python expression
@@ -188,7 +189,7 @@ class TTank:
 		data typing should be correctly preserved and propagated.
 		"""
 		try:
-			self.client.Send(pickle.dumps(cmd))
+			self.client.Send(pickle.dumps(cmdtuple))
 			p = self.client.Receive()
 			(ok, result) = pickle.loads(p)
 			if 0:
@@ -199,28 +200,14 @@ class TTank:
 			pass
 		return (ok, result)
 
-	def send(self, cmd):
-		(ok, result) = self._send('TTank.' + cmd)
-		if ok:
-			return result
-		else:
-			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (cmd, result)
-
 	def invoke(self, method, *args):
 		import types
-		
-		cmd = 'TTank.%s(' % method
-		for arg in args:
-			if type(arg) == types.StringType:
-				cmd = cmd + ('"%s",' % arg)
-			else:
-				cmd = cmd + ('%s,' % arg)
-		cmd = cmd[0:-1] + ')'
-		(ok, result) = self._send(cmd)
+
+		(ok, result) = self._send(('TTank', method, args,))
 		if ok:
 			return result
 		else:
-			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (cmd, result)
+			raise TDTError, 'TTank Error; cmd=<%s>; err=<%s>' % (method, result)
 
 def loopforever():
 	try:
