@@ -4,9 +4,11 @@
 # Retrieve spike timestamps from tdt datatank using network api (ttank.py)
 #
 
+import sys
 import Numeric
 import pypedata, ttank
-#import time
+
+from pypedebug import keyboard
 
 class Spikes:
     # get all spikes at once, then sort into trials locally..
@@ -38,8 +40,10 @@ class Spikes:
             self.block = block
 
         tt = ttank.TTank(self.server)
-        tt.invoke('OpenTank', self.tank, 'R')
-        tt.invoke('SelectBlock', self.block)
+        if tt.invoke('OpenTank', self.tank, 'R'):
+            tt.invoke('SelectBlock', self.block)
+        else:
+            sys.stderr.write('Missing tdt tank: %s\n' % self.tank)
 
         # trl1 is the rising edge of the gating signal
         # this query will get the timestamps for each TRL1 event in SECS
@@ -50,8 +54,13 @@ class Spikes:
         n = tt.invoke('ReadEventsV', 1e6, 'TRL2', 0, 0, 0.0, 0.0, 'ALL')
         trl2 = tt.invoke('ParseEvInfoV', 0, n, ttank.TIME)
 
+        if len(trl1) != len(trl2):
+            # this probably means a new record came in between requesting
+            # trl1 and trl2, so truncate the data to only look at complete
+            # trials
+            sys.stderr.write('Warning: incomplete trial in tdt tank.\n')
+            trl1 = trl1[0:len(trl2)]
 
-        #tstart = time.time()
         start, stop = trl1[0], trl2[-1]
         # get number of spike/snip's between start and stop
         #   chan=0 for any channel
@@ -76,8 +85,6 @@ class Spikes:
                 sigs.append('%03d%c' % (c[j], chr(int(s[j])+ord('a')-1),))
             self.sdata.append((t, c, s, sigs,))
             
-        #print '%.1fms' % ((time.time() - tstart) * 1000.0)
-
         self.ntrials = len(trl1)
 
     def dump(self, out):
@@ -87,6 +94,18 @@ class Spikes:
             for j in range(len(t)):
                 out.write('%d\t%.1f\t%.0f\t%.0f\n' % (k, t[j], c[j], s[j],))
                 #out.write('%d\t%.1f\t%s\n' % (k, t[j], int(c[j]), sigs[j].))
+
+    def unique(self, out):
+        units = {}
+        for k in range(self.ntrials):
+            (t, c, s, sigs) = self.sdata[k]
+            for j in range(len(t)):
+                if s[j]:
+                    units[sigs[j]] = 1
+        k = units.keys()
+        k.sort()
+        for sig in k:
+            out.write('%s\n' % sig)
 
 if __name__ == '__main__':
     sys.stderr.write('%s should never be loaded as main.\n' % __file__)

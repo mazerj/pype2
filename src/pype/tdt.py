@@ -40,6 +40,7 @@
 ############################################################################
 
 import sys
+import errno
 import time
 import socket
 import pickle
@@ -63,23 +64,58 @@ PREVIEW = 2								# running, not saving to tank
 RECORD = 3								# running and saving all data
 
 PORT=10000
+DEBUG=1
+
+def log(msg=None):
+	import sys, os, time
+	if msg is None:
+		sys.stderr.write('\n')
+	else:
+		for ln in msg.split('\n'):
+			sys.stderr.write('%02d:%02d:%02d ' % \
+							 time.localtime(time.time())[3:6])
+			sys.stderr.write('%s: %s\n' % (os.path.basename(sys.argv[0]), ln))
 
 class _Socket:
 	def Send(self, data):
 		import struct
 		self.conn.send(struct.pack('!I', len(data)))
 		return self.conn.sendall(data)
+
+	def _recv(self, nbytes):
+		while 1:
+			try:
+				buf = self.conn.recv(nbytes)
+				return buf
+			except socket.error:
+				etype, evalue, traceback = sys.exc_info()
+				(errno, err) = evalue
+				if evalue == errno.EINTER:
+					# unexpected SIGNAL came in before data, just retry..
+					# this is likely to be something like a fixwin break
+					# during data collection..
+					
+					# I'm pretty sure this only happens when no data has
+					# been read, so there should be no loss..
+					sys.stderr.write('warning: tdt recv caught EINTR\n')
+				elif evalue == errno.EBUSY:
+					# not sure what causes this one..
+					sys.stderr.write('warning: tdt recv caught EBUSY\n')
+				else:
+					# otherwise, god knows what caused it, better raise
+					# a proper exception for debuggin..
+					raise
 	
-	def Receive(self, size=8192):
+	def Receive(self, size=1024):
 		import struct
-		buf = self.conn.recv(struct.calcsize('!I'))
+		buf = self._recv(struct.calcsize('!I'))
 		if not len(buf):
 			raise EOFError, '_Socket.Receive()'
 		else:
 			N = struct.unpack('!I', buf)[0]
 			data = ''
 			while len(data) < N:
-				packet = self.conn.recv(size)
+				packet = self._recv(size)
 				data = data + packet
 			return data
 
@@ -109,9 +145,8 @@ class _SocketClient(_Socket):
 
 	def Connect(self, remoteHost = socket.gethostname(), remotePort = PORT):
 		self.remoteHost, self.remotePort = remoteHost, remotePort
-		# set timeout to 100s - for long queries, the TTank component
-		# can churn for a LONG time before the packet comes back..
-		self.conn.settimeout(100)
+		# non blocking..
+		self.conn.settimeout(None)
 		# generates exception on failure-to-connect
 		self.conn.connect((self.remoteHost, self.remotePort))
 		
@@ -153,27 +188,23 @@ class TDTServer:
 		"""
 		global TDevAcc, TTank
 			
-		sys.stderr.write('Connecting to TDT servers...\n')
+		log('Connecting to TDT servers...')
 
 		connections = 0
 		
 		if TDevAcc.ConnectServer(self.Server):
-			sys.stderr.write('..connect to %s:TDevAcc\n' % self.Server)
+			log('..connect to %s:TDevAcc' % self.Server)
 			connections = connections + 1
 		else:
-			sys.stderr.write('..no connection to %s:TDevAcc\n' % self.Server)
+			log('..no connection to %s:TDevAcc' % self.Server)
 			
 		if TTank.ConnectServer(self.Server, 'Me'):
-			sys.stderr.write('..connect to %s:TTank.X\n' % self.Server)
+			log('..connect to %s:TTank.X' % self.Server)
 			connections = connections + 2
 		else:
-			sys.stderr.write('..no connection %s:TTank.X\n' % self.Server)
+			log('..no connection %s:TTank.X' % self.Server)
 			
 		return connections
-
-	def disconnect(self):
-		TDevAcc.CloseConnection()
-		TTank.CloseConnection()
 
 	def listen(self):
 		global TDevAcc, TTank
@@ -181,14 +212,13 @@ class TDTServer:
 
 		while 1:
 			server = _SocketServer()
-			sys.stderr.write("tdt: Waiting for client..\n")
+			log('Waiting for client..')
 			server.Listen()
-			sys.stderr.write("Received connection from %s\n" % \
-							 server.remoteHost)
+			log('Received connection from %s' % server.remoteHost)
 
 			connections = self.connect()
 			server.Send(pickle.dumps(connections))
-			sys.stderr.write("Ready.\n")
+			log('Recieving commands')
 			while 1:
 				try:
 					x = pickle.loads(server.Receive())
@@ -196,58 +226,49 @@ class TDTServer:
 					# client closed connection
 					break
 
-				if type(x) is str:
-					# original string-based mode..
-					try:
-						ok = 1
-						result = eval(x)
-					except:
-						# send error info back to client for debugging..
-						ok = None
-						result = sys.exc_info()
-						traceback.print_tb(result[2])
-						result = result[0:1]
-				else:
-					try:
-						# new original string-based mode..
-						ok = 1
-						sys.stderr.write('[')
-						(obj, method, args) = x
-						fn = eval('%s.%s' % (obj, method))
-						result = apply(fn, args)
-						sys.stderr.write(']')
-					except:
-						# send error info back to client for debugging..
-						ok = None
-						result = sys.exc_info()
-						traceback.print_tb(result[2])
-						result = result[0:1]
+				et = time.time()
+				try:
+					# new original string-based mode..
+					ok = 1
+					(obj, method, args) = x
+					fn = eval('%s.%s' % (obj, method))
+					result = apply(fn, args)
+					time.sleep(10)
+				except:
+					# send error info back to client for debugging..
+					ok = None
+					result = sys.exc_info()
+					traceback.print_tb(result[2])
+					result = result[0:1]
+				et = time.time() - et
 				server.Send(pickle.dumps((ok, result)))
-				if 1:
-					sys.stderr.write('(%s,"%s") <- %s\n' % (ok, result, x))
-				else:
-					sys.stderr.write('.');
-					sys.stderr.flush();
+				if DEBUG:
+					log('(%s,"%s") <- %s' % (ok, result, x))
+					log('[%.3fs elapsed]' % (et, ))
+					
 				if ok is None:
-					sys.stderr.write('%s\n' % sys.exc_value)
-			sys.stderr.write("\nClient closed connection.\n")
+					log('%s' % sys.exc_value)
+					
+			log("client closed connection.")
+			if TTank:
+				log('TTank.X closing tank')
+				TTank.CloseTank()
+				log('TTank.X releasing server')
+				TTank.ReleaseServer()
+			if TDevAcc:
+				if TDevAcc.CheckServerConnection():
+					log('TDevAcc closing connection')
+					TDevAcc.CloseConnection()
+
 			server.Close()
-			#this fails:
-			#self.disconnect()
-	
+			log()
+			
 class TDTClient:
 	def __init__(self, server):
 		self.server = server
 		self.client = None
-		
 		self.open_conn()
 		
-		if self.gotTDevAcc:
-			(self.nchans, self.sniplen) = self.tdev_chaninfo()
-			self.fs = self.tdev_invoke('GetDeviceSF', 'Amp1')
-		else:
-			(self.nchans, self.sniplen, self.fs) = (None, None, None)
-
 	def __repr__(self):
 		return '<TDTClient server=%s TDevAcc=%d TTank=%d>' % \
 			   (self.server, self.gotTDevAcc, self.gotTTank)
@@ -275,44 +296,6 @@ class TDTClient:
 		self.client.Close()
 		self.client = None
 
-	def send(self, cmd):
-		"""
-		Send a command string for remove evaluation to the server.
-		Command string (cmd) should be a valid python expression
-		that can be eval'ed in the remote envrionment. Access to
-		the Tucker-Davis API is via:
-		  TDevAcc (for the direct DSP interface), or,
-		  TTank (for access to the data tank)
-
-		The return value is a pair: (statusFlag, resultValue), where
-		statusFlag is 1 for normal evaluation and 0 for an error and
-		resultValue is the actual value returned by the function
-		call (the value is pickled on the Server side and returns, so
-		data typing should be correctly preserved and propagated.
-		"""
-		if self.client is None:
-			self.open_conn()
-		try:
-			self.client.Send(pickle.dumps(cmd))
-			(ok, result) = pickle.loads(self.client.Receive())
-			if 0:
-				# debugging
-				print (ok, result), "<-", cmd
-		finally:
-			#self.close_conn()
-			pass
-		return (ok, result)
-
-	def tdev(self, cmd):
-		if not self.gotTDevAcc:
-			raise TDTError, 'No TDevAcc connection'
-		return self.send('TDevAcc.' + cmd)
-
-	def ttank(self, cmd):
-		if not self.gotTTank:
-			raise TDTError, 'No TTank.X connection'
-		return self.send('TTank.' + cmd)
-
 	def _sendtuple(self, cmdtuple):
 		"""
 		Send a command string for remove evaluation to the server.
@@ -332,11 +315,7 @@ class TDTClient:
 			self.client.Send(pickle.dumps(cmdtuple))
 			p = self.client.Receive()
 			(ok, result) = pickle.loads(p)
-			if 0:
-				# debugging
-				print (ok, result), "<-", cmd
 		finally:
-			#self.close_conn()
 			pass
 		return (ok, result)
 
@@ -370,24 +349,17 @@ class TDTClient:
 		  RECORD = 3	# running and saving all data
 		"""
 		if not mode is None:
-			(ok, r) = self.tdev('SetSysMode(%d)' % mode)
-			if ok is None:
-				sys.stderr.write("tdt: can't set mode\n")
-				return None
-			if wait:
-				while 1:
-					x = self.tdev_invoke('GetSysMode')
-					if x == mode:
-						break
+			self.tdev_invoke('SetSysMode', mode)
+			while wait:
+				if self.tdev_invoke('GetSysMode') == mode:
+					break
 		else:
-			(ok, r) = self.tdev('GetSysMode()')
-			if ok is None:
-				sys.stderr.write("tdt: can't get mode\n")
-				return None
+			r = self.tdev_invoke('GetSysMode')
 			if name:
 				modes = { IDLE:'IDLE', STANDBY:'STANDBY',
 						  PREVIEW:'PREVIEW', RECORD:'RECORD'}
 				r = modes[r]
+		r = self.tdev_invoke('GetSysMode')
 		return r
 
 	def tdev_tnum(self, reset=None):
@@ -396,19 +368,11 @@ class TDTClient:
 		should really be done when OpenEx is in standby mode..
 		"""
 		if reset:
-			(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 1.0)')
+			self.tdev_invoke('SetTargetVal', 'Amp1.TNumRst', 1.0)
 			while 1:
-				(ok, r) = self.tdev('GetTargetVal("Amp1.TNum")')
-				if int(r) == 0:
-					(ok, r) = self.tdev('SetTargetVal("Amp1.TNumRst", 0)')
+				if self.tdev_invoke('GetTargetVal', 'Amp1.TNum') == 0:
 					break
-		(ok, r) = self.tdev('GetTargetVal("Amp1.TNum")')
-		
-		if ok is None:
-			sys.stderr.write('TDT Error!\n')
-			return None
-		
-		return int(r)
+		return self.tdev_invoke('GetTargetVal', 'Amp1.TNum')
 
 	def tdev_chaninfo(self):
 		"""
@@ -418,7 +382,12 @@ class TDTClient:
 		"""
 		n = 1
 		while 1:
-			(ok, s) = self.tdev("GetTargetSize('Amp1.cSnip~%d')" % n)
+			s = self.tdev_invoke('GetTargetSize',
+								 'Amp1.cSnip~%d' % n)
+			if s < 0:
+				self.tdev_invoke('SetSysMode', PREVIEW)
+				s = self.tdev_invoke('GetTargetSize',
+									 'Amp1.cSnip~%d' % n)
 			if s == 0:
 				break
 			if n == 1:
@@ -426,15 +395,15 @@ class TDTClient:
 			n = n + 1
 		return (n-1, hoopsize/3)
 
-	def tdev_getblock(self):
+	def getblock(self):
 		"""
 		Query current block info -- this is enough info to find the current
 		data record later (assuming tank doesn't get deleted...)
 		"""
-		(ok, block) = self.ttank('GetHotBlock()')
-		(ok, tank) = self.tdev("GetTankName()")
-		return (self.server, tank, block, self.tdev_tnum())
-		
+		return (self.server,
+				self.tdev_invoke('GetTankName'),
+				self.ttank_invoke('GetHotBlock'),
+				self.tdev_invoke('GetTargetVal', 'Amp1.TNum'))
 
 	def tdev_newblock(self, record=1):
 		"""
@@ -459,12 +428,11 @@ class TDTClient:
 
 		self.tdev_mode(PREVIEW)
 
-		(ok, tank) = self.tdev("GetTankName()")
-		tank = str(tank).replace('\\', '\\\\')
-		(ok, err) = self.ttank("OpenTank('%s', 'R')" % tank)
+		tank = self.tdev_invoke('GetTankName')
+		err = self.ttank_invoke('OpenTank', tank, 'R')
 
 		while 1:
-			(ok, oldblock) = self.ttank('GetHotBlock()')
+			oldblock = self.ttank_invoke('GetHotBlock')
 			if str(oldblock) == 'TempBlk' or len(oldblock) == 0:
 				break
 
@@ -478,16 +446,16 @@ class TDTClient:
 		if record:
 			self.tdev_mode(RECORD)
 			while 1:
-				(ok, newblock) = self.ttank('GetHotBlock()')
+				newblock = self.ttank_invoke('GetHotBlock')
 				if not (newblock == oldblock) and len(newblock) > 0:
 					break
 		else:
 			self.tdev_mode(PREVIEW)
-			(ok, newblock) = self.ttank('GetHotBlock()')
+			newblock = self.ttank_invoke('GetHotBlock')
 			
 		# and return the tank & block name --> this is enough info to
 		# find the record later..
-		(ok, tank) = self.tdev('GetTankName()')
+		tank = self.tdev_invoke('GetTankName')
 		return (self.server, str(tank), str(newblock))
 
 
@@ -497,30 +465,38 @@ class TDTClient:
 		with no arguments, current settings are returned. Otherwise, the
 		params arg specifies a new set of settings to setup
 		"""
+
+		# just assume 16 channels to be safe...
+		nchans = 16
+		sniplen = -1
+		while sniplen < 0:
+			sniplen = self.tdev_invoke('GetTargetSize',
+									   'Amp1.cSnip~%d' % 1)
+			if sniplen < 0:
+				# sniplen means circuit hasn't been started up yet, so
+				# start it going and try again..
+				self.tdev_invoke('SetSysMode', PREVIEW)
+
 		if params is None:
 			params = {}
-			for n in range(1, self.nchans+1):
-				(ok, t) = \
-					 self.tdev("GetTargetVal('Amp1.aSnip~%d')" %
-									(n, ))
-				(ok, h) = \
-					 self.tdev("ReadTargetV('Amp1.cSnip~%d', 0, %d)" %
-							   (n, self.sniplen*3))
-				params[n, 'thresh'] = t
-				params[n, 'hoops'] = h
+			for n in range(1, nchans+1):
+				try:
+					params[n, 'thresh'] = self.tdev_invoke('GetTargetVal',
+														   'Amp1.aSnip~%d' % n)
+				except ValueError:
+					# not sure what this is --> comes back as -1.#IND..
+					params[n, 'thresh'] = 1.0
+				params[n, 'hoops'] = self.tdev_invoke('ReadTargetV',
+													  'Amp1.cSnip~%d' % n,
+													  0, sniplen)
 			return params
 		else:
-			for n in range(1, self.nchans+1):
+			for n in range(1, nchans+1):
 				t = params[n, 'thresh']
 				h = params[n, 'hoops']
-
-				(ok, r) = \
-					 self.tdev("SetTargetVal('Amp1.aSnip~%d',%f)" %
-							   (n, t))
-				(ok, r) = \
-					 self.tdev("WriteTargetVEX('Amp1.cSnip~%d', 0, 'F32', %s)" %
-							   (n, h))
-				#self.send('type(%s)' % (h,))
+				self.tdev_invoke('SetTargetVal', 'Amp1.aSnip~%d' % n, t)
+				self.tdev_invoke('WriteTargetVEX',
+								 'Amp1.cSnip~%d' % n, 0, 'F32', h)
 			
 def loopforever():
 	while 1:
@@ -531,12 +507,12 @@ def loopforever():
 		try:
 			s.listen()
 		except:
-			sys.stderr.write('-----------------------------\n')
-			sys.stderr.write('Server-side near fatal error in loopforever:\n')
-			sys.stderr.write('%s\n' % sys.exc_value)
-			sys.stderr.write('-----------------------------\n')
+			log('-----------------------------')
+			log('Server-side near fatal error in loopforever:')
+			log(sys.exc_value)
+			log('-----------------------------')
 			del s
-			
+
 if __name__ == '__main__':
 	loopforever()
 	sys.stderr.write("Don't run me under linux!\n")

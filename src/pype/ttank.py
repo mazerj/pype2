@@ -3,7 +3,7 @@
 # TTank.X ONLY interface  -- see tdt.py for complete docs..
 #
 
-import sys
+import sys, time
 import socket
 import pickle
 
@@ -20,6 +20,7 @@ DATAFMT=8
 RATE=9
 
 TTank=None
+DEBUG=1
 
 class _Socket:
 	def Send(self, data):
@@ -66,9 +67,8 @@ class _SocketClient(_Socket):
 
 	def Connect(self, remoteHost = socket.gethostname(), remotePort = 10001):
 		self.remoteHost, self.remotePort = remoteHost, remotePort
-		# set timeout to 100s - for long queries, the TTank component
-		# can churn for a LONG time before the packet comes back..
-		self.conn.settimeout(100)
+		# set to non-blocking..
+		self.conn.settimeout(None)
 		# generates exception on failure-to-connect
 		self.conn.connect((self.remoteHost, self.remotePort))
 		
@@ -92,9 +92,11 @@ class TTankServer:
 		if msg is None:
 			sys.stderr.write('\n')
 		else:
-			sys.stderr.write('%02d:%02d:%02d ' % \
-							 time.localtime(time.time())[3:6])
-			sys.stderr.write('%s: %s\n' % (os.path.basename(sys.argv[0]), msg))
+			for ln in msg.split('\n'):
+				sys.stderr.write('%02d:%02d:%02d ' % \
+								 time.localtime(time.time())[3:6])
+				sys.stderr.write('%s: %s\n' % \
+								 (os.path.basename(sys.argv[0]), ln))
 
 	def connect(self):
 		"""
@@ -106,22 +108,23 @@ class TTankServer:
 		else:
 			self.log('No connection %s:TTank.X' % self.Server)
 			return 0
-			
 
 	def disconnect(self):
-		TTank.CloseConnection()
+		TTank.CloseTank()
+		TTank.ReleaseServer()
 
 	def listen(self):
 		import traceback
 		
+		server = _SocketServer()
 		while 1:
-			server = _SocketServer()
 			self.log('Waiting for client connection')
 			server.Listen()
 			self.log('Received connection from %s' % server.remoteHost)
 
 			if not self.connect():
 				raise TDTError, 'TTank.X ActiveX control not installed'
+
 			
 			self.log('Recieving commands')
 			while 1:
@@ -131,28 +134,31 @@ class TTankServer:
 					# client closed connection
 					break
 
+				et = time.time()
 				try:
 					ok = 1
-					sys.stderr.write('[')
 					(obj, method, args) = x
 					fn = eval('%s.%s' % (obj, method))
 					result = apply(fn, args)
-					sys.stderr.write(']')
 				except:
 					# send error info back to client for debugging..
 					ok = None
 					result = sys.exc_info()
 					traceback.print_tb(tb)
+				et = time.time() - et
 				server.Send(pickle.dumps((ok, result)))
-				if 0:
-					self.log('(%s,"%s") <- %s' % (ok, result, x))
-					if ok is None:
-						self.log('%s' % sys.exc_value)
-			self.log()
+				if DEBUG:
+					#self.log('(%s,"%s") <- %s' % (ok, result, x))
+					self.log('(%s,??) <- ..%s..' % (ok, x[1]))
+					self.log('[%.3fs elapsed]' % (et, ))
+					
+				if ok is None:
+					self.log(sys.exc_value)
+					
 			self.log('Client closed connection.')
-			server.Close()
-			#this fails:
-			#self.disconnect()
+			self.disconnect()
+		server.Close()
+
 	
 class TTank:
 	def __init__(self, server):
@@ -192,11 +198,7 @@ class TTank:
 			self.client.Send(pickle.dumps(cmdtuple))
 			p = self.client.Receive()
 			(ok, result) = pickle.loads(p)
-			if 0:
-				# debugging
-				print (ok, result), "<-", cmd
 		finally:
-			#self.close_conn()
 			pass
 		return (ok, result)
 
@@ -222,10 +224,10 @@ def loopforever():
 		try:
 			s.listen()
 		except:
-			sys.stderr.write('-----------------------------\n')
-			sys.stderr.write('Server-side near fatal error in loopforever:\n')
-			sys.stderr.write('%s\n' % sys.exc_value)
-			sys.stderr.write('-----------------------------\n')
+			log('-----------------------------')
+			log('Server-side near fatal error in loopforever:')
+			log(sys.exc_value)
+			log('-----------------------------')
 			del s
 			
 if __name__ == '__main__':

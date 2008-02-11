@@ -1249,26 +1249,29 @@ class PypeApp:
 					   '%04d%02d%02d' % time.localtime(time.time())[0:3]
 			try:
 				import pype2tdt
-				self.tdt = pype2tdt.Controller(cpane, tdthost)
+				self.tdt = pype2tdt.Controller(self, tdthost)
 				Logger('xdacq: connected to tdt @ %s.\n' % tdthost)
 				t = self.tdt.settank(tankdir, tankname)
 				if t is None:
-					Logger("Can't set tdt tank -- is circuit running?\n",
+					Logger("Is TDT running? Can't set tank...\n",
 						   popup=1)
 					self.tdt = None
 				else:
 					Logger('xdacq: tank = %s\n' % t)
 					self.xdacq = 'tdt'
-					self.tdt.tdtconnx.tdev_mode(0, wait=1)
-					self.tdt.tdtconnx.tdev_mode(3, wait=1)
-					self.tdt.tdtconnx.tdev_mode(2, wait=1)
-					self.tdt.update()
 			except socket.error:
 				self.tdt = None
 				Logger('xdacq: no connection to tdt @ %s.\n' % tdthost,
 					   popup=1)
-
-
+				
+			if self.tdt:
+				mb.addmenu('TDT', '', '')
+				mb.addmenuitem('TDT', 'command', 
+							   label='save hoops',
+							   command=self.tdt.save)
+				mb.addmenuitem('TDT', 'command', 
+							   label='restore hoops',
+							   command=self.tdt.restore)
 
 		Logger('pype build: %s by %s\n' % (PypeBuildDate, PypeBuildBy))
 		Logger('PYPERC=%s\n' % pyperc())
@@ -1926,10 +1929,8 @@ class PypeApp:
 				elif self.xdacq == 'tdt':
 					# start new block in current tank, this includes resting the
 					# trial counter..
-					(server, tank, block) = self.tdt.newblock(record=1)
+					self.tdt.newblock(record=1)
 					Logger('tdt data: %s %s\n' % (tank, block))
-					self.tdt.update()
-
 						
 				if self.tk:
 					self._startbut.config(text='stop')
@@ -1979,8 +1980,7 @@ class PypeApp:
 					warn('xdacq', 'Stop the plexon NOW', wait=0)
 				elif self.xdacq == 'tdt':
 					# recording's done -- direct output back to TempBlk
-					(server, tank, block) = self.tdt.newblock(record=0)
-					self.tdt.update()
+					self.tdt.newblock(record=0)
 						
 			else:
 				if self.tk:
@@ -3068,11 +3068,10 @@ class PypeApp:
 				#
 				# NOTE: first trial has tdt_tnum == 1, not zero!!!!
 				#
-				info[2]['tdt_server'] = server
+				info[2]['tdt_server'] = str(server.encode('ascii'))
 				info[2]['tdt_tank'] = str(tank.encode('ascii'))
 				info[2]['tdt_block'] = str(block.encode('ascii'))
 				info[2]['tdt_tnum'] = tnum
-				self.tdt.update()
 
 			rec = [ENCODE, info, self.record_buffer,
 				   list(self.eyebuf_t),

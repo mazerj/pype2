@@ -22,7 +22,10 @@ if __name__ == '__main__':
     p.add_option('-b', '--block', dest='block',
                  action='store', type='string', default=None,
                  help='tdt block name')
-    
+    p.add_option('-i', '--info', dest='info',
+                 action='store_true', default=0,
+                 help='info about available channels')
+
     (options, args) = p.parse_args()
 
     try:
@@ -37,7 +40,10 @@ if __name__ == '__main__':
             sys.stderr.write("%s: extract from where??\n" % \
                              posixpath.basename(sys.argv[0]))
             sys.exit(1)
-        d.dump(sys.stdout)
+        if options.info:
+            d.unique(sys.stdout)
+        else:
+            d.dump(sys.stdout)
     except ttank.TDTError:
         sys.stderr.write("%s: can\'t connect to TTank\n" % \
                          posixpath.basename(sys.argv[0]))

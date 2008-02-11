@@ -59,7 +59,8 @@ def get_traceback(show=None):
 		exc_type = exc_type.__name__
 
 	# in python-2.5 exc_type is not a string, must be coerced into one..
-	msg = 'Exception: %s\n' % exc_value
+	msg = 'Exception (value): %s\n' % exc_value
+	msg = 'Exception (type): %s\n' % exc_type
 
 	# Add the traceback.
 	stack = traceback.extract_tb(exc_traceback)
@@ -67,7 +68,8 @@ def get_traceback(show=None):
 	depth = 1
 	for frame in stack:
 		(file, line, fn, text) = frame
-		prefix = '>' * depth + ' '
+		#prefix = '>' * depth + ' '
+		prefix = '%d> ' % (1+len(stack)-depth)
 		msg = msg + prefix + 'File "%s", line %s, in %s:\n' % (file, line, fn)
 		msg = msg + prefix + ' %s\n' % text
 		depth = depth + 1

@@ -45,7 +45,7 @@ def _comparedatafiles(a, b):
             return -1
         else:
             return 1
-    except IndexError:
+    except (IndexError, ValueError):
         if a > b:
             return 1
         else:
