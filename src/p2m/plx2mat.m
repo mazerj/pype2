@@ -150,10 +150,16 @@ xd.lfp_chans = {};
 xd.lfp_volts = {};
 
 for n=1:ntrials
-  ix = find(spk(:,1) == n);
-  xd.spk_chans{n} = spk(ix, 2);
-  xd.spk_units{n} = spk(ix, 3);
-  xd.spk_times{n} = spk(ix, 4);
+  if ~isempty(spk)
+    ix = find(spk(:,1) == n);
+    xd.spk_chans{n} = spk(ix, 2);
+    xd.spk_units{n} = spk(ix, 3);
+    xd.spk_times{n} = spk(ix, 4);
+  else
+    xd.spk_chans{n} = [];
+    xd.spk_units{n} = [];
+    xd.spk_times{n} = [];
+  end
 
   if ~isempty(lfp)
     ix = find(lfp(:,1) == n);
@@ -164,16 +170,24 @@ for n=1:ntrials
     xd.lfp_chans{n} = [];
     xd.lfp_times{n} = [];
     xd.lfp_volts{n} = [];
-    
   end
 end
 
-xd.spw.trial = swaves(:,1);
-xd.spw.channel = swaves(:,2);
-xd.spw.unit = swaves(:,3);
-xd.spw.index = swaves(:,4);
-xd.spw.time = swaves(:,5);
-xd.spw.volt = swaves(:,6);
+if ~isempty(swaves)
+  xd.spw.trial = swaves(:,1);
+  xd.spw.channel = swaves(:,2);
+  xd.spw.unit = swaves(:,3);
+  xd.spw.index = swaves(:,4);
+  xd.spw.time = swaves(:,5);
+  xd.spw.volt = swaves(:,6);
+else
+  xd.spw.trial = [];
+  xd.spw.channel = [];
+  xd.spw.unit = [];
+  xd.spw.index = [];
+  xd.spw.time = [];
+  xd.spw.volt = [];
+end
 
 % save arguments so we know what got loaded..
 xd.spikes_flag = spikes;

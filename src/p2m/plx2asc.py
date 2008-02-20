@@ -364,7 +364,7 @@ def info(fname):
 							 (s.SIGName, s.Channel, s.NUnits))
 
 
-def xall(fname, prefix, spikes, lfp, start, stop):
+def xall(fname, prefix, noout, spikes, lfp, start, stop):
 	if prefix is None:
 		prefix = fname
 
@@ -374,25 +374,37 @@ def xall(fname, prefix, spikes, lfp, start, stop):
 	t0 = 0.0;
 	trial_number = 0
 
-	o = prefix + '.hdr'
+	if noout:
+		o = '/dev/null'
+	else:
+		o = prefix + '.hdr'
+		sys.stderr.write('header -> %s\n' % o)
 	hdrout = open(o, 'w')
 	hdrout.write('% channel nunits lfp\n')
-	sys.stderr.write('header -> %s\n' % o)
 
-	o = prefix + '.spk'
+	if noout:
+		o = '/dev/null'
+	else:
+		o = prefix + '.spk'
+		sys.stderr.write('spikes -> %s\n' % o)
 	spikeout = open(o, 'w')
 	spikeout.write('% trial channel unit time\n')
-	sys.stderr.write('spikes -> %s\n' % o)
 	
-	o = prefix + '.spw'
+	if noout:
+		o = '/dev/null'
+	else:
+		o = prefix + '.spw'
+		sys.stderr.write('spike waveforms -> %s\n' % o)
 	spwout = open(o, 'w')
 	spwout.write('% trial channel unit index time volt\n')
-	sys.stderr.write('spike waveforms -> %s\n' % o)
 
-	o = prefix + '.lfp'
+	if noout:
+		o = '/dev/null'
+	else:
+		o = prefix + '.lfp'
+		sys.stderr.write('lfp -> %s\n' % o)
 	lfpout = open(o, 'w')
 	lfpout.write('% trial channel time volt\n')
-	sys.stderr.write('lfp -> %s\n' % o)
 
 	for i in range(h.NumDspChannels):
 		hdrout.write('%d\t' % i)
@@ -466,7 +478,7 @@ def xall(fname, prefix, spikes, lfp, start, stop):
 
 	sys.stderr.write('%d trials\n' % trial_number)
 	sys.stderr.write(' %d spikes\n' % nspikes)
-	sys.stderr.write(' %d spike waveforms samples\n' % nwavesamps)
+	sys.stderr.write(' %d spike waveform samples\n' % nwavesamps)
 	sys.stderr.write(' %d slow samples\n' % nsamps)
 	
 	f.close()
@@ -500,6 +512,9 @@ if __name__ == '__main__':
 	p.add_option('-l', '--lfp', dest='lfp',
 				 action='store_true', default=0,
 				 help='access lfp data)')
+	p.add_option('-n', '--noout', dest='noout',
+				 action='store_true', default=0,
+				 help='no output at all to files)')
 	
 	
 	# options with mandatory arguments
@@ -523,7 +538,8 @@ if __name__ == '__main__':
 		elif options.info:
 			info(args[0])
 		else:
-			xall(args[0], options.prefix, options.spikes, options.lfp,
+			xall(args[0], options.prefix, options.noout,
+				 options.spikes, options.lfp,
 				 options.start, options.stop)
 	except NotPlx:
 		sys.stderr.write('"%s" is not a plx file\n' % args[0])
