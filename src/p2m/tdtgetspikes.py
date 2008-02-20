@@ -41,7 +41,7 @@ if __name__ == '__main__':
                              posixpath.basename(sys.argv[0]))
             sys.exit(1)
         if options.info:
-            d.unique(sys.stdout)
+            d.info(sys.stdout)
         else:
             d.dump(sys.stdout)
     except ttank.TDTError:

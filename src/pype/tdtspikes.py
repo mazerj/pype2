@@ -20,7 +20,7 @@ class Spikes:
                  rec=None,
                  pypefile=None,
                  server=None, tank=None, block=None,
-                 chan=0, unit=0):
+                 chan=0, unit=0, getwaves=None):
         
         # note: we're just looking at the first pype record in the
         # datafile to get the necessary tank info. That's all we need
@@ -61,6 +61,15 @@ class Spikes:
             sys.stderr.write('Warning: incomplete trial in tdt tank.\n')
             trl1 = trl1[0:len(trl2)]
 
+        # if requested -- pull down the analog snipet waveform data:
+        # still needs to be massaged to adjust timestmps..
+        if getwaves:
+            nsnip = tt.invoke('ReadEventsV', 1e6, 'Snip', 0, 0, 0.0, 0.0, 'ALL')
+            self.waves = tt.invoke('ParseEvV', 0, nsnip)
+            self.channel = tt.invoke('ParseEvInfoV', 0, nsnip, ttank.CHANNUM)
+            self.sortnum = tt.invoke('ParseEvInfoV', 0, nsnip, ttank.SORTNUM)
+            self.ts = tt.invoke('ParseEvInfoV', 0, nsnip, ttank.TIME)
+
         start, stop = trl1[0], trl2[-1]
         # get number of spike/snip's between start and stop
         #   chan=0 for any channel
@@ -95,7 +104,11 @@ class Spikes:
                 out.write('%d\t%.1f\t%.0f\t%.0f\n' % (k, t[j], c[j], s[j],))
                 #out.write('%d\t%.1f\t%s\n' % (k, t[j], int(c[j]), sigs[j].))
 
-    def unique(self, out):
+    def info(self, out):
+        out.write('server=%s\n' % self.server)
+        out.write('tank=%s\n' % self.tank)
+        out.write('block=%s\n' % self.block)
+        out.write('channels with spikes:\n')
         units = {}
         for k in range(self.ntrials):
             (t, c, s, sigs) = self.sdata[k]
@@ -105,7 +118,7 @@ class Spikes:
         k = units.keys()
         k.sort()
         for sig in k:
-            out.write('%s\n' % sig)
+            out.write(' %s\n' % sig)
 
 if __name__ == '__main__':
     sys.stderr.write('%s should never be loaded as main.\n' % __file__)
