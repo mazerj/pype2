@@ -1,5 +1,5 @@
-function xd = plx2mat(fname, spikes, lfps, autosave)
-%function xd = plx2mat(fname, spikes, lfps, autosave)
+function xd = plx2mat(fname, spikes, lfps, savefile)
+%function xd = plx2mat(fname, spikes, lfps, savefile)
 %
 % Use plx2asc.py to convert and load the spike and LFP data from a .plx
 % file into a compact, generic data stucture and optionally save it
@@ -14,8 +14,7 @@ function xd = plx2mat(fname, spikes, lfps, autosave)
 %   fname -- name of .plx datafile (wildcard ok here, it will iterate)
 %   spikes -- flag for spike extraction
 %   lfps -- flag for lfp extraction
-%   autosave -- optional flag (default=no) to save the result as a .mat
-%               file; save file will be 'fname.mat' (in same dir)
+%   savefile -- optional filename to save to
 %
 % OUTPUT
 %   matlab data structure 'xd'
@@ -53,7 +52,7 @@ function xd = plx2mat(fname, spikes, lfps, autosave)
 %Tue Jan  8 09:53:18 2008 mazer
 
 if nargin < 4
-  autosave = 0;
+  savefile = '';
 end
 
 flist = jls(fname);
@@ -193,8 +192,7 @@ end
 xd.spikes_flag = spikes;
 xd.lfps_flag = lfps;
 
-if autosave
-  fout = [fname '.mat'];
-  save(fout, 'xd', '-mat');
-  fprintf('Saved to %s\n', fout);
+if savefile
+  save(savefile, 'xd', '-mat');
+  fprintf('Saved to %s\n', savefile);
 end

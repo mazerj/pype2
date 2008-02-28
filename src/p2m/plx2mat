@@ -1,5 +1,11 @@
 #!/bin/sh
 
-cat <<EOF | matlab -nojvm
-plx2mat('$1', 1, 0, 1); quit;
+for f in $*; do
+  echo making $f.spk and $f.lfp
+  cat <<EOF | matlab -nojvm
+plx2mat('$f', 1, 0, '$f.spk');
+plx2mat('$f', 0, 1, '$f.lfp');
+quit;
 EOF
+
+done

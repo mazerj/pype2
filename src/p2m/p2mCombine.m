@@ -25,17 +25,24 @@ for n = 1:length(files)
   if n == 1
     PF = pf;
   else
-    k0 = length(PF.extradata);
-    for k = 1:length(pf.extradata)
-      PF.extradata{k0+k} = pf.extradata{k};
+    % Check for Field Mismatch: Touryan 02.28.08 %
+    if length(fieldnames(PF.rec(1))) ~= length(fieldnames(pf.rec(1)))
+        % Skip File %
+        fprintf('Warning: p2m file from different system (Plexon, TDT), skipping merge...\n') 
+    else
+        % Merge File %
+        k0 = length(PF.extradata);
+        for k = 1:length(pf.extradata)
+            PF.extradata{k0+k} = pf.extradata{k};
+        end
+
+        k0 = length(PF.rec);
+        for k = 1:length(pf.rec)
+            PF.rec(k0+k) = pf.rec(k);
+        end
+        
+        PF.src = [PF.src '+' cannonicalfname(fname)];
     end
-      
-    k0 = length(PF.rec);
-    for k = 1:length(pf.rec)
-      PF.rec(k0+k) = pf.rec(k);
-    end
-    
-    PF.src = [PF.src '+' cannonicalfname(fname)];
   end
 end
 
