@@ -6,22 +6,41 @@
 Tools for extracting data from Plexon .plx files
 ------------------------------------------------
 
-usage: plx2asc.py  [-i] [-d] [-s] [-l] [-p outprefix] plxfile
+usage: plx2asc.py  [-i] [-v] [-p outprefix] plxfile
 
   -i     list summary info for spike & lfp channels
   -h     just dump header info
-  -d     dump every record verbosely (debugging only!)
-  -s     extract spike data
-  -l     extract LFP data
-  -p str filename/dir prefix for -a (prefix+'.spk' and prefix+'.lfp')
+  -v     verbose dump (debugging only!)
+  -p str filename/dir prefix for output files
+          prefix+'.hdr'  --> hdr info
+          prefix+'.spk'  --> spike times
+          prefix+'.spw'  --> spike waveforms
+          prefix+'.lfp'  --> spike lfp signals
 
-Output formats:
+Output Files
+------------
+<prefix>.hdr:		columns="% channel nunits lfp"
+		table of electrodes/channels (1-based!) -- for each
+		channel column #2 indicates # of single units recorded
+		and column #3 indicates whether or not LFPs were recorded
+<prefix>.spk:		columns="% trial channel unit time"
+		spike timing info -- timestamps only. Columns should be
+		self-explanatory; channel is 1-based; unit is 0-based, but
+		unit 0 is 'unsorted' threshold crossings.
 
-  LFP list:     <idstr, channel#, ON/off>
-  SPIKE list:   <idstr, channel#, # of units>
-  
-  LFP output:   <trial#, channel#, time(s), volt>
-  SPIKE output: <trial#, channel#, unit#, time(s)>
+<prefix>.spw:		columns="% trial channel unit index time volt"
+		again, pretty self explanatory: channel is 1-based, unit is
+		0-based (0 for unsorted). index is sequence in the data stream
+		to facilitate sorting -- each waveform is sequenced in order
+		using 'index' with a NaN between events. 'time' is real
+		time in MS relative to pype gating signal and 'volt' is the
+		actual voltage on the electrode (waveform)
+
+<prefix>.lfp:	   columns="% trial channel time volt"
+		Same as .spw, but without 'index' and no NaN dividers are
+		needed..
+
+NOTE: 'trial' is always 1-based
 
 Times are all in MS relative to the pype trigger signal for each trial
 (assumes plexon is running in gated mode). Voltages are output in MV
@@ -35,6 +54,9 @@ IMPORT NOTES
 	  strings stored in 'fileheader.slows[n].name' by the plexon.
 	- however, the actual channel numbers stored in the data records
 	  are zero based, so AD01 has DataRecord.channel=0
+
+	  HOWEVER: THIS PROGRAM ADDS ONE TO THE SLOW CHANNEL NUMBER SO
+	  THEY WILL MATCH THE SPIKE DATA!
 
   For spikes, this the system is different -- again, the naming system
   is 1-based (sig001-sig016), however, this time, sig001 is stored
@@ -62,9 +84,9 @@ PL_EVENT=4								# discrete event record
 PL_SLOW=5								# block of slow (lfp) data
 
 # Plexon event codes
-PL_XSTROBE=257							# external strobe signal
+PL_XSTROBE=257							# external strobe signal (?)
 PL_XSTART=258							# external start trigger
-PL_XSTOPE=259							# external stop trigger
+PL_XSTOP=259							# external stop trigger
 PL_PAUSE=260							# ..not used..
 PL_RESUME=261							# ..not used..
 
@@ -285,7 +307,6 @@ class SlowHeader:
 		f.write('slow.Gain=%d\n' % self.Gain)
 		f.write('slow.Enabled=%d\n' % self.Enabled)
 		f.write('slow.PreAmpGain=%d\n' % self.PreAmpGain)
-		f.write('slow.SpikeChannel=%d\n' % self.SpikeChannel)
 		f.write('slow.Comment=<%s>\n' % self.Comment)
 
 class DataRecord:
@@ -329,42 +350,27 @@ class DataRecord:
 			f.write('data.waveform=None\n')
 
 
-def dumpall(fname, all):
-	f=open(fname, 'r')
-	h=FileHeader(f)
-	h.pp(sys.stdout)
-	if all:
-		buf = []
-		while 1:
-			try:
-				d = DataRecord(f)
-				d.pp(sys.stdout)
-				sys.stdout.write('\n')
-			except EOFError:
-				break
-			if d.Type == 5 and d.Channel == 1:
-				buf.append(d.waveform)
-	f.close()
-
 def info(fname):
 	f = open(fname, 'r')
 	h = FileHeader(f)
 	f.close()
 
-	n = 0
+	sys.stdout.write("chan\t#units\n")
 	for s in h.slows:
 		if s.Enabled:
-			sys.stdout.write("%s\t%d\t%s\n" % \
-							 (s.Name, n, 'ON'))
-		n = n + 1
+			sys.stdout.write("%s\t%d\n" % \
+							 (s.Name, 1, ))
 		
 	for s in h.channels:
 		if s.NUnits > 0:
-			sys.stdout.write("%s\t%d\t%d\n" % \
-							 (s.SIGName, s.Channel, s.NUnits))
+			sys.stdout.write("%s\t%d\n" % \
+							 (s.SIGName, s.NUnits, ))
 
 
-def xall(fname, prefix, noout, spikes, lfp, start, stop):
+def xall(fname, prefix):
+	spikes = 1
+	lfp = 1
+	
 	if prefix is None:
 		prefix = fname
 
@@ -374,65 +380,71 @@ def xall(fname, prefix, noout, spikes, lfp, start, stop):
 	t0 = 0.0;
 	trial_number = 0
 
-	if noout:
+	if prefix is None:
 		o = '/dev/null'
 	else:
 		o = prefix + '.hdr'
-		sys.stderr.write('header -> %s\n' % o)
+		#sys.stderr.write('header -> %s\n' % o)
 	hdrout = open(o, 'w')
 	hdrout.write('% channel nunits lfp\n')
 
-	if noout:
+	if prefix is None:
 		o = '/dev/null'
 	else:
 		o = prefix + '.spk'
-		sys.stderr.write('spikes -> %s\n' % o)
+		#sys.stderr.write('spikes -> %s\n' % o)
 	spikeout = open(o, 'w')
 	spikeout.write('% trial channel unit time\n')
 	
-	if noout:
+	if prefix is None:
 		o = '/dev/null'
 	else:
 		o = prefix + '.spw'
-		sys.stderr.write('spike waveforms -> %s\n' % o)
+		#sys.stderr.write('spike waveforms -> %s\n' % o)
 	spwout = open(o, 'w')
 	spwout.write('% trial channel unit index time volt\n')
 
-	if noout:
+	if prefix is None:
 		o = '/dev/null'
 	else:
 		o = prefix + '.lfp'
-		sys.stderr.write('lfp -> %s\n' % o)
+		#sys.stderr.write('lfp -> %s\n' % o)
 	lfpout = open(o, 'w')
 	lfpout.write('% trial channel time volt\n')
 
 	for i in range(h.NumDspChannels):
-		hdrout.write('%d\t' % i)
+		hdrout.write('%d\t' % (i+1,))
 		hdrout.write('%d\t' % h.channels[i].NUnits)
 		hdrout.write('%d\n' % h.slows[i].Enabled)
 
 	nspikes = 0
 	nsamps = 0
 	nwavesamps = 0
+	nrec = 0
+
+	t0 = None
 
 	while 1:
 		try:
 			d = DataRecord(f)
+			nrec = nrec + 1
 		except EOFError:
 			break
 
 		if d.Type == PL_EVENT and d.Channel == PL_XSTART:
-			t0 = d.ts
-			trial_number = trial_number + 1
-			if stop > 0 and trial_number > stop:
-				break
+			if t0 is None:
+				t0 = float(d.ts)
+				trial_number = trial_number + 1
+			else:
+				sys.stderr.write('double XSTART: trial %d\n' % trial_number)
+				sys.exit(1)
 			
-		elif lfp and d.Type == PL_SLOW:
-			if start > 0 and trial_number < start:
-				continue
-				
+		elif d.Type == PL_EVENT and d.Channel == PL_XSTOP:
+			t0 = None
+
+		elif lfp and d.Type == PL_SLOW and (not t0 is None):
 			# compute timestamp in secs
-			ts = float(d.ts - t0) / float(h.ADFrequency)
+			ts = (float(d.ts) - t0) / float(h.ADFrequency)
 			
 			for i in range(len(d.waveform)):
 				# convert waveform value to voltage (from plexon docs,
@@ -443,19 +455,17 @@ def xall(fname, prefix, noout, spikes, lfp, start, stop):
 				v = (v * h.SlowMaxMagnitudeMV) / \
 					(0.5 * (2.0**h.BitsPerSlowSample) * \
 					 h.slows[d.Channel].Gain * h.slows[d.Channel].PreAmpGain)
-				
+
+				# the +1 on d.Channel
 				lfpout.write("%d\t%d\t%f\t%f\n" % \
-							 (trial_number, d.Channel, \
-							  1000.0 * (ts + (i / float(h.slow_adfreq))),
+							 (trial_number, d.Channel+1, \
+							  1000.0 * (ts + (float(i) / float(h.slow_adfreq))),
 							  1000.0 * v))
 				nsamps += 1
 
-		elif spikes and d.Type == PL_SPIKE:
-			if start > 0 and trial_number < start:
-				continue
-
+		elif spikes and d.Type == PL_SPIKE and (not t0 is None):
 			# compute timestamp in secs
-			ts = float(d.ts - t0) / float(h.ADFrequency)
+			ts = (float(d.ts) - t0) / float(h.ADFrequency)
 			spikeout.write("%d\t%d\t%d\t%f\n" % 
 						   (trial_number, d.Channel, d.Unit, 1000.0 * ts))
 			nspikes += 1
@@ -497,50 +507,28 @@ if __name__ == '__main__':
 	p = OptionParser('usage: %prog [ options] plx-file')
 
 	# flag options (store_true is for flags)
-	p.add_option('-d', '--dump', dest='dump',
-				 action='store_true', default=0,
-				 help='dump all header info')
-	p.add_option('-a', '--dumpall', dest='dumpall',
+	p.add_option('-v', '--verbose', dest='dump',
 				 action='store_true', default=0,
 				 help='dump all header info')
 	p.add_option('-i', '--info', dest='info',
 				 action='store_true', default=0,
 				 help='info on channels')
-	p.add_option('-s', '--spikes', dest='spikes',
-				 action='store_true', default=0,
-				 help='access spike data')
-	p.add_option('-l', '--lfp', dest='lfp',
-				 action='store_true', default=0,
-				 help='access lfp data)')
-	p.add_option('-n', '--noout', dest='noout',
-				 action='store_true', default=0,
-				 help='no output at all to files)')
 	
 	
 	# options with mandatory arguments
 	p.add_option('-p', '--prefix', dest='prefix',
 				 action='store', type='string', default=None,
 				 help='file prefix for ascii dump files')
-	p.add_option('--start', dest='start',
-				 action='store', type='int', default=0,
-				 help='start at trial (1-based)')
-	p.add_option('--stop', dest='stop',
-				 action='store', type='int', default=0,
-				 help='stop at trial (1-based)')
 
 	(options, args) = p.parse_args()
 
 	try:
 		if len(args) != 1:
-			parser.error('must specify .plx file')
-		elif options.dump:
-			dumpall(args[0], options.dumpall)
+			p.error('must specify .plx file')
 		elif options.info:
 			info(args[0])
 		else:
-			xall(args[0], options.prefix, options.noout,
-				 options.spikes, options.lfp,
-				 options.start, options.stop)
+			xall(args[0], options.prefix)
 	except NotPlx:
 		sys.stderr.write('"%s" is not a plx file\n' % args[0])
 		sys.exit(1)

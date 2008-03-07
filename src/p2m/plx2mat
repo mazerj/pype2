@@ -1,11 +1,22 @@
 #!/bin/sh
+#
+# Extract .lfp and .spw files from .plx files
+#
+# usage: plx2mat [-f] ..plxfiles...
+#  if -f is specified, then existing files will be overwritten
+#  
+
+force=0
+if [ "$1" = "-f" ]; then
+  force=1
+  shift
+fi
 
 for f in $*; do
-  echo making $f.spk and $f.lfp
-  cat <<EOF | matlab -nojvm
-plx2mat('$f', 1, 0, '$f.spk');
-plx2mat('$f', 0, 1, '$f.lfp');
-quit;
-EOF
-
+  if [ -e $f.lfp -a $force -eq 0 ]; then
+    echo "skipped $f (use -f to force)"
+  else
+    echo extracting $f
+    echo "plx2mat('$f'); quit;" | matlab -nojvm
+  fi
 done

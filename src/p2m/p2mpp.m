@@ -20,8 +20,13 @@ end
 
 fprintf('--EVENTS---------------------------------------\n');
 
+dt = -1;
 for n = 1:length(pf.rec(recno).ev_e)
-  fprintf('%6d ms\t<%s>\n', pf.rec(recno).ev_t(n), pf.rec(recno).ev_e{n})
+  if n > 1
+    dt = pf.rec(recno).ev_t(n) - pf.rec(recno).ev_t(n-1);
+  end
+  fprintf('%6d ms\t(%6dms)\t<%s>\n', ...
+	  pf.rec(recno).ev_t(n), dt, pf.rec(recno).ev_e{n})
 end
 
 fprintf('--USERPARAMS-----------------------------------\n');
