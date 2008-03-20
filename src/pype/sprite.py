@@ -1682,9 +1682,39 @@ class Sprite(_ImageBase):
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
 
+	def rotozoom(self, scale=1.0, angle=0.0):
+		"""Resize this sprite using rotozoom
+
+		This does combined scale and rotation and smooths on the
+		fly -- probbaly not as fast as scale(), but will look better.
+
+		**scale** -- floating point scale factor
+
+		**angle** -- angle in degrees to rotate CCW
+		  
+		**returns** -- None
+		  
+	    **NOTE** --
+		this is NOT invertable! Scaling down and back up will
+		not return the original sprite!!
+		"""
+		new = pygame.transform.rotozoom(self.im, scale, angle)
+		self.im = new.convert(ALPHAMASKS)
+		self.array.refresh(self.im)
+		self.alpha.refresh(self.im)
+
+		self.im.set_colorkey((0,0,0,0))
+		self.w = self.im.get_width()
+		self.h = self.im.get_height()
+		self.iw = self.w
+		self.ih = self.h
+		
+		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
+		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
+
 	def circmask(self, x, y, r):
 		"""hard vignette in place --- was image_circmask"""
-		mask = where(less(((((self.ax-x)**2)+((self.ay-y)**2)))**0.5, r), 1, 0)
+		mask = where(less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
 		a[:] = mask * a
 		
@@ -1704,7 +1734,7 @@ class Sprite(_ImageBase):
 		  
 		**returns** -- None
 		"""
-		d = where(less((((self.ax-x)**2)+((self.ay-y)**2))**0.5, r),
+		d = where(less((((self.ax-x)**2)+((self.ay+y)**2))**0.5, r),
 				  255, 0).astype(UnsignedInt8)
 		self.alpha[:] = d
 
@@ -1724,7 +1754,7 @@ class Sprite(_ImageBase):
 		**returns** -- None
 		"""
 		d = 255 - (255 * (((((self.ax-x)**2)+\
-							((self.ay-y)**2))**0.5)-r1) / (r2-r1))
+							((self.ay+y)**2))**0.5)-r1) / (r2-r1))
 		d = where(less(d, 0), 0,
 				  where(greater(d, 255), 255, d)).astype(UnsignedInt8)
 		self.alpha[:] = d
@@ -1744,7 +1774,7 @@ class Sprite(_ImageBase):
 		  
 		**returns** -- None
 		"""
-		d = 1.0 - ((hypot(self.ax-x, self.ay-y) - r1) / (r2 - r1))
+		d = 1.0 - ((hypot(self.ax-x, self.ay+y) - r1) / (r2 - r1))
 		alpha = clip(d, 0.0, 1.0)
 		i = pygame.surfarray.pixels3d(self.im)
 		alpha = transpose(array((alpha,alpha,alpha)), axes=[1,2,0])
