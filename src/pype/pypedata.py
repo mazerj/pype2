@@ -134,6 +134,29 @@ class PypedataTimeError(Exception):
 	"""
 	pass
 
+
+def idfile(f):
+	try:
+		fp = open(f, 'r')
+	except IOError:
+		return None
+	m1 = fp.read(1)
+	m2 = fp.read(1)
+	m3 = fp.read(1)
+	fp.close()
+	if len(m1) == 0:
+		return 'empty'
+	elif m1 == '<' and m2 == '<' and m3 == '<':
+		return 'pype'
+	elif m1 == 'n' and m2 == 'p' and m3 == 'f':
+		return 'newpype'
+	elif ord(m1) == 0xbe and ord(m2) == 0xef and ord(m3) == 0x08:
+		return 'gz'
+	elif ord(m1) == 0x42 and ord(m2) == 0x5a:
+		return 'bz2'
+	else:
+		return ''
+
 class Note:
 	def __init__(self, rec):
 		self.id = rec[1]
@@ -597,6 +620,10 @@ class PypeFile:
 			try:
 				sys.stderr.write("Warning: pulling tdt spikes from tank\n")
 				self.tdt = tdtspikes.Spikes(rec=rec)
+				# download spikes and pull out into tdt.sdata[]
+				self.tdt.query()
+				sys.stderr.write("Warning: pulled %d trials from tank\n" %
+								 len(self.tdt.sdata))
 			except ttank.TDTError:
 				sys.stderr.write("Warning: can't connect to tank\n")
 				self.tdt = None

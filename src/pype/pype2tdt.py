@@ -89,10 +89,11 @@ class Controller:
     def newblock(self, record=1):
         (self._server, self._tank, self._block) = \
                        self.tdtconnx.tdev_newblock(record=record)
+        return (self._server, self._tank, self._block)
         
 	def getblock(self):
-        return (self._server, self._tank, self._block,
-                self.tdevconnx.tdev_tnum()) 
+        tnum = self.tdtconnx.tdev_tnum()
+        return (self._server, self._tank, self._block, tnum)
     
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

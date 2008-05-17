@@ -232,7 +232,7 @@ class _Probe:
 		#	self.app.udpy._canvas.delete(self.txt)
 		#	self.txt = None
 		self.app.udpy_note('')
-
+		
 	def reset(self):
 		"""force sprite to be redraw next cycle"""
 		if self.s:
@@ -285,8 +285,9 @@ class _Probe:
 		self.colorn = (self.colorn + incr) % 9
 
 	def showprobe(self):
-		i = self.app.udpy._canvas.create_image(0, 0, anchor=NW,
-											   image=self.s.asPhotoImage())
+		photoim = self.s.asPhotoImage()
+		i= self.app.udpy._canvas.create_image(0, 0, anchor=NW,
+											  image=photoim)
 		
 	def draw(self):
 		t = self.app.ts()

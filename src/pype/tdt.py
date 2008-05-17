@@ -233,7 +233,7 @@ class TDTServer:
 					(obj, method, args) = x
 					fn = eval('%s.%s' % (obj, method))
 					result = apply(fn, args)
-					time.sleep(10)
+					#time.sleep(10)
 				except:
 					# send error info back to client for debugging..
 					ok = None

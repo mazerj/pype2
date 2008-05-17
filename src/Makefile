@@ -23,6 +23,11 @@ install-subdirs:
 	@rm -rf $(PYPEDIR)/lib/Pmw*
 	@sh pmw.sh $(PYPEDIR)/lib
 
+install-p2m:
+	@mkdir -p $(PYPEDIR)/../p2m
+	(cd p2m ; $(MAKE) install)
+
+
 install-py:
 	@(cd $(PYDIR); $(MAKE) install)
 

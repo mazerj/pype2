@@ -728,6 +728,19 @@ class FrameBuffer:
 		else:
 			self.screen.set_at((0,0), self.screen.get_at((0,0)))
 
+		if 0:
+			ar = float(self.w) / float(self.h)
+			w = 256
+			h = int(0.5 + w / ar)
+			i = Image.fromstring('RGBA', self.screen.get_size(),
+								 pygame.image.tostring(self.screen, 'RGBA'))
+			i = i.resize((w,h))
+			self._snap = ImageTk.PhotoImage(i)
+			i = self.app.udpy._canvas.create_image(self.w-w, 0,
+												   anchor=Tkinter.NW,
+												   image=self._snap)
+			
+
 	def string(self, x, y, s, color, flip=None, prefill=None, size=30):
 		"""Draw string on framebuffer
 		
@@ -881,16 +894,22 @@ class FrameBuffer:
 		**size** -- optional size of the snapshot; PIL is used to rescale
 		the image to this size. If size is left unspecified, then
 		the snapshot is written at the screen's true resolution.
+
+		returns PIL Image structure containing the snapshot (can
+		be converted th PhotoImage for display in Tkinter/Canvas..)
 		"""
 		import Image
 		pil = Image.fromstring('RGBA', self.screen.get_size(),
 							   pygame.image.tostring(self.screen, 'RGBA'))
-		if size:
-			pil.resize(size).save(filename)
-			Logger("Wrote %s screen to: %s\n" % (size,filename))
-		else:
-			pil.save(filename)
-			Logger("Wrote screen to: %s\n" % filename)
+		if filename:
+			if size:
+				pil.resize(size).save(filename)
+				Logger("Wrote %s screen to: %s\n" % (size,filename))
+			else:
+				pil.save(filename)
+				Logger("Wrote screen to: %s\n" % filename)
+		return pil
+			
 
 	def rectangle(self, cx, cy, w, h, color, width=0):
 		"""Draw rectangle directly on framebuffer
@@ -1330,6 +1349,7 @@ class Sprite(_ImageBase):
 		**returns** -- PhotoImage represenation of the sprite's pixels.
 		"""
 		import Image, ImageTk
+
 		if alpha:
 			im = self.im.convert()
 			im.set_alpha(alpha)

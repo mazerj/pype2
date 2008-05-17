@@ -41,6 +41,9 @@ install-shared:
 	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
 	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
+p2m:
+	(cd src; $(MAKE) install-p2m)
+
 pycompile:
 	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
 	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
@@ -53,6 +56,7 @@ else
 endif
 
 # clean: all the pype src directories
+# the find command is slowest here..
 clean: 
 	@echo "Cleaning temp files..."
 	@find . -name core -o -name music.raw -o -name \*.pyc | xargs rm -f

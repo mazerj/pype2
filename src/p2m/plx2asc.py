@@ -70,6 +70,13 @@ IMPORT NOTES
 
   Note that unit data is always 0-based, with 0 corresponding to unsorted
   spike data and 1 to unit 'a', 2 to unit 'b' etc..
+
+REVISION HISTORY
+----------------
+Wed May  7 10:46:17 2008 mazer
+  - DataRecord.ts was not being correctly computed -- the MSB word was
+    typically being set to 1 (val<40 instead of val<<40..) regenerated
+	plx files after fixing..
 """
 
 import sys, struct
@@ -317,7 +324,9 @@ class DataRecord:
 		# upper is upper byte, lower is lower 4 bytes
  		(buf, self.timestamp_upper) = _extractbytes(buf, 1, 'H')
 		(buf, self.timestamp_lower) = _extractbytes(buf, 1, 'L')
-		self.ts = (self.timestamp_upper<40) + self.timestamp_lower
+
+		# BUG: prior to 5/7/2008 this was ...<40 instead of ...<<40
+		self.ts = (self.timestamp_upper<<40) + self.timestamp_lower
 
 		# channel and be a channel OR an event code!
 		# if type == PL_EVENT, it's an event code..
@@ -423,6 +432,7 @@ def xall(fname, prefix):
 	nrec = 0
 
 	t0 = None
+	adshift = None
 
 	while 1:
 		try:
@@ -443,8 +453,18 @@ def xall(fname, prefix):
 			t0 = None
 
 		elif lfp and d.Type == PL_SLOW and (not t0 is None):
+			if adshift is None:
+				# assume the very first LFP sample in the file starts
+				# at time ZERO (for pype, this is the same time as the
+				# very first PL_XSTART). The assumption here is that
+				# the NIDAQ card lags a bit behind the MAP box (group
+				# delay), so timestamps are later than the actual time
+				# the data came in, but the 1st sample should really be
+				# zero..
+				adshift = d.ts
+				
 			# compute timestamp in secs
-			ts = (float(d.ts) - t0) / float(h.ADFrequency)
+			ts = (float(d.ts) - t0 - adshift) / float(h.ADFrequency)
 			
 			for i in range(len(d.waveform)):
 				# convert waveform value to voltage (from plexon docs,

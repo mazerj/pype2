@@ -20,7 +20,7 @@ DATAFMT=8
 RATE=9
 
 TTank=None
-DEBUG=1
+DEBUG=0
 
 class _Socket:
 	def Send(self, data):
@@ -92,7 +92,11 @@ class TTankServer:
 		if msg is None:
 			sys.stderr.write('\n')
 		else:
-			for ln in msg.split('\n'):
+			try:
+				msg = msg.split('\n')
+			except:
+				msg = repr(msg).split('\n')
+			for ln in msg:
 				sys.stderr.write('%02d:%02d:%02d ' % \
 								 time.localtime(time.time())[3:6])
 				sys.stderr.write('%s: %s\n' % \
@@ -134,7 +138,7 @@ class TTankServer:
 					# client closed connection
 					break
 
-				et = time.time()
+				tic = time.time()
 				try:
 					ok = 1
 					(obj, method, args) = x
@@ -143,14 +147,21 @@ class TTankServer:
 				except:
 					# send error info back to client for debugging..
 					ok = None
-					result = sys.exc_info()
-					traceback.print_tb(tb)
-				et = time.time() - et
+					result = repr(sys.exc_info()[1])
+					##???: traceback.print_tb(tb)
+				ete = time.time() - tic
+				tic = time.time()
 				server.Send(pickle.dumps((ok, result)))
+				ett = time.time() - tic
+				self.log('[%.0f/%.0f ms eval/xmit]' % (1000*ete, 1000*ett,))
 				if DEBUG:
-					#self.log('(%s,"%s") <- %s' % (ok, result, x))
-					self.log('(%s,??) <- ..%s..' % (ok, x[1]))
-					self.log('[%.3fs elapsed]' % (et, ))
+					if 0:
+						self.log('obj=%s' % (obj,))
+						self.log('method=%s' % (method,))
+						self.log('args=%s' % (args,))
+						self.log(' (ok,result)=%s' % ((ok, result),))
+					else:
+						self.log('(%s,??) <- ..%s..' % (ok, x[1]))
 					
 				if ok is None:
 					self.log(sys.exc_value)
@@ -224,10 +235,13 @@ def loopforever():
 		try:
 			s.listen()
 		except:
-			log('-----------------------------')
-			log('Server-side near fatal error in loopforever:')
-			log(sys.exc_value)
-			log('-----------------------------')
+			s.log('-----------------------------')
+			s.log('Server-side near fatal error in loopforever:')
+			s.log(sys.exc_value)
+			s.log('-----------------------------')
+			s.disconnect()
+			sys.stdout.write('<hit enter>')
+			sys.stdin.readline()
 			del s
 			
 if __name__ == '__main__':

@@ -7,26 +7,25 @@
 import sys
 import Numeric
 import pypedata, ttank
+import time
 
 from pypedebug import keyboard
 
-class Spikes:
-    # get all spikes at once, then sort into trials locally..
-    # this is much faster -- seems about 1-2 secs to get all the
-    # spikes, even for big datasets. Danger is if there's more than
-    # 1e6 spikes...
-    
-    def __init__(self,
-                 rec=None,
-                 pypefile=None,
-                 server=None, tank=None, block=None,
-                 chan=0, unit=0, getwaves=None):
+class TDTBaseClass:
+    """
+    Class is intended to open a datatank and query the trial struction
+    info, which can later be expanded into spike or LFP data etc..
+    """
         
-        # note: we're just looking at the first pype record in the
-        # datafile to get the necessary tank info. That's all we need
-        # to find the data..
+    def __init__(self, rec=None, pypefile=None,
+                 server=None, tank=None, block=None):
 
-        if rec or pypefile :
+        # NOTE: Just look at the first pype record (or the
+        # user-specified 'rec') to get the necessary tank info. The
+        # assumption is that this doesn't change once you start
+        # collecting data.
+
+        if rec or pypefile:
             if pypefile:
                 pf = pypedata.PypeFile(pypefile)
                 rec = pf.nth(0)
@@ -39,20 +38,20 @@ class Spikes:
             self.tank = tank
             self.block = block
 
-        tt = ttank.TTank(self.server)
-        if tt.invoke('OpenTank', self.tank, 'R'):
-            tt.invoke('SelectBlock', self.block)
+        self.tt = ttank.TTank(self.server)
+        if self.tt.invoke('OpenTank', self.tank, 'R'):
+            self.tt.invoke('SelectBlock', self.block)
         else:
             sys.stderr.write('Missing tdt tank: %s\n' % self.tank)
 
         # trl1 is the rising edge of the gating signal
         # this query will get the timestamps for each TRL1 event in SECS
-        n = tt.invoke('ReadEventsV', 1e6, 'TRL1', 0, 0, 0.0, 0.0, 'ALL')
-        trl1 = tt.invoke('ParseEvInfoV', 0, n, ttank.TIME)
+        n = self.tt.invoke('ReadEventsV', 1e6, 'TRL1', 0, 0, 0.0, 0.0, 'ALL')
+        trl1 = self.tt.invoke('ParseEvInfoV', 0, n, ttank.TIME)
 
         # trl2 is the falling edge of the gating signal
-        n = tt.invoke('ReadEventsV', 1e6, 'TRL2', 0, 0, 0.0, 0.0, 'ALL')
-        trl2 = tt.invoke('ParseEvInfoV', 0, n, ttank.TIME)
+        n = self.tt.invoke('ReadEventsV', 1e6, 'TRL2', 0, 0, 0.0, 0.0, 'ALL')
+        trl2 = self.tt.invoke('ParseEvInfoV', 0, n, ttank.TIME)
 
         if len(trl1) != len(trl2):
             # this probably means a new record came in between requesting
@@ -61,16 +60,28 @@ class Spikes:
             sys.stderr.write('Warning: incomplete trial in tdt tank.\n')
             trl1 = trl1[0:len(trl2)]
 
-        # if requested -- pull down the analog snipet waveform data:
-        # still needs to be massaged to adjust timestmps..
+        self.trl1 = trl1
+        self.trl2 = trl2
+
+class Spikes(TDTBaseClass):
+    # get all spikes at once, then sort into trials locally..
+    # this is much faster -- seems about 1-2 secs to get all the
+    # spikes, even for big datasets. Danger is if there's more than
+    # 1e6 spikes...
+    
+    def query(self, chan=0, unit=0, getwaves=None):
+        tt = self.tt
+        
         if getwaves:
+            # pull down the analog snipet waveform data: still needs
+            # to be massaged to adjust timestmps..
             nsnip = tt.invoke('ReadEventsV', 1e6, 'Snip', 0, 0, 0.0, 0.0, 'ALL')
             self.waves = tt.invoke('ParseEvV', 0, nsnip)
             self.channel = tt.invoke('ParseEvInfoV', 0, nsnip, ttank.CHANNUM)
             self.sortnum = tt.invoke('ParseEvInfoV', 0, nsnip, ttank.SORTNUM)
             self.ts = tt.invoke('ParseEvInfoV', 0, nsnip, ttank.TIME)
 
-        start, stop = trl1[0], trl2[-1]
+        start, stop = self.trl1[0], self.trl2[-1]
         # get number of spike/snip's between start and stop
         #   chan=0 for any channel
         #   unit=0 for any unit (aka sortcode)
@@ -83,10 +94,12 @@ class Spikes:
         sall = Numeric.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.SORTNUM))
         
         self.sdata = []
-        for k in range(len(trl1)):
-            mask = Numeric.logical_and(Numeric.greater_equal(tall, trl1[k]),
-                                       Numeric.less_equal(tall, trl2[k]))
-            t = (Numeric.compress(mask, tall) - trl1[k]) * 1000.0
+        for k in range(len(self.trl1)):
+            mask = Numeric.logical_and(Numeric.greater_equal(tall,
+                                                             self.trl1[k]),
+                                       Numeric.less_equal(tall,
+                                                          self.trl2[k]))
+            t = (Numeric.compress(mask, tall) - self.trl1[k]) * 1000.0
             c = Numeric.compress(mask, call)
             s = Numeric.compress(mask, sall)
             sigs = []
@@ -94,7 +107,7 @@ class Spikes:
                 sigs.append('%03d%c' % (c[j], chr(int(s[j])+ord('a')-1),))
             self.sdata.append((t, c, s, sigs,))
             
-        self.ntrials = len(trl1)
+        self.ntrials = len(self.trl1)
 
     def dump(self, out):
         #out.write('#tnum time chan unit\n')
@@ -120,6 +133,41 @@ class Spikes:
         for sig in k:
             out.write(' %s\n' % sig)
 
+class Raw(TDTBaseClass):
+    def query(self, tnum, chan=0):
+        # 0 for all channels!
+        tt = self.tt
+        
+        start, stop = self.trl1[tnum], self.trl2[tnum]
+        tt.invoke('SetGlobalB', 'Channel', chan)
+        tt.invoke('SetGlobalB', 'T1', start)
+        tt.invoke('SetGlobalB', 'T2', stop)
+        keyboard()
+        print start, stop, stop-stop, 's'
+        w = Numeric.array(tt.invoke('ReadWavesV', 'RAW0'))
+        dt = float(stop-start)/float(w.shape[0])
+        t = Numeric.arange(start, stop, step=dt)
+        return t, w
+
+    def dump(self, out, dump=0):
+        # written trial num and channel num are 1-based
+        #out.write('#tnum time chan unit\n')
+        for tnum in range(len(self.trl1)):
+            sys.stderr.write('retrieving trial %d\n' % tnum)
+            tic = time.time()
+            t, w = self.query(tnum, chan=0)
+            toc = time.time()-tic
+            if dump:
+                for k in range(w.shape[1]):
+                    for j in range(w.shape[0]):
+                        out.write('%d\t%f\t%d\t%f\n' % \
+                                  (tnum+1, t[j]-t[0], k+1, w[j,k]))
+            sys.stderr.write('%d samples/sec\n' % (w.shape[0]*w.shape[1]/toc))
+
 if __name__ == '__main__':
+    f = '/auto/data/critters/flea/2008/2008-02-08/flea0137.spotmap.005.gz'
+    x = Raw(pypefile=f)
+    x.dump(sys.stdout)
+    
     sys.stderr.write('%s should never be loaded as main.\n' % __file__)
     sys.exit(1)

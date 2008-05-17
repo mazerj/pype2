@@ -1695,6 +1695,7 @@ class PypeApp:
 							  synclevel=self.config.iget('SYNCLEVEL'),
 							  fopengl=self.config.iget('OPENGL'))
 
+		self.fb.app = self
 
 		g = self.config.fget('GAMMA')
 		if self.fb.set_gamma(g):
@@ -1929,7 +1930,7 @@ class PypeApp:
 				elif self.xdacq == 'tdt':
 					# start new block in current tank, this includes resting the
 					# trial counter..
-					self.tdt.newblock(record=1)
+					(server, tank, block) = self.tdt.newblock(record=1)
 					Logger('tdt data: %s %s\n' % (tank, block))
 						
 				if self.tk:
@@ -3255,7 +3256,6 @@ class PypeApp:
 		self.show_eyetrace_stop = stop
 
 	def plotEyetraces(self, t=None, x=None, y=None, others=None, raster=None):
-		keyboard()
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
 			oldgraph = attach(self._eyetrace_window)
