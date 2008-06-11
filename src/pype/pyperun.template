@@ -278,4 +278,8 @@ else:
     while not app.terminate:
         app.idlefn(toplevel=1)
 	app.close()
+    #sys.stderr.write('<closed app>')
+    sys.exit(0)
+    
+#sys.stderr.write('<pyperun exiting>')
 

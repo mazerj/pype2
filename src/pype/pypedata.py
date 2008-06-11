@@ -344,6 +344,31 @@ class PypeRecord:
 			self.photo_times = Numeric.array(self.rec[6], 'i')
 			self.spike_times = Numeric.array(self.rec[7], 'i')
 
+
+			try_ttank_pull = 1
+			if self.params.has_key('tdt_tank'):
+				# use set environment var ('env') TTANK=0 to skip trying
+				# to pull data from the TDT TTank subsystem
+				try:
+					try_ttank_pull = int(os.environ['TTANK'])
+				except:
+					pass
+
+				global __ttank_warn__
+				try:
+					xxxx = __ttank_warn__
+					warn = 0
+				except NameError:
+					warn = 1
+				__ttank_warn__ = None
+
+				if warn:
+					if try_ttank_pull:
+						sys.stderr.write('warning: pulling data from TTank.\n')
+					else:
+						sys.stderr.write('warning: TTL data only.\n')
+					
+
 			if len(self.rec) > 13 and self.rec[13] is not None:
 				plist = self.rec[13]
 				times, channels, units, ids = [], [], [], []
@@ -356,7 +381,7 @@ class PypeRecord:
 				self.plex_channels = Numeric.array(channels, 'i')
 				self.plex_units = Numeric.array(units, 'i')
 				self.plex_ids = ids[:]
-			elif self.params.has_key('tdt_tank'):
+			elif try_ttank_pull and self.params.has_key('tdt_tank'):
 				(times, channels, units, ids) = self.file.tdtpull(self)
 				self.plex_times = times
 				self.plex_channels = channels

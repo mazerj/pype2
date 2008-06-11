@@ -1158,6 +1158,8 @@ class PypeApp:
 		fps = self.fb.calcfps(duration=250)
 		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
 			Logger('pype: error! fps does not match requested rate\n')
+			Logger('pype: requested=%d actual=%d\n' % \
+				   (self.config.iget('FPS'), fps))
 			sys.exit(1)
 		self.rig_common.set('mon_fps', '%g' % fps)
 		self.idlefb()
