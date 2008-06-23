@@ -35,6 +35,14 @@ Tue Aug	 8 14:04:36 2006 mazer
 Wed Aug	 9 13:15:34 2006 mazer
   Added _unpack_rgb() to make all the stimulus generators use a common
   color specification. And documented all the grating generators.
+
+Fri Jun 13 15:24:57 2008 mazer
+  added ppd=, meanlum=, moddepth= and color=  options to sin, cos,
+  polar, logpolar and hyper grating functions
+  
+Wed Jun 18 13:54:46 2008 mazer
+ removed old grating generator functions: Make_2D_XXXX() 
+
 """
 
 import math
@@ -99,15 +107,17 @@ def pixelize(a, rgb=None, norm=1):
 	else:
 		return g2rgb(a)
 
-def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
+		
+def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
+			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D sine grating generator (odd symmetric)
 	
 	INPUT
 	
 		s = Sprite object
 		
-		frequency = frequency in cycles/sprite
-		
+		frequency = frequency in cycles/sprite (or cyc/deg, if ppd is given)
+
 		phase_deg = phase in degrees
 		  (nb: 0deg phase centers the sine function at sprite ctr)
 		  
@@ -118,7 +128,16 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 		G = green channel value (0-1)
 		
 		B = blue channel value (0-1)
-	
+
+		ppd = pixels/degree-visual-angle; if included, then it means that
+		   freq is being specified in cycles/degree
+		   
+		meanlum = mean (DC) value of grating (0-1); default is 0.5
+		
+		moddepth = modulation depth (0-1)
+
+		color = RGB triple (alternative specification of color vector)
+
 	OUTPUT
 	
 		None.
@@ -126,16 +145,28 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 	NB: verified frequency is really cycles/sprite JM 17-sep-2006
 	
 	"""
-	R, G, B = _unpack_rgb(R, G, B)
+	
+	if not ppd is None:
+		# convert cycles/deg into cycles/sprite:
+		d = (s.w + s.h) / 2.0
+		frequency = d / ppd * frequency
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
+
+	if color:
+		R, G, B = color
+	else:
+		R, G, B = _unpack_rgb(R, G, B)
 	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
 	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
 	x, y = (r * cos(t), r * sin(t))
 
-	i = 127.0 * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+	i = moddepth * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
-def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
+def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
+			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D cosine grating generator (even symmetric)
 	
 	INPUT
@@ -155,30 +186,50 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0):
 		
 		B = blue channel value (0-1)
 	
+		ppd = pixels/degree-visual-angle; if included, then it means that
+		   freq is being specified in cycles/degree
+		   
+		meanlum = mean (DC) value of grating (0-1); default is 0.5
+
+		moddepth = modulation depth (0-1)
+
+		color = RGB triple (alternative specification of color vector)
+		
 	OUTPUT
 		None.
 		
 	NB: verified frequency is really cycles/sprite JM 17-sep-2006
 	
 	"""
-	R, G, B = _unpack_rgb(R, G, B)
+	if not ppd is None:
+		# convert cycles/deg into cycles/sprite:
+		d = (s.w + s.h) / 2.0
+		freq = d / ppd * freq
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
+
+	if color:
+		R, G, B = color
+	else:
+		R, G, B = _unpack_rgb(R, G, B)
 	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
 	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 
-	i = 127.0 * cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+	i = moddepth * cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
 def polargrat(s, cfreq, rfreq, phase_deg, polarity, 
-			 R=1.0, G=1.0, B=1.0, logpolar=0):
+			  R=1.0, G=1.0, B=1.0, logpolar=0,
+			  meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D polar (non-Cartesian) grating generator
 	
 	INPUT
 	
 		s = Sprite object
 		
-		cfreq = concentric frequency (cycles/sprite)
+		cfreq = concentric frequency (cycles/sprite or cyc/deg -- see ppd)
 		
 		rfreq = concentric frequency (cycles/360deg)
 		
@@ -191,7 +242,16 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 		G = green channel value (0-1)
 		
 		B = blue channel value (0-1)
-	
+
+		ppd = pixels/degree-visual-angle; if included, then it means that
+		   freq is being specified in cycles/degree -- for cfreq only
+		   
+		meanlum = mean (DC) value of grating (0-1); default is 0.5
+
+		moddepth = modulation depth (0-1)
+
+		color = RGB triple (alternative specification of color vector)
+
 	OUTPUT
 	
 		None.
@@ -199,7 +259,17 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 	NB: verified frequencies are really cycles/sprite JM 17-sep-2006
 	
 	"""
-	R, G, B = _unpack_rgb(R, G, B)
+	if not ppd is None:
+		# convert cycles/deg into cycles/sprite:
+		d = (s.w + s.h) / 2.0
+		cfreq = d / ppd * cfreq
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
+
+	if color:
+		R, G, B = color
+	else:
+		R, G, B = _unpack_rgb(R, G, B)
 	if polarity < 0:
 		polarity = -1.0
 	else:
@@ -210,19 +280,20 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 		z = (log(hypot(x,y)) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
 	else:
 		z = (hypot(x,y) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
-	i = 127.0 * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+	i = moddepth * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])	
 
 def logpolargrat(s, cfreq, rfreq, phase_deg, polarity, 
-				 R=1.0, G=1.0, B=1.0):
+				 R=1.0, G=1.0, B=1.0,
+				 meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D log polar (non-Cartesian) grating generator
 	
 	INPUT
 	
 		s = Sprite object
 		
-		cfreq = concentric frequency (cycles/sprite)
+		cfreq = concentric frequency (cycles/sprite or cycles/deg -- see ppd)
 		
 		rfreq = concentric frequency (cycles/360deg)
 		
@@ -236,6 +307,15 @@ def logpolargrat(s, cfreq, rfreq, phase_deg, polarity,
 		
 		B = blue channel value (0-1)
 		
+		ppd = pixels/degree-visual-angle; if included, then it means that
+		   freq is being specified in cycles/degree
+		   
+		meanlum = meanlum (DC) value of grating (0-1); default is 0.5
+
+		moddepth = modulation depth (0-1)
+
+		color = RGB triple (alternative specification of color vector)
+
 	OUTPUT
 	
 		None.
@@ -246,17 +326,20 @@ def logpolargrat(s, cfreq, rfreq, phase_deg, polarity,
 	
 	"""
 	polargrat(s, cfreq, rfreq, phase_deg, polarity, 
-			 R=R, G=G, B=B, logpolar=1)
+			  R=R, G=G, B=B, logpolar=1,
+			  meanlum=meanlum, moddepth=moddepth, ppd=ppd)
 
 def hypergrat(s, freq, phase_deg, ori_deg,
-			  R=1.0, G=1.0, B=1.0):
+			  R=1.0, G=1.0, B=1.0,
+			  meanlum=0.5, moddepth=1.0, ppd=None, color=None):
+			  
 	"""2D hyperbolic (non-Cartesian) grating generator
 	
 	INPUT
 	
 		s = Sprite object
 		
-		freq = frequency (cycles/sprite)
+		freq = frequency (cycles/sprite or cyc/deg -- see ppd)
 		
 		phase_deg = phase in degrees
 		
@@ -270,6 +353,15 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 		
 		B = blue channel value (0-1)
 	
+		ppd = pixels/degree-visual-angle; if included, then it means that
+		   freq is being specified in cycles/degree
+		   
+		meanlum = mean (DC) value of grating (0-1); default is 0.5
+
+		moddepth = modulation depth (0-1)
+		
+		color = RGB triple (alternative specification of color vector)
+		
 	OUTPUT
 	
 		None.
@@ -279,15 +371,24 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	NOTE: verified frequencies are really cycles/sprite JM 17-sep-2006
 	
 	"""
+	if not ppd is None:
+		# convert cycles/deg into cycles/sprite:
+		d = (s.w + s.h) / 2.0
+		freq = d / ppd * freq
+	meanlum = 256.0 * meanlum
+	moddepth = 127.0 * moddepth
 
-	R, G, B = _unpack_rgb(R, G, B)
+	if color:
+		R, G, B = color
+	else:
+		R, G, B = _unpack_rgb(R, G, B)
 	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
 	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 
 	z = sqrt(fabs((x * freq) ** 2 - (y * freq) ** 2))
-	i = 127.0 * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+128).astype(UnsignedInt8),
+	i = moddepth * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
@@ -354,128 +455,6 @@ def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 	x, y = (r * cos(t), r * sin(t))
 	i = 255.0 * exp(-(x**2) / (2*xsigma**2)) * exp(-(y**2) / (2*ysigma**2))
 	s.alpha[:] = i[:].astype(UnsignedInt8)	  
-
-
-##########################################################################
-# old clunky support functions below.. try not to use if you can help
-# it..
-##########################################################################
-
-def Make_2D_Sine(freq, phase, rot, rc, gc, bc, im):
-	"""OBSOLETE -- DO NOT USE
-	
-	freq		cycles/image
-	
-	phase		phase (0=cos; deg)
-	
-	rot			rotation angle (deg)
-	
-	rc,gc,bc	red, green, blue contrast (float)
-	
-	im			target image (typically sprite.im)
-	
-	"""
-	
-	Logger("Warning: use singrat instead of Make_2D_Sine!\n")
-	
-	w, h = im.get_size()
-	x, y = sprite.genaxes(w, h, Float)
-	x = x / w
-	y = y / h
-
-	r = (x**2 + y**2)**0.5
-	t = arctan2(y, x) - (math.pi * (rot-90) / 180.0)
-	x = r * cos(t)
-	y = r * sin(t)
-
-	# convert sin->cos phase:
-	phase = phase - 90
-		
-	g = 127.0 * sin((2.0 * math.pi * freq * x) -
-					(math.pi * phase / 180.0))
-	gg = transpose(array((rc*g,gc*g,bc*g)).astype(Int),
-				   axes=[1,2,0])
-	pygame.surfarray.blit_array(im, gg+127)
-	pygame.surfarray.pixels_alpha(im)[:] = 255
-
-def Make_2D_Cnc_Rdl(Cord, Rord, Phase, Polarity,
-					Logflag, rc, gc, bc, im):
-	"""OBSOLETE -- DO NOT USE
-	
-	Cord: Concentric frequency
-	
-	Rord: Radial frequendcy (NOTE: spirals have both Cord != & Rord != 0)
-	
-	Phase: in degrees
-	
-	Logflag:
-	
-	Polarity: -1 or +1.	 This really only applies to spirals, +1
-				is CCW out from center.
-				
-	im: target image (typically sprite.im)
-	
-	"""
-
-	Logger("Warning: use polargrat instead of Make_2D_Cnc_Rdl!\n")
-	
-	w, h = im.get_size()
-	x, y = sprite.genaxes(w, h, Float)
-
-	x = x * Polarity
-	
-	x = x / w
-	y = y / h
-
-	try:
-		if Logflag:
-			x = (log(hypot(x,y)) * Cord) + \
-				(arctan2 (y,x) * Rord / (2.0 * math.pi))
-		else:
-			x = (hypot (x,y) * Cord) + \
-				(arctan2 (y,x) * Rord / (2.0 * math.pi))
-	except:
-		print "*** PYPE ERROR ***"
-		return
-	
-	# convert sin->cos phase:
-	Phase = Phase - 90
-
-	g = 127.0 * sin((2.0 * math.pi * x) - (math.pi * Phase / 180.0))
-	
-	gg = transpose(array((rc*g,gc*g,bc*g)).astype(Int),
-				   axes=[1,2,0])
-	pygame.surfarray.blit_array(im, gg+127)
-	pygame.surfarray.pixels_alpha(im)[:] = 255
-
-def Make_2D_Hyperbolic(Pf, Phase, Rot, rc, gc, bc, im):
-	"""OBSOLETE -- DO NOT USE
-	
-	"""
-	
-	Logger("Warning: use hypergrat instead of Make_2D_Hyperbolic!\n")
-	
-	w, h = im.get_size()
-	x, y = sprite.genaxes(w, h, Float)
-	x = x / w
-	y = y / h
-
-	r = (x**2 + y**2)**0.5
-	t = arctan2(y, x) - (math.pi * (Rot-90) / 180.0)
-	x = r * cos(t)
-	y = r * sin(t)
-
-	x = sqrt(fabs((x * Pf) ** 2 - (y * Pf) ** 2))
-	
-	# convert sin->cos phase:
-	Phase = Phase - 90
-
-	g = 127.0 * sin((2.0 * math.pi * x) - (math.pi * Phase / 180.0))
-
-	gg = transpose(array((rc*g,gc*g,bc*g)).astype(Int),
-				   axes=[1,2,0])
-	pygame.surfarray.blit_array(im, gg+127)
-	pygame.surfarray.pixels_alpha(im)[:] = 255
 
 def gaussianEnvelope(s, sigma):
 	w, h = s.im.get_size()

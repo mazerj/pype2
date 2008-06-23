@@ -7,7 +7,7 @@
 import sys
 import Numeric
 import pypedata, ttank
-import time
+import time, os, string
 
 from pypedebug import keyboard
 
@@ -37,6 +37,15 @@ class TDTBaseClass:
             self.server = server
             self.tank = tank
             self.block = block
+
+        # these environment vars will override the values stored
+        # in the datafile:
+        if os.environ.has_key('TTANKDIR'):
+            # this one should probably have a trailing '\', e.g. 'T:\'
+            self.tank = os.envrion['TTANKDIR'] + \
+                        string.split(self.tank, '\\')[-1]
+        if os.environ.has_key('TTANKSERVER'):
+            self.server = os.envrion['TTANKSERVER']
 
         self.tt = ttank.TTank(self.server)
         if self.tt.invoke('OpenTank', self.tank, 'R'):

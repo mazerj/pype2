@@ -21,6 +21,15 @@ function defaults = getopts(defaults, varargin)
 %
 %Tue Mar  4 15:19:19 2003 mazer 
 
-for n = 1:2:length(varargin)
-  defaults = setfield(defaults, varargin{n}, varargin{n+1});
+if length(varargin) > 0 && strcmp(varargin{1}, 'help')
+  f = fieldnames(defaults);
+  for n = 1:length(f)
+    disp({f{n} getfield(defaults, f{n})});
+  end
+  error('getopt: stopped after help');
+else
+  for n = 1:2:length(varargin)
+    defaults = setfield(defaults, varargin{n}, varargin{n+1});
+  end
 end
+  

@@ -42,3 +42,13 @@ SYNCY		(#)	y-location (pixels) of sync pulse sprite
 VIDEODRIVER	(str)	name of SDL_VIDEODRIVER
 VIEWDIST	(#)	viewing distance (eye to monitor) in cm
 TDTHOST		(str)	name or IP number of machine running tdt.py
+
+
+Magic Environment Vars
+----------------------------------
+TTANK		(0/1)	if 0, then forces skipping to TTANK queries
+TTANKSERVER	(str)	hostname for ttank server (overrides pypefile)
+TTANKDIR	(str)	directory for ttanks (overrides pypefile)
+ Note: TTANKHOST/DIR are useful when the data get stored directly
+       to a local disk, but later moved to a new location for
+       permanent storage (like a RAID).
