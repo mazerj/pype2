@@ -1,5 +1,5 @@
-function [ix, ts] = p2mFindEvents(pf, n, evname)
-%function [ix, ts] = p2mFindEvents(pf, n, evname)
+function [ix, ts] = p2mFindEvents(pf, n, evname, exact)
+%function [ix, ts] = p2mFindEvents(pf, n, evname, exact)
 %
 % Find events prefix-matching 'evname' in the nth record of pf.
 %
@@ -7,6 +7,7 @@ function [ix, ts] = p2mFindEvents(pf, n, evname)
 %   pf = p2m data strcture
 %   n = record number
 %   evname = string to search for in event table
+%   exact = use exact matching, instead of strmatch
 %
 % OUTPUT
 %   ix = indices of matching events in pf.rec(n).ev_e/ev_t
@@ -16,5 +17,13 @@ function [ix, ts] = p2mFindEvents(pf, n, evname)
 
 pf=p2mLoad(pf);
 
-ix = strmatch(evname, pf.rec(n).ev_e);
+if ~exist('exact', 'var')
+  exact = 0;
+end
+
+if exact
+  ix = strmatch(evname, pf.rec(n).ev_e, 'exact');
+else
+  ix = strmatch(evname, pf.rec(n).ev_e);
+end
 ts = pf.rec(n).ev_t(ix);

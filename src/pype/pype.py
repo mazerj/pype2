@@ -2749,6 +2749,7 @@ class PypeApp:
 		at the same point in the trial.  All timestamping will be relative
 		to this call.
 		"""
+
 		# bump up the data collect process priorities
 		dacq_set_pri(self.rig_common.queryv('dacq_pri'))
 		dacq_set_mypri(self.rig_common.queryv('fb_pri'))
@@ -2760,7 +2761,7 @@ class PypeApp:
 		self.record_buffer = []
 		# following line got lost for a day or two during plexnet
 		# implementation:
-		self.encode(START)
+		t = self.encode(START)
 
 		# tell plexon trial is BEGINNING
 		self.record_state(1)
@@ -2768,6 +2769,9 @@ class PypeApp:
 
 		# start with fresh eye trace..
 		self.udpy.eye_clear()
+
+		print "record_start @ %d" % t
+		self._rst = t
 		
 
 	def record_stop(self):
@@ -2789,6 +2793,8 @@ class PypeApp:
 
 		if self.plex is not None:
 			self.xdacq_data_store = get_plexon_events(self.plex, fc=40000)
+			
+		print "record_stop @ %d (%d)" % (t, t - self._rst)
 
 	def status_plex(self):
 		if self.plex is not None:
@@ -2801,9 +2807,19 @@ class PypeApp:
 
 	def record_state(self, state):
 		"""Enable or disable plexon recording state"""
+
 		if not self.config.iget('DACQ_TESTMODE'):
+			try:
+				l = self._last_recstate
+			except:
+				self._last_recstate = dacq_ts()
+			if (dacq_ts() - self._last_recstate) < 250:
+				sys.stderr.write('short start/stop (state=%d)\n' % state)
+				while (dacq_ts() - self._last_recstate) < 250:
+					pass
 			# this is causing a wedge!!!
 			dacq_dig_out(2, state)
+			self._last_recstate = dacq_ts()
 		if state:
 			self.record_led.configure(fg='blue')
 		else:
