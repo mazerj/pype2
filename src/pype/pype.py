@@ -251,6 +251,11 @@ Tue Dec 11 16:20:50 2007 mazer
 
 - got rid of synctest() built in -- never used and problematic..
 
+Mon Oct 27 12:57:50 2008 mazer
+
+- added TOD_START and TOD_STOP events to store real time-of-day
+  for these events to facilitate sync-checking in future
+
 """
 
 #####################################################################
@@ -263,6 +268,7 @@ import string
 import posixpath
 import signal
 import socket
+import time
 from types import *
 import math
 
@@ -2773,6 +2779,11 @@ class PypeApp:
 		# tell plexon trial is BEGINNING
 		self.record_state(1)
 		t = self.encode(START)
+		
+		# Mon Oct 27 12:56:47 2008 mazer
+		# - log full 'time of day' for start event
+		self.encode('TOD_START %f' % time.time())
+		
 		self.recording = 1
 
 		# start with fresh eye trace..
@@ -2798,6 +2809,10 @@ class PypeApp:
 		self.recording = 0
 		self.record_state(0)
 		t = self.encode(STOP)
+		
+		# Mon Oct 27 12:56:47 2008 mazer
+		# - log full 'time of day' for start event
+		self.encode('TOD_STOP %f' % time.time())
 
 		# bump back down the data collect process priorities
 		dacq_set_pri(0)
@@ -3836,8 +3851,6 @@ def now(military=1):
 	Return a simple timestring of the form HHMM or HHMM[am|pm]
 	depending on whether 'military' is true or false.
 	"""
-	import time
-	
 	(year, month, day, h, m, s, x1, x2, x3) = time.localtime(time.time())
 	if military:
 		return "%02d:%02d" % (h, m)
