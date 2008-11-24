@@ -345,7 +345,7 @@ class PypeRecord:
 			self.spike_times = Numeric.array(self.rec[7], 'i')
 
 
-			try_ttank_pull = 1
+			try_ttank_pull = 0
 			if self.params.has_key('tdt_tank'):
 				# use set environment var ('env') TTANK=0 to skip trying
 				# to pull data from the TDT TTank subsystem

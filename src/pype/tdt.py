@@ -89,7 +89,13 @@ class _Socket:
 				return buf
 			except socket.error:
 				etype, evalue, traceback = sys.exc_info()
-				(errno, err) = evalue
+				# Fri Nov  7 15:02:23 2008 mazer 
+				#  following was (errno, err) = ..., which masked the errno
+				#  module, changed to address... but now, I'm not sure this
+				#  is right, since errno and err are never referenced and
+				#  it doesn't look like a tuple, so I've removed it.. we'll
+				#  see..
+				# (errnum, err) = evalue
 				if evalue == errno.EINTER:
 					# unexpected SIGNAL came in before data, just retry..
 					# this is likely to be something like a fixwin break
@@ -435,6 +441,7 @@ class TDTClient:
 			oldblock = self.ttank_invoke('GetHotBlock')
 			if str(oldblock) == 'TempBlk' or len(oldblock) == 0:
 				break
+		    sys.stderr.write('waiting1...');
 
 		# actually, I do not think this is necessary, as long as the
 		# tnum's are unique, so just let it count up continuously..
@@ -444,11 +451,14 @@ class TDTClient:
 		# switch back to record mode and wait for this to get into the
 		# tank, so we can store the block name for easy access later..
 		if record:
+			# should probably wait here (wait=1) to make sure we
+			# really switch to RECORD mode.. this seems to be the problem..
 			self.tdev_mode(RECORD)
 			while 1:
 				newblock = self.ttank_invoke('GetHotBlock')
 				if not (newblock == oldblock) and len(newblock) > 0:
 					break
+				sys.stderr.write('waiting2...');
 		else:
 			self.tdev_mode(PREVIEW)
 			newblock = self.ttank_invoke('GetHotBlock')
