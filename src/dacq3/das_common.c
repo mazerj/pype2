@@ -58,6 +58,16 @@
 **
 ** Fri Jun 15 15:09:05 2007 mazer 
 **   added arange (analog input range) for comedi drivers
+**
+** Thu Dec 18 11:39:36 2008 mazer 
+**   - moved eyelink and iscan specific code into separate files
+**     that get included here:
+**       - iscan.c
+**       - eyelink.c
+**   - reorganized the mainloop to sample each channel only once
+**     and then usleep for a bit to reduce CPU load. original
+**     behavior can be restored by #defining SPIN_SAMPLE (which
+**     averages over the 1ms interval in a tight loop).
 */
 
 #include <unistd.h>
@@ -74,15 +84,7 @@
 #endif
 #include "usbjs.h"
 
-/* these are eyelink API header files */
-#include "eyelink.h"
-#include "eyetypes.h"
-
-/* this has set_eyelink_address() etc.. */
-#include "exptsppt.h"
-
-/* ez-serial library for iscan interface */
-#include "libezV24-0.0.3/ezV24.h"
+//#define SPIN_SAMPLE 1
 
 static char *_tmodes[] = {
   "ANALOG", "ISCAN", "EYELINK", "EYELINK_TEST", "NONE"
@@ -99,12 +101,13 @@ static char *_tmodes[] = {
 static int tracker_mode = ANALOG;
 static int semid = -1;
 static unsigned long long ticks_per_ms = 0;
-static int eyelink_camera = -1;
 static int swap_xy = 0;
 static int usbjs_dev = -1;
-static v24_port_t *iscan_port = NULL;
 static int iscan_x, iscan_y, iscan_p;
 static double arange = 10.0;
+
+#include "iscan.c"
+#include "eyelink.c"
 
 static double find_clockfreq()	/* get clock frequency in Hz */
 {
@@ -124,234 +127,6 @@ static double find_clockfreq()	/* get clock frequency in Hz */
   }
   return(mhz * 1.0e6);
 }
-
-static void iscan_init(char *dev)
-{
-  if ((iscan_port = v24OpenPort(dev, V24_NO_DELAY | V24_NON_BLOCK)) == NULL) {
-    fprintf(stderr, "%s: iscan_init can't open \"%s\"\n.", progname, dev);
-    exit(1);
-  }
-  v24SetParameters(iscan_port, V24_B115200, V24_8BIT, V24_NONE);
-
-  tracker_mode = ISCAN;
-  fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
-}
-
-static void iscan_halt()
-{
-  if (iscan_port) {
-    v24ClosePort(iscan_port);
-    fprintf(stderr, "%s: closed iscan_port\n", progname);
-  }
-}
-
-static void iscan_read()
-{
-  static unsigned char buf[25];
-  static int bp = -1;
-  static short *ibuf;
-  static int lastc = -1;
-  int c;
-
-  // 2 bytes/param; 2 params/packet ==> 4 bytes/packet (XP, YP, XCR, YCR)
-  int packet_length = 8;
-
-  /* initialize the read buffer */
-  if (bp < 0) {
-    for (bp = 0; bp < sizeof(buf); bp++) {
-      buf[bp] = 0;
-    }
-    bp = -1;
-    ibuf = (short *)buf;
-    iscan_x = 99999;
-    iscan_y = 99999;
-    iscan_p = 0;
-  }
-
-  if ((c = v24Getc(iscan_port)) < 0) {
-    return;
-  }
-  if (c == 'D') {
-    if (lastc == 'D') {
-      lastc = -1;
-      bp = 0;
-    } else {
-      lastc = c;
-    }
-    return;
-  }
-  if (bp >= 0) {
-    buf[bp] = 0x00ff & c;
-    if (bp == (packet_length - 1)) {
-      if (ibuf[0] || ibuf[1] || ibuf[2] || ibuf[3]) {
-	// currently packets should be:
-	///   <PUP_H1 PUP_V1 CR_H1 CR_V1>
-	iscan_x = (ibuf[0] - ibuf[2] + 4096);
-	iscan_y = (ibuf[1] - ibuf[3] + 4096);
-	iscan_p = 1000;
-	//fprintf(stderr, "  x=%d y=%d\n", iscan_x, iscan_y); fflush(stderr);
-	return;
-      } else {
-	// out of range or no pupil lock
-	iscan_x = 99999;
-	iscan_y = 99999;
-	iscan_p = 0;
-	//fprintf(stderr, "* x=%d y=%d\n", iscan_x, iscan_y); fflush(stderr);
-	return;
-      }
-    } else {
-      if (++bp > (packet_length - 1)) {
-	fprintf(stderr, "something bad happened.\n");
-      }
-    }
-  }
-}
-
-
-static void eyelink_init(char *ip_address)
-{
-  char *p, *q, *opts, buf[100];
-  extern char *__progname;
-  char *saved;
-  FILE *fp;
-  
-
-  fprintf(stderr, "%s/eyelink_init: trying %s\n", progname, ip_address);
-
-  saved = malloc(strlen(__progname) + 1);
-  strcpy(saved, __progname);
-#ifdef CHANGE_NAME
-  set_proc_title("eyelink_thread");
-#endif
-
-  //begin_realtime_mode();
-  set_eyelink_address(ip_address);
-  
-  if (open_eyelink_connection(0)) {
-    fprintf(stderr, "\n%s/eyelink_init: can't open connection to tracker\n",
-	    progname);
-    return;
-  }
-  set_offline_mode();
-
-  /* 16-apr-2003: step through the XXEYELINK_OPTS env var (commands
-   * separated by :'s) and set each command to the eyelink, while
-   * echoing to the console..  This variable is setup by pype before
-   * dacq_start() gets called..
-   */
-  opts = getenv("XXEYELINK_OPTS");
-  for (q = p = opts; *p; p++) {
-    if (*p == ':') {
-      *p = 0;
-      eyecmd_printf(q);
-      fprintf(stderr, "%s: eyelink_opt=<%s>\n", progname, q);
-      *p = ':';
-      q = p + 1;
-    }
-  }
-
-  /* this should be "0" or "1", default to 1 */
-  p = getenv("XXEYELINK_CAMERA");
-  if (p == NULL || sscanf(p, "%d", &eyelink_camera) != 1) {
-    eyelink_camera = 1;
-  }
-  sprintf(buf, "eyelink_camera = %d", eyelink_camera);
-  fprintf(stderr, "%s: %s\n", progname, buf);
-  eyecmd_printf(buf);
-
-  /* Tue Jan 17 11:37:48 2006 mazer 
-   * if file "eyelink.ini" exists in the current directory, send
-   * it as a series of commands to the eyelink over the network.
-   */
-
-  if ((fp = fopen("eyelink.ini", "r")) != NULL) {
-    while (fgets(buf, sizeof(buf), fp) != NULL) {
-      if ((p = index(buf, '\n')) != NULL) {
-	*p = 0;
-      }
-      fprintf(stderr, "%s: %s\n", progname, buf);
-      eyecmd_printf(buf);
-    }
-  }
-
-  // start recording & tell EL to send samples but
-  // not events through link
-  p = getenv("EYELINK_FILE");
-  if (p != NULL) {
-    open_data_file(p);
-    if (start_recording(1,1,1,0)) {
-      fprintf(stderr, "%s/eyelink_init: can't start recording\n", progname);
-      return;
-    }
-    fprintf(stderr, "%s/eyelink_init: saving data to '%s'\n", progname, p);
-  } else {
-    if (start_recording(0,0,1,0)) {
-      fprintf(stderr, "%s/eyelink_init: can't start recording\n", progname);
-      return;
-    }
-  }
-
-  if (eyelink_wait_for_block_start(10,1,0)==0) {
-    fprintf(stderr, "%s/eyelink_init: can't get block start\n", progname);
-    return;
-  }
-
-  fprintf(stderr, "%s/eyelink_init: connected ok\n", progname);
-  tracker_mode = EYELINK;
-#ifdef CHANGE_NAME
-  set_proc_title(saved);
-#endif
-}
-
-
-static void eyelink_halt()
-{
-  char *p;
-
-  if (tracker_mode == EYELINK || tracker_mode == EYELINK_TEST) {
-    stop_recording();
-    set_offline_mode();
-    tracker_mode = ANALOG;
-
-    p = getenv("EYELINK_FILE");
-    if (p != NULL) {
-      pump_delay(500);
-      eyecmd_printf("close_data_file");
-      fprintf(stderr, "%s/eyelink_halt: requesting '%s'\n", progname, p);
-      if (receive_data_file(p, p, 0) > 1) {
-	fprintf(stderr, "%s/eyelink_halt: received.\n", progname);
-      } else {
-	fprintf(stderr, "%s/eyelink_halt: error receiving.\n", progname);
-      }
-    }
-  }
-}
-
-static int eyelink_read(float *x, float *y,  float *p,
-			unsigned int *t, int *new)
-{
-  static FSAMPLE sbuf;
-  int e;
-
-  if ((e = eyelink_newest_float_sample(&sbuf)) < 0) {
-    return(0);
-  } else {
-#ifdef DEBUGGING
-    fprintf(stderr, "ti = %d\n.", sbuf.time);
-    fprintf(stderr, " px = [%f %f]\n", sbuf.px[0], sbuf.px[eyelink_camera]);
-    fprintf(stderr, " py = [%f %f]\n", sbuf.py[0], sbuf.py[eyelink_camera]);
-    fprintf(stderr, " pa = [%f %f]\n", sbuf.pa[0], sbuf.pa[eyelink_camera]);
-#endif /* DEBUGGING */
-    /* there are new data about eye positions */
-    *t = (unsigned int) sbuf.time;
-    *x = sbuf.px[eyelink_camera];		/* xpos, RIGHT/LEFT */
-    *y = sbuf.py[eyelink_camera];		/* ypos, RIGHT/LEFT */
-    *p = sbuf.pa[eyelink_camera];		/* pupil area, RIGHT/LEFT */
-    *new = (e == 1);
-    return(1);
-  }
-}
-
 
 #define RDTSC(x) __asm__ __volatile__ ( ".byte 0x0f,0x31" \
 					:"=a" (((unsigned long*)&x)[0]), \
@@ -409,7 +184,6 @@ static void mainloop(void)
   unsigned int eyelink_t;
   int eyelink_new;
   int k;
-  long accum[NADC], naccum;
   int jsbut, jsnum, jsval;
   unsigned long jstime;
 
@@ -462,57 +236,82 @@ static void mainloop(void)
      * into temp buffer for averaging at the end of the sample
      * period (1ms).  This replaces spin-locking code.
      */
-    naccum = 0;
-    do {
-      /* sample the converters & acculumate values */
-      for (i = 0; i < NADC; i++) {
-	if (naccum == 0) {
-	  accum[i] = ad_in(i);
-	} else {
-	  accum[i] += ad_in(i);
+#ifdef SPIN_SAMPLE
+    {
+      int naccum = 0;
+      long accum[NADC];
+
+      do {
+	/* sample the converters & acculumate values */
+	for (i = 0; i < NADC; i++) {
+	  if (naccum == 0) {
+	    accum[i] = ad_in(i);
+	  } else {
+	    accum[i] += ad_in(i);
+	  }
 	}
+	naccum += 1;
+	if (tracker_mode == ISCAN) {
+	  iscan_read();
+	}
+      } while (((ts = timestamp(0)) - last_ts) < 1);
+      last_ts = ts;
+      
+      /* adjust for # of acculumated values */
+      for (i = 0; i < NADC; i++) {
+	LOCK(semid);
+	dacq_data->adc[i] = (int)(accum[i] / naccum);
+	UNLOCK(semid);
       }
-      naccum += 1;
-      if (tracker_mode == ISCAN) {
-	iscan_read();
-      }
-    } while (((ts = timestamp(0)) - last_ts) < 1);
-    last_ts = ts;
+    }
+#else
+    // usleep(500); --> looks like usleep actually sleeps for more
+    // like 8ms minimum... so we're back to spinning..
 
-    /* adjust for # of acculumated values */
+    /* and then wait for the 1ms interval to elapse */
+    while ((timestamp(0) - last_ts) < 1) {
+      ;
+    }
+    /* now quickly sample all the converters just once */
     for (i = 0; i < NADC; i++) {
-      LOCK(semid);
-      dacq_data->adc[i] = (int)(accum[i] / naccum);
-      UNLOCK(semid);
+      dacq_data->adc[i] = ad_in(i);
     }
-
-    if (tracker_mode == NONE) {
-      x = y = pa = 0;
-    } else if (tracker_mode == ISCAN) {
-      x = iscan_x;
-      y = iscan_y;
-      pa = iscan_p;
-    } else if (tracker_mode == EYELINK) {
-      /* try reading from eyelink */
-      if (eyelink_read(&tx, &ty, &tp, &eyelink_t, &eyelink_new) != 0) {
-	x = tx;
-	y = ty;
-	pa = tp;
-      }
-    } else if (tracker_mode == EYELINK_TEST) {
-      /* try reading from eyelink */
-      if (eyelink_read(&tx, &ty, &tp, &eyelink_t, &eyelink_new) == 0) {
-	tx = ty = tp = -1;
-      }
-      LOCK(semid);
-      x = dacq_data->adc[0];
-      y = dacq_data->adc[1];
-      UNLOCK(semid);
-    } else {
-      x = dacq_data->adc[0];
-      y = dacq_data->adc[1];
-      pa = -1;
+    if (tracker_mode == ISCAN) {
+      iscan_read();
     }
+    ts = last_ts = timestamp(0);
+#endif
+    switch (tracker_mode)
+      {
+      case NONE:
+	x = y = pa = 0;
+	break;
+      case ISCAN:
+	x = iscan_x;
+	y = iscan_y;
+	pa = iscan_p;
+	break;
+      case EYELINK:
+	if (eyelink_read(&tx, &ty, &tp, &eyelink_t, &eyelink_new) != 0) {
+	  x = tx;
+	  y = ty;
+	  pa = tp;
+	}
+	break;
+      case EYELINK_TEST:
+	if (eyelink_read(&tx, &ty, &tp, &eyelink_t, &eyelink_new) == 0) {
+	  tx = ty = tp = -1;
+	}
+	LOCK(semid);
+	x = dacq_data->adc[0];
+	y = dacq_data->adc[1];
+	UNLOCK(semid);
+	break;
+      default:
+	x = dacq_data->adc[0];
+	y = dacq_data->adc[1];
+	pa = -1;
+      }
 
     if (swap_xy) {
       tmp = x; x = y; y = tmp;

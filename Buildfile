@@ -41,6 +41,13 @@ install-shared:
 	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
 	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
 
+justbuild:
+	@for i in $(SUBDIRS); \
+		do (cd $$i ; $(MAKE) build);\
+		done
+	(cd $(PYPEDIR); $(PYCOMPILE) -q lib || $(PYCOMPILE) lib)
+	(cd $(PYPEDIR); $(PYCOMPILE) -q Tasks || $(PYCOMPILE) Tasks)
+
 p2m:
 	(cd src; $(MAKE) install-p2m)
 
