@@ -41,14 +41,16 @@ Fri Jun 13 15:24:57 2008 mazer
   polar, logpolar and hyper grating functions
   
 Wed Jun 18 13:54:46 2008 mazer
- removed old grating generator functions: Make_2D_XXXX() 
+ removed old grating generator functions: Make_2D_XXXX()
+
+Mon Jan  5 14:49:56 2009 mazer
+ moved gen{axes,d,rad,theta} axes generator from sprite.py to this
+ file (spritetools.py) -- gend() function is now officially obsolete..
 
 """
 
-import math
-import sys
+import math, sys
 from Numeric import *
-
 import pygame.surfarray
 from pygame.constants import *
 import sprite
@@ -107,6 +109,75 @@ def pixelize(a, rgb=None, norm=1):
 	else:
 		return g2rgb(a)
 
+def genaxes(w, h=None, typecode=Float64, inverty=0):
+	"""Generate two Numeric vectors describing the axis of a sprite
+	of width w (and optional height h).
+
+	**w, h** -- scalar values indicating the width and height of the
+    sprite in needing axes in pixels
+	
+	**typecode** -- Numeric-style typecode for the output array
+	
+	**inverty** (boolean) --
+	if true, then axes are matlab-style with
+	0th row at the top, y increasing in the downward direction
+
+	**returns** -- pair of vectors (xaxis, yaxis) where the dimensions of
+    each vector are (w, 1) and (1, h) respectively.
+
+    **NOTE**
+	  By default the coordinate system is matrix/matlab, which means
+	  that negative y-values are at the top of the sprite and increase
+	  going down the screen. This is fine if all you use the function
+	  for is to compute eccentricity to shaping envelopes, but wrong
+	  for most math. Use inverty=1 to get proper world coords..
+	"""
+	if h is None:
+		(w, h) = w						# size supplied as pair/tuple
+	x = arange(0, w) - ((w - 1) / 2.0)
+	if inverty:
+		y = arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
+	else:
+		y = arange(0, h) - ((h - 1) / 2.0)
+	return x.astype(typecode)[:,NewAxis],y.astype(typecode)[NewAxis,:]
+
+
+def genrad(w, h=None, typecode=Float64):
+	"""Replaces old gend() function.
+	  
+	**w, h** -- width and height of sprite (height defaults to width)
+	typecode: output type, defaults to Flaot65 ('d')
+	  
+	**returns** -- 2d matrix of dimension (w, h) containg a map of
+	pixel eccentricity values.
+	"""
+	
+	x, y = genaxes(w, h)
+	return (((x**2)+(y**2))**0.5).astype(typecode)
+
+def gend(w, h=None, typecode=Float64):
+	raise SpriteObsolete, 'gend function obsolete -- use genrad'
+
+def gentheta(w, h=None, typecode=Float64, degrees=None):
+	"""Generate 2D theta map for sprite
+	  
+	**w, h** -- width and height of sprite (height defaults to width)
+	typecode: output type, defaults to Flaot65 ('d')
+	degrees: optionally convert to degrees (default is radians)
+	  
+	**returns** -- 2d matrix of dimension (w, h) containg a map of pixel theta
+	values (polar coords). 0deg/0rad is 3:00 position, increasing
+	values CCW, decreasing values CW.
+	  
+    **NOTE** --
+	BE CAREFUL, IF YOU REQUEST AN INTEGER TYPECODE AND RADIANS,
+	THE VALUES WILL RANGE FROM -3 TO 3 .. NOT VERY USEFUL!!!
+	"""
+	x, y = genaxes(w, h)
+	t = arctan2(y, x)
+	if degrees:
+		t = 180.0 * t / pi
+	return t.astype(typecode)
 		
 def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):

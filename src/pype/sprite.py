@@ -39,6 +39,37 @@ Fri Mar 24 11:09:23 2006 mazer
 
  - fixed fb.show()/hide() methods -- I think these should work
    now, at least with the OPENGL driver..
+
+Mon Jan  5 14:36:35 2009 mazer
+
+ - got rid of unrender() method -- you can force unrendering by calling
+   render with the clear=1 optional argument, but otherwise, deleting the
+   sprite will free up the render storage to avoid leaks
+   
+ - noticed that fastblit() method was blitting even when the sprite was
+   not turn off -- fixed that and deleted a redundant coordinate calculation
+
+ - generate cleanup while considering switching to a pure OpenGL solution..
+
+ - moved gen{axes,d,rad,theta} axes generator functions into spritetools
+   
+Fri Jan 23 12:37:10 2009 mazer
+
+ - Framebuffer -- removed dga and videodriver options. Now just specify
+   full screen or not and opengl or not and let the code sort out the
+   best driver. Basically for GL you get quartz or X11 depending on
+   the platform and for non-GL you get quartz on mac, DGA for linux-fullscreen
+   and X11 for anything else.
+
+ - Framebuffer -- only flag you can specify now is full screen, DOUBLEBUFFER
+   and HWSURFACE are always..
+
+ - fopengl --> opengl
+
+ - everything's much simpler now -- only big confusion points are:
+   * why can't we request a specific bits/pixel in opengl mode..
+   * why does ALPHAMASKS need hard coding?
+   
 """
 
 import os
@@ -67,15 +98,14 @@ from rootperm import *
 from pypedebug import keyboard
 from guitools import Logger
 
-#Shinji added 17-Jan-2006:
 try:
+	# Shinji added 17-Jan-2006:
 	from OpenGL.GL import *
 	from OpenGL.GLU import *
 	from OpenGL.GLUT import *
-	GL_OK = 1
+	OPENGL_AVAIL = 1
 except ImportError:
-	sys.stderr.write('WARNING: No PyOpenGL not installed!\n');
-	GL_OK = 0
+	OPENGL_AVAIL = 0
 
 # some useful colors..
 WHITE = (255, 255, 255)
@@ -87,14 +117,9 @@ YELLOW = (255, 255, 1)
 CYAN = (1, 255, 255)
 MAGENTA = (255, 1, 255)
 
-# Get rid of the future warning (2.3) or error (2.4).
-# What we really want is:
-#	ALPHAMASKS = 0xff<<16, 0xff<<8, 0xff, 0xFF<<24
-# but this causes a FutureWarning in Python 2.3 and a real Error
-# with Python 2.4 and beyond, so instead, we do:
 ALPHAMASKS = (16711680, 65280, 255, -16777216)
 
-class PygameIncompleteError(Exception): pass
+class SpriteObsolete(Exception): pass
 class SpriteError(Exception): pass
 
 def _got_root():
@@ -102,88 +127,17 @@ def _got_root():
 	"""
 	return (posix.geteuid() == 0)
 
-def genaxes(w, h=None, typecode=Float64, inverty=0):
-	"""Generate two Numeric vectors describing the axis of a sprite
-	of width w (and optional height h).
-
-	**w, h** -- scalar values indicating the width and height of the
-    sprite in needing axes in pixels
-	
-	**typecode** -- Numeric-style typecode for the output array
-	
-	**inverty** (boolean) --
-	if true, then axes are matlab-style with
-	0th row at the top, y increasing in the downward direction
-
-	**returns** -- pair of vectors (xaxis, yaxis) where the dimensions of
-    each vector are (w, 1) and (1, h) respectively.
-
-    **NOTE**
-	  By default the coordinate system is matrix/matlab, which means
-	  that negative y-values are at the top of the sprite and increase
-	  going down the screen. This is fine if all you use the function
-	  for is to compute eccentricity to shaping envelopes, but wrong
-	  for most math. Use inverty=1 to get proper world coords..
-	"""
-	if h is None:
-		(w, h) = w						# size supplied as pair/tuple
-	x = arange(0, w) - ((w - 1) / 2.0)
-	if inverty:
-		y = arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
-	else:
-		y = arange(0, h) - ((h - 1) / 2.0)
-	return x.astype(typecode)[:,NewAxis],y.astype(typecode)[NewAxis,:]
-
-def gend(w, h=None, typecode=Float64):
-	"""Same as genrad(), just here for backward compatibility.
-		
-	**w, h** -- width and height of sprite (height defaults to width)
-	typecode: output type, defaults to Float64 ('d')
-	  
-	**returns** -- 2d matrix of dimension (w, h) containg a map of
-	pixel eccentricity values.
-	"""
-	return genrad(w, h, typecode=typecode)
-
-def genrad(w, h=None, typecode=Float64):
-	"""Replaces old gend() function.
-	  
-	**w, h** -- width and height of sprite (height defaults to width)
-	typecode: output type, defaults to Flaot65 ('d')
-	  
-	**returns** -- 2d matrix of dimension (w, h) containg a map of
-	pixel eccentricity values.
-	"""
-	
-	x, y = genaxes(w, h)
-	return (((x**2)+(y**2))**0.5).astype(typecode)
-
-def gentheta(w, h=None, typecode=Float64, degrees=None):
-	"""Generate 2D theta map for sprite
-	  
-	**w, h** -- width and height of sprite (height defaults to width)
-	typecode: output type, defaults to Flaot65 ('d')
-	degrees: optionally convert to degrees (default is radians)
-	  
-	**returns** -- 2d matrix of dimension (w, h) containg a map of pixel theta
-	values (polar coords). 0deg/0rad is 3:00 position, increasing
-	values CCW, decreasing values CW.
-	  
-    **NOTE** --
-	BE CAREFUL, IF YOU REQUEST AN INTEGER TYPECODE AND RADIANS,
-	THE VALUES WILL RANGE FROM -3 TO 3 .. NOT VERY USEFUL!!!
-	"""
-	x, y = genaxes(w, h)
-	t = arctan2(y, x)
-	if degrees:
-		t = 180.0 * t / pi
-	return t.astype(typecode)
+def _pygl_setxy(x, y):
+	# A trick for the OpenGL position setting to let us blit
+	# image even if the part of sprite is outside the screen.
+	# 24-jan-2006 shinji
+	glRasterPos2i(0,0)
+	glBitmap(0, 0, 0, 0, x, y, '\0')
 
 class FrameBuffer:
-	def __init__(self, dpy, width, height, bpp, flags,
-				 bg=1, sync=1,
-				 syncsize=50, syncx=-1, syncy=-1, synclevel=255,
-				 videodriver=None, dga=-1, fopengl=0):
+	def __init__(self, dpy, width, height, bpp, fullscreen,
+				 bg=1, sync=1, syncsize=50, syncx=-1, syncy=-1, synclevel=255,
+				 opengl=0):
 		"""FrameBuffer class (SDL<-pygame<-pype).
 
 		This class provides a simple wrapper for the pygame interface
@@ -198,18 +152,11 @@ class FrameBuffer:
 
 		**bpp** -- bits per pixel, typically 24 or 32
 
-		**flags** -- special flags defined in pygame.constants (if you imported
-		this module, then you get pygame.constants for free!)
-		Useful flags are: FULLSCREEN and DOUBLEBUF
+		**fullscreen** -- boolean flag indicating full screen or not
 
 		**bg** -- default background color. This can be a color tripple (r,g,b)
 		or a grey scale value. Actually, it can be anything that the
 		_C() function in this module can parse.
-
-		(**dga** -- boolean flag indicating whether or not to use DGA
-		mode to talk to the server. This only works on local displays
-		and provides the fastest X11-based graphics performance.)
-		DGA removed willmore 13-jul-2006 in favour of VIDEODRIVER
 
 		**sync** -- boolean flag indicating whether or not to setup (and
 		subsequently use) a sync pulse placed on the monkey's video
@@ -221,7 +168,7 @@ class FrameBuffer:
 		syncsize x syncsize pixels and located in the lower right
 		corner of the screen.
 
-		**fopengl** -- boolean flag indicating whether or not to run
+		**opengl** -- boolean flag indicating whether or not to run
 		in OpenGL mode  (added 17-jan-2006 shinji)
 
 		**pype** -- optional pype app handle
@@ -233,75 +180,50 @@ class FrameBuffer:
 		Only one instance allowed per application!
 		"""
 
-		if not dga == -1:
-			Logger('****************************************\n')
-			Logger('FrameBuffer: dga option is now obsolete!\n')
-			Logger('****************************************\n')
-
 		self.keystack = []
-		self.do_sync = sync
+		self.phdiode_mode = sync
 
-		if flags is None:
-			flags = FULLSCREEN | DOUBLEBUF
-			Logger("Defaulted to FULLSCREEN|DOUBLEBUF mode.\n")
+		if fullscreen:
+			self.flags = FULLSCREEN | DOUBLEBUF | HWSURFACE
+		else:
+			self.flags = DOUBLEBUF | HWSURFACE
 
 
 		# you can't have fullscreen unless you're root
-		if (not _got_root()) and (flags & FULLSCREEN):
+		if (not _got_root()) and (self.flags & FULLSCREEN):
 			Logger('sprite: fullscreen only for root, ignored.\n')
-			flags = flags & (~FULLSCREEN)
+			self.flags = self.flags & ~FULLSCREEN
 
-		self.opengl = 0
-		if not GL_OK and fopengl:
-			Logger('PyOpenGL not available -- disabled GL mode.\n')
-			fopengl = 0
+		self.opengl = opengl
+		if self.opengl and not OPENGL_AVAIL:
+			sys.stderr.write('Requested GL, but PyOpenGL not installed!\n');
+			sys.exit(1)
 			
-		if fopengl:
+		if self.opengl:
+			# set driver for OPENGL mode
 			if sys.platform=='darwin':
-				os.environ['SDL_VIDEODRIVER'] = 'Quartz'
+				self.driver = 'Quartz'
 			else:
-				os.environ['SDL_VIDEODRIVER'] = 'x11'
+				self.driver = 'x11'
 			os.environ['__GL_SYNC_TO_VBLANK'] = '1'
-			flags = flags | OPENGL
-			self.opengl = 1
-			Logger('sprite: running in OPENGL mode\n')
-			# added OpenGL mode 12-jan-2006 shinji
-		elif os.environ.has_key('SDL_VIDEODRIVER'):
-			if os.environ['SDL_VIDEODRIVER']=='dga' and not (flags & FULLSCREEN):
-				Logger('sprite/vid: dga from $SDL_VIDEODRIVER\n')
-				Logger('sprite/vid: dga only w/ FULLSCREEN mode\n')
-				Logger('sprite/vid: Falling back to <x11>\n')
-				os.environ['SDL_VIDEODRIVER'] = 'x11'
-			else:
-				Logger('sprite/vid: <%s> from $SDL_VIDEODRIVER\n' %
-					   os.environ['SDL_VIDEODRIVER'])
-		elif videodriver:
-			if videodriver=='dga' and not (flags & FULLSCREEN):
-				Logger('sprite/vid: dga from config file...\n')
-				Logger('sprite/vid: dga only w/ FULLSCREEN mode.\n')
-				Logger('sprite/vid: Falling back to <x11>\n')
-				videodriver = 'x11'
-			else:
-				Logger('sprite/vid: <%s> from config file\n' %
-								 videodriver)
-			os.environ['SDL_VIDEODRIVER'] = videodriver
+			self.flags = self.flags | OPENGL
 		else:
+			# set driver for non-GL mode
 			if sys.platform=='darwin':
-				videodriver = 'Quartz'
-			elif (flags & FULLSCREEN):
-				videodriver = 'dga'
+				# mac still uses quartz..
+				self.driver = 'Quartz'
+			elif (self.flags & FULLSCREEN):
+				# linux uses dga for full screen only..
+				self.driver = 'dga'
 			else:
-				videodriver = 'x11'
-
-			Logger('sprite/vid: <%s> by default\n' %
-								 videodriver)
-			os.environ['SDL_VIDEODRIVER'] = videodriver
+				# otherwise x11
+				self.driver = 'x11'
+		
+		os.environ['SDL_VIDEODRIVER'] = self.driver
 
 		if dpy:
 			self.gui_dpy = os.environ['DISPLAY']
 			self.fb_dpy = dpy
-			
-		self.driver = os.environ['SDL_VIDEODRIVER']
 
 		try:
 			os.environ['DISPLAY'] = self.fb_dpy
@@ -310,7 +232,7 @@ class FrameBuffer:
 			os.environ['DISPLAY'] = self.gui_dpy
 		
 		if width is None or height is None:
-			modes = pygame.display.list_modes(bpp, flags)
+			modes = pygame.display.list_modes(bpp, self.flags)
 			if len(modes) > 0:
 				width = modes[0][0]
 				height = modes[0][1]
@@ -326,59 +248,48 @@ class FrameBuffer:
 		self.hh = height / 2
 		
 		try:
-			maxbpp = pygame.display.mode_ok((self.w, self.h), flags, bpp)
+			self.maxbpp = pygame.display.mode_ok((self.w, self.h),
+												 self.flags, bpp)
 		except pygame.error:
-			Logger("Error: Can't initialize pygame!\n")
-			Logger("       Usually this means the X server's dead!\n")
+			Logger('FrameBuffer: check X server -- can''t start pygame!');
 			sys.exit(1)
 			
-		if maxbpp == 0:
-			Logger('sprite: requested w=%d h=%d bpp=%d\n' % \
-							 (self.w, self.h, bpp))
+		if self.maxbpp == 0:
+			Logger('sprite: requested %dx%d %d\n' % (self.w, self.h, bpp))
 			Logger('sprite: no joy -- mode not available\n')
 			sys.exit(1)
-		else:
-			self.font = None
-			self.flags = flags
-			self.maxbpp = maxbpp
-			self.fopengl = fopengl
-			self.opendisplay()
 
-		Logger('sprite/vid: dev=<%s> (%dx%d; %d bbp)\n' % \
-			   (os.environ['SDL_VIDEODRIVER'], self.w, self.h, maxbpp))
+
+		self._font = None
+		self.opendisplay()
+
+		if (self.flags & OPENGL):
+			mode = '/OPENGL'
+		else:
+			mode = '/pygame'
+			
+		if (self.flags & FULLSCREEN):
+			mode = mode+'/fullscreen'
+		else:
+			mode = mode+'/windowed'
+			
+		
+		Logger('framebuffer: devv=%s%s %dx%d %dbbp\n' % \
+			   (self.driver, mode, self.w, self.h, self.maxbpp))
 
 		# note: for historical reasons, bg is a scalar -- grayscale only..
 		self.bg = bg
 		
-		if self.do_sync:
+		if self.phdiode_mode:
 			# pre-build sync/photodiode driving sprites:
-			if syncx < -5000:
-				self._sync_low = Sprite(syncsize, syncsize,
-										(self.w/2)-(syncsize/2),
-										-((self.h/2)-(syncsize/2)),
-										name='sync_low',
-										on=1, fb=self)
-			else:
-				self._sync_low = Sprite(syncsize, syncsize,
-										syncx, syncy,
-										name='sync_low',
-										on=1, fb=self)
+			self._sync_low = Sprite(syncsize, syncsize, syncx, syncy,
+									name='sync_low', on=1, fb=self)
 			self._sync_low.fill((1, 1, 1))
-
-			if syncx < -5000:
-				self._sync_high = Sprite(syncsize, syncsize,
-										 (self.w/2)-(syncsize/2),
-										 -((self.h/2)-(syncsize/2)),
-										 name='sync_high',
-										 on=1, fb=self)
-			else:
-				self._sync_high = Sprite(syncsize, syncsize,
-										 syncx, syncy,
-										 name='sync_high',
-										 on=1, fb=self)
-			self._sync_high.fill((synclevel, synclevel, synclevel))
-			
 			self._sync_low.render()
+			
+			self._sync_high = Sprite(syncsize, syncsize, syncx, syncy,
+									 name='sync_high', on=1, fb=self)
+			self._sync_high.fill((synclevel, synclevel, synclevel))
 			self._sync_high.render()
 		else:
 			self._sync_low = None
@@ -405,28 +316,30 @@ class FrameBuffer:
 		self.close()
 
 	def opendisplay(self):
-		if self.fopengl:
-			self.screen = pygame.display.set_mode((self.w, self.h),
-											  self.flags)
+		if self.opengl:
 			# for unknown reason(s), we can not set_mode using
 			# maxbpp in OpenGL mode. (shinji)
+			self.screen = pygame.display.set_mode((self.w, self.h),
+											  self.flags)
+			# doesn't seem like you can set this with gl_set_attribute either.
+			self.maxbpp = pygame.display.gl_get_attribute(GL_DEPTH_SIZE)
 		else:
 			self.screen = pygame.display.set_mode((self.w, self.h),
 											  self.flags, self.maxbpp)
+			
 		pygame.display.set_caption('Pype Display (%dx%d; %d bbp)' % \
 								   (self.w, self.h, self.maxbpp))
 
 		# turn OFF the cursor!!
 		self.cursor(0)
 
-		if self.fopengl:
+		if self.opengl:
 			glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
 			glEnable(GL_BLEND)
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 		else:
 			# set (0,0,0) to be transparent/colorkey
 			self.screen.set_colorkey((0,0,0,0))
-		#self.printinfo()
 		
 	def printinfo(self):
 		vi = pygame.display.Info()
@@ -472,8 +385,8 @@ class FrameBuffer:
 		from pype import Timer
 
 		# try to estimate current frame rate
-		oldsync = self.do_sync
-		self.do_sync = 0
+		oldsync = self.phdiode_mode
+		self.phdiode_mode = 0
 		self.clear((1,1,1))
 		self.flip()
 		self.clear((2,2,2))
@@ -492,7 +405,7 @@ class FrameBuffer:
 			intervals.append(b-a)
 			a = b
 
-		self.do_sync = oldsync
+		self.phdiode_mode = oldsync
 
 		if len(intervals) <= 1:
 			Logger('sprite: failed to estimate frames per second, using 60Hz\n')
@@ -691,7 +604,7 @@ class FrameBuffer:
 		idea of the framerate, if it's very fast (>100 Hz), chances
 		are that the hardware doesn't support blocking on flips.
 		"""
-		if self.do_sync:
+		if self.phdiode_mode:
 			if self._sync_state == 1:
 				self._sync_high.blit()
 			elif self._sync_state == 0:
@@ -723,9 +636,7 @@ class FrameBuffer:
 		#   flip doesn't actually block until you try to read or write
 		#   the screen surface.. just in case that's true
 
-		if self.opengl:
-			pass
-		else:
+		if not self.opengl:
 			self.screen.set_at((0,0), self.screen.get_at((0,0)))
 
 		if 0:
@@ -766,24 +677,24 @@ class FrameBuffer:
 		**NOTE** -- this requires the SDL_ttf package...
 		"""
 		color = _C(color)
-		if self.font is None:
+		if self._font is None:
 			pygame.font.init()
-			self.font = {}
+			self._font = {}
 
 		# Try to use a cached copy of font if it's already been
 		# loaded, otherwise load it and cache it. So, this can
 		# be slow the first time it's called
 		try:
-			font = self.font[size]
+			font = self._font[size]
 		except KeyError:
 			try:
 				from pype import pypelib
 				fontfile = pypelib('cour.ttf')
-				self.font[size] = pygame.font.Font(fontfile, size)
+				self._font[size] = pygame._font.Font(fontfile, size)
 			except ImportError:
-				self.font[size] = pygame.font.Font(None, size)
+				self._font[size] = pygame._font.Font(None, size)
 
-		s = self.font[size].render(s, 0, color).convert()
+		s = self._font[size].render(s, 0, color).convert()
 
 		rawx, rawy = x, y   # need for prefill in OpenGL mode
 		(x, y) = self._xy(x, -y)
@@ -801,18 +712,16 @@ class FrameBuffer:
 				self.screen.fill(prefill, rect)
 
 		if self.opengl:
+			# added OpenGL mode 12-jan-2006 shinji
 			blitstr = pygame.image.tostring(s, 'RGBA', 1)
-			self.pygl_setxy(x - (s.get_width()/2),
-						  self.h - y - (s.get_height()/2))
+			_pygl_setxy(x - (s.get_width()/2),
+					   self.h - y - (s.get_height()/2))
                         
 			glDrawPixels(s.get_width(), s.get_height(), GL_RGBA,
 						 GL_UNSIGNED_BYTE, blitstr)
 		else:
 			self.screen.blit(s, (x - (s.get_width()/2),
                              (y - (s.get_height()/2))))
-
-		#added OpenGL mode 12-jan-2006 shinji
-
 
 		if flip:
 			self.flip()
@@ -935,15 +844,15 @@ class FrameBuffer:
 
 
 		if self.opengl:
+			# added OpenGL drawing 12-jan-2006 shinji
 			s = pygame.Surface((w*2, h*2), flags=0, depth=32)
 			s.set_colorkey((0,0,0,0))
 			pygame.draw.rect(s, color, (0,0,w*2,h*2), width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
-			self.pygl_setxy(cx-w, self.h - cy - h)
+			_pygl_setxy(cx-w, self.h - cy - h)
 			glDrawPixels(w*2, h*2, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
 		else:
 			pygame.draw.polygon(self.screen, color, pointslist, width)
-		#added OpenGL drawing 12-jan-2006 shinji
 
 	def line(self, start, stop, color, width=1, flip=None):
 		"""Draw line directly on framebuffer
@@ -963,6 +872,7 @@ class FrameBuffer:
 		color = _C(color)
 
 		if self.opengl:
+			# added OpenGL drawing 12-jan-2006
 			glLineWidth(width)
 			glColor3d(float(color[0])/255, float(color[1])/255,
                       float(color[2])/255)
@@ -977,7 +887,6 @@ class FrameBuffer:
                              self._xy(start, sflip=1), self._xy(stop, sflip=1),
                              width)
 
-		#added OpenGL drawing 12-jan-2006
 
 		if flip:
 			self.flip()
@@ -1000,26 +909,18 @@ class FrameBuffer:
 		"""
 
 		if self.opengl:
+			# added OpenGL drawing 12-jan-2006 shinji
 			(cx, cy) = self._xy((cx, -cy), sflip=1)
 			surfsize = r*2+width
 			s = pygame.Surface((surfsize, surfsize), flags=0, depth=32)
 			s.set_colorkey((0,0,0,0))
 			pygame.draw.circle(s, color, (surfsize/2, surfsize/2), r, width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
-			self.pygl_setxy(cx-surfsize/2, cy-surfsize/2)
+			_pygl_setxy(cx-surfsize/2, cy-surfsize/2)
 			glDrawPixels(surfsize, surfsize, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
 		else:
 			(cx, cy) = self._xy((cx, cy), sflip=1)
 			pygame.draw.circle(self.screen, color, (cx, cy), r, width)
-
-		#added OpenGL drawing 12-jan-2006 shinji
-
-	def pygl_setxy(self, x, y):
-		glRasterPos2i(0,0)
-		glBitmap(0, 0, 0, 0, x, y, '\0')
-		# A trick for the OpenGL position setting to let us blit
-		# image even if the part of sprite is outside the screen.
-		# 24-jan-2006 shinji
 
 
 def zoomdown(fb, cx, cy, width=100, height=100,
@@ -1261,7 +1162,7 @@ class Sprite(_ImageBase):
 		self.iw = self.w
 		self.ih = self.h
 		self.centerorigin = centerorigin
-		
+
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
 
@@ -1297,6 +1198,7 @@ class Sprite(_ImageBase):
 		list of sprites to facilitate detection of un-garbage
 		collected sprites
 		"""
+		self.render(clear=1)
 		Sprite.__list__.remove(self._id)
 
 	def __repr__(self):
@@ -1843,23 +1745,6 @@ class Sprite(_ImageBase):
 		pixs = pygame.surfarray.pixels3d(self.im)
 		pixs[:] = where(less(pixs, t), 1, 255).astype(UnsignedInt8)
 
-	def as_array(self):
-		"""Return Numeric array linked to pixel data
-
-		**This function is really obsolete -- you can access the
-		same array through the '.array' field hanging off each
-		instantiated sprite.**
-		
-		Return an array that accesses the raw pixels in the surface.
-		Array is rank=3, dimensions of <Y, X, RGB>
-
-		**returns** --
-		(w, h, 3) Numeric array (type 'b') that references the raw
-		sprite image data. Modifying the array modifies that image
-		data.
-		"""
-		return pygame.surfarray.pixels3d(self.im)
-
 	def on(self):
 		"""Turn sprite on
 
@@ -1915,12 +1800,6 @@ class Sprite(_ImageBase):
 		self.x = self.x + dx
 		self.y = self.y + dy
 
-	def saveunder(self, restore=None):
-		raise PygameIncompleteError, 'saveunder obsolete'
-
-	def unblit(self):
-		raise PygameIncompleteError, 'unblit obsolete'
-
 	def blit(self, x=None, y=None, fb=None, flip=None, force=0, fast=None):
 		"""Copy sprite to screen (block transfer)
 
@@ -1968,11 +1847,11 @@ class Sprite(_ImageBase):
 		# blit and optional page flip..
 		if fb.opengl:
 			scy = fb.hh + y - (self.h / 2)
-			fb.pygl_setxy(scx, scy)
+			_pygl_setxy(scx, scy)
 			try:
 				# fastim precomputed by render()?
 				glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
-							 self.fastim)
+							 self._fastim)
 			except AttributeError:
 				# nope, go ahead and render then blit..
 				blitstr = pygame.image.tostring(self.im, 'RGBA', 1)
@@ -2003,24 +1882,24 @@ class Sprite(_ImageBase):
 		**NOTE** -- fastblit method does **NOT** support alpha channel
 		            in the SDL mode. (OpenGL mode support alpha)
 		"""
-		x = self.fb.hw + self.x - (self.w / 2)
-		y = self.fb.hh - self.y - (self.h / 2)
+		if not self._on:
+			return
+		
 		if self.fb.opengl:
+			# added OpenGL fastblit(blit pre-calculated string)
+			# 12-jan-2006 shinji
+			x = self.fb.hw + self.x - (self.w / 2)
 			y = self.fb.hh + self.y - (self.h / 2)
-			self.fb.pygl_setxy(x, y)
+			_pygl_setxy(x, y)
 			glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
-                         self.fastim)
-			return 1
-		#added OpenGL fastblit(blit pre-calculated string) 12-jan-2006 shinji
-		elif self._on:
+                         self._fastim)
+		else:
 			x = self.fb.hw + self.x - (self.w / 2)
 			y = self.fb.hh - self.y - (self.h / 2)
-			self.fb.screen.blit(self.fastim, (x, y))
-			return 1
-		else:
-			return 0
+			self.fb.screen.blit(self._fastim, (x, y))
+		return 1
 
-	def render(self):
+	def render(self, clear=None):
 		"""Convert to image data hardware-compatible format
 		
 		Force coercion of internal bitmap to SDL format for speed.
@@ -2030,22 +1909,19 @@ class Sprite(_ImageBase):
 		This may cause the bitmap to move to video memory, which is
 		going to be limited!!
 		"""
+		if clear:
+			try:
+				del self._fastim
+			except AttributeError:
+				pass
+			return
+
 		if self.fb.opengl:
-			self.fastim = pygame.image.tostring(self.im,'RGBA', 1)
+			self._fastim = pygame.image.tostring(self.im,'RGBA', 1)
 		else:
-			self.fastim = self.im.convert()
+			self._fastim = self.im.convert()
 
 		#added opengl convert 12-jan-2006 shinji
-
-	def unrender(self):
-		"""Release memory allocated by render()
-		
-		See render() and fastblit() methods.
-		"""
-		try:
-			del self.fastim
-		except AttributeError:
-			pass
 
 	def subimage(self, x, y, w, h, center=None):
 		"""Extract a sub-region
@@ -2106,7 +1982,7 @@ class Sprite(_ImageBase):
 		s._on = self._on
 
 		try:
-			s.fastim = self.fastim
+			s._fastim = self._fastim
 		except AttributeError:
 			# not accelerated..
 			pass
@@ -2128,18 +2004,9 @@ class Sprite(_ImageBase):
 		self.dx = vel * math.cos(angle)
 		self.dy = vel * math.sin(angle)
 
-	####################
-	# methods never ported to pygame (from home-brew SDL interface)
-	####################
-
 	def save(self, fname, mode='w'):
 		# use pygame's save function to write image to file (PNG, JPG)
 		return pygame.image.save(self.im, fname)
-
-	def save_alpha(self, fname, mode='w'):
-		"""DO NOT USE
-		"""
-		raise PygameIncompleteError, 'save_alpha not available'
 
 	def save_ppm(self, fname, mode='w'):
 		try:
@@ -2163,39 +2030,40 @@ class Sprite(_ImageBase):
 			return None
 
 
+	# these are just here to generate useful error messages
+	
+	def as_array(self):
+		raise SpriteObsolete, 'as_array method'
+		
+	def saveunder(self, restore=None):
+		raise SpriteObsolete, 'saveunder method'
+
+	def unblit(self):
+		raise SpriteObsolete, 'unblit method'
+
 	def fix(self, w, h, color, x=None, y=None):
-		"""DO NOT USE
-		"""
-		raise PygameIncompleteError, 'image.fix() method obsolete'
+		"""DO NOT USE"""
+		raise SpriteObsolete, 'fix() method obsolete'
 
 	def invert(self):
-		"""DO NOT USE
-		"""
-		raise PygameIncompleteError, 'image.fix() method obsolete'
+		"""DO NOT USE"""
+		raise SpriteObsolete, 'fix() method obsolete'
 
 	def trim(self):
-		"""DO NOT USE
-		"""
-		raise PygameIncompleteError, 'image.trim() method obsolete'
+		"""DO NOT USE"""
+		raise SpriteObsolete, 'trim() method obsolete'
 
 	def roll(self, dx, dy, wrap=0):
-		"""DO NOT USE
-		"""
-		raise PygameIncompleteError, 'image.roll() method obsolete'
+		"""DO NOT USE"""
+		raise SpriteObsolete, 'roll() method obsolete'
 
-	####################
-	# methods almost never used, thinking about deleting..
-	####################
+	def save_alpha(self, fname, mode='w'):
+		"""DO NOT USE"""
+		raise SpriteObsolete, 'save_alpha method obsolete -- pre-pygame!'
 
 	def old_subimage(self, x, y, w, h, center=None):
-		"""DO NOT USE
-		
-		This is the subimage method from the original Image class.
-		"""
-		if center:
-			x = self.X(x) + (w/2) # this should be -
-			y = self.Y(y) + (h/2) # this should be -
-		return Image(image=self.im.subsurface((x, y, w, h)))
+		"""DO NOT USE"""
+		raise SpriteObsolete, 'save_alpha method obsolete -- pre-pygame!'
 	
 class MpegMovie(_ImageBase):
 	"""Mpeg movie player
@@ -2636,34 +2504,13 @@ def _C(color):
 		if color < 255:
 			color = (color, color, color, 255)
 		else:
-			# this is ALSO python 2.4 fodder:
-			##colorout = (color&0x00ff0000, \
-			##			color&0x0000ff00, \
-			##			color&0x000000ff, \
-			##			color&0xff000000)
-			# instead, let's try this:
 			color = (color&ALPHAMASKS[0], \
 					 color&ALPHAMASKS[1], \
 					 color&ALPHAMASKS[2], \
 					 color&ALPHAMASKS[3])
 	return color
 
-def color24(color):
-	"""DO NOT USE; OBSOLETE
-	"""
-	raise PygameIncompleteError, 'sprite.color24() obsolete'
-
-def grey24(g, alpha=255):
-	"""DO NOT USE; OBSOLETE
-	"""
-	raise PygameIncompleteError, 'sprite.grey24() obsolete'
-
-def gray24(g, alpha=255):
-	"""DO NOT USE; OBSOLETE
-	"""
-	raise PygameIncompleteError, 'sprite.gray24() obsolete'
-
-def quickinit(dpy=":0.0", w=100, h=100, bpp=32, flags=0, opengl=0):
+def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0):
 	"""Quickly setup and initialize framebuffer
 
 	**dpy** (string) -- display string
@@ -2675,14 +2522,21 @@ def quickinit(dpy=":0.0", w=100, h=100, bpp=32, flags=0, opengl=0):
 	**flags** -- pygame/SDL flags. If you have to ask, you shouldn't
 	be using this feature or function...
 	
-	(**dga** (boolean) -- try to use dga (full screen) mode? Be careful,
-	you can lock up the machine by getting into full screen mode with
-	no way to get out!)
-	DGA removed willmore 13-jul-2006 in favour of VIDEODRIVER
-
 	**returns** -- live frame buffer
 	"""
-	return FrameBuffer(dpy, w, h, bpp, flags, sync=None, fopengl=opengl)
+	return FrameBuffer(dpy, w, h, bpp, fullscreen, sync=None, opengl=opengl)
+
+
+# these are just here to generate useful error messages
+
+def color24(color):
+	raise SpriteObsolete, 'color24 function obsolete'
+
+def grey24(g, alpha=255):
+	raise SpriteObsolete, 'grey24 function obsolete'
+
+def gray24(g, alpha=255):
+	raise SpriteObsolete, 'gray24 function obsolete'
 
 
 if __name__ == '__main__':

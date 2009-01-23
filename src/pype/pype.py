@@ -1179,9 +1179,6 @@ class PypeApp:
 		root_drop()
 		Logger('dropped root access\n')
 
-		self.recording = 0
-		self.record_state(0)
-
 
 		# Sat Sep  3 16:56:50 2005 mazer
 		# as of now, fixation break and bartransitions received via
@@ -1294,6 +1291,10 @@ class PypeApp:
 		if dacq_jsbut(-1):
 			self.console.writenl("warning: joystick replaces bar input",
 								 color='blue')
+
+		self.recording = 0
+		self.record_state(0)
+			
 
 	def tog_training(self, toggle=1):
 		"""INTERNAL"""
@@ -1685,23 +1686,16 @@ class PypeApp:
 		dacq_eye_params(xg, yg, self.eye_xoff, self.eye_yoff)
 
 	def init_framebuffer(self):
-		if self.config.iget('FULLSCREEN'):
-			flags = DOUBLEBUF | FULLSCREEN | HWSURFACE
-		else:
-			flags = 0
-
-
 		self.fb = FrameBuffer(self.config.get('SDLDPY'),
 							  self.config.iget('DPYW'),
 							  self.config.iget('DPYH'),
 							  self.config.iget('DPYBITS'),
-							  flags,
-							  videodriver=self.config.get('VIDEODRIVER'),
+							  self.config.iget('FULLSCREEN'),
 							  syncsize=self.config.iget('SYNCSIZE'),
 							  syncx=self.config.iget('SYNCX'),
 							  syncy=self.config.iget('SYNCY'),
 							  synclevel=self.config.iget('SYNCLEVEL'),
-							  fopengl=self.config.iget('OPENGL'))
+							  opengl=self.config.iget('OPENGL'))
 
 		self.fb.app = self
 
@@ -2840,11 +2834,12 @@ class PypeApp:
 			except:
 				self._last_recstate = dacq_ts()
 				
-			warn = 1
-			while (dacq_ts() - self._last_recstate) < 250:
-				if warn:
-					sys.stderr.write('warning: short ITI, stalling\n')
-					warn = 0
+			if self.xdacq is 'plexon':
+				warn = 1
+				while (dacq_ts() - self._last_recstate) < 250:
+					if warn:
+						sys.stderr.write('warning: short ITI, stalling\n')
+						warn = 0
 			# this is causing a wedge!!!
 			dacq_dig_out(2, state)
 			self._last_recstate = dacq_ts()
