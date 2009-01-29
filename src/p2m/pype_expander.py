@@ -26,6 +26,10 @@ Mon Jan 26 11:00:53 2009 mazer
   roughly cut conversion times in half -- but all the improvement
   is really on the matlab side..
 
+Thu Jan 29 14:05:22 2009 mazer
+  more optimizing to use fread() in matlab and numeric.array.tostring()
+  for fast python-side i/o
+  
 """
 import sys, types, string
 from Numeric import *
@@ -123,19 +127,37 @@ def writeDict(fp, objname, name, dict):
 						 (objname, name, m, j+1), v[j])
 
 def writeVector(fp, objname, name, v, format):
-	# Mon Jan 26 10:58:21 2009 mazer spent some time profile and
-	# trying to speed this up...  best was to use tempfile and
-	# matlab-load() instead of matlab-eval(). This fn is still the
-	# main cycle stealer for this module..
-	if v is None:
+	# Mon Jan 26 10:58:21 2009 mazer
+	#  spent some time profile and trying to speed this up...  best was
+	#  to use tempfile and matlab-load() instead of matlab-eval(). This
+	#  fn is still the main cycle stealer for this module..
+	#
+	# Thu Jan 29 13:51:03 2009 mazer
+	#  by writing vectors out as strings, the python code becomes
+	#  significantly faster. more than factor of two I think..
+	
+	if v is None or len(v) == 0:
+		# empty vector
 		fp.write("%s.%s=[];" % (objname, name));
 	else:
-		tmp = mktemp()
-		fp.write("%s.%s=load('-ascii', '%s')'; delete('%s');" % \
-				 (objname, name, tmp, tmp))
-		fp = open(tmp,'w');
-		fp.write(string.join([format % x for x in v], '\n'))
-		fp.close()
+		vs = Numeric.array(v, 'd').tostring()
+		if len(vs)/len(v) == 8:
+			# 8 bytes/item is correct, otherwise we're on some hardware
+			tmp = mktemp()
+			t = open(tmp,'w');
+			t.write(Numeric.array(v, 'd').tostring())
+			t.close()
+		
+			fp.write("fid=fopen('%s','r');\n" % tmp)
+			fp.write("%s.%s=fread(fid, 'float64');\n" % (objname, name))
+			fp.write("fclose(fid); delete('%s');\n" % tmp)
+		else:
+			tmp = mktemp()
+			fp.write("%s.%s=load('-ascii', '%s')'; delete('%s');\n" % \
+					 (objname, name, tmp, tmp))
+			fp = open(tmp,'w');
+			fp.write(string.join([format % x for x in v], '\n'))
+			fp.close()
 		
 def expandExtradata(fname, prefix, extradata):
 	fp = open('%s_xd.m' % prefix, 'w')
@@ -313,6 +335,8 @@ if __name__ == '__main__':
 		sys.exit(0)
 	else:
 		from cProfile import *
+		import pstats
+		
 		prof = Profile()
 		prof = prof.run('expandFile(sys.argv[1], sys.argv[2], startat=n)')
 		prof.dump_stats('profile.out')
@@ -324,3 +348,6 @@ if __name__ == '__main__':
 		p=pstats.Stats('profile.out');
 		p.sort_stats('cumulative').print_stats()
 		"""
+		
+		p=pstats.Stats('profile.out');
+		p.sort_stats('cumulative').print_stats(10)
