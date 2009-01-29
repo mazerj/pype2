@@ -1,6 +1,6 @@
 include ../../make.defs
 
-P2MDIR = $(PYPEDIR)/../p2m
+P2MDIR = $(PYPEDIR)/p2m
 
 install:
 	@mkdir -p $(P2MDIR)
