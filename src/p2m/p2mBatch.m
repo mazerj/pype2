@@ -45,7 +45,7 @@ for n = 1:length(xxx)
   end
 end
 if length(files) == 0
-  fprintf('Nothing to convert, stopping.\n');
+  fprintf(2, 'Nothing to convert, stopping.\n');
   return
 end
   
@@ -75,13 +75,13 @@ for n = 1:length(files)
   end
 
   try
-    fprintf('%s -> %s\n', pypefile, matfile);
+    %fprintf(2, '%s -> %s\n', pypefile, matfile);
     PF = p2m(pypefile, oldpf);
     save(matfile, 'PF', '-mat');
-    fprintf('Saved data to ''%s''\n', matfile);
+    %fprintf(2, 'Saved data to ''%s''\n', matfile);
     errors{n} = '';
   catch
-    fprintf('Error converting file: %s\n', pypefile);
+    fprintf(2, 'Error converting file: %s\n', pypefile);
     if exitOnError
       p2mExit(1);
     else
@@ -90,15 +90,12 @@ for n = 1:length(files)
   end
 end
 
+waserr = 0;
 for n = 1:length(files)
-  fprintf('----------------------------------------------------\n');
   pypefile = char(files(n));
-  if length(errors{n}) == 0
-    fprintf('%s: ok\n', pypefile);
-  else
-    fprintf('%s: error\n%s\n', pypefile, errors{n});
+  if length(errors{n}) ~= 0
+    fprintf(2, '----------------------------------------------------\n');
+    fprintf(2, '%s: error\n%s\n', pypefile, errors{n});
+    fprintf(2, '----------------------------------------------------\n');
   end
-end
-if n > 0
-  fprintf('----------------------------------------------------\n');
 end

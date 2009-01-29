@@ -18,10 +18,7 @@ foreach i ($*)
     set dst="$root.p2m"
   endif
 
-  echo "====================================================="
-  echo "  INFILE: $i"
-  echo " OUTFILE: $dst"
-  echo "====================================================="
+  echo "CONVERTING $i ===> $dst"
   if !(-e $i) then
     echo "`basename $0`: $i does not exist."
     exit 1
@@ -36,7 +33,7 @@ foreach i ($*)
   else if (-e $dst.gz) then
     echo $dst.gz already exists, skipping
   else
-    echo "p2mBatch('$i', 1, 1);" | matlab -nodisplay -nojvm
+    echo "p2mBatch('$i', 1, 1);" | matlab -nodisplay -nojvm >/dev/null
     if (-e $ec) then
       set s = `cat $ec`
       /bin/rm -f $ec

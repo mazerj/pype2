@@ -31,7 +31,7 @@ Thu Jan 29 14:05:22 2009 mazer
   for fast python-side i/o
   
 """
-import sys, types, string
+import sys, types, string, math
 from Numeric import *
 from pype import *
 from events import *
@@ -300,26 +300,25 @@ def expandFile(fname, prefix, startat=0):
 	pf = PypeFile(fname, filter=None)
 
 	recno = 0
+	expanded = 0
 	while 1:
 		d = pf.nth(recno)
 		if d is None:
 			break
 		elif recno >= startat:
 			o = expandRecord(fname, prefix, recno, d, pf.extradata)
-			sys.stderr.write('.')
-			sys.stderr.flush()
+			if math.fmod(recno,10) == 0:
+				sys.stderr.write('.')
+				sys.stderr.flush()
 		else:
-			sys.stderr.write('-')
+			if math.fmod(recno,10) == 0:
+				sys.stderr.write('x')
+				sys.stderr.flush()
 		recno = recno + 1
-		# Sun May 21 13:45:52 2006 mazer
-		# Don't need the freenth() here -- it's now automatic!
-		#
-		## added following line 07-apr-2004 to reduce memory/swap load
-		#pf.freenth(recno)
-		
 	expandExtradata(fname, prefix, pf.extradata)
-	sys.stderr.write('\n')
 	pf.close()
+	if recno > 0:
+		sys.stderr.write('\n')
 	
 
 if __name__ == '__main__':

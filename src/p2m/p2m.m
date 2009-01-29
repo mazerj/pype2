@@ -75,21 +75,24 @@ try
       et = [et toc];
     catch
       err = lasterror;
-      fprintf('\n');
-      fprintf('ERROR converting record #%d from %s:\n', n, pypefile);
-      fprintf('%s\n', err.message);
-      fprintf('\n');
+      fprintf(2, '\n');
+      fprintf(2, 'ERROR converting record #%d from %s:\n', n, pypefile);
+      fprintf(2, '%s\n', err.message);
+      fprintf(2, '\n');
       rethrow(err);
     end
     delete(fs(n).name);
     rec(n).ttl_times = rec(n).spike_times;
-    fprintf('+');
+    if ~mod(n,10), fprintf(2, '+'), end;
   end
   cd(origdir);
 catch
   cd(origdir);
 end
-fprintf('\n');
+
+if length(rec) > 0
+  fprintf(2, '\n');
+end
 
 if 0
   fprintf('python: %.2fs / trial\n', pet/length(et));
@@ -102,15 +105,16 @@ end
 
 
 if isempty(oldpf)
-  fprintf('Converted %d trials.\n', length(rec));
+  fprintf(2, 'Converted %d trials.\n', length(rec));
   pf.extradata = extradata;
   pf.src = cannonicalfname(pypefile);
   pf.rec = rec;
 elseif isempty(rec)
-  fprintf('No new data converted.\n');
+  fprintf(2, 'No new data converted.\n');
   pf = oldpf;
 else
-  fprintf('Converted %d new trials.\n', length(rec) - length(oldpf.rec));
+  fprintf(2, 'Updated %d new trials (%d old).\n', ...
+	  length(rec) - length(oldpf.rec), length(oldpf.rec));
   pf.extradata = extradata;
   pf.src = cannonicalfname(pypefile);
   pf.rec = rec;
