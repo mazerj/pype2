@@ -274,7 +274,7 @@ class FrameBuffer:
 			mode = mode+'/windowed'
 			
 		
-		Logger('framebuffer: devv=%s%s %dx%d %dbbp\n' % \
+		Logger('framebuffer: dev=%s%s %dx%d %dbbp\n' % \
 			   (self.driver, mode, self.w, self.h, self.maxbpp))
 
 		# note: for historical reasons, bg is a scalar -- grayscale only..

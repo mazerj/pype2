@@ -52,8 +52,10 @@ else
   n = length(oldpf.rec);
 end 
 
+tic;
 cmd = sprintf('pype_expander.py %s %s %d >/dev/null', pypefile, f, n);
 status = unix(cmd);
+pet = toc;
 if status ~= 0
   error('Can''t find pype_expander.py or datafile, check path');
   return
@@ -61,13 +63,16 @@ end
 
 rec = [];
 origdir = pwd;
+et = [];
 try
   cd(tempdir)
   fs = dir(sprintf('%s_*.m', f));
   for n=1:length(fs)
     f = fs(n).name(1:end-2);
     try
+      tic;
       eval(f);
+      et = [et toc];
     catch
       err = lasterror;
       fprintf('\n');
@@ -78,13 +83,18 @@ try
     end
     delete(fs(n).name);
     rec(n).ttl_times = rec(n).spike_times;
-    fprintf('.');
+    fprintf('+');
   end
   cd(origdir);
 catch
   cd(origdir);
 end
 fprintf('\n');
+
+if 0
+  fprintf('python: %.2fs / trial\n', pet/length(et));
+  fprintf('matlab: %.2fs / trial\n', mean(et));
+end
 
 if ~exist('extradata', 'var')
   extradata = [];

@@ -147,17 +147,14 @@ class UserDisplay:
 					   label='clear trace',
 					   command=lambda s=self: s.eye_clear())
 
-		self.gridinterval = pix_per_dva
-		l = Label(f, text="%d pix/div" % self.gridinterval) 
-		l.pack(side=RIGHT)
+		mb.addmenu('Help', '', '')
+		mb.addmenuitem('Help', 'command', 
+					   label='show shortcuts', command=self.help)
+		
 
 		self.scount = Button(f, text="<>", command=self.showsprites)
-		self.scount.pack(side=RIGHT, padx=20)
+		self.scount.pack(side=RIGHT)
 		
-		self.xypos = Label(f, text="")
-		self.xypos.pack(side=RIGHT, padx=20)
-		self._mouse_motion(ev=None)
-
 		self.info = Label(f, text="", fg='red')
 		self.info.pack(side=RIGHT, padx=20)
 
@@ -170,24 +167,34 @@ class UserDisplay:
 		self._canvas.configure(width=cwidth, height=cheight,
 							   cursor='tcross', bg='grey80')
 
+		f = Frame(self.frame)
+		f.pack(expand=1, side=BOTTOM, fill=X)
+
+		self.xypos = Label(f, text="")
+		self.xypos.pack(side=LEFT)
+		self._mouse_motion(ev=None)
+		
+		self.gridinterval = pix_per_dva
+		l = Label(f, text="%d pix/div" % self.gridinterval) 
+		l.pack(side=RIGHT)
+
 		self.mousex = 0
 		self.mousey = 0
 		self.xoffset = 0
 		self.yoffset = 0
 
 		self.popup = Menu(self._canvas, tearoff=0)
-		self.popup.add_command(label="Mark Menu")
-		self.popup.add_separator()
+
+		self.popup.add_command(label="User Display Menu")
 		self.popup.add_command(label="Fixspot here",
 							   command=self._fixset)
 		self.popup.add_command(label="Set fixspot to (0,0)",
 							   command=self._fixzero)
 		self.popup.add_command(label="Enter fixspot coords",
 							   command=self._fixxy)
-		self.popup.add_separator()
-		self.popup.add_command(label="Set box corner (/)",
+		self.popup.add_command(label="Set a box corner (/)",
 							   command=self.setbox)
-		self.popup.add_command(label="Clear box corners",
+		self.popup.add_command(label="Clear box",
 							   command=self.clearbox)
 		self._canvas.bind("<Button-1>", self.do_popup)
 		
@@ -200,6 +207,7 @@ class UserDisplay:
 		self._iconlist = []
 		self._displaylist_icons = []
 		self._fid_list = []
+		self._fidstuff = []
 		self._axis = []
 		self.markstack = []
 		self.markbox = None
@@ -267,7 +275,6 @@ class UserDisplay:
 			if self.msg_win is None:				
 				font = "-*-lucidatypewriter-medium-r-normal-*-12-*-*-*-*-*-*-*"
 				f = Frame(self._canvas, borderwidth=1)
-				#Label(f, text='messages', bg='green').pack(expand=0, anchor=W)
 				self.msg_win = self._canvas.create_window(5, 25,
 													  window=f, anchor=NW)
 				self.msg_label = Label(f, text=msg, font=font, justify=LEFT,
@@ -291,21 +298,30 @@ class UserDisplay:
 
 	def help(self):
 		warn('help', """
-Arrows  Move fid marks left, right etc
+Fiduciary marks (aka fidmarks)
+-----------------------------------------
+Arrows  Move all fidmarks left, right etc
+     f  Set fidmark at cursor
      <  Shrink fidmarks in
      >  Expand fidmarks out
-     f  Set fidmark at cursor
-   c/C  Clear nearest/all fidmark
+   c/C  Clear nearest-one/all fidmark(s)
      s  Save fidmarks to file
-     s  Load fidmarks from file
-     x  Place messages/note
-     .  Set eyecal point (period)
-     ,  Delete eyecal point (comma)
-     /  Set box corner
-Mouse-1 set fix position / mark box
-Mouse-2 task-specific dropdown
-Mouse-3 simulate bar up/down
-""", fixed=1)
+     l  Load fidmarks from file
+
+Eyecal marks
+-----------------------------------------
+   ./e  Set eyecal point (period) at cursor
+   ,/E  Delete nearest eyecal point (comma)
+
+Other
+-----------------------------------------
+      /  Mark box corner (twice to set box)
+      x  postion message window at cursor
+L-mouse access fixspot menu
+M-mouse access task-specific dropdown
+R-mouse simulate bar up/down
+
+""", fixed=1, astext=1)
 
 	def deltags(self, taglist):
 		for tag in taglist:
@@ -461,7 +477,8 @@ Mouse-3 simulate bar up/down
 
 			self.markbox = self._canvas.create_rectangle(x1,y1,x2,y2,
 														 fill=None,
-														 outline="white")
+														 outline="red",
+														 dash=(5,5))
 
 	def _key(self, ev):
 		c = ev.keysym
@@ -508,9 +525,9 @@ Mouse-3 simulate bar up/down
 			self._showfidmarks()
 		elif c == 'h':
 			self.help()
-		elif c == 'period':
+		elif c == 'period' or c == 'e':
 			self.addpoint(ev.x, ev.y)
-		elif c == 'comma':
+		elif c == 'comma' or c == 'E':
 			self.deletepoint(ev.x, ev.y)
 		elif c == 'slash':
 			self.setbox()
@@ -525,10 +542,10 @@ Mouse-3 simulate bar up/down
 
 	def addpoint(self, x, y):
 		"""(x, y) specifies point in CANVAS coords (0,0) is upper left"""
-		px = int(round(x - (self.w/2.0)))
-		py = int(round((self.h/2.0) - y))
-		t = self._canvas.create_rectangle(x-2, y-2, x+2, y+2,
-												 fill="red", outline = "blue")
+		(px, py) = (int(round(x - (self.w/2.0))), int(round((self.h/2.0) - y)))
+		d = 2;
+		t = self._canvas.create_text(x, y, anchor=CENTER, justify=CENTER, \
+									 text='e', fill='blue')
 		self.points.append((px, py, t))
 
 	def deletepoint(self, x, y):
@@ -678,7 +695,7 @@ Mouse-3 simulate bar up/down
 		else:
 			(self.mousex, self.mousey) = self.can2fb(ev.x, ev.y)
 			(x, y, fx, fy) = (self.mousex, self.mousey, self.fix_x, self.fix_y)
-		s = "[ABS: %4d,%4d] [REL: %4d,%4d]" % (x, y, x-fx, y-fy)
+		s = "[%4d,%4d][rel %4d,%4d]" % (x, y, x-fx, y-fy)
 		self.xypos.configure(text=s)
 
 	def _mouse_enter(self, ev):
@@ -797,11 +814,12 @@ Mouse-3 simulate bar up/down
 
 
 	def fidinfo(self, file=None):
-		try:
-			self._canvas.delete(self._fidctr)
-			self._canvas.delete(self._fidring)
-		except AttributeError:
-			pass
+		for f in self._fidstuff:
+			try:
+				self._canvas.delete(f)
+			except AttributeError:
+				pass
+		self._fidstuff = []
 			
 		n = 0
 		xs = 0.
@@ -827,12 +845,18 @@ Mouse-3 simulate bar up/down
 			_xs = self.fix_x + xs
 			_ys = self.fix_y + ys
 			(cx, cy) = self.fb2can(_xs, _ys)
-			self._fidctr = self._canvas.create_rectangle(cx-2, cy-2,
-														 cx+2, cy+2,
-														 fill='green',
-														 outline = "")
-			self._fidring = self._canvas.create_oval(cx-r, cy-r, cx+r, cy+r, 
-													 fill='', outline='black')
+			self._fidstuff = (
+				self._canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
+										 fill='blue', text='o'),
+				self._canvas.create_oval(cx-r, cy-r, cx+r, cy+r, 
+										 fill='', outline='blue',
+										 dashoffset=0,
+										 dash=(10,10)),
+				self._canvas.create_line(cx, cy-r, cx, cy+r, fill='blue',
+										 dash=(10,10)),
+				self._canvas.create_line(cx-r, cy, cx+r, cy, fill='blue',
+										 dash=(10,10)),
+				)
 		if file:
 			fp = open(file, 'w')
 			fp.write('%% %s\n' % Timestamp())
@@ -929,8 +953,8 @@ Mouse-3 simulate bar up/down
 		ax = mx + self.fix_x
 		ay = my + self.fix_y
 		(cx, cy) = self.fb2can(ax, ay)
-		tag = self._canvas.create_rectangle(cx-2, cy-2, cx+2, cy+2,
-										   fill='green', outline = "blue")
+		tag = self._canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
+									   fill='black', text='f')
 		
 		# save mark in retinal coords
 		self._fid_list.append((tag, mx, my))

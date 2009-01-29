@@ -21,12 +21,18 @@ Sun May 21 13:44:57 2006 mazer
   Added 'startat' support so you can convert from the middle of a
   file to the end. This is for appending new data...
   
+Mon Jan 26 11:00:53 2009 mazer
+  Optimizing writeVector() to use matlab's load function seems to
+  roughly cut conversion times in half -- but all the improvement
+  is really on the matlab side..
+
 """
 import sys, types, string
 from Numeric import *
 from pype import *
 from events import *
 from pypedata import *
+from tempfile import mktemp
 
 __TMPVAR__ = 0;
 
@@ -117,13 +123,19 @@ def writeDict(fp, objname, name, dict):
 						 (objname, name, m, j+1), v[j])
 
 def writeVector(fp, objname, name, v, format):
+	# Mon Jan 26 10:58:21 2009 mazer spent some time profile and
+	# trying to speed this up...  best was to use tempfile and
+	# matlab-load() instead of matlab-eval(). This fn is still the
+	# main cycle stealer for this module..
 	if v is None:
-		v = []
-	format = format + ' '
-	fp.write("%s.%s=[" % (objname, name))
-	for n in range(len(v)):
-		fp.write(format % v[n])
-	fp.write("];\n")
+		fp.write("%s.%s=[];" % (objname, name));
+	else:
+		tmp = mktemp()
+		fp.write("%s.%s=load('-ascii', '%s')'; delete('%s');" % \
+				 (objname, name, tmp, tmp))
+		fp = open(tmp,'w');
+		fp.write(string.join([format % x for x in v], '\n'))
+		fp.close()
 		
 def expandExtradata(fname, prefix, extradata):
 	fp = open('%s_xd.m' % prefix, 'w')
@@ -289,10 +301,26 @@ def expandFile(fname, prefix, startat=0):
 	
 
 if __name__ == '__main__':
+	PROFILE = 0
 	if len(sys.argv) < 3:
 		sys.stderr.write("Usage: pype_expander pypefile prefix [startat]\n")
 		sys.exit(1)
 	if len(sys.argv) > 3:
 		n = int(sys.argv[3])
-	expandFile(sys.argv[1], sys.argv[2], startat=n)
-	sys.exit(0)
+
+	if not PROFILE:
+		expandFile(sys.argv[1], sys.argv[2], startat=n)
+		sys.exit(0)
+	else:
+		from cProfile import *
+		prof = Profile()
+		prof = prof.run('expandFile(sys.argv[1], sys.argv[2], startat=n)')
+		prof.dump_stats('profile.out')
+
+		"""
+		to look at the profile try this:
+
+		import pstats
+		p=pstats.Stats('profile.out');
+		p.sort_stats('cumulative').print_stats()
+		"""

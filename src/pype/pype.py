@@ -256,6 +256,16 @@ Mon Oct 27 12:57:50 2008 mazer
 - added TOD_START and TOD_STOP events to store real time-of-day
   for these events to facilitate sync-checking in future
 
+Mon Jan 26 13:44:01 2009 mazer
+
+- added KEYBAR option for config file to allow leftshift key to
+  generate BarTransition interupts like a regular bar input.. Mouse
+  must be the display window!
+    
+Tue Jan 27 12:18:09 2009 mazer
+
+- cleaned and simplified up audio initialization procedure
+
 """
 
 #####################################################################
@@ -441,9 +451,9 @@ class PypeApp:
 			Logger('WARNING: MON_ID field in Config file unset.\n')
 
 		# GFX_TESTMODE is now obsolete, replaced by FULLSCREEN
-		if self.config.iget('GFX_TESTMODE', default=666) != 666:
-			Logger('WARNING: GFX_TESTMODE is obsolete.\n')
-			Logger('         assuming you mean FULLSCREEN=0\n')
+		if self.config.iget('GFX_TESTMODE', default=-666) != -666:
+			Logger('CONFIG ERROR: GFX_TESTMODE is obsolete. Try FULLSCREEN\n')
+			sys.exit(1)
 
 		if gui:
 			state = self._readstate()
@@ -1105,18 +1115,8 @@ class PypeApp:
 		self.flip_bar = self.config.iget('FLIP_BAR')
 		self.flip_sw1 = self.config.iget('FLIP_SW1')
 		self.flip_sw2 = self.config.iget('FLIP_SW2')
-			
 
-		# This should really be the FIRST thing done -- eventually
-		# the program will be run suid-root to get access to the
-		# full-screen DGA mode.  Once sdl_open's called, root-privs
-		# can be safely given up!
-		#
-		# There's a problem here: doublebuffering only works
-		# in full screen mode, but full screen mode (which requires
-		# you be root) locks out BOTH heads.. so until I figure
-		# a work around, don't use FULLSCREEN mode..
-		#
+		# NOTE:
 		# Framebuffer initialization will give up root access
 		# automatically.. so make sure you start the dacq process
 		# first (see above).
@@ -1125,37 +1125,15 @@ class PypeApp:
 		if self.config.iget('NO_AUDIO'):
 			# disable the beep subsystem:
 			nobeep()
-			Logger('pype/snd: audio disabled (NO_AUDIO in config)\n')
 		else:
-			# Wed Dec  7 08:59:14 2005 mazer 
-			# initialize pygame sound subsystem now.. the SDL_AUDIODRIVER
-			# code used to be in sprite.py, but it's not really related to
-			# the sprite engine, so I've moved it back here..
-			# however, it does exactly the same thing it used to..
-			
-			# the order of precedence for AUDIODRIVER setting is:
-			#   environment var -> config file -> hardcoded defaults
-
-			if os.environ.has_key('SDL_AUDIODRIVER'):
-				audiodriver = (os.environ['SDL_AUDIODRIVER'], 'env')
-			elif self.config.get('AUDIODRIVER'):
-				audiodriver = (self.config.get('AUDIODRIVER'), 'config')
+			if self.config.get('AUDIODRIVER'):
+				audiodriver = self.config.get('AUDIODRIVER')
+			elif sys.platform == 'darwin':
+				audiodriver = 'sndmgr'
 			else:
-				if sys.platform=='darwin':
-					audiodriver = ('sndmgr', 'default')
-				else:
-					#audiodriver = 'alsa'
-					audiodriver = (None, 'default')
-					
-			Logger('pype/snd: audiodriver=%s (from %s)\n' % audiodriver)
-			
-			if audiodriver[0] is not None:
-				os.environ['SDL_AUDIODRIVER'] = audiodriver[0]
-
-			# call beep to force pygame.mixer initialization now:
-			#nobeep()
-			beep(-1, -1)
-			
+				# default for linux...
+				audiodriver = 'alsa'
+			beep(driver=audiodriver)
 		root_take()
 
 		self.init_framebuffer()
@@ -1292,8 +1270,13 @@ class PypeApp:
 			self.console.writenl("warning: joystick replaces bar input",
 								 color='blue')
 
+		self.keybar = self.config.iget('KEYBAR', default=0)
+		self.keybar_state = self.lshiftdown()
+
 		self.recording = 0
 		self.record_state(0)
+
+		
 			
 
 	def tog_training(self, toggle=1):
@@ -2126,6 +2109,12 @@ class PypeApp:
 			self._post_alarm = 0
 			raise Alarm
 
+		if self.keybar:
+			s = self.lshiftdown()
+			if self.allow_ints and (not s == self.keybar_state):
+				s = self.keybar_state
+				raise BarTransition
+
 		if fast:
 			return
 
@@ -2296,13 +2285,15 @@ class PypeApp:
 		"""
 		Currently a NOP, but could be used for positive feedback.
 		"""
+		warble(3*440, 100)
 		pass
 
 	def warn_trial_incorrect(self, flash=1000):
 		"""
 		Beep and possibly flash screen red for a short time.
 		"""
-		beep(440, 250)
+		#beep(440, 250)
+		warble(440, 100)
 		if flash:
 			self.fb.clear((255, 0, 0), flip=1)
 			self.idlefn(flash)
@@ -3289,6 +3280,17 @@ class PypeApp:
 			self.fb.clear((1,1,1))
 			if self._testpat:
 				self._testpat.blit(force=1)
+				s = Sprite(x=50, y=50, width=150, height=150,
+						   fb=self.fb, on=1)
+				s.fill((255,1,1))
+				s.alpha[:]=128
+				s.blit()
+				s = Sprite(x=-50, y=-50,  width=150, height=150,
+						   fb=self.fb, on=1)
+				s.fill((1,255,1))
+				s.alpha[:]=128
+				s.blit()
+						   
 			self.fb.sync(0)
 			self.fb.flip()
 
