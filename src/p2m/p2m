@@ -33,7 +33,7 @@ foreach i ($*)
   else if (-e $dst.gz) then
     echo $dst.gz already exists, skipping
   else
-    echo "p2mBatch('$i', 1, 1);" | matlab -nodisplay -nojvm >/dev/null
+    echo "p2mBatch('$i', 1, 1); quit;" | matlab -nodisplay -nojvm
     if (-e $ec) then
       set s = `cat $ec`
       /bin/rm -f $ec

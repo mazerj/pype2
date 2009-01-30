@@ -44,7 +44,7 @@ elseif ischar(oldpf)
   oldpf = p2mLoad(oldpf);
 end
 
-f = tempname;
+tmpf = [tempname '.m'];
 
 if isempty(oldpf)
   n = 0;
@@ -52,10 +52,11 @@ else
   n = length(oldpf.rec);
 end 
 
+cmd = sprintf('pype_expander.py %s %s %d', pypefile, tmpf, n);
 tic;
-cmd = sprintf('pype_expander.py %s %s %d >/dev/null', pypefile, f, n);
 status = unix(cmd);
 pet = toc;
+
 if status ~= 0
   error('Can''t find pype_expander.py or datafile, check path');
   return
@@ -66,37 +67,30 @@ origdir = pwd;
 et = [];
 try
   cd(tempdir)
-  fs = dir(sprintf('%s_*.m', f));
-  for n=1:length(fs)
-    f = fs(n).name(1:end-2);
-    try
-      tic;
-      eval(f);
-      et = [et toc];
-    catch
-      err = lasterror;
-      fprintf(2, '\n');
-      fprintf(2, 'ERROR converting record #%d from %s:\n', n, pypefile);
-      fprintf(2, '%s\n', err.message);
-      fprintf(2, '\n');
-      rethrow(err);
-    end
-    delete(fs(n).name);
+  try
+    tic;
+    eval(strrep(basename(tmpf),'.m',''));
+    et = [et toc];
+  catch
+    err = lasterror;
+    fprintf(2, '\n');
+    fprintf(2, 'ERROR loading %s into matlab.\n', pypefile);
+    fprintf(2, '%s\n', err.message);
+    fprintf(2, '\n');
+    rethrow(err);
+  end
+  for n = 1:length(rec)
     rec(n).ttl_times = rec(n).spike_times;
-    if ~mod(n,10), fprintf(2, '+'), end;
   end
   cd(origdir);
 catch
   cd(origdir);
 end
-
-if length(rec) > 0
-  fprintf(2, '\n');
-end
+delete(tmpf);
 
 if 0
-  fprintf('python: %.2fs / trial\n', pet/length(et));
-  fprintf('matlab: %.2fs / trial\n', mean(et));
+  fprintf(2, 'python: %.2fs / trial\n', pet/length(et));
+  fprintf(2, 'matlab: %.2fs / trial\n', mean(et));
 end
 
 if ~exist('extradata', 'var')

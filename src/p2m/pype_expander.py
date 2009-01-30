@@ -29,6 +29,9 @@ Mon Jan 26 11:00:53 2009 mazer
 Thu Jan 29 14:05:22 2009 mazer
   more optimizing to use fread() in matlab and numeric.array.tostring()
   for fast python-side i/o
+
+Fri Jan 30 10:59:42 2009 mazer
+  updated to use single monster output file.. even fast, I think..
   
 """
 import sys, types, string, math
@@ -155,24 +158,19 @@ def writeVector(fp, objname, name, v, format):
 			tmp = mktemp()
 			fp.write("%s.%s=load('-ascii', '%s')'; delete('%s');\n" % \
 					 (objname, name, tmp, tmp))
-			fp = open(tmp,'w');
-			fp.write(string.join([format % x for x in v], '\n'))
-			fp.close()
+			t = open(tmp,'w');
+			t.write(string.join([format % x for x in v], '\n'))
+			t.close()
 		
-def expandExtradata(fname, prefix, extradata):
-	fp = open('%s_xd.m' % prefix, 'w')
+def expandExtradata(fname, fp, extradata):
 	for n in range(len(extradata)):
 		printify(fp, "extradata{%d}.id" % (n+1),
 				 extradata[n].id)
 		for k in range(len(extradata[n].data)):
 			printify(fp, "extradata{%d}.data{%d}" % (n+1, k+1), \
 					 extradata[n].data[k])
-	fp.close()
 
-def expandRecord(fname, prefix, n, d, xd):
-	outfile = '%s_%04d.m' % (prefix, n)
-	fp = open(outfile, 'w')
-	
+def expandRecord(fname, fp, n, d, xd):
 	objname = 'rec(%d)' % (n+1)
 	d.compute()	
 
@@ -292,42 +290,39 @@ def expandRecord(fname, prefix, n, d, xd):
 		v = []
 	writeVector(fp, objname, 'eyep', v, '%d')
 
-	fp.close()
-
-	return outfile
-
-def expandFile(fname, prefix, startat=0):
+def expandFile(fname, outfile, startat=0):
 	pf = PypeFile(fname, filter=None)
 
 	recno = 0
 	expanded = 0
+	out = open(outfile, 'w');
 	while 1:
 		d = pf.nth(recno)
 		if d is None:
 			break
 		elif recno >= startat:
-			o = expandRecord(fname, prefix, recno, d, pf.extradata)
-			if math.fmod(recno,10) == 0:
-				sys.stderr.write('.')
-				sys.stderr.flush()
+			expandRecord(fname, out, recno, d, pf.extradata)
+			sys.stderr.write('.')
+			sys.stderr.flush()
 		else:
-			if math.fmod(recno,10) == 0:
-				sys.stderr.write('x')
-				sys.stderr.flush()
+			sys.stderr.write('x')
+			sys.stderr.flush()
 		recno = recno + 1
-	expandExtradata(fname, prefix, pf.extradata)
+	expandExtradata(fname, out, pf.extradata)
+	out.close()
 	pf.close()
 	if recno > 0:
 		sys.stderr.write('\n')
-	
 
 if __name__ == '__main__':
 	PROFILE = 0
 	if len(sys.argv) < 3:
-		sys.stderr.write("Usage: pype_expander pypefile prefix [startat]\n")
+		sys.stderr.write("Usage: pype_expander pypefile outfile [startat]\n")
 		sys.exit(1)
 	if len(sys.argv) > 3:
 		n = int(sys.argv[3])
+	else:
+		n = 0
 
 	if not PROFILE:
 		expandFile(sys.argv[1], sys.argv[2], startat=n)

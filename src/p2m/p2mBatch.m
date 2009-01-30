@@ -75,10 +75,8 @@ for n = 1:length(files)
   end
 
   try
-    %fprintf(2, '%s -> %s\n', pypefile, matfile);
     PF = p2m(pypefile, oldpf);
     save(matfile, 'PF', '-mat');
-    %fprintf(2, 'Saved data to ''%s''\n', matfile);
     errors{n} = '';
   catch
     fprintf(2, 'Error converting file: %s\n', pypefile);
