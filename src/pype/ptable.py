@@ -21,13 +21,19 @@ Mon Aug 14 13:46:27 2006 mazer
   Jon Touryan... should work ok with runlock'ing, but I haven't
   tested it. Is anybody using runlock??
 
+Fri Feb 13 11:15:35 2009 mazer
+
+- changed load/save format to a human-readable (non-pickled) version
+  change should be transparent -- old pickle versions will get read
+  and new text versions written from now on..
+
 """
 
 from Tkinter import *
 import Pmw
 import string
 import types
-import os
+import os, posixpath
 
 import pype
 import pype_aux
@@ -47,7 +53,6 @@ def is_dir(s, evaluate=None):
 	"""
 	entry must be a directory
 	"""
-	import posixpath
 	if posixpath.isdir(s):
 		r = VALID
 	else:
@@ -60,7 +65,6 @@ def is_file(s, evaluate=None):
 	"""
 	entry must be name of an EXISTING file
 	"""
-	import posixpath
 	if posixpath.exists(s):
 		r = VALID
 	else:
@@ -73,7 +77,6 @@ def is_newfile(s, evaluate=None):
 	"""
 	entry must be name of NON-EXISTING file
 	"""
-	import posixpath
 	if posixpath.exists(s):
 		r = INVALID
 	else:
@@ -696,18 +699,33 @@ class ParamTable:
 
 	def save(self, file=None):
 		"""
-		Pickle and save a dictionary containing the values from
-		the table/worksheet.  This is for persistent state across
-		sessions.
+		Save a dictionary containing the values from the table/worksheet.
+		Uses plain ascii file format -- no pickle anymore..
 		"""
-		import cPickle
 		if file is None:
 			file = self._file
+			
+		f = open(file, 'w')
 
 		(ok, x) = self.get(evaluate=0)
-		f = open(file, 'w')
-		cPickle.dump(x, f)
-		cPickle.dump(self._locks, f)
+
+		if 0:
+			import cPickle
+			# old style cpickle version
+			(ok, x) = self.get(evaluate=0)
+			cPickle.dump(x, f)
+			cPickle.dump(self._locks, f)
+			
+		if 1:
+			# new human-readable text version
+			for k in x.keys():
+				if self._locks.has_key(k):
+					lock = self._locks[k]
+				else:
+					lock = ''
+				f.write('%s!!%s!!%s!!%s\n' % (posixpath.basename(file)[:-4],
+											  k, lock, x[k]))
+				
 		f.close()
 
 	def load(self, file=None):
@@ -747,6 +765,14 @@ class ParamTable:
 				return
 
 	def _load(self, file=None):
+		try:
+			# try to load as pickle file (old-style)
+			return self._loadp(file=file)
+		except:
+			# then try as string version (new-style)
+			return self._loadt(file=file)
+		
+	def _loadp(self, file=None):
 		"""
 		This is the actual load function -- the load() method is
 		a wrapper that lets the user select alternative files in
@@ -781,6 +807,49 @@ class ParamTable:
 			for k in locks.keys():
 				self.lockfield(k, state=locks[k])
 				
+			return 1
+		except IOError:
+			return 0
+
+	def _loadt(self, file=None):
+		"""
+		New load as text function (replaces pickle version).
+		State is saved as ascii file with one table-slot per line and
+		each line of the form:
+				slotname!!lockstate!!value\n
+		"""
+		try:
+			x = {}
+			locks = {}
+			
+			f = open(file, 'r')
+			while 1:
+				line = f.readline()
+				if not line: break
+				source, key, lockstate, value = string.split(line, '!!')
+				# value has trailing \n
+				x[key] = value[:-1]
+				locks[key] = lockstate
+			f.close()
+			
+			for slot in self._table:
+				(name, default, validate, descr, runlock) = _unpack_slot(slot)
+				if default is None:
+					continue
+				if type(validate) is types.TupleType:
+					try:
+						self._entries[name].selectitem(x[name])
+					except IndexError:
+						# invalid string..
+						pass
+				else:
+					try:
+						self._entries[name].setentry(x[name])
+					except KeyError:
+						pass
+			for k in locks.keys():
+				if len(locks[k]) > 0:
+					self.lockfield(k, state=locks[k])
 			return 1
 		except IOError:
 			return 0

@@ -310,8 +310,8 @@ Arrows  Move all fidmarks left, right etc
 
 Eyecal marks
 -----------------------------------------
-   ./e  Set eyecal point (period) at cursor
-   ,/E  Delete nearest eyecal point (comma)
+     .  Set eyecal point (period) at cursor
+     ,  Delete nearest eyecal point (comma)
 
 Other
 -----------------------------------------
@@ -525,9 +525,9 @@ R-mouse simulate bar up/down
 			self._showfidmarks()
 		elif c == 'h':
 			self.help()
-		elif c == 'period' or c == 'e':
+		elif c == 'period':
 			self.addpoint(ev.x, ev.y)
-		elif c == 'comma' or c == 'E':
+		elif c == 'comma':
 			self.deletepoint(ev.x, ev.y)
 		elif c == 'slash':
 			self.setbox()
