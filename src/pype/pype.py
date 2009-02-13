@@ -279,8 +279,9 @@ import posixpath
 import signal
 import socket
 import time
-from types import *
 import math
+import cPickle
+from types import *
 
 # for importing tasks and stack tracing
 import imp, traceback
@@ -1712,8 +1713,6 @@ class PypeApp:
 		return fname
 
 	def _savestate(self):
-		import cPickle
-
 		if self.tk:
 			d = {}
 
@@ -1736,7 +1735,6 @@ class PypeApp:
 			self.sub_common.save()
 			
 	def _readstate(self):
-		import cPickle
 		try:
 			file = open(self._get_statefile_name(), 'r')
 			d = cPickle.load(file)

@@ -43,7 +43,7 @@ import sys
 import errno
 import time
 import socket
-import pickle
+import cPickle
 
 try:
 	from pypedebug import keyboard
@@ -223,11 +223,11 @@ class TDTServer:
 			log('Received connection from %s' % server.remoteHost)
 
 			connections = self.connect()
-			server.Send(pickle.dumps(connections))
+			server.Send(cPickle.dumps(connections))
 			log('Recieving commands')
 			while 1:
 				try:
-					x = pickle.loads(server.Receive())
+					x = cPickle.loads(server.Receive())
 				except EOFError:
 					# client closed connection
 					break
@@ -247,7 +247,7 @@ class TDTServer:
 					traceback.print_tb(result[2])
 					result = result[0:1]
 				et = time.time() - et
-				server.Send(pickle.dumps((ok, result)))
+				server.Send(cPickle.dumps((ok, result)))
 				if DEBUG:
 					log('(%s,"%s") <- %s' % (ok, result, x))
 					log('[%.3fs elapsed]' % (et, ))
@@ -291,7 +291,7 @@ class TDTClient:
 		if self.client is None:
 			self.client = _SocketClient()
 			self.client.Connect(self.server)
-		c = pickle.loads(self.client.Receive())
+		c = cPickle.loads(self.client.Receive())
 		self.gotTDevAcc = (1 & c) > 0
 		self.gotTTank = (2 & c) > 0
 		
@@ -318,7 +318,7 @@ class TDTClient:
 		data typing should be correctly preserved and propagated.
 		"""
 		try:
-			self.client.Send(pickle.dumps(cmdtuple))
+			self.client.Send(cPickle.dumps(cmdtuple))
 			p = self.client.Receive()
 			(ok, result) = pickle.loads(p)
 		finally:

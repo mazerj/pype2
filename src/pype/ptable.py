@@ -34,6 +34,8 @@ import Pmw
 import string
 import types
 import os, posixpath
+import cPickle
+
 
 import pype
 import pype_aux
@@ -710,7 +712,6 @@ class ParamTable:
 		(ok, x) = self.get(evaluate=0)
 
 		if 0:
-			import cPickle
 			# old style cpickle version
 			(ok, x) = self.get(evaluate=0)
 			cPickle.dump(x, f)
@@ -778,13 +779,11 @@ class ParamTable:
 		a wrapper that lets the user select alternative files in
 		the event the application-specficied file doesn't exist.
 		"""
-		import pickle
-
 		try:
 			f = open(file, 'r')
-			x = pickle.load(f)
+			x = cPickle.load(f)
 			try:
-				locks = pickle.load(f)
+				locks = cPickle.load(f)
 			except EOFError:
 				locks = {}
 			f.close()

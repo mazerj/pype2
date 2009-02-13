@@ -5,7 +5,7 @@
 
 import sys, time
 import socket
-import pickle
+import cPickle
 
 class TDTError(Exception): pass
 
@@ -133,7 +133,7 @@ class TTankServer:
 			self.log('Recieving commands')
 			while 1:
 				try:
-					x = pickle.loads(server.Receive())
+					x = cPickle.loads(server.Receive())
 				except EOFError:
 					# client closed connection
 					break
@@ -151,7 +151,7 @@ class TTankServer:
 					##???: traceback.print_tb(tb)
 				ete = time.time() - tic
 				tic = time.time()
-				server.Send(pickle.dumps((ok, result)))
+				server.Send(cPickle.dumps((ok, result)))
 				ett = time.time() - tic
 				self.log('[%.0f/%.0f ms eval/xmit]' % (1000*ete, 1000*ett,))
 				if DEBUG:
@@ -206,9 +206,9 @@ class TTank:
 		data typing should be correctly preserved and propagated.
 		"""
 		try:
-			self.client.Send(pickle.dumps(cmdtuple))
+			self.client.Send(cPickle.dumps(cmdtuple))
 			p = self.client.Receive()
-			(ok, result) = pickle.loads(p)
+			(ok, result) = cPickle.loads(p)
 		finally:
 			pass
 		return (ok, result)

@@ -4,7 +4,7 @@ from Tkinter import *
 from Pmw import *
 from guitools import *
 
-import pickle
+import cPickle
 import glob
 import tdt
 
@@ -29,7 +29,7 @@ class Controller:
             f = 'tmp-%03d.hoop' % (nmax + 1)
             sortp = self.tdtconnx.tdev_sortparams()
             fp = open(f, 'w')
-            fp.write(pickle.dumps(sortp))
+            fp.write(cPickle.dumps(sortp))
             fp.close()
             self.app.console.writenl('hoops -> %s' % f)
         except:
@@ -51,7 +51,7 @@ class Controller:
             else:
                 f = 'tmp-%03d.hoop' % nmax
                 fp = open(f, 'r')
-                sortp = pickle.loads(fp.read())
+                sortp = cPickle.loads(fp.read())
                 self.tdtconnx.tdev_sortparams(sortp)
                 fp.close()
                 self.app.console.writenl('%s -> hoops' % f)
