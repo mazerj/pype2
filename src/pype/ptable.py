@@ -27,6 +27,11 @@ Fri Feb 13 11:15:35 2009 mazer
   change should be transparent -- old pickle versions will get read
   and new text versions written from now on..
 
+Wed Mar 11 11:08:19 2009 mazer
+
+- when parameter tables are evaluated, added storage of the raw
+  unevaluated string version of the var for future reference..
+
 """
 
 from Tkinter import *
@@ -646,6 +651,11 @@ class ParamTable:
 				continue
 			v = self.query(name)
 			if evaluate:
+				# Wed Mar 11 11:08:13 2009 mazer 
+				# store raw string version of param in dictionary in addition
+				# to the evaluated version for future reference..  only do
+				# this if evaluating
+				d[name+'_raw_'] = v
 				if not (type(validate) is types.TupleType) and validate:
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
 					if (runlock == KEEPLOCKED) and not readonly:

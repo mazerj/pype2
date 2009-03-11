@@ -690,9 +690,9 @@ class FrameBuffer:
 			try:
 				from pype import pypelib
 				fontfile = pypelib('cour.ttf')
-				self._font[size] = pygame._font.Font(fontfile, size)
+				self._font[size] = pygame.font.Font(fontfile, size)
 			except ImportError:
-				self._font[size] = pygame._font.Font(None, size)
+				self._font[size] = pygame.font.Font(None, size)
 
 		s = self._font[size].render(s, 0, color).convert()
 
