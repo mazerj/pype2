@@ -441,7 +441,7 @@ class TDTClient:
 			oldblock = self.ttank_invoke('GetHotBlock')
 			if str(oldblock) == 'TempBlk' or len(oldblock) == 0:
 				break
-		    sys.stderr.write('waiting1...');
+			sys.stderr.write('waiting1...')
 
 		# actually, I do not think this is necessary, as long as the
 		# tnum's are unique, so just let it count up continuously..
@@ -458,7 +458,7 @@ class TDTClient:
 				newblock = self.ttank_invoke('GetHotBlock')
 				if not (newblock == oldblock) and len(newblock) > 0:
 					break
-				sys.stderr.write('waiting2...');
+				sys.stderr.write('waiting2...')
 		else:
 			self.tdev_mode(PREVIEW)
 			newblock = self.ttank_invoke('GetHotBlock')
