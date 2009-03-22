@@ -195,7 +195,8 @@ class TTank:
 		Send a command string for remove evaluation to the server.
 		Command string (cmd) should be a valid python expression
 		that can be eval'ed in the remote envrionment. Access to
-		the Tucker-Davis API is via:
+		the Tucker-Davis API is via::
+		
 		  TDevAcc (for the direct DSP interface), or,
 		  TTank (for access to the data tank)
 

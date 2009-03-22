@@ -1,19 +1,21 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Interactive plot utilities
+"""
+**Interactive plot utilities**
 
 Front end for gracePlot/grace_np. These functions provide a
 matlab-like interface to the grace/xmgr plotting program for
 generating real-time interactive plot windows
 
-**NOTE** --
+Author -- James A. Mazer (james.mazer@yale.edu)
+
+**NOTE**
+
 This module makes use of a hidden global to preserve state
 cross calls giving the user/programmer a matlab-like feel.
 
 *This is the preferred interface for interactive plots in pype*
-
-Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 

@@ -1,16 +1,17 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id: configvars.py 233 2007-06-21 15:12:59Z mazer $
 
-"""Default Configuration Variables
+"""
+**Default Configuration Variables**
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Tue Jun 26 14:21:36 2007 mazer 
+Tue Jun 26 14:21:36 2007 mazer 
 
-  - abstract out from pype.py to put all config vars in a single
-    file for documentation/code-clarity purposes..
+- abstract out from pype.py to put all config vars in a single
+  file for documentation/code-clarity purposes.
 
 """
 

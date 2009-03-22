@@ -1,7 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Sprite-based movie classes.
+"""
+**Sprite-based movie classes**
 
 These classes provide bare-bones movie classes. Movies are stored as
 individual frames in a directory. Each movie directory must contain a
@@ -16,11 +17,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Mon Jul 16 12:07:03 2001 mazer
+Mon Jul 16 12:07:03 2001 mazer
 
- - extracted from imview4.py (task file) as a generally useful tool.
+- extracted from imview4.py (task file) as a generally useful tool.
 
- - only change at this time was "app" replaced by "fb"
+- only change at this time was "app" replaced by "fb"
 
 """
 

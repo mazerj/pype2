@@ -56,22 +56,3 @@ clean:
 	(cd ./icons ; $(MAKE) clean)
 	@rm -f *.pyc pypeversion.py .*~ prun .happydoc*py
 
-happydoc:
-	etags *.py
-	#/bin/rm -rf ../../happydoc
-	mkdir -p ../../happydoc
-	happydoc \
-		-d ../../happydoc \
-		-t "pype" \
-		-F HTMLTable \
-		--author=james.mazer@yale.edu \
-		--no-private-names \
-		*.py
-	date > ../../happydoc/GENERATED
-
-#'docbookx', 'Text', 'Dia', 'xpydoc', 'SGMLDocBook', 'Null', 'HTMLTable'] 
-
-epydoc:
-	etags *.py
-	/bin/rm -rf ../../epydoc
-	epydoc --docformat restructuredtext --html -o ../../epydoc -n pype *.py

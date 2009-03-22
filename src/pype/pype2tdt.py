@@ -33,12 +33,12 @@ class Controller:
             fp.close()
             self.app.console.writenl('hoops -> %s' % f)
         except:
+            warn('tdt save', 'Error saving TDT hoops');
 			# [[effort to remove all unnamed exceptions:
 			import pypedebug
 			pypedebug.get_traceback(1)
+			reporterror()
 			# effort to remove all unnamed exceptions:]]
-            reporterror()
-            warn('tdt save', 'Error saving TDT hoops');
 
     def restore(self):
         try:
@@ -56,13 +56,12 @@ class Controller:
                 fp.close()
                 self.app.console.writenl('%s -> hoops' % f)
         except:
+            warn('tdt restore', 'Error restoring TDT hoops');
 			# [[effort to remove all unnamed exceptions:
 			import pypedebug
 			pypedebug.get_traceback(1)
 			# effort to remove all unnamed exceptions:]]
-            
             reporterror()
-            warn('tdt restore', 'Error restoring TDT hoops');
 
     def settank(self, dirname, name):
         # this will only work in IDLE or STANDBY mode, so do it 1st!

@@ -1,21 +1,22 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Simple 'config' file parser class.
+"""
+**Simple 'config' file parser class**
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Tue Aug 13 17:23:06 2002 mazer
+Tue Aug 13 17:23:06 2002 mazer
 
- - removed save method from UserParams class
+- removed save method from UserParams class
  
- - renamed UserParams to Config
+- renamed UserParams to Config
 
-- Tue Jun 26 14:20:10 2007 mazer
+Tue Jun 26 14:20:10 2007 mazer
 
- - added show() method
+- added show() method
 
 """
 

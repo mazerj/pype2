@@ -1,7 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Events and result codes
+"""
+**Events and result codes**
 
 Event definitions, based on the encode tags used by the
 ORTEX program from Bob Desimone's lab at NIMH.
@@ -11,7 +12,8 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 **Revision History**
 
 Wed Nov 15 10:32:20 2006 mazer
-  added NA_RESPONSE
+- added NA_RESPONSE
+
 """
 
 ####################################################################

@@ -1,13 +1,14 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Parameter tables with type validation.
+"""
+**Parameter tables with type validation**
 
 PMW (Python MegaWidgets) based parameter tables (aka worksheets)
 for use by the pype GUI. Most of these functions are **INTERNAL**
 only and should never be called directly, except by "power users"!
 
-The exception is the "is_*" function that are used as validators
+The exceptions are the *is_????* functions to be used as validators
 for task worksheets.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
@@ -47,7 +48,7 @@ import pype_aux
 from guitools import *
 from filebox import Open, SaveAs
 
-KEEPLOCKED = -1
+_KEEPLOCKED = -1
 
 # these are made available for custom validation functions,
 # so the user doesn't have to know how Pmw works (it's just
@@ -587,7 +588,7 @@ class ParamTable:
 				xxx.pack_propagate(0)
 				xxx.pack(side=LEFT)
 				if locks:
-					if runlock == KEEPLOCKED:
+					if runlock == _KEEPLOCKED:
 						lockbut = Label(xxx, text = '')
 					else:
 						lockbut = Button(xxx, text = '',\
@@ -595,8 +596,8 @@ class ParamTable:
 										 self.lockfield(n, toggle=1))
 					lockbut.pack(fill=BOTH, expand=1)
 
-					if runlock == KEEPLOCKED:
-						# runlock==KEEPLOCKED(-1): usr can NEVER set this value!
+					if runlock == _KEEPLOCKED:
+						# runlock==_KEEPLOCKED(-1): usr can NEVER set this value!
 						e.component('entry').configure(state=DISABLED)
 						e.component('label').configure(fg='red')
 						lockbut.configure(state=DISABLED)
@@ -658,7 +659,7 @@ class ParamTable:
 				d[name+'_raw_'] = v
 				if not (type(validate) is types.TupleType) and validate:
 					(r, v) = apply(validate, (v,), {"evaluate": 1})
-					if (runlock == KEEPLOCKED) and not readonly:
+					if (runlock == _KEEPLOCKED) and not readonly:
 						continue
 					elif r != VALID:
 						return (0, name)
@@ -821,11 +822,14 @@ class ParamTable:
 			return 0
 
 	def _loadt(self, file=None):
-		"""
+		"""Load text-based param file.
+		
 		New load as text function (replaces pickle version).
 		State is saved as ascii file with one table-slot per line and
-		each line of the form:
-				slotname!!lockstate!!value\n
+		each line of the form::
+		
+		  slotname!!lockstate!!value\n
+		  
 		"""
 		try:
 			x = {}

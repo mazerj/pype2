@@ -1,0 +1,7 @@
+#!/bin/sh
+
+\ls /auto/share/src/pype2/src/pype/*.py | \
+    grep -v gracePlot.py | grep -v grace_np.py | grep -v blt | \
+    xargs epydoc --docformat "restructuredtext en" --html \
+   --simple-term --parse-only -v --no-private \
+    -o /auto/share/pypedocs -n pype

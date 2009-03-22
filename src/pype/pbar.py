@@ -1,7 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Progress bar
+"""
+**Progress bar**
 
 Standalone progress bar (like the matlab waitbar function) for
 GUI tasks that take a long time. This is the same idea as the
@@ -11,6 +12,7 @@ Tkinter GUI will be active.
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
+
 """
 
 from Tkinter import *
@@ -51,7 +53,7 @@ class ProgressBar:
 		f = Frame(self.master, bd=3, relief=SUNKEN)
 		f.pack(expand=1, fill=BOTH)
 		if title is None:
-			title = basename(argv[0])
+			title = "Working"
 		Label(f, text=title).pack(expand=1, fill=Y, side=TOP)
 		self.frame=Frame(f, relief=SUNKEN, bd=4, background='black')
 		self.frame.pack(fill=BOTH)
@@ -117,8 +119,11 @@ class DanceBar(ProgressBar):
 	This is for when you DON'T know how long, but just want to
 	let the user know you're still alive & running.
 	"""
-	def set(self, newValue):
-		self.value = newValue
+	def set(self, newValue=None):
+		if newValue:
+			self.value = newValue
+		else:
+			self.value = (self.value + 1) % 100
 		self.update()
 
 	def update(self):
@@ -128,13 +133,14 @@ class DanceBar(ProgressBar):
 
 		self.canvas.coords(self.scale, x1, 0, x1-10, self.height,
 						   x2-10, self.height, x2, 0)
-		self.canvas.itemconfig(self.label, text='%s' % self.value)
 		self.canvas.update_idletasks()
 		
 if __name__ == '__main__':
+	bar = DanceBar()
 	foo = ProgressBar(doLabel=1)
-	for n in range(100):
+	for n in range(0,100,1):
 		foo.set(n)
+		bar.set()
 		foo.canvas.after(100)
 else:
 	try:

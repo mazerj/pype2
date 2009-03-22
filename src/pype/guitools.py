@@ -1,6 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
-"""Assorted GUI-related functions
+"""
+**Assorted GUI-related functions**
 
 Useful Tkinter and Pmw utility functions for GUI building
 nd running. Things that get repeated over and over again
@@ -11,27 +12,27 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Wed Apr  8 21:42:18 1998 mazer
+Wed Apr  8 21:42:18 1998 mazer
 
- - created
+- created
 
-- Thu Jan 27 15:27:15 2000 mazer
+Thu Jan 27 15:27:15 2000 mazer
 
- - added DockWindow class
+- added DockWindow class
 
-- Mon Jun 25 12:21:40 2007 mazer
+Mon Jun 25 12:21:40 2007 mazer
 
- - Container() class is obsolete... deleted it..
+- Container() class is obsolete... deleted it..
 
- - Added SimpleDialog() class to replace use of the Tk builtin Dialog
-   class (which is opaque and unchangable). This is much simpler..
+- Added SimpleDialog() class to replace use of the Tk builtin Dialog
+  class (which is opaque and unchangable). This is much simpler..
 
-- Thu Jun 28 10:41:43 2007 mazer
+Thu Jun 28 10:41:43 2007 mazer
 
- - Switched use of ScrolledText to Pmw.ScrolledText -- didn't realize
-   there was a Tkinter version (that doesn't properly resize!). Hmmm,
-   actually this is a problem -- doesn't work for Tally window, so I
-   reverted back to Tkinter's version..
+- Switched use of ScrolledText to Pmw.ScrolledText -- didn't realize
+  there was a Tkinter version (that doesn't properly resize!). Hmmm,
+  actually this is a problem -- doesn't work for Tally window, so I
+  reverted back to Tkinter's version..
 
 """
 
@@ -115,8 +116,15 @@ class TaskNotebook(DockWindow):
 class Logger:
 	logwindow = None
 	buffered = []
-	def __init__(self, text=None, window=None, popup=None):
+	msgs = {}
+	def __init__(self, text=None, window=None, popup=None, once=None):
 		import time
+
+		if once:
+			if Logger.msgs.has_key(text):
+				return
+			else:
+				Logger.msgs[text] = 1
 
 		if not text is None:
 			(year, month, day,

@@ -1,18 +1,18 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""OBSOLETE; DO NOT USE
+"""
+**OBSOLETE**
 
 Obsolete module; backward compatibility ONLY!
 
-Author --
-James A. Mazer (mazer@socrates.berkeley.edu)
+Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Thu Aug  8 17:23:21 2002 mazer
+Thu Aug  8 17:23:21 2002 mazer
 
- - OBSOLETE, DON'T USE
+- OBSOLETE, DON'T USE
 
 """
 

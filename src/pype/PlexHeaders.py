@@ -1,9 +1,22 @@
 #!/usr/bin/env python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
+"""
+**Plexon Datafile/Network Headers**
+
+Converted/figured-out from the Plexon .h and .m files distributed by
+Plexon.
+
+Author -- James A. Mazer (james.mazer@yale.edu)
+
+**Revision History**
+
+"""
+
 class Plex:
 	"""
-	A class for defining structures and constants for Plexon data
+	Class for defining structures and constants for Plexon data.
+	
 	"""
 	
 	PL_SingleWFType = 1
@@ -41,8 +54,8 @@ class Plex:
 		
 	fPL_Event = 'cccBLhhcccc'
 	
-	"""Original structure definitions from C header files.
-	
+	"""Original structure definitions from C header files
+
 	struct PL_Event{
 		char	Type;						// so far, PL_SingleWFType or PL_ExtEventType
 		char	NumberOfBlocksInRecord;
@@ -56,12 +69,13 @@ class Plex:
 		char	BlockNumberForWaveform;		// tetrode stuff, ignore for now
 		char	NumberOfDataWords;			// number of shorts (2-byte integers) that follow this header 
 	};
+	
 	"""
 	
 	fPL_Wave = 'cccBLhhccc56h'
 	
 	"""Original structure definitions from C header files.
-	
+
 	// the same PL_Event above with Waveform added
 	struct PL_Wave {
 		char	Type;
@@ -77,6 +91,7 @@ class Plex:
 		char	NumberOfDataWords;		// number of shorts (2-byte integers) that follow this header 
 		short	WaveForm[MAX_WF_LENGTH];
 	};
+	
 	"""
 
 	fPL_WaveLong = 'cccBLhhcccc120h'
@@ -98,6 +113,7 @@ class Plex:
 		char	NumberOfDataWords;
 		short	WaveForm[MAX_WF_LENGTH_LONG];
 	}; // size should be 256
+	
 	"""
 
 
@@ -141,6 +157,7 @@ class Plex:
 		int		WFCounts[130][5];		// number of waveforms[channel][unit]
 		int		EVCounts[512];			// number of timestamps[event_number]
 	};
+	
 	""" 
 
 	fPL_ChanHeader = '32s32siiiiiiiii320h5ii40hi43i'
@@ -164,6 +181,7 @@ class Plex:
 		int		SortBeg;
 		int		Padding[43];
 	};
+	
 	"""
 
 	fPL_EventHeader = '32sii64i'
@@ -174,6 +192,7 @@ class Plex:
 		int		IsFrameEvent;		// frame start/stop signal
 		int		Padding[64];
 	};
+	
 	"""
 
 	fPL_SlowChannelHeader = '32siiiii61i'
@@ -187,6 +206,7 @@ class Plex:
 		int		PreAmpGain;
 		int		Padding[61];
 	};
+	
 	"""
 
 	fPL_DataBlockHeader = 'hHLhhhh'
@@ -204,6 +224,7 @@ class Plex:
 		short	NumberOfWaveforms;
 		short	NumberOfWordsInWaveform; 
 	};
+	
 	"""
 	
 	

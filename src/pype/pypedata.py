@@ -1,7 +1,8 @@
 # -*- Mode: Python; tab-width:4 py-indent-offset:4 -*-
 # $Id$
 
-"""Classes for reading pype data files.
+"""
+**Classes for reading pype data files**
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
@@ -10,28 +11,28 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 Tue Jan 25 15:23:19 2000 mazer
 
 - Originally *pview.py*. This is a multithreaded browser for pype datafiles
-It includes a few useful and interesting tricks.
+  It includes a few useful and interesting tricks:
 
- 1. Object class for encapsulating trial records
+  - Object class for encapsulating trial records
 
- 2. Object class for encapsulating entire pype data files.
+  - Object class for encapsulating entire pype data files.
 
- 3. A simple eye trace viewer
+  - A simple eye trace viewer
 
- 4. It's multithreaded -- it loads the records using a background
+  - It's multithreaded -- it loads the records using a background
    thread, so while you're browsing, it continues to load the data for
    when you get there.
 
- 5. The load is threaded, but the numerical crunching is not. This is
+  - The load is threaded, but the numerical crunching is not. This is
    to make it easier to skip towards the end of the file. Once the
    file's all loaded, it goes back and starts to crunch from the
    beginning
 
 - Things to do:
 
- 1. Set up easy way to subclass the viewer for code-reuse
+  - Set up easy way to subclass the viewer for code-reuse
 
- 2. standardize on how to convert pix->dva
+  - standardize on how to convert pix->dva
 
 Mon Feb	 7 21:15:12 2000 mazer
 
@@ -58,29 +59,29 @@ Tue Apr	 3 12:31:51 2001 mazer
 Fri Apr 13 11:52:19 2001 mazer
 
 - Added support for shifting eye traces on load (for iscan lag).
-  From my notes ::
+  From my notes::
   
- > Just got off phone with Rikki.  There's definitely an unaccounted
- > for latency problem in our iscan, could be as much as 24ms at 120hz
- > (ie, 3 frames).
- > 
- > Here's the deal: T
- > 
- > The camera in our system does not do progressive scan.  Instead of
- > clocking out each scanline as it's aquired, like a normal tube
- > video camera, it acquires an entire video frame (8ms) and holds it.
- > That frame is then clocked out over the next 8ms while the next
- > frame is being acquired by the CCD.	Second, the frame grabber
- > hardware on the iscan board (inside pc) takes another 8ms to
- > acquire each video frame.  Computation time is negliable.  These
- > 8ms values are actually frame periods (ie, at 240hz, assume 4ms etc)
- > 
- > According to Tim Gawne there's one more frame in there (he got a 12ms
- > lag at 240hz; Rikki is checking into this for me now).
- > 
- > This means that the eye trace is actually telling us where the eye
- > was 16-24ms BEFORE the actual time..	 So the eye trace should be
- > shifted forward (to the left) in time by at least 16ms.
+   > Just got off phone with Rikki.  There's definitely an unaccounted
+   > for latency problem in our iscan, could be as much as 24ms at 120hz
+   > (ie, 3 frames).
+   > 
+   > Here's the deal: T
+   > 
+   > The camera in our system does not do progressive scan.  Instead of
+   > clocking out each scanline as it's aquired, like a normal tube
+   > video camera, it acquires an entire video frame (8ms) and holds it.
+   > That frame is then clocked out over the next 8ms while the next
+   > frame is being acquired by the CCD.	Second, the frame grabber
+   > hardware on the iscan board (inside pc) takes another 8ms to
+   > acquire each video frame.  Computation time is negliable.  These
+   > 8ms values are actually frame periods (ie, at 240hz, assume 4ms etc)
+   > 
+   > According to Tim Gawne there's one more frame in there (he got a 12ms
+   > lag at 240hz; Rikki is checking into this for me now).
+   > 
+   > This means that the eye trace is actually telling us where the eye
+   > was 16-24ms BEFORE the actual time..	 So the eye trace should be
+   > shifted forward (to the left) in time by at least 16ms.
 
 Thu Feb 27 17:27:36 2003 mazer
 
@@ -729,50 +730,60 @@ def deg2pix(d, deg):
 		return float(deg) * float(d.params['pix_per_dva'])
 
 def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
-	"""
-	Thu Apr	 5 13:33:12 2001 mazer
+	"""Find all saccades in a trial
 	
-	Find all saccades in a trial.
+	Thu Apr 5 13:33:12 2001 mazer
+	
 	This function is carefully hand tuned. The steps are as follows:
-	  1. decimates eye signal back down to 120hz (iscan speed)
-	  2. compute the velocity signal
-	  3. smooth velocity with a running average (5pt)
-	  4. find velocity spikes that exceed thresh
-	  5. Two saccades within <mindur>ms are essentially considered to
-		 be one noisy saccade and the second one is discarded.
-		 
-			/\					 /\						/\
-	 v: ___/  \_________________/  \___________________/  \_____....
-			   <-------------------------------------->
-			   |				|	|				  |
-			   t0				t1	t2				  t3
-									<-------------------------------
-									|				  |	  |			 
-									t0				  t1  t2
+	
+	- decimates eye signal back down to 120hz (iscan speed)
+	
+	- compute the velocity signal
+	
+	- smooth velocity with a running average (5pt)
+	
+	- find velocity spikes that exceed thresh
+	
+	- Two saccades within <mindur>ms are essentially considered to be
+      one noisy saccade and the second one is discarded::
 
-	So, to compute a real fixation triggered PSTH, you allign
-	all the rasters up on 't2' and only count spikes from t0-t3.
+		vel  /\                   /\                     /\       / ...
+		 ___/  \_________________/  \___________________/  \_____/
+		       <-------------------------------------->
+		       |                |   |                 |
+		       t0               t1  t2                t3
+		                            <-------------------------------
+		                            |                 |   |          
+		                            t0                t1  t2
 
-	The output of this function is a complicated list:
-	  [
-	  (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
-	  (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
-	  (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
-	  ....
-	  ]
-	tN's are the times of the events shown in the diagram above,
-	while tNi's the indices of those events back into the
-	d.eye[xyt] arrays.
-	fx,fy are the mean x & y positions between t2-t3 and l_fx,
-	l_fy are the position of the last fixation.	 fv and l_fv refer
-	to the calibration state of fx/fy and l_fx/l_fy respectively.
-	If fv is TRUE, then this is a 'calibrated' fixation.  Which
-	means inside the calibration field, or,
-		OR *NO* EYE CALIBRATION DATA WAS SUPPLIED.
+	  - So, to compute a real fixation triggered PSTH, you allign
+        allthe rasters up on 't2' and only count spikes from t0-t3.
+
+	- The output of this function is a complicated list::
+	
+	    [
+	    (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
+	    (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
+	    (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
+	    ....
+	    ]
+	  
+	  tN's are the times of the events shown in the diagram above,
+	  while tNi's the indices of those events back into the d.eye[xyt]
+	  arrays.
+	
+	  fx,fy are the mean x & y positions between t2-t3 and l_fx, l_fy
+	  are the position of the last fixation.  fv and l_fv refer to the
+	  calibration state of fx/fy and l_fx/l_fy respectively.  If fv is
+	  TRUE, then this is a 'calibrated' fixation.  Which means inside
+	  the calibration field, OR **NO** EYE CALIBRATION DATA WAS
+	  SUPPLIED.
 
 	Mon Oct	 7 10:59:13 2002 mazer
-	Added maxthresh -- if (vel > maxthresh), assume it's a blink and
-	don't put it in the list..
+	
+	- Added maxthresh -- if (vel > maxthresh), assume it's a blink and
+	  don't put it in the list..
+	  
 	"""
 	
 	start = 0

@@ -27,11 +27,14 @@ except ImportError:
 
 
 def find(boolvec):
-	"""
-	Find indices of all TRUE elements in boolvec.
-	You can use like this:
-		take(x, find(greater(x, 0)))
+	"""Find indices of all TRUE elements in boolvec.
+	
+	You can use like this::
+	
+	  take(x, find(greater(x, 0)))
+	  
 	to select all elements of x greater than zero..
+	
 	"""
 	return Numeric.compress(boolvec, Numeric.arange(len(boolvec)))
 

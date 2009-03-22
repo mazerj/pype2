@@ -1,27 +1,29 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Auxiliary functions for pype.
+"""
+**Auxiliary functions for pype**
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Wed Apr  8 21:42:18 1998 mazer
+Wed Apr  8 21:42:18 1998 mazer
 
- - created
+- created
 
-- Mon Jan 24 23:15:29 2000 mazer
+Mon Jan 24 23:15:29 2000 mazer
 
- - added tic/toc functions
+- added tic/toc functions
 
-- Sun Nov  6 13:06:34 2005 mazer
+Sun Nov  6 13:06:34 2005 mazer
 
- - added stat:stop:step slice syntax to param_expand
+- added stat:stop:step slice syntax to param_expand
 
-- Wed Jul  5 16:16:19 2006 mazer
+Wed Jul  5 16:16:19 2006 mazer
 
- - added =start:stop:step for inclusive ranges
+- added =start:stop:step for inclusive ranges
+
 """
 
 import random, sys, time, posixpath

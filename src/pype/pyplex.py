@@ -2,45 +2,46 @@
 # $Id$
 
 """
-Loader for PLEXON generated sorted spike datafiles (*.plx).
+**Loader for PLEXON generated sorted spike datafiles (*.plx)**
 
 As a standalone module (pypenv pyplex), converts *.plx files
 into *.plx.ts files that can be used directly by pypedata.py.
 
-Author --
+Authors
 
-- Jack L. Gallant (gallant@socrates.berkeley.edu)
+- Jack L. Gallant (gallant@berkeley.edu)
 
-- James A. Mazer (mazer@socrates.berkeley.edu)
+- James A. Mazer (james.mmazer@yale.edu)
 
-**Original Notes (jack & jamie)** ::
+Original Notes (jack & jamie)::
  
- Functions
- -------------------
- LoadPlexonFile(filename, save=None)
- LoadTimestampFile(filename, search=1)
- FindTimestampFile(pypefile, search=os.environ['PLXPATH'])
-   - NOTE: pypefile should be the name of the PYPE datafile, not
-     the plexon file or the timestamp file.  The '.plx.ts' extension
- 	is automatically added.
-   - PLXPATH should be colon-delimited search path (like PYTHONPATH)
-     that indicates were to look for *.plx files (autmatically adds
- 	current directory at the head!!)
- 
- Classes
- -------------------
- Plexondata
-   - Holds all the header and timestamp information contained in
-     a plexon datafile.
-   - Can be saved and loaded using the python builtin cPickle fns.
- 
+  Functions
+  -------------------
+  LoadPlexonFile(filename, save=None)
+  LoadTimestampFile(filename, search=1)
+  FindTimestampFile(pypefile, search=os.environ['PLXPATH'])
+    - NOTE: pypefile should be the name of the PYPE datafile, not
+      the plexon file or the timestamp file.  The '.plx.ts' extension
+  	is automatically added.
+    - PLXPATH should be colon-delimited search path (like PYTHONPATH)
+      that indicates were to look for *.plx files (autmatically adds
+  	current directory at the head!!)
+  
+  Classes
+  -------------------
+  Plexondata
+    - Holds all the header and timestamp information contained in
+      a plexon datafile.
+    - Can be saved and loaded using the python builtin cPickle fns.
+  
 **Revision History**
  
-- Feb 17, 2002	JLG PYPLEX.PY		v. 3 ::
+- Feb 17, 2002	JLG PYPLEX.PY		v. 3
 
-  Python routines to read plexon data files
-  All routines converted from plexon-supplied Matlab files
-   plx_info.m, plx_ts.m
+  - Python routines to read plexon data files
+  
+  - All routines converted from plexon-supplied Matlab files plx_info.m,
+    plx_ts.m
 
 - Sun Sep 22 17:58:00 2002 mazer ::
 

@@ -2,7 +2,7 @@
 # $Id$
 
 """
-Clone of the matlab GRIDDATA function.
+**Clone of the matlab GRIDDATA function**
 
 This basically works by taking a set of (x,y,z) data and using the
 existing data to interpolate z-values for a new set of (X,Y)
@@ -13,6 +13,8 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
+Tue Mar 17 14:41:32 2009 mazer
+
 """
 
 try:
@@ -20,7 +22,7 @@ try:
 except ImportError:
 	raise ImportError, "%s requires Numeric module" % __name__
 
-def __crossproduct(a, b):
+def _crossproduct(a, b):
 	"""Compute cross product of two 3-d vectors (x,y,z)"""
 	if len(a) != 3 or len(b) != 3:
 		raise TypeError, "Cross product only for vectors of length 3"
@@ -29,7 +31,7 @@ def __crossproduct(a, b):
 		 a[0]*b[1] - a[1]*b[0]]
 	return array(v)
 
-def __project(a, b, c, x, y):
+def _project(a, b, c, x, y):
 	"""
 	Project a line (x,y,0) to the plane defined by abc (perpendicular
 	to the XY plane) and return the z value of the intersection point.
@@ -38,7 +40,7 @@ def __project(a, b, c, x, y):
 		x,y: scalars
 		returns: scalar z-value
 	"""
-	nv = -__crossproduct((a-b),(a-c))
+	nv = -_crossproduct((a-b),(a-c))
 	d = nv[0]*a[0] + nv[1]*a[1] + nv[2]*a[2]
 	if nv[2] == 0:
 		# points are co-linear, normal isn't defined
@@ -49,32 +51,25 @@ def __project(a, b, c, x, y):
 def griddata(xd, yd, zd, nx, ny):
 	"""Clone of matlab GRIDDATA function.
 	
-	xd, yd, zd: all vectors of same length describing the
-				surface to be interpolated in 3-space
-	nx, ny:		2 vectors indicating the *AXIS* grid points where new
-				z-values are to be computed. nx and ny must be same
-				length; (len(nx)*len(ny)) points will be computed.
-	return:		return in a 2d numeric matrix containing
-				intepolated z-values at the grid points defined
-				by nx,ny.
+	**xd, yd, zd** -- all vectors of same length describing the
+      surface to be interpolated in 3-space
+				  
+	**nx, ny** -- 2 vectors indicating the *AXIS* points where new
+      z-values are to be computed. nx and ny must be same length;
+      (len(nx)*len(ny)) points will be computed.
 				
-    *NOTE*
-	griddata() should only be used to interpolate onto a regular grid.
+	**return** -- return in a 2d numeric matrix containing intepolated
+      z-values at the grid points defined by nx,ny.
+				
+    **NOTE:** griddata() should only be used to interpolate onto a
+      regular grid.
 
 	Similar to the matlab griddata() function.	Takes a set of
 	XYZ triples that define a surface.	The sampling can be
 	irregular or gridded, order doesn't matter.	 The surface is
 	then resample on the grid defined by nx and ny using nearest
-	neighbor linear interpolation.
-	
-		xd: vector of x values			Note: xd,yd and zd should be
-		yd: vector of y values				  1-d vectors, all the same
-		zd: vector of z values				  length, not axis vectors!!
+	neighbor linear interpolation::
 
-		nx: vector of new x axis values
-		ny: vector of new y axis values
-
-		returns: len(nx) x len(ny) matrix of resampled z values
 	"""
 	if len(xd) != len(yd) or len(xd) != len(zd):
 		raise TypeError, "xd,yd,zd must all be same length"
@@ -89,7 +84,7 @@ def griddata(xd, yd, zd, nx, ny):
 			b = array((xd[ix[1]], yd[ix[1]], zd[ix[1]]), 'f')
 			for n in range(2, len(ix)):
 				c = array((xd[ix[n]], yd[ix[n]], zd[ix[n]]), 'f')
-				z = __project(a, b, c, x, y)
+				z = _project(a, b, c, x, y)
 				if not (z is None):
 					break
 			if not (z is None):
@@ -100,32 +95,21 @@ def griddata(xd, yd, zd, nx, ny):
 	return nz
 			
 def surfinterp(xd, yd, zd, new_xd, new_yd):
-	"""
-	xd, yd, zd:		all vectors of same length describing the
-					surface to be interpolated in 3-space
-	new_xd, new_yd: 2 vectors indicating the new (x,y) points for which
-					new z-values should be computed. Must be same length.
-	return:			return in a 1-d numeric vector containing
-					intepolated z-values at the points defined
-					by new_xd and new_yd. Result is same length
-					as new_xd and new_yd.
-					
-    *NOTE*
-	Algorithm is identical to griddata(), but doesn't assume that the
-	inputs are on a regular grid.
+	"""Interpolate from raw x,y,z data to new space.
 
-	
-	Like griddata(), but doesn't required the interpolated data
-	to live on a regular grid.
-	
-		xd: vector of x values			Note: xd,yd and zd should be
-		yd: vector of y values				  1-d vectors, all the same
-		zd: vector of z values				  length, not axis vectors!!
+	**xd, yd, zd** -- all vectors of same length describing the
+      surface to be interpolated in 3-space
+				  
+	**new_xd, new_yd** -- 2 vectors indicating the *AXIS* points where new
+      z-values are to be computed. nx and ny must be same length;
+      (len(nx)*len(ny)) points will be computed.
+				
+	**return** -- return in a 2d numeric matrix containing intepolated
+      z-values at the grid points defined by new_xd, new_yd.
+				
+    *NOTE:* Algorithm is identical to griddata(), but doesn't assume
+     that the output space is a regular grid.
 
-		nx: vector of new x values (NOT AXIS VALUES)
-		ny: vector of new y values (NOT AXIS VALUES)
-
-		returns: len(nx) (== len(ny)) vector of z-values
 	"""
 	if len(xd) != len(yd) or len(xd) != len(zd):
 		raise TypeError, "xd,yd,zd must all be same length"
@@ -141,7 +125,7 @@ def surfinterp(xd, yd, zd, new_xd, new_yd):
 		b = array((xd[ix[1]], yd[ix[1]], zd[ix[1]]), 'f')
 		for n in range(2, len(ix)):
 			c = array((xd[ix[n]], yd[ix[n]], zd[ix[n]]), 'f')
-			z = __project(a, b, c, x, y)
+			z = _project(a, b, c, x, y)
 			if not (z is None):
 				break
 		if not (z is None):

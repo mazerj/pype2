@@ -1,7 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Helper functions for pype tasks
+"""
+**Helper functions for pype tasks**
 
 If you import helper.py in your task or program then you can
 access most of the methods hanging of the standard 'app'
@@ -9,8 +10,9 @@ param without having to type 'app.METHOD'. Use with caution.
 This is really intended ONLY for people not familiar with
 objected oriented programming..
 
-This is for task files only -- it should not be used in plain
-pypenv programs -- there won't be any PypeApp instance to find.
+This is for task files only - it should not be used in plain
+pypenv programs - there won't be any PypeApp instance to find.
+
 """
 
         

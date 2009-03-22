@@ -1,7 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Open/Save file dialog box
+"""
+**Open/Save file dialog box**
 
 Customized dialog boxes derrived from the standard Tkinter
 Dialog class.
@@ -10,9 +11,9 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Wed Aug 14 13:05:27 2002 mazer
+Wed Aug 14 13:05:27 2002 mazer
 
- - made set_selection() method place cursor at the end of the line
+- made set_selection() method place cursor at the end of the line
 
 """
 
@@ -32,11 +33,18 @@ def _comparedatafiles(a, b):
     This is highly PYPE-SPECIFIC and is activated by passing keyword
     argument datafiles=1 to the Open() and SaveAs() functions below
 
-    Pype data file names are of the form:
-    <animal_id><cell_number>.<taskname><taskversion>.<filenumber>
-    eg, m0037.hmap7.002   -> animal "m", task was hmap, version 7
-                             and this is the 3rd (0,1,2) datafile
-                             collected for cell m0037
+    Pype data file names are of the form::
+    
+      <animal_id><cell_number>.<taskname><taskversion>.<filenumber>
+      
+    eg, m0037.hmap7.002, where,
+
+    - animal is "m"
+
+    - task was hmap (version 7)
+
+    - and this is the 3rd (0,1,2) datafile collected for cell m0037
+                             
     """
     
     import string

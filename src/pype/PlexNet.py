@@ -1,5 +1,17 @@
-#!/usr/bin/env python
+>#!/usr/bin/env python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
+
+"""
+**Basic interface to Plexon network API**
+
+The plexon  network API is massively broken, but this will get
+you some of the data in a pure-python application.
+
+Author -- James A. Mazer (james.mazer@yale.edu)
+
+**Revision History**
+
+"""
 
 import sys
 import struct
@@ -43,7 +55,7 @@ class PlexNet:
 		self.__db_size = struct.calcsize(Plex.fPL_DataBlockHeader)
 
 		self.__lock = threading.Lock()
-		Logger('starting plexnet thread\n')
+		Logger("PlexNet: starting background retrieval thread\n")
 		threading.Thread(target=self.run).start()
 
 	def __del__(self):
@@ -84,15 +96,14 @@ class PlexNet:
 
 		if (NumMMFDropped - self.__last_NumMMFDropped) > 0:
 			self.__last_NumMMFDropped = NumMMFDropped
-			Logger("PlexNet: Warning, MMF dropout!!\n")
-			Logger("PlexNet: Consider power cycling MAP box...\n")
+			Logger("PlexNet: Warning, MMF dropout!!\n"
+				   "         Consider power cycling MAP box...\n")
 			self.__mmf_drops = self.__mmf_drops + 1
 
 		if NumServerDropped > 0:
-			Logger("PlexNet: NumServerDropped=%d\n" %
-				   NumServerDropped)
-			Logger("PlexNet: This shouldn't happen; tell Jamie & then\n")
-			Logger("         quit and restart Plexon programs.\n")
+			Logger("PlexNet: NumServerDropped=%d\n" % NumServerDropped
+				   "         This shouldn't happen; tell Jamie & then\n"
+				   "         quit and restart Plexon programs.\n")
 
 		pos = 16
 		events = []

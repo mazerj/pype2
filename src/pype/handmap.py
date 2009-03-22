@@ -1,48 +1,56 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Handmap engine.
+"""
+**Handmap engine**
 
 This module was derived from hmapstim.py (10-jul-2005) and
 intended to make it easy (although less flexible) for users
 to incorporate handmap stimuli into their tasks.
 
+In your task (see http://www.mlab.yale.edu/lab/index.php/Handmap too)
+ 
+- At the top of your module (taskfile.py), add::
 
-From http://www.mlab.yale.edu/lab/index.php/Handmap ::
+   from handmap import *
  
- In your task:
+- In your "main(app)" function, add::
+
+   hmap_install(app)
  
- * At the top of your module (taskfile.py), add:
-  from handmap import *
+- In your "cleanup(app)" function, add::
+
+   hmap_uninstall(app)
  
- * In your ''main(app)'' function, add:
-  hmap_install(app)
+- Keep all the sprites you want to display within the task inside a single
+  DisplayList (call in dlist) and tell hmap where to find it::
+
+   ...
+   dlist = DisplayList(fb=app.fb, ...)
+   dlist.add(somesprite)
+   dlist.add(someothersprite)
+   ...
+   hmap_set_dlist(app, dlist)
  
- * In your ''cleanup(app)'' function, add:
-  hmap_uninstall(app)
+- anywhere you want the handmap stimulus to be live on the monkey display
+  (typically after fixation is acquired), call::
+  
+   hmap_show(app)
  
- * Keep all the sprites you want to display within the task inside a single DisplayList (call in dlist) and tell hmap where to find it:
-  ...
-  dlist = DisplayList(fb=app.fb, ...)
-  dlist.add(somesprite)
-  dlist.add(someothersprite)
-  ...
-  hmap_set_dlist(app, dlist)
+- and when you don't want it to display (after an error or during the
+  intertrial interval), call::
+  
+   hmap_hide(app)
  
- * anywhere you want the handmap stimulus to be live on the monkey display (typically after fixation is acquired), call:
-  hmap_show(app)
- 
- * and when you don't want it to display (after an error or during the intertrial interval), call:
-  hmap_hide(app)
- 
- * at the end of each trial, it's probably a good idea to call:
+- at the end of each trial, it's probably a good idea to call::
+
    hmap_hide(app)
    hmap_set_dlist(app, None)
 
 Sun Jul 24 16:30:25 2005 mazer
 
- - minor changes in cleanup code trying to figure out why Jon's tasks
-   are leaving text and markers behind..
+- minor changes in cleanup code trying to figure out why Jon's tasks
+  are leaving text and markers behind..
    
 """
 

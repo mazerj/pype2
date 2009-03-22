@@ -1,7 +1,11 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""matlab like interface to biggle plotting library
+"""
+**OBSOLETE**
+
+
+**matlab like interface to biggle plotting library**
 
 This provides a matlab compatible interface to biggles. Biggles is
 only suitable for static, non-interactive graphs. If you want
@@ -12,7 +16,7 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-Tue Apr  3 12:44:04 2001 mazer  ::
+Tue Apr  3 12:44:04 2001 mazer::
 
   matlab-like quick plot tools.
     plot(x,y,style),
@@ -26,7 +30,8 @@ Tue Apr  3 12:44:04 2001 mazer  ::
     subplot(nr,nc,n) or subplot(nr,nc,r,c) (note: r & c zerobased)
     psprint()
 
-  NOTE: PLOTS ARE NOT DRAWN UNTIL YOU CALL DRAWNOW()!!
+**NOTE: PLOTS ARE NOT DRAWN UNTIL YOU CALL DRAWNOW()**
+  
 """
 
 import Numeric
@@ -142,7 +147,7 @@ def drawnow(width=None, height=None):
 			import pypedebug
 			pypedebug.get_traceback(1)
 			# effort to remove all unnamed exceptions:]]
-            return None
+    return None
 
 def xlabel(s):
     global HOLD, LAST, TABLE, NROWS, NCOLS, R, C

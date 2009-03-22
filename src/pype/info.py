@@ -3,8 +3,11 @@
 # $Id: pype.py 104 2006-01-25 21:16:55Z mazer $
 
 """
+** internal information **
+
 Wed Feb  1 09:41:40 2006 mazer
-  Print useful info about installed versions of dependent libraries
+- Print useful info about installed versions of dependent libraries
+
 """
 
 import string

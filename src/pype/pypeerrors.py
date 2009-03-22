@@ -2,7 +2,7 @@
 # $Id$
 
 """
-Exception classes for errors.
+**Exception classes for errors**
 
 These are are the standard errors that pype and the pype libraries
 functions might throw during task execution.

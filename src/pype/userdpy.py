@@ -50,7 +50,7 @@ from beep import beep
 class UserDisplay:
 	def __init__(self, master, cwidth=1024, cheight=768,
 				 pix_per_dva=1.0, blocked=None, app=None, callback=None):
-		"""UserDisplay Class
+		"""UserDisplay Class.
 
 		The UserDisplay is a pype local window on the user's computer
 		screen that shows a shadow/copy of what the subject is viewing
@@ -59,20 +59,21 @@ class UserDisplay:
 		**master** -- parent window (None for make new toplevel window)
 
 		**cwidth,cheight** -- width and height of framebuffer we're
-        shadowing.
+          shadowing.
 
 	    **pix_per_dva** -- pixels per degree visual angle
 
 	    **blocked** -- x,y coords of the upper left corner of the *blocked*
-		region of the display (blocked by photodiode). This is just marked
-		out so the user doesn't forget...
+		  region of the display (blocked by photodiode). This is just marked
+		  out so the user doesn't forget...
 
-		**app* -- PypeApp handle
+		**app** -- PypeApp handle
 
-		**NOTE** -- Just because most of these arguments are keywords
-		(and therefore optional), doesn't mean they're not required. You
-		should really supply all the parameters to this function each
-		time it's called.
+		**NOTE:** Just because most of these arguments are keywords
+		(and therefore optional), doesn't mean they're not
+		required. You should really supply all the parameters to this
+		function each time it's called.
+
 		"""
 		
 		self.app = app

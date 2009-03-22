@@ -1,7 +1,8 @@
 #!/usr/local/bin/python -t
 # $Id$
 
-"""INTERNAL USE ONLY; DO NOT USE DIRECTLY
+"""
+INTERNAL USE ONLY; DO NOT USE DIRECTLY
 
 Do not call anything in this module directly. If you want
 to use the grace interactive plot facility, use the wrappers

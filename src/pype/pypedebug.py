@@ -1,15 +1,17 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Debugging tools for python and pype.
+"""
+**Debugging tools for python and pype**
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Sat Feb  8 14:37:50 2003 mazer
+Sat Feb  8 14:37:50 2003 mazer
 
- - created from scratch
+- created from scratch
+
 """
 
 def keyboard(banner='Type EOF/^D to continue'):

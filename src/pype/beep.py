@@ -2,7 +2,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Interface to pygame.mixer
+"""
+**Interface to pygame.mixer**
 
 New sound I/O module. Simplified pure-python interace to the pygame
 sound/mixer subsytem.
@@ -11,21 +12,24 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Thu Dec  8 13:10:49 2005 mazer
+Thu Dec  8 13:10:49 2005 mazer
 
- - This is a complete replacement for the old beep.py module. It
-   provides a very simple interface to the pygame mixer subsystem.
-   Basically there are only two user-accessible functions:
+- This is a complete replacement for the old beep.py module. It
+  provides a very simple interface to the pygame mixer subsystem.
+  Basically there are only two user-accessible functions: beep()
+  and nobeep().
 
-   beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1):
-	   beep(-1, -1) will initialize the pygame subsystem
-	   beep(freq=None,...) generates a noise burst
-	   beep(freq=int,...) generates a tone pip
+  beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1)
+  
+  - beep(-1, -1) will initialize the pygame subsystem
+	
+  - beep(freq=None,...) generates a noise burst
+	
+  - beep(freq=int,...) generates a tone pip
 
-   nobeep()
-       disables the sound subsystem; if called before beep(), then
-	   the pygame sound system won't be initialized at all (this
-	   is useful in case of problems).
+  nobeep() disables the sound subsystem; if called before beep(), then
+  the pygame sound system won't be initialized at all (this
+  is useful in case of problems).
  
 Tue Jan 27 12:16:59 2009 mazer
 
@@ -43,44 +47,44 @@ except:
 	def Logger(s):
 		sys.stderr.write(s)
 
-class Beeper:
+class _Beeper:
 	_init = 1
 	_disabled = None
 	
 	def __init__(self, disable=0):
-		if Beeper._disabled:
+		if _Beeper._disabled:
 			return
 		elif disable:
-			Beeper._disabled = 1
-			Logger('Beeper: audio disabled\n')
+			_Beeper._disabled = 1
+			Logger('_Beeper: audio disabled\n')
 			return
-		elif Beeper._init:
+		elif _Beeper._init:
 			if pygame.mixer.get_init() is not None:
-				Logger('Beeper: audio was initialized!\n')
+				Logger('_Beeper: audio was initialized!\n')
 			try:
 				# negative values for word size indicates to driver
 				# that samples are 'signed'
 				pygame.mixer.init(22050, -16, 1, 8192)
 			except pygame.error:
-				Logger('Beeper: probable hardware access error -- disabled\n')
-				Beeper._disabled = 1
+				Logger('_Beeper: probable hardware access error -- disabled\n')
+				_Beeper._disabled = 1
 				return
 				
 			i = pygame.mixer.get_init()
-			Logger('Beeper: %d hz, %d bits, stereo=%d\n' % i)
-			(Beeper.dafreq, Beeper.bits, Beeper.stereo) = i
-			Beeper.cache = {}
-			Beeper._init = 0
+			Logger('_Beeper: %d hz, %d bits, stereo=%d\n' % i)
+			(_Beeper.dafreq, _Beeper.bits, _Beeper.stereo) = i
+			_Beeper.cache = {}
+			_Beeper._init = 0
 		
 	def beep(self, freq, msdur, vol, risefall, wait, play):
-		if Beeper._disabled:
+		if _Beeper._disabled:
 			#print '[beep]'
 			return
 		try:
-			s = Beeper.cache[freq,msdur,vol,risefall]
+			s = _Beeper.cache[freq,msdur,vol,risefall]
 		except KeyError:
 			s = self.synth(freq, msdur, vol, risefall)
-			Beeper.cache[freq,msdur,vol,risefall] = s
+			_Beeper.cache[freq,msdur,vol,risefall] = s
 		if play:
 			# wait for free mixer...
 			while pygame.mixer.get_busy():
@@ -91,7 +95,7 @@ class Beeper:
 					pass
 
 	def synth(self, freq, msdur, vol, risefall):
-		t = arange(0, msdur / 1000.0, 1.0 / Beeper.dafreq)
+		t = arange(0, msdur / 1000.0, 1.0 / _Beeper.dafreq)
 		s = zeros((t.shape[0], 2))
 		# use trapezoidal envelope with risefall (below) time
 		if msdur < 40:
@@ -100,7 +104,7 @@ class Beeper:
 		env = env - min(env)
 		env = where(less(env, 1.0), env, 1.0)
 
-		fullrange = power(2, abs(Beeper.bits)-1)
+		fullrange = power(2, abs(_Beeper.bits)-1)
 
 		if freq is None:
 			import RandomArray
@@ -110,7 +114,7 @@ class Beeper:
 			y = (env * vol * fullrange * \
 				 sin(2.0 * pi * t * freq)).astype(Int16)
 
-		if Beeper.stereo:
+		if _Beeper.stereo:
 			s[:,0] = y
 			s[:,1] = y
 			s = pygame.sndarray.make_sound(s)
@@ -127,13 +131,13 @@ def beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1, driver=None):
 			Logger("beep: initializing '%s' audio\n" % driver)
 		else:
 			Logger("beep: initializing default audio\n")
-		Beeper()
+		_Beeper()
 	else:
-		Beeper().beep(freq, msdur,
+		_Beeper().beep(freq, msdur,
 					  vol=vol, risefall=risefall, wait=wait, play=play)
 
 def nobeep():
-	Beeper(disable=1)
+	_Beeper(disable=1)
 	Logger('nobeep: audio disabled by user config\n')
 
 

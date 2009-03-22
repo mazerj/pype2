@@ -1,7 +1,10 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Interface/wrapper for BLT (Tk plotting widget)
+"""
+**OBSOLETE**
+
+Interface/wrapper for BLT (Tk plotting widget)
 
 Wrappers for BLT plotting widgets.  BLT is a Tk package/extension
 that provides XY plotting widgets, along with some other assorted

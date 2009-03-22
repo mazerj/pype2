@@ -3,10 +3,11 @@
 # $Id$
 
 """
-Override standard import function for debugging.
+**Override standard import function for debugging**
 
 Importing this module wil override the standard definition of __import__
 to print debugging information each time a module gets imported.
+
 """
 
 import __builtin__

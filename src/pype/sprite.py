@@ -1,74 +1,80 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 # $Id$
 
-"""Pygame based sprite engine.
+"""
+**Pygame based sprite engine**
+
+This module contains a pygame/Numeric-based sprite engine for doing
+graphics during behavioral experiments.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-- Mon Jan  6 18:03:09 2003 mazer
+Mon Jan  6 18:03:09 2003 mazer
 
- - added userdict to Image/Sprite classes
+- added userdict to Image/Sprite classes
 
-- Tue Jul  5 12:28:24 2005 mazer
+Tue Jul  5 12:28:24 2005 mazer
 
- - fastblit now pays attention to the on/off flag!
+- fastblit now pays attention to the on/off flag!
 
 Sun Jul 24 15:46:53 2005 mazer
 
- - added synclevel=255 to FrameBuffer __init__ method.
+- added synclevel=255 to FrameBuffer __init__ method.
  
 Mon Nov 21 18:35:39 2005 mazer
 
- - Sprite.clone() method correctly sets the sprite name to avoid
-   errors on deletion.
+- Sprite.clone() method correctly sets the sprite name to avoid
+  errors on deletion.
    
 Tue Mar  7 09:26:05 2006 mazer
 
- - Added Sprite.rotateCW(0 and Sprite.rotateCCW() methods. This is
-   because the standard pygame-based rotation method actually rotates
-   CW, and really we want CCW rotation. This has previously been
-   corrected at the task level..
+- Added Sprite.rotateCW(0 and Sprite.rotateCCW() methods. This is
+  because the standard pygame-based rotation method actually rotates
+  CW, and really we want CCW rotation. This has previously been
+  corrected at the task level..
  
 Tue Mar  7 16:27:40 2006 mazer
 
- - oops -- missed one thing --> barsprite
+- oops - missed one thing -> barsprite
 
 Fri Mar 24 11:09:23 2006 mazer
 
- - fixed fb.show()/hide() methods -- I think these should work
-   now, at least with the OPENGL driver..
+- fixed fb.show()/hide() methods - I think these should work
+  now, at least with the OPENGL driver..
 
 Mon Jan  5 14:36:35 2009 mazer
 
- - got rid of unrender() method -- you can force unrendering by calling
-   render with the clear=1 optional argument, but otherwise, deleting the
-   sprite will free up the render storage to avoid leaks
+- got rid of unrender() method - you can force unrendering by calling
+  render with the clear=1 optional argument, but otherwise, deleting the
+  sprite will free up the render storage to avoid leaks
    
- - noticed that fastblit() method was blitting even when the sprite was
-   not turn off -- fixed that and deleted a redundant coordinate calculation
+- noticed that fastblit() method was blitting even when the sprite was
+  not turn off - fixed that and deleted a redundant coordinate calculation
 
- - generate cleanup while considering switching to a pure OpenGL solution..
+- generate cleanup while considering switching to a pure OpenGL solution..
 
- - moved gen{axes,d,rad,theta} axes generator functions into spritetools
+- moved gen{axes,d,rad,theta} axes generator functions into spritetools
    
 Fri Jan 23 12:37:10 2009 mazer
 
- - Framebuffer -- removed dga and videodriver options. Now just specify
-   full screen or not and opengl or not and let the code sort out the
-   best driver. Basically for GL you get quartz or X11 depending on
-   the platform and for non-GL you get quartz on mac, DGA for linux-fullscreen
-   and X11 for anything else.
+- Framebuffer - removed dga and videodriver options. Now just specify
+  full screen or not and opengl or not and let the code sort out the
+  best driver. Basically for GL you get quartz or X11 depending on
+  the platform and for non-GL you get quartz on mac, DGA for linux-fullscreen
+  and X11 for anything else.
 
- - Framebuffer -- only flag you can specify now is full screen, DOUBLEBUFFER
-   and HWSURFACE are always..
+- Framebuffer - only flag you can specify now is full screen, DOUBLEBUFFER
+  and HWSURFACE are always..
 
- - fopengl --> opengl
+- fopengl -> opengl
 
- - everything's much simpler now -- only big confusion points are:
-   * why can't we request a specific bits/pixel in opengl mode..
-   * why does ALPHAMASKS need hard coding?
+- everything's much simpler now - only big confusion points are:
+
+  - why can't we request a specific bits/pixel in opengl mode..
+  
+  - why does ALPHAMASKS need hard coding?
    
 """
 

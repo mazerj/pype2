@@ -1,6 +1,7 @@
 # $Id$
 
-"""Basic statistics modules (works with Numeric)
+"""
+**Basic statistics modules (works with Numeric)**
 
 Author -- Gary Strangman (see source code for copyright & notes)
 

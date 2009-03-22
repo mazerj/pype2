@@ -103,10 +103,6 @@ x-clean:
 uninstall: 
 	echo  "Uninstall must be done manually!"
 
-docs:
-	# note: this requires happydoc to be installed!
-	(cd src/pype; $(MAKE) happydoc)
-
 .PHONY: install
 
 ###############################################################
