@@ -1549,16 +1549,17 @@ class Sprite(_ImageBase):
 		  
 		**returns** -- None
 		
-		**NOTES** --
+		**NOTES:**
 		
-		 1. 'trim' ignored for now -- don't even remember what
-		 it was for... totally obsolete now.
+		 - 'trim' ignored for now -- don't even remember what it was
+           for... totally obsolete now.
 
-		 2. this is NOT invertable! Multiple rotations will accumulate
-		 errors, so keep an original and only rotate copies. Ideal only
-		 rotate things once!
+		 - this is NOT invertable! Multiple rotations will accumulate
+           errors, so keep an original and only rotate copies. Ideal
+           only rotate things once!
 
-		 3. 03/07/2006: note rotation direction is CW!!
+		 - 03/07/2006: note rotation direction is CW!!
+		 
 		"""
 		new = pygame.transform.rotate(self.im, -angle)
 		if preserve_size:
@@ -2492,8 +2493,8 @@ def _C(color):
 
 	Takes number of similar "color" specifications and tries to
 	convert them all into a common format compatible with pygame.
-	Currently that means a tuple of length 4:
-		(red, green, blue, alpha)
+	Currently that means a tuple of length 4: (red, green, blue, alpha)
+	
 	"""
 	try:
 		if len(color) == 1:

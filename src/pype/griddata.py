@@ -53,14 +53,14 @@ def griddata(xd, yd, zd, nx, ny):
 	
 	**xd, yd, zd** -- all vectors of same length describing the
       surface to be interpolated in 3-space
-				  
+	  
 	**nx, ny** -- 2 vectors indicating the *AXIS* points where new
       z-values are to be computed. nx and ny must be same length;
       (len(nx)*len(ny)) points will be computed.
-				
+	  
 	**return** -- return in a 2d numeric matrix containing intepolated
       z-values at the grid points defined by nx,ny.
-				
+
     **NOTE:** griddata() should only be used to interpolate onto a
       regular grid.
 
@@ -68,9 +68,10 @@ def griddata(xd, yd, zd, nx, ny):
 	XYZ triples that define a surface.	The sampling can be
 	irregular or gridded, order doesn't matter.	 The surface is
 	then resample on the grid defined by nx and ny using nearest
-	neighbor linear interpolation::
-
+	neighbor linear interpolation.
+	
 	"""
+	
 	if len(xd) != len(yd) or len(xd) != len(zd):
 		raise TypeError, "xd,yd,zd must all be same length"
 	
@@ -100,8 +101,8 @@ def surfinterp(xd, yd, zd, new_xd, new_yd):
 	**xd, yd, zd** -- all vectors of same length describing the
       surface to be interpolated in 3-space
 				  
-	**new_xd, new_yd** -- 2 vectors indicating the *AXIS* points where new
-      z-values are to be computed. nx and ny must be same length;
+	**new_xd, new_yd** -- 2 vectors indicating the *AXIS* points where
+      new z-values are to be computed. nx and ny must be same length;
       (len(nx)*len(ny)) points will be computed.
 				
 	**return** -- return in a 2d numeric matrix containing intepolated

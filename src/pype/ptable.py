@@ -626,19 +626,19 @@ class ParamTable:
 		means they should come back correctly) typed (ie,
 		is_int's should come back as Integers).
 
-		optional arguments:
+		**evaluate[=1]** -- Enable or disable calling of validation
+          functions. All values will probaly be strings if this is
+          disabled.
 		
-		- evaluate=1 --> Enable or disable calling of validation
-		functions.	All values will probaly be
-		strings if this is disabled.
-		
-		- mergewith=<dict> -> pass in an existing dictionary and
-		results will be merged into the existing dictionary, new
-		merged dictionary is returned.
+		**mergewith[=<dict>]** -- pass in an existing dictionary and
+          results will be merged into the existing dictionary, new
+          merged dictionary is returned.
 
-		- readonly=1 -> validate readonly fields?
+		**readonly[=1]** -- validate readonly fields?
 		
-		*NOTE* THIS DICTIONARY WILL HAVE PRIORITY
+		**NOTE:**
+		THIS DICTIONARY WILL HAVE PRIORITY
+		
 		"""
 
 		if mergewith:

@@ -19,14 +19,14 @@ Tue Jan 25 15:23:19 2000 mazer
 
   - A simple eye trace viewer
 
-  - It's multithreaded -- it loads the records using a background
-   thread, so while you're browsing, it continues to load the data for
-   when you get there.
+  - It's multithreaded - it loads the records using a background
+    thread, so while you're browsing, it continues to load the data
+    for when you get there.
 
   - The load is threaded, but the numerical crunching is not. This is
-   to make it easier to skip towards the end of the file. Once the
-   file's all loaded, it goes back and starts to crunch from the
-   beginning
+    to make it easier to skip towards the end of the file. Once the
+    file's all loaded, it goes back and starts to crunch from the
+    beginning
 
 - Things to do:
 
@@ -755,9 +755,9 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 		                            <-------------------------------
 		                            |                 |   |          
 		                            t0                t1  t2
-
-	  - So, to compute a real fixation triggered PSTH, you allign
-        allthe rasters up on 't2' and only count spikes from t0-t3.
+									
+	- So, to compute a real fixation triggered PSTH, you allign allthe
+      rasters up on 't2' and only count spikes from t0-t3.
 
 	- The output of this function is a complicated list::
 	
@@ -916,7 +916,9 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 	events.
 
 	NOTE: start and stop are index values, NOT TIMES!
-	Returns list of tuples:
+	
+	Returns list of tuples::
+	
 	  [(start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
 	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
 	   .......

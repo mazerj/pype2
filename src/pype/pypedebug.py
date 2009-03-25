@@ -24,6 +24,7 @@ def keyboard(banner='Type EOF/^D to continue'):
 	
     The idea and code are stolen from something Fredrick
 	Lundh posted on the web a while back.
+	
     """
 
 	import code, sys

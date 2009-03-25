@@ -197,8 +197,9 @@ def from_discrete_dist(v):
     that index, choose an index from that distribution.  Note,
 	the sum(v) MUST equal 1!!!
 
-	**NOTE** -- Returned values start from 0, i.e. for v=[0.5, 0.5]
+	**NOTE:** Returned values start from 0, i.e. for v=[0.5, 0.5]
 	possible return values are 0 or 1, with 50/50 chance..
+	
 	"""
 
 	# compute cummulative density function

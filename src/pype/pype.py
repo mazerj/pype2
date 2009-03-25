@@ -190,7 +190,7 @@ Mon Dec  4 09:26:10 2006 mazer
   alarm goes off an 'Alarm' exception is raised the next time idlefn()
   gets called, just like Bar events::
   
-  usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
+    usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
 
 Tue Apr  3 10:41:33 2007 mazer
 
@@ -1559,9 +1559,11 @@ class PypeApp:
 	def set_canvashook(self, fn=None, data=None):
 		"""
 		Set function to call when unbound key is pressed in the
-		udy canvas window. Function should take three args:
-			def hookfn(data, key, ev):
-				..code..
+		udy canvas window. Function should take three args::
+		
+		  def hookfn(data, key, ev):
+		  		..code..
+				
 		Where data is whatever you want the function to have
 		and key is the string containing the key pressed and
 		ev is the full event, in case you want (x,y) etc.
@@ -1571,6 +1573,7 @@ class PypeApp:
 
 		This function returns the old hookfn and hookdata values
 		so they can be saved and restored.
+		
 		"""
 		oldfn = self.udpy.userhook
 		olddata = self.udpy.userhook_data

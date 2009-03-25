@@ -1,4 +1,4 @@
->#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
@@ -96,14 +96,14 @@ class PlexNet:
 
 		if (NumMMFDropped - self.__last_NumMMFDropped) > 0:
 			self.__last_NumMMFDropped = NumMMFDropped
-			Logger("PlexNet: Warning, MMF dropout!!\n"
-				   "         Consider power cycling MAP box...\n")
+			Logger("PlexNet: Warning, MMF dropout!!\n" +
+			       "         Consider power cycling MAP box...\n")
 			self.__mmf_drops = self.__mmf_drops + 1
 
 		if NumServerDropped > 0:
-			Logger("PlexNet: NumServerDropped=%d\n" % NumServerDropped
-				   "         This shouldn't happen; tell Jamie & then\n"
-				   "         quit and restart Plexon programs.\n")
+			Logger("PlexNet: NumServerDropped=%d\n" % NumServerDropped +
+			       "         This should never happen. Tell Jamie,\n" +
+			       "         then quit and restart Plexon programs.\n")
 
 		pos = 16
 		events = []

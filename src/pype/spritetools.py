@@ -91,7 +91,7 @@ def _unpack_rgb(R, G, B):
 	
 def g2rgb(a):
 	"""Convert a single grayscale image into a numeric array.
-
+	
 	This converts a shape=(W,H) array into an RGB shape=(W, H, 3) array.
 	
 	"""
@@ -99,20 +99,15 @@ def g2rgb(a):
 
 def pixelize(a, rgb=None, norm=1):
 	"""Convert a floating point array into an UnsignedInt8 array.
-
-	Result is suitable for assigning to <sprite>.alpha or <sprite>.array.
-
-	INPUTS
 	
-	  a =  array to be converted
-	  
-	  rgb =  if true, then promote from 1 plane to 3 planes using g2rgb
-	  
-	  norm =  if true, scale min-max into range 1-255
-
-    OUTPUTS
+	**a** -- array to be converted
 	
-	  array
+	**rgb** -- if true, then promote from 1 plane to 3 planes using g2rgb
+	
+	**norm** -- if true, scale min-max into range 1-255
+	
+	**returns** -- pixelized version of input array; result is suitable
+	for assigning to <sprite>.alpha or <sprite>.array.
 	  
 	"""
 	if norm:
@@ -140,7 +135,8 @@ def genaxes(w, h=None, typecode=Float64, inverty=0):
 	**returns** -- pair of vectors (xaxis, yaxis) where the dimensions of
 	each vector are (w, 1) and (1, h) respectively.
 
-    **NOTE:** By default the coordinate system is matrix/matlab, which
+    **NOTE:**
+	By default the coordinate system is matrix/matlab, which
 	means that negative y-values are at the top of the sprite and
 	increase going down the screen. This is fine if all you use the
 	function for is to compute eccentricity to shaping envelopes, but
@@ -159,10 +155,10 @@ def genaxes(w, h=None, typecode=Float64, inverty=0):
 
 def genrad(w, h=None, typecode=Float64):
 	"""Replaces old gend() function.
-	  
+	
 	**w, h** -- width and height of sprite (height defaults to width)
 	typecode: output type, defaults to Flaot65 ('d')
-	  
+	
 	**returns** -- 2d matrix of dimension (w, h) containg a map of
 	pixel eccentricity values.
 	
@@ -188,8 +184,10 @@ def gentheta(w, h=None, typecode=Float64, degrees=None):
 	values (polar coords). 0deg/0rad is 3:00 position, increasing
 	values CCW, decreasing values CW.
 	  
-    **NOTE:** BE CAREFUL, IF YOU REQUEST AN INTEGER TYPECODE AND
-	RADIANS, THE VALUES WILL RANGE FROM -3 TO 3 .. NOT VERY USEFUL!!!
+    **NOTE:**
+	Be careful, if you request an integer typecode and
+	radians, the values will range from -3 to 3 .. not very
+	useful!
 	
 	"""
 	x, y = genaxes(w, h)
@@ -202,39 +200,33 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D sine grating generator (odd symmetric)
 	
-	**INPUT**
-	
-		**s** -- Sprite object
+	**s** -- Sprite object
 		
-		**frequency** -- frequency in cycles/sprite (or cyc/deg, if
-		ppd is given)
+	**frequency** -- frequency in cycles/sprite (or cyc/deg, if ppd is
+	given)
 
-		**phase_deg** -- phase in degrees (nb: 0deg phase centers the sine
-		function at sprite ctr)
+	**phase_deg** -- phase in degrees (nb: 0deg phase centers the sine
+	function at sprite ctr)
 		  
-		**ori_deg** -- grating orientation in degrees
+	**ori_deg** -- grating orientation in degrees
 		
-		**R** -- red channel value (0-1) or standard pype RGB color triple
+	**R** -- red channel value (0-1) or standard pype RGB color triple
 		
-		**G** -- green channel value (0-1)
+	**G** -- green channel value (0-1)
 		
-		**B** -- blue channel value (0-1)
+	**B** -- blue channel value (0-1)
 
-		**ppd** -- pixels/degree-visual-angle; if included, then it
-          means that freq is being specified in cycles/degree
+	**ppd** -- pixels/degree-visual-angle; if included, then it
+    means that freq is being specified in cycles/degree
 		   
-		**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
+	**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
 		
-		**moddepth** -- modulation depth (0-1)
+	**moddepth** -- modulation depth (0-1)
 
-		**color** -- RGB triple (alternative specification of color vector)
+	**color** -- RGB triple (alternative specification of color vector)
 
-	**OUTPUT**
-	
-		None.
-
-    **NOTE:** Verified frequency is really cycles/sprite JM
-      17-sep-2006.
+    **NOTE:**
+	Verified frequency is really cycles/sprite JM 17-sep-2006.
 	
 	"""
 	
@@ -261,37 +253,32 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 			meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D cosine grating generator (even symmetric)
 	
-	**INPUT**
-
-		**s** -- Sprite object
+	**s** -- Sprite object
 		
-		**frequency** -- frequency in cycles/sprite
+	**frequency** -- frequency in cycles/sprite
 		
-		**phase_deg** -- phase in degrees (nb: 0deg phase centers the
-          cosine function at sprite ctr)
-		  
-		**ori_deg** -- grating orientation in degrees
-		
-		**R** -- red channel value (0-1) or standard pype RGB color triple
-		
-		**G** -- green channel value (0-1)
-		
-		**B** -- blue channel value (0-1)
+	**phase_deg** -- phase in degrees (nb: 0deg phase centers the
+	cosine function at sprite ctr)
 	
-		**ppd** -- pixels/degree-visual-angle; if included, then it
-          means that freq is being specified in cycles/degree
+	**ori_deg** -- grating orientation in degrees
+		
+	**R** -- red channel value (0-1) or standard pype RGB color triple
+		
+	**G** -- green channel value (0-1)
+		
+	**B** -- blue channel value (0-1)
+	
+	**ppd** -- pixels/degree-visual-angle; if included, then it
+	means that freq is being specified in cycles/degree
 		   
-		**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
+	**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
 
-		**moddepth** -- modulation depth (0-1)
+	**moddepth** -- modulation depth (0-1)
 
-		**color** -- RGB triple (alternative specification of color vector)
+	**color** -- RGB triple (alternative specification of color vector)
 		
-	**OUTPUT**
-		None.
-		
-	**NOTE:** Verified frequency is really cycles/sprite JM
-      17-sep-2006.
+	**NOTE:**
+	Verified frequency is really cycles/sprite JM 17-sep-2006.
 	
 	"""
 	if not ppd is None:
@@ -318,40 +305,34 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 			  meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D polar (non-Cartesian) grating generator
 	
-	**INPUT**
+	**s** -- Sprite object
+		
+	**cfreq** -- concentric frequency (cycles/sprite or cyc/deg -- see ppd)
+		
+	**rfreq** -- concentric frequency (cycles/360deg)
+		
+	**phase_deg** -- phase in degrees
+		
+	**polarity** -- 0 or 1 -> really just a 180 deg phase shift
+		
+	**R** -- red channel value (0-1) or standard pype RGB color triple
+		
+	**G** -- green channel value (0-1)
+		
+	**B** -- blue channel value (0-1)
+
+	**ppd** -- pixels/degree-visual-angle; if included, then it
+	means that freq is being specified in cycles/degree -- for
+	cfreq only
 	
-        **s** -- Sprite object
-		
-		**cfreq** -- concentric frequency (cycles/sprite or cyc/deg -- see ppd)
-		
-		**rfreq** -- concentric frequency (cycles/360deg)
-		
-		**phase_deg** -- phase in degrees
-		
-		**polarity** -- 0 or 1 -> really just a 180 deg phase shift
-		
-		**R** -- red channel value (0-1) or standard pype RGB color triple
-		
-		**G** -- green channel value (0-1)
-		
-		**B** -- blue channel value (0-1)
+	**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
 
-		**ppd** -- pixels/degree-visual-angle; if included, then it
-          means that freq is being specified in cycles/degree -- for
-          cfreq only
+	**moddepth** -- modulation depth (0-1)
 
-		**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
+	**color** -- RGB triple (alternative specification of color vector)
 
-		**moddepth** -- modulation depth (0-1)
-
-		**color** -- RGB triple (alternative specification of color vector)
-
-	**OUTPUT**
-	
-		None.
-		
-	**NOTE:** Verified frequencies are really cycles/sprite JM
-      17-sep-2006.
+	**NOTE:**
+	Verified frequencies are really cycles/sprite JM 17-sep-2006.
 	
 	"""
 	if not ppd is None:
@@ -384,41 +365,36 @@ def logpolargrat(s, cfreq, rfreq, phase_deg, polarity,
 				 meanlum=0.5, moddepth=1.0, ppd=None, color=None):
 	"""2D log polar (non-Cartesian) grating generator
 	
-	**INPUT**
-	
-		**s** -- Sprite object
+	**s** -- Sprite object
 		
-		**cfreq** -- concentric frequency (cycles/sprite or cycles/deg see ppd)
+	**cfreq** -- concentric frequency (cycles/sprite or cycles/deg see ppd)
 		
-		**rfreq** -- concentric frequency (cycles/360deg)
+	**rfreq** -- concentric frequency (cycles/360deg)
 		
-		**phase_deg** -- phase in degrees
+	**phase_deg** -- phase in degrees
 		
-		**polarity** -- 0 or 1 -> really just a 180 deg phase shift
+	**polarity** -- 0 or 1 -> really just a 180 deg phase shift
 		
-		**R** -- red channel value (0-1) or standard pype RGB color triple
+	**R** -- red channel value (0-1) or standard pype RGB color triple
 		
-		**G** -- green channel value (0-1)
+	**G** -- green channel value (0-1)
 		
-		**B** -- blue channel value (0-1)
+	**B** -- blue channel value (0-1)
 		
-		**ppd** -- pixels/degree-visual-angle; if included, then it
-          means that freq is being specified in cycles/degree
+	**ppd** -- pixels/degree-visual-angle; if included, then it
+	means that freq is being specified in cycles/degree
 		   
-		**meanlum** -- meanlum (DC) value of grating (0-1); default is 0.5
-
-		**moddepth** -- modulation depth (0-1)
-
-		**color** -- RGB triple (alternative specification of color vector)
-
-	**OUTPUT**
+	**meanlum** -- meanlum (DC) value of grating (0-1); default is 0.5
 	
-		None.
-		
-	**NOTE:** Frequencies are in cycles/sprite or cycles/360deg
+	**moddepth** -- modulation depth (0-1)
 
-	**NOTE:** Verified frequenies are really cycles/sprite JM
-      17-sep-2006.
+	**color** -- RGB triple (alternative specification of color vector)
+	
+	**NOTE:**
+	Frequencies are in cycles/sprite or cycles/360deg
+
+	**NOTE:**
+	Verified frequenies are really cycles/sprite JM 17-sep-2006.
 	
 	"""
 	polargrat(s, cfreq, rfreq, phase_deg, polarity, 
@@ -431,41 +407,36 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 			  
 	"""2D hyperbolic (non-Cartesian) grating generator
 	
-	**INPUT**
+	**s** -- Sprite object
+		
+	**freq** -- frequency (cycles/sprite or cyc/deg -- see ppd)
+		
+	**phase_deg** -- phase in degrees
+		
+	**ori_deg** -- orientation in degrees
+		
+	**polarity** -- 0 or 1 -> really just a 180 deg phase shift
+		
+	**R** -- red channel value (0-1) or standard pype RGB color triple
+		
+	**G** -- green channel value (0-1)
+		
+	**B** -- blue channel value (0-1)
 	
-		**s** -- Sprite object
-		
-		**freq** -- frequency (cycles/sprite or cyc/deg -- see ppd)
-		
-		**phase_deg** -- phase in degrees
-		
-		**ori_deg** -- orientation in degrees
-		
-		**polarity** -- 0 or 1 -> really just a 180 deg phase shift
-		
-		**R** -- red channel value (0-1) or standard pype RGB color triple
-		
-		**G** -- green channel value (0-1)
-		
-		**B** -- blue channel value (0-1)
-	
-		**ppd** -- pixels/degree-visual-angle; if included, then it
-          means that freq is being specified in cycles/degree
+	**ppd** -- pixels/degree-visual-angle; if included, then it
+	means that freq is being specified in cycles/degree
 		   
-		  **meanlum** -- mean (DC) value of grating (0-1); default is 0.5
-
-		  **moddepth** -- modulation depth (0-1)
-		
-		  **color** -- RGB triple (alternative specification of color vector)
-		
-	**OUTPUT**
+	**meanlum** -- mean (DC) value of grating (0-1); default is 0.5
 	
-		None.
-
-	**NOTE:** frequencies are in cycles/sprite or cycles/360deg
+	**moddepth** -- modulation depth (0-1)
+		
+	**color** -- RGB triple (alternative specification of color vector)
+		
+	**NOTE:**
+	frequencies are in cycles/sprite or cycles/360deg
 	
-	**NOTE:** verified frequencies are really cycles/sprite JM
-      17-sep-2006
+	**NOTE:**
+	verified frequencies are really cycles/sprite JM 17-sep-2006
 	
 	"""
 	if not ppd is None:
@@ -494,24 +465,18 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	This fills the sprite with 'color' and then puts a [bw x bh] transparent
 	bar of the specified orientation in the alpha channel.
 
-	**INPUT**
+	**s** -- Sprite()
+		
+	**bw,bh** -- bar width and height in pixels
+		
+	**ori_deg** -- bar orientation in degrees
+		
+	**R** -- standard color triple (0-255) or R channel value (0-1)
+		
+	**G** -- optional G channel value
+		
+	**B** -- optional B channel value
 	
-		**s** -- Sprite()
-		
-		**bw,bh** -- bar width and height in pixels
-		
-		**ori_deg** -- bar orientation in degrees
-		
-		**R** -- standard color triple (0-255) or R channel value (0-1)
-		
-		**G** -- optional G channel value
-		
-		**B** -- optional B channel value
-	
-	**OUTPUT**
-	
-		None.
-		
 	"""
 	R, G, B = (array(_unpack_rgb(R, G, B)) * 255.0).astype(Int)
 	r = sprite.genrad(s.w, s.h)
@@ -525,10 +490,13 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 
 def alphaGaussian(s, sigma):
 	"""Put symmetric Gaussian envelope into sprite's alpha channel.
+
+	**s** -- sprite
+
+	**sigma** -- standard deviation in pixels
 	
-	**NOTE:** sigma in pixels
-	
-	**NOTE:** alpha's have peak value of fully visible (255), low end
+	**NOTE:**
+	alpha's have peak value of fully visible (255), low end
 	depends on sigma
 		  
 	"""
@@ -539,14 +507,17 @@ def alphaGaussian(s, sigma):
 def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 	"""Put non-symmetric Gaussian envelope into sprite's alpha channel.
 
-	**NOTE:** sigmas in pixels (xsigma and ysigma refer to x and y
-      when ori=0)
+	**s** -- existing sprite
 	
-	**NOTE:** alpha's have peak value of fully visible (255), low end
-      depends on sigma
+	**xsigma, ysigma** -- standard deviations in pixels (think of this as the
+	Gaussian's generated with ori=0 and then rotated)
+
+	**ori_deg** -- orientation of Gaussian in degrees
+	
+	**NOTE:**
+	alpha's have peak value of fully visible (255), low end
+    depends on sigma
 		  
-	**NOTE:** this is a hack -- it's not quite a Gabor anymore..
-	
 	"""
 	r = ((s.xx**2) + (s.yy**2))**0.5
 	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0

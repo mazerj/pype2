@@ -1128,4 +1128,4 @@ Usage:   aunique (inarray)
     return dups
 
 except ImportError:    # IF NUMERIC ISN'T AVAILABLE, SKIP ALL arrayfuncs
- pass
+    pass
