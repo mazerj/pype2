@@ -26,7 +26,7 @@ import time, random
 
 from guitools import Logger
 
-from PlexHeaders import *
+from PlexHeaders import Plex
 
 class PlexNet:
 	def __init__(self, host, port=6000, waveforms=0):
