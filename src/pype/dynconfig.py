@@ -1,5 +1,5 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id: dynconfig.py 233 2007-06-21 15:12:59Z mazer $
+# $Id$
 
 """
 **Dynamic config files -- things to change on the fly**
@@ -11,6 +11,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 **Revision History**
 
 """
+
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
 
 import os, sys, posixpath
 

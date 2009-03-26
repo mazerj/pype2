@@ -63,6 +63,11 @@ Mon Jan  5 14:49:56 2009 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import math, sys
 from Numeric import *
 import pygame.surfarray

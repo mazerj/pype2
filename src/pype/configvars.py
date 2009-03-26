@@ -1,5 +1,5 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id: configvars.py 233 2007-06-21 15:12:59Z mazer $
+# $Id$
 
 """
 **Default Configuration Variables**
@@ -14,6 +14,10 @@ Tue Jun 26 14:21:36 2007 mazer
   file for documentation/code-clarity purposes.
 
 """
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
 
 import os
 import config

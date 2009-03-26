@@ -18,6 +18,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
  
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 from griddata import griddata
 
 try:

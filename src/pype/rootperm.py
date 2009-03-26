@@ -13,6 +13,11 @@ pype process. Not really for general use.
  - separated from pype.py
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import pwd
 import os
 from dacq import *

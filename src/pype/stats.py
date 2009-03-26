@@ -131,6 +131,11 @@ Author -- Gary Strangman (see source code for copyright & originalnotes)
                      findwithin
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 # Copyright (c) 1999-2000 Gary Strangman; All Rights Reserved.
 #
 # This software is distributable under the terms of the GNU

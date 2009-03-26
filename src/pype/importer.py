@@ -10,6 +10,11 @@ to print debugging information each time a module gets imported.
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import __builtin__
 import imp, sys
 from guitools import Logger

@@ -35,6 +35,11 @@ Wed Mar 11 11:08:19 2009 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 from Tkinter import *
 import Pmw
 import string

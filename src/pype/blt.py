@@ -36,6 +36,10 @@ Unknown Date; Changes for BLT version 2.4 ::
  setup proper subclassing to remove redundant methods..
  fixed legend_configure
 """
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
 
 from Tkinter import *
 import string

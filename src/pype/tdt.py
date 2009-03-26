@@ -39,6 +39,11 @@
 #    src: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/200946
 ############################################################################
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys
 import errno
 import time

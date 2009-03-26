@@ -13,6 +13,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
  - OBSOLETE, DON'T USE
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys
 sys.stderr.write('WARNING: import stimlib is obsolete, use sprite instead.\n')
 

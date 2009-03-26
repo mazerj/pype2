@@ -54,6 +54,11 @@ Sun Jul 24 16:30:25 2005 mazer
    
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys
 import math
 

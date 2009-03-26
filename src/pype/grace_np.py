@@ -70,8 +70,13 @@ pipe).]
 
 """
 
-__version__ = '1.0'
-__cvs_version__ = 'CVS version $Revision$'
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
+__xx_version__ = '1.0'
+__xx_cvs_version__ = 'CVS version $Revision$'
 
 import sys, os, signal, errno
 

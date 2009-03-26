@@ -15,7 +15,10 @@ pypenv programs - there won't be any PypeApp instance to find.
 
 """
 
-        
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
 
 import sys
 from pype import *

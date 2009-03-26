@@ -35,6 +35,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
   
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import math
 import os
 import sys

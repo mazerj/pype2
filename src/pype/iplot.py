@@ -21,6 +21,11 @@ cross calls giving the user/programmer a matlab-like feel.
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys
 from gracePlot import *
 from grace_np import Disconnected

@@ -14,6 +14,11 @@ Sat Feb  8 14:37:50 2003 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 def keyboard(banner='Type EOF/^D to continue'):
 	"""Clone of the matlab keyboard() function.
 	

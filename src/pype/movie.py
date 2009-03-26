@@ -25,6 +25,11 @@ Mon Jul 16 12:07:03 2001 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys, types, error, math, os, glob, string
 from sprite import *
 from guitools import *

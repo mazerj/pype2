@@ -36,6 +36,11 @@ Thu Jun 28 10:41:43 2007 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 from Tkinter import *
 import Pmw
 import pypeversion

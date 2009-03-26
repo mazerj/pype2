@@ -17,6 +17,11 @@ Tue Mar 17 14:41:32 2009 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 try:
 	from Numeric import *
 except ImportError:

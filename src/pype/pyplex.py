@@ -49,6 +49,11 @@ Original Notes (jack & jamie)::
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys
 import struct
 import cPickle

@@ -3,6 +3,11 @@
 # TTank.X ONLY interface  -- see tdt.py for complete docs..
 #
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys, time
 import socket
 import cPickle

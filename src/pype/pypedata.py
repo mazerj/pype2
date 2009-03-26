@@ -118,6 +118,11 @@ Sun May 21 13:30:18 2006 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys, types, string, os
 import math, Numeric, time
 from vectorops import *

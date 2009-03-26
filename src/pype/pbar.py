@@ -15,6 +15,11 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 from Tkinter import *
 from Tkinter import _default_root
 from sys import argv

@@ -34,6 +34,12 @@ Tue Apr  3 12:44:04 2001 mazer::
   
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
+
 import Numeric
 from biggles import *
 

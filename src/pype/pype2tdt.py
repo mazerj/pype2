@@ -1,5 +1,10 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 from Tkinter import *
 from Pmw import *
 from guitools import *

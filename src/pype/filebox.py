@@ -17,6 +17,11 @@ Wed Aug 14 13:05:27 2002 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 from Tkinter import *
 from Dialog import Dialog
 

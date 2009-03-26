@@ -37,6 +37,11 @@ Tue Jan 27 12:16:59 2009 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import sys, os
 import pygame, pygame.mixer, pygame.sndarray
 from Numeric import *

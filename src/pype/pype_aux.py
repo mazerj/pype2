@@ -26,6 +26,11 @@ Wed Jul  5 16:16:19 2006 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 import random, sys, time, posixpath
 
 _tic = None

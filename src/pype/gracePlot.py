@@ -59,9 +59,14 @@ layout of graphs, the number of Sets that each graph has, and the hold state
 for each graph.
 """
 
-__version__ = "0.5.1"
-__author__ = "Nathaniel Gray <n8gray@caltech.edu>"
-__date__ = "September 16, 2001"
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
+__xx_version__ = "0.5.1"
+__xx_author__ = "Nathaniel Gray <n8gray@caltech.edu>"
+__xx_date__ = "September 16, 2001"
 
 import grace_np
 import Numeric, string
