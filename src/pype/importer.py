@@ -1,6 +1,4 @@
-#!/usr/bin/python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
 
 """
 **Override standard import function for debugging**

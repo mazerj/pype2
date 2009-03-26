@@ -1,8 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
-#
-# Retrieve spike timestamps from tdt datatank using network api (ttank.py)
-#
+
+"""
+Retrieve spike timestamps from tdt datatank using network api (ttank.py)
+"""
 
 __author__   = '$Author$'
 __date__     = '$Date$'

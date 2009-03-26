@@ -1,43 +1,48 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-#
-# Simple python client/server system to provide remote access
-# to TDT COM interface from a linux box (or anyother system
-# running python) over the network.
-#
-# NOTE -- this implments a *simple* server -- only one client
-#         at a time!
-#
-############################################################################
-# SERVER SIDE
-############################################################################
-#
-# This module, WHEN RUN AS A PROGRAM ON A WINDOWS MACHINE, implments
-# the server. At startup, the program tries to connect to TDevAcc
-# (direct access to workbench) and a TTank (data tank) COM
-# services. Then it just listens for incomming connections
-# on port 10000 (from pype or anything else on the the
-# network).
-#
-# The client then sends commands as pickled strings. For each
-# picked string the client sends, the server will eval() the
-# string and return a pickled tuple of length 2. Either:
-#   (1, result-object)
-#   (None, None)
-# The first value indicates whether an error occured during
-# execution. If it's 1, then execution was a sucess and the
-# result is returned.
-#
-############################################################################
-# CLIENT SIDE
-############################################################################
-#
-#
-#
-############################################################################
-# Socket Classes derrived from:
-#    Socket utilities class by Amey R Pathak
-#    src: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/200946
-############################################################################
+
+"""
+Simple python client/server system to provide remote access
+to TDT COM interface from a linux box (or anyother system
+running python) over the network.
+
+Warning: this implments a very simple server -- only one client
+can connect at a time!
+
+Server Side
+===========
+
+This module, WHEN RUN AS A PROGRAM ON A WINDOWS MACHINE, implments the
+server. At startup, the program tries to connect to TDevAcc (direct
+access to workbench) and a TTank (data tank) COM services. Then it
+just listens for incomming connections on port 10000 (from pype or
+anything else on the the network).
+
+The client then sends commands as pickled strings. For each picked
+string the client sends, the server will eval() the string and return
+a pickled tuple of length 2. Either::
+
+  (1, result-object)
+  (None, None)
+  
+The first value indicates whether an error occured during
+execution. If it's 1, then execution was a sucess and the result is
+returned.
+
+Client Side
+===========
+
+  [needs writing]
+
+
+Sources
+=======
+
+Socket Classes derrived from::
+
+   Socket utilities class by Amey R Pathak
+   src: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/200946
+	
+"""
 
 __author__   = '$Author$'
 __date__     = '$Date$'

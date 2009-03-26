@@ -1,6 +1,5 @@
 #!/usr/bin/env pypenv
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
 
 """
 **Interface to pygame.mixer**

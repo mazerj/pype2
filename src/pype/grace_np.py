@@ -1,5 +1,4 @@
 #!/usr/local/bin/python -t
-# $Id$
 
 """
 INTERNAL USE ONLY; DO NOT USE DIRECTLY

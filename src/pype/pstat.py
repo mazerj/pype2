@@ -1,4 +1,4 @@
-# $Id$
+# -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
 **Basic statistics modules (works with Numeric)**

@@ -1,8 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
 
 """
-Simnple Config file parser and accessor class.
+Simple Config file parser and accessor class.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 

@@ -1,5 +1,4 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id$
 
 """
 **OBSOLETE**
