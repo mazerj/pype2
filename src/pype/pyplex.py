@@ -3,8 +3,8 @@
 """
 **Loader for PLEXON generated sorted spike datafiles (*.plx)**
 
-As a standalone module (pypenv pyplex), converts *.plx files
-into *.plx.ts files that can be used directly by pypedata.py.
+As a standalone module (pypenv pyplex), converts .plx files
+into .plx.ts files that can be used directly by pypedata.py.
 
 Authors
 
@@ -13,7 +13,7 @@ Authors
 - James A. Mazer (james.mmazer@yale.edu)
 
 Original Notes (jack & jamie)::
- 
+
   Functions
   -------------------
   LoadPlexonFile(filename, save=None)
@@ -32,19 +32,18 @@ Original Notes (jack & jamie)::
     - Holds all the header and timestamp information contained in
       a plexon datafile.
     - Can be saved and loaded using the python builtin cPickle fns.
-  
+
 **Revision History**
+
+Feb 17, 2002	JLG PYPLEX.PY		v. 3
+
+- Python routines to read plexon data files
  
-- Feb 17, 2002	JLG PYPLEX.PY		v. 3
+- All routines converted from plexon-supplied Matlab files plx_info.m, plx_ts.m
 
-  - Python routines to read plexon data files
-  
-  - All routines converted from plexon-supplied Matlab files plx_info.m,
-    plx_ts.m
+Sun Sep 22 17:58:00 2002 mazer ::
 
-- Sun Sep 22 17:58:00 2002 mazer ::
-
-  Extensive revision (almost rewrote from scratch).
+- Extensive revision (almost rewrote from scratch).
 
 """
 
@@ -95,7 +94,7 @@ class Header:
 	"""
 	def __init__(self, fp):
 		buf = readbytes(fp, 64, 'int32')
-		
+
 		# get version information from header
 		self.vers = buf[1]		# version file made with
 		self.freq = buf[34]		# sampling frequencychanne
@@ -104,13 +103,13 @@ class Header:
 		self.nslow = buf[37]	# number slow channels
 		self.npw = buf[38]		# number points in wave
 		self.npr = buf[39]		# number points before thresh
-	
+
 		# read to appropriate place in file
 		# constant part
 		readbytes(fp, 5*130, 'int32') # tscounts header
 		readbytes(fp, 5*130, 'int32') # wfcounts header
 		readbytes(fp, 512, 'int32')   # evcounts header
-		
+
 		# variable part -- skip??  what's in here?
 		fp.seek(((1020*self.ndsp) +
 					  (296*self.nevents) + (296*self.nslow)), 1)
@@ -118,12 +117,12 @@ class Header:
 class PlexonRecord:
 	def __init__(self, fp, waveforms=None):
 		self.typecode = readbytes(fp, 1, 'int16')
- 		self.upperbyte = readbytes(fp, 1, 'int16')
+		self.upperbyte = readbytes(fp, 1, 'int16')
 		self.timestamp = readbytes(fp, 1, 'int32')
 		self.channel = readbytes(fp, 1, 'int16') # channel OR event code!!
 		self.unit = readbytes(fp, 1, 'int16')
 		self.nwf = readbytes(fp, 1, 'int16')
-		
+
 		# if a waveform is present, read it
 		nwords = readbytes(fp, 1, 'int16')
 		self.waveform = None
@@ -140,7 +139,7 @@ class Plexondata:
 
 	def __init__(self, filename):
 		self.load_plx(filename)
-		
+
 	def __repr__(self):
 		return """\
 <Plexondata object
@@ -164,14 +163,14 @@ class Plexondata:
 			for chn in self.neurons:
 				print '#%d, <%s>' % (n, chn)
 				print self.trialdata[n][chn]
-		
+
 	def load_plx(self, filename):
 		self.filename = filename
 		fp = open(self.filename, 'r')
 		self.header = Header(fp)
 		self.trialdata = {}
 		self.channellist = {}
-		
+
 		trialno = -1
 		while 1:
 			try:
@@ -199,7 +198,7 @@ class Plexondata:
 		self.neurons = self.channellist.keys()
 		sys.stderr.write('\n')
 		sys.stderr.flush()
-		
+
 	def save(self, filename):
 		file = open(filename, 'w')
 		cPickle.dump(self, file)
@@ -242,7 +241,7 @@ def FindTimestampFile(pypefile, search=None):
 		searchpath = ''
 
 	searchpath = '.:' + searchpath
-	
+
 	for d in string.split(searchpath, ':'):
 		if len(d) > 0:
 			f = '%s/%s.plx.ts' % (d, pypefile)
@@ -253,7 +252,7 @@ def FindTimestampFile(pypefile, search=None):
 if __name__ == '__main__':
 	import os
 	from stat import *
-	
+
 	if len(sys.argv) < 2:
 		sys.stderr.write('usage: pyplex plexonfile timestampfile\n')
 		sys.stderr.write('usage: pyplex timestampfile (to browse)\n')
@@ -283,4 +282,3 @@ if __name__ == '__main__':
 							 (infile, outfile))
 		else:
 			p = LoadPlexonFile(infile, save=outfile)
-

@@ -1,7 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-User display window.
+**User display window**
 
 Functions and classes in this module implement the user display
 window. This includes all mouse & key inputs, display of shadow
@@ -29,9 +29,9 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 - Mon Jan 16 11:18:57 2006 mazer
 
-  - added callback option to the UserDisplay class to support time marking
-    from pype.py (see notes in pype.py)
-  
+  - added callback option to the UserDisplay class to support time
+    marking from pype.py (see notes in pype.py)
+
 """
 
 __author__   = '$Author$'
@@ -63,13 +63,13 @@ class UserDisplay:
 		**master** -- parent window (None for make new toplevel window)
 
 		**cwidth,cheight** -- width and height of framebuffer we're
-          shadowing.
+		shadowing.
 
-	    **pix_per_dva** -- pixels per degree visual angle
+		**pix_per_dva** -- pixels per degree visual angle
 
-	    **blocked** -- x,y coords of the upper left corner of the *blocked*
-		  region of the display (blocked by photodiode). This is just marked
-		  out so the user doesn't forget...
+		**blocked** -- x,y coords of the upper left corner of the *blocked*
+		region of the display (blocked by photodiode). This is just marked
+		out so the user doesn't forget...
 
 		**app** -- PypeApp handle
 
@@ -79,7 +79,7 @@ class UserDisplay:
 		function each time it's called.
 
 		"""
-		
+
 		self.app = app
 
 		if master:
@@ -92,7 +92,7 @@ class UserDisplay:
 				self.master.geometry('-0+20')
 			else:
 				self.master.geometry('-0-0')
-				
+
 			self.visible = 1
 			self.master.protocol("WM_DELETE_WINDOW", self.showhide)
 
@@ -102,64 +102,64 @@ class UserDisplay:
 		# this is used by pype to stick marks in the encode stream
 		# for debugging purposes...
 		self.callback = callback
-		
+
 		f = Frame(self.frame)
 		f.pack(expand=1, fill=X)
 
 		mb = Pmw.MenuBar(f)
 		mb.pack(side=LEFT, expand=0, fill=X)
 		mb.addmenu('Fidmarks', '', '')
-		mb.addmenuitem('Fidmarks', 'command', 
+		mb.addmenuitem('Fidmarks', 'command',
 					   label='Help', command=self.help)
-		mb.addmenuitem('Fidmarks', 'command', 
+		mb.addmenuitem('Fidmarks', 'command',
 					   label='Clear all marks (C)', command=self._clearfidmarks)
-		mb.addmenuitem('Fidmarks', 'command', 
+		mb.addmenuitem('Fidmarks', 'command',
 					   label='Save (s)', command=self.savefidmarks)
-		mb.addmenuitem('Fidmarks', 'command', 
+		mb.addmenuitem('Fidmarks', 'command',
 					   label='Load (l)', command=self.loadfidmarks)
-		mb.addmenuitem('Fidmarks', 'command', 
+		mb.addmenuitem('Fidmarks', 'command',
 					   label='View (v)', command=self._showfidmarks)
 
 		mb.addmenu('Eyecal', '', '')
-		mb.addmenuitem('Eyecal', 'command', 
+		mb.addmenuitem('Eyecal', 'command',
 					   label='Clear all points', command=self.clearpoints)
 		mb.addmenuitem('Eyecal', 'separator')
-		mb.addmenuitem('Eyecal', 'command', 
+		mb.addmenuitem('Eyecal', 'command',
 					   label='Load .pts file',
 					   command=lambda s=self: s.loadpoints(merge=None))
-		mb.addmenuitem('Eyecal', 'command', 
+		mb.addmenuitem('Eyecal', 'command',
 					   label='Merge .pts file',
 					   command=lambda s=self: s.loadpoints(merge=1))
-		mb.addmenuitem('Eyecal', 'command', 
+		mb.addmenuitem('Eyecal', 'command',
 					   label='Save .pts file', command=self.savepoints)
 		mb.addmenuitem('Eyecal', 'separator')
-		mb.addmenuitem('Eyecal', 'command', 
+		mb.addmenuitem('Eyecal', 'command',
 					   label='Load ascii file',
 					   command=lambda s=self: s.loadpoints_ascii(merge=None))
-		mb.addmenuitem('Eyecal', 'command', 
+		mb.addmenuitem('Eyecal', 'command',
 					   label='Merge ascii file',
 					   command=lambda s=self: s.loadpoints_ascii(merge=1))
-		
+
 		mb.addmenu('Display', '', '')
 		self._photomode_tvar = IntVar()
 		self._photomode_tvar.set(0)		# photo mode starts up OFF!!
 		self._photomode = self._photomode_tvar.get()
-		mb.addmenuitem('Display', 'checkbutton', 
+		mb.addmenuitem('Display', 'checkbutton',
 					   label='Photo mode', command=self._phototoggle,
 					   variable=self._photomode_tvar)
-		
-		mb.addmenuitem('Display', 'command', 
+
+		mb.addmenuitem('Display', 'command',
 					   label='clear trace',
 					   command=lambda s=self: s.eye_clear())
 
 		mb.addmenu('Help', '', '')
-		mb.addmenuitem('Help', 'command', 
+		mb.addmenuitem('Help', 'command',
 					   label='show shortcuts', command=self.help)
-		
+
 
 		self.scount = Button(f, text="<>", command=self.showsprites)
 		self.scount.pack(side=RIGHT)
-		
+
 		self.info = Label(f, text="", fg='red')
 		self.info.pack(side=RIGHT, padx=20)
 
@@ -178,9 +178,9 @@ class UserDisplay:
 		self.xypos = Label(f, text="")
 		self.xypos.pack(side=LEFT)
 		self._mouse_motion(ev=None)
-		
+
 		self.gridinterval = pix_per_dva
-		l = Label(f, text="%d pix/div" % self.gridinterval) 
+		l = Label(f, text="%d pix/div" % self.gridinterval)
 		l.pack(side=RIGHT)
 
 		self.mousex = 0
@@ -202,7 +202,6 @@ class UserDisplay:
 		self.popup.add_command(label="Clear box",
 							   command=self.clearbox)
 		self._canvas.bind("<Button-1>", self.do_popup)
-		
 
 		self._canvas.bind("<Motion>", self._mouse_motion)
 		self._canvas.bind("<Enter>", self._mouse_enter)
@@ -230,7 +229,7 @@ class UserDisplay:
 		self._eye_trace_maxlen = 50
 		self._eye_lx = None
 		self._eye_ly = None
-		
+
 		self.fix_x = 0
 		self.fix_y = 0
 		self.eye = self._canvas.create_rectangle(0, 0, 0, 0,
@@ -246,7 +245,7 @@ class UserDisplay:
 
 		self.msg_label = None
 		self.msg_win = None
-			
+
 		self.set_taskpopup()
 
 		self.bind_but3(fn=None, arg=None)
@@ -277,7 +276,7 @@ class UserDisplay:
 				self.msg_label.destroy()
 				self.msg_label = None
 		else:
-			if self.msg_win is None:				
+			if self.msg_win is None:
 				font = "-*-lucidatypewriter-medium-r-normal-*-12-*-*-*-*-*-*-*"
 				f = Frame(self._canvas, borderwidth=1)
 				self.msg_win = self._canvas.create_window(5, 25,
@@ -288,7 +287,7 @@ class UserDisplay:
 				self._placenote()
 			else:
 				self.msg_label.configure(text=msg)
-				
+
 
 	def _placenote(self, x=None, y=None):
 		if self.msg_win is None:
@@ -302,45 +301,44 @@ class UserDisplay:
 		self.app.rig_common.set('note_y', y)
 
 	def help(self):
-		warn('help', """
-Fiduciary marks (aka fidmarks)
------------------------------------------
-Arrows  Move all fidmarks left, right etc
-     f  Set fidmark at cursor
-     <  Shrink fidmarks in
-     >  Expand fidmarks out
-   c/C  Clear nearest-one/all fidmark(s)
-     s  Save fidmarks to file
-     l  Load fidmarks from file
-
-Eyecal marks
------------------------------------------
-     .  Set eyecal point (period) at cursor
-     ,  Delete nearest eyecal point (comma)
-
-Other
------------------------------------------
-      /  Mark box corner (twice to set box)
-      x  postion message window at cursor
-L-mouse access fixspot menu
-M-mouse access task-specific dropdown
-R-mouse simulate bar up/down
-
-""", fixed=1, astext=1)
+		warn('help',
+			 "Fiduciary marks (aka fidmarks)\n"+
+			 "-----------------------------------------\n"+
+			 "Arrows  Move all fidmarks left, right etc\n"+
+			 "f  Set fidmark at cursor\n"+
+			 "<  Shrink fidmarks in\n"+
+			 ">  Expand fidmarks out\n"+
+			 "c/C  Clear nearest-one/all fidmark(s)\n"+
+			 "s  Save fidmarks to file\n"+
+			 "l  Load fidmarks from file\n"+
+			 "\n"+
+			 "Eyecal marks\n"+
+			 "-----------------------------------------\n"+
+			 ".  Set eyecal point (period) at cursor\n"+
+			 ",  Delete nearest eyecal point (comma)\n"+
+			 "\n"+
+			 "Other\n"+
+			 "-----------------------------------------\n"+
+			 "/  Mark box corner (twice to set box)\n"+
+			 "x  postion message window at cursor\n"+
+			 "L-mouse access fixspot menu\n"+
+			 "M-mouse access task-specific dropdown\n"+
+			 "R-mouse simulate bar up/down",
+			 fixed=1, astext=1)
 
 	def deltags(self, taglist):
 		for tag in taglist:
 				self._canvas.delete(tag)
 		return []
-		
+
 	def eye_clear(self, autotrace=None):
 		"""Note: autotrace does NOTHING."""
 		self._eye_trace = self.deltags(self._eye_trace)
 		self._eye_trace = []
-		
+
 		self._eye_lx = None
 		self._eye_ly = None
-		
+
 	def eye_at(self, x, y):
 		sz = 3
 		(x, y) = self.fb2can(x, y)
@@ -360,7 +358,7 @@ R-mouse simulate bar up/down
 		self._eye_lx = x
 		self._eye_ly = y
 		self._canvas.coords(self.eye, x-sz, y-sz, x+sz, y+sz);
-		
+
 		from sprite import Sprite
 		self.scount.config(text="%d sprites" % len(Sprite.__list__))
 
@@ -445,7 +443,7 @@ R-mouse simulate bar up/down
 
 	def clearbox(self):
 		self.setbox(clear=1)
-		
+
 	def setbox(self, clear=None):
 		if clear is None:
 			# mouse position in retinal coords (re fixspot)
@@ -456,7 +454,7 @@ R-mouse simulate bar up/down
 		else:
 			self.markstack = []
 		self.drawbox()
-			
+
 	def drawbox(self):
 		if self.markbox:
 			self._canvas.delete(self.markbox)
@@ -599,7 +597,7 @@ R-mouse simulate bar up/down
 			(x, y, t) = self.points[n]
 			self._canvas.delete(t)
 		self.points = []
-			
+
 	def savepoints(self, filename=None):
 		"""Save points to file"""
 		import cPickle
@@ -634,7 +632,7 @@ R-mouse simulate bar up/down
 
 		if not merge:
 			self.clearpoints()
-		
+
 		for n in range(len(newpoints)):
 			(px, py, t) = newpoints[n]
 			x = int(round(px + (self.w/2.0)))
@@ -648,7 +646,7 @@ R-mouse simulate bar up/down
 		pixels separated by commas or spaces
 		"""
 		import string
-		
+
 		if filename is None:
 			from filebox import Open
 			from pype import subjectrc
@@ -663,7 +661,7 @@ R-mouse simulate bar up/down
 
 		if not merge:
 			self.clearpoints()
-		
+
 		while 1:
 			l = fp.readline()
 			if not l:
@@ -710,10 +708,12 @@ R-mouse simulate bar up/down
 		pass
 
 	def display(self, displaylist=None):
-		"""auto-draw a DisplayList (from sprite.py) as icons
+		"""
+		Autmoatically-draw a DisplayList object as a set of icons on the
+		UserDisplay (faster than exact copies).
 
-		**displaylist** -- DisplayList (see sprite.py) to draw or
-				None for clear all.
+		**displaylist** -- DisplayList or None for clear all.
+
 		"""
 
 		# first clear previsou displaylist icons
@@ -809,7 +809,7 @@ R-mouse simulate bar up/down
 		s = s + 'CTR=(%d,%d) R=%.1f px (%.1f deg)\n' % (xs, ys, r,
 														r/self.gridinterval)
 		s = s + 'ECC=%d px (%.1f deg)\n' % \
-			(math.sqrt((xs * xs) + (ys * ys)), 
+			(math.sqrt((xs * xs) + (ys * ys)),
 			 math.sqrt((xs * xs) + (ys * ys)) / self.gridinterval)
 
 		s = s + 'FIX=(%d, %d)\n' % (self.fix_x, self.fix_y)
@@ -825,7 +825,7 @@ R-mouse simulate bar up/down
 			except AttributeError:
 				pass
 		self._fidstuff = []
-			
+
 		n = 0
 		xs = 0.
 		ys = 0.
@@ -853,7 +853,7 @@ R-mouse simulate bar up/down
 			self._fidstuff = (
 				self._canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
 										 fill='blue', text='o'),
-				self._canvas.create_oval(cx-r, cy-r, cx+r, cy+r, 
+				self._canvas.create_oval(cx-r, cy-r, cx+r, cy+r,
 										 fill='', outline='blue',
 										 dashoffset=0,
 										 dash=(10,10)),
@@ -935,7 +935,7 @@ R-mouse simulate bar up/down
 								  pattern='*.fid',
 								  initialfile=initf,
 								  append=None)
-			
+
 		if not (file is None):
 			self.fidinfo(file=file)
 
@@ -960,7 +960,7 @@ R-mouse simulate bar up/down
 		(cx, cy) = self.fb2can(ax, ay)
 		tag = self._canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
 									   fill='black', text='f')
-		
+
 		# save mark in retinal coords
 		self._fid_list.append((tag, mx, my))
 		if update:
@@ -1072,7 +1072,7 @@ R-mouse simulate bar up/down
 		else:
 			self.taskpopup = menu
 		self._canvas.bind("<Button-2>", self.do_taskpopup)
-			
+
 	def do_taskpopup(self, event):
 		try:
 			self.taskpopup.tk_popup(event.x_root, event.y_root, 0)
@@ -1092,7 +1092,6 @@ R-mouse simulate bar up/down
 	def invoke_but3(self, event):
 		if self.but3_fn:
 			self.but3_fn(self.but3_arg, event)
-	
 
 class FID:
 	def __init__(self, file=None):
@@ -1104,10 +1103,9 @@ class FID:
 		if file:
 			self._load(file)
 			self.file = file
-			
+
 	def _load(self, file):
 		from string import split
-	
 
 		f = open(file, 'r')
 		while 1:
@@ -1127,7 +1125,6 @@ class FID:
 				self.cx = float(cx)
 				self.cy = float(cy)
 				self.r = float(r)
-				
 		f.close()
 
 if __name__ == '__main__':
@@ -1142,4 +1139,3 @@ else:
 		loadwarn(__name__)
 	except ImportError:
 		pass
-

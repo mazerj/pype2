@@ -54,26 +54,26 @@ def _project(a, b, c, x, y):
 
 def griddata(xd, yd, zd, nx, ny):
 	"""Clone of matlab GRIDDATA function.
-	
-	**xd, yd, zd** -- all vectors of same length describing the
-      surface to be interpolated in 3-space
-	  
-	**nx, ny** -- 2 vectors indicating the *AXIS* points where new
-      z-values are to be computed. nx and ny must be same length;
-      (len(nx)*len(ny)) points will be computed.
-	  
-	**return** -- return in a 2d numeric matrix containing intepolated
-      z-values at the grid points defined by nx,ny.
 
-    **NOTE:** griddata() should only be used to interpolate onto a
-      regular grid.
+	**xd, yd, zd** -- all vectors of same length describing the
+	surface to be interpolated in 3-space
+
+	**nx, ny** -- 2 vectors indicating the *AXIS* points where new
+	z-values are to be computed. nx and ny must be same length;
+	(len(nx)*len(ny)) points will be computed.
+
+	**return** -- return in a 2d numeric matrix containing intepolated
+	z-values at the grid points defined by nx,ny.
+
+	**NOTE:** griddata() should only be used to interpolate onto a
+	regular grid.
 
 	Similar to the matlab griddata() function.	Takes a set of
 	XYZ triples that define a surface.	The sampling can be
 	irregular or gridded, order doesn't matter.	 The surface is
 	then resample on the grid defined by nx and ny using nearest
 	neighbor linear interpolation.
-	
+
 	"""
 	
 	if len(xd) != len(yd) or len(xd) != len(zd):
@@ -98,29 +98,29 @@ def griddata(xd, yd, zd, nx, ny):
 				# all points are colinear!
 				return None
 	return nz
-			
+
 def surfinterp(xd, yd, zd, new_xd, new_yd):
 	"""Interpolate from raw x,y,z data to new space.
 
 	**xd, yd, zd** -- all vectors of same length describing the
-      surface to be interpolated in 3-space
-				  
+	surface to be interpolated in 3-space
+
 	**new_xd, new_yd** -- 2 vectors indicating the *AXIS* points where
-      new z-values are to be computed. nx and ny must be same length;
-      (len(nx)*len(ny)) points will be computed.
-				
+	new z-values are to be computed. nx and ny must be same length;
+	(len(nx)*len(ny)) points will be computed.
+
 	**return** -- return in a 2d numeric matrix containing intepolated
-      z-values at the grid points defined by new_xd, new_yd.
-				
-    *NOTE:* Algorithm is identical to griddata(), but doesn't assume
-     that the output space is a regular grid.
+	z-values at the grid points defined by new_xd, new_yd.
+
+	*NOTE:* Algorithm is identical to griddata(), but doesn't assume
+	that the output space is a regular grid.
 
 	"""
 	if len(xd) != len(yd) or len(xd) != len(zd):
 		raise TypeError, "xd,yd,zd must all be same length"
 	if len(new_xd) != len(new_yd):
 		raise TypeError, "new_xd and new_yd must be same length"
-	
+
 	new_z = zeros((len(new_xd),), 'f')
 	for i in range(len(new_z)):
 		x, y = nx[i], ny[j]
@@ -161,7 +161,6 @@ if __name__ == '__main__':
 	mplot.xrange(-5.0, 5.0)
 	mplot.title('original')
 
-	
 	nx = arange(-4.5, 4.5, 0.1)
 	ny = arange(-4.5, 4.5, 0.1)
 	nz = griddata(array(xd), array(yd), array(zd), nx, ny)
@@ -180,5 +179,3 @@ else:
 		loadwarn(__name__)
 	except ImportError:
 		pass
-		
-

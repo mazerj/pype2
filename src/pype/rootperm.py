@@ -1,6 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
-"""Getting and setting root access.
+"""
+**Root access tools**
 
 This stuff's for accessing the hardware from a running
 pype process. Not really for general use.

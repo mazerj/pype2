@@ -34,6 +34,15 @@ Thu Jun 28 10:41:43 2007 mazer
   actually this is a problem -- doesn't work for Tally window, so I
   reverted back to Tkinter's version..
 
+Thu Mar 26 15:55:05 2009 mazer
+
+- Merged in pbar.py (progress bar) stuff -- should have been here
+  all along.
+
+Fri Mar 27 13:39:49 2009 mazer
+
+- moved DancingBear and dance() (console versions) from pype.py to here
+
 """
 
 __author__   = '$Author$'
@@ -453,6 +462,147 @@ def splash():
 	w.update_idletasks()
 	w.after(3000, w.destroy)
 
+
+class ProgressBar:
+	"""
+	Indicate progress for a long running task.
+
+	This is for when you know how long something is going to
+	take -- you can specify the percentage done.
+	"""
+
+	def __init__(self, width=200, height=22,
+				 doLabel=None, labelText="",
+				 value=0, title=None, min=0, max=100):
+
+		from Tkinter import _default_root
+
+		if _default_root is None:
+			root = Tk()
+			root.withdraw()
+		
+		self.master = Toplevel()
+		self.master.title('Working')
+		self.master.iconname('Working')
+		self.master.lift()
+		#self.master.overrideredirect(1)
+		self.min=min
+		self.max=max
+		self.width=width
+		self.height=height
+		self.doLabel=doLabel
+		
+		fillColor="red"
+		labelColor="black"
+		background="lightgreen"
+		self.labelFormat="%d%%"
+		self.value=value
+		f = Frame(self.master, bd=3, relief=SUNKEN)
+		f.pack(expand=1, fill=BOTH)
+		if title is None:
+			title = "Working"
+		Label(f, text=title).pack(expand=1, fill=Y, side=TOP)
+		self.frame=Frame(f, relief=SUNKEN, bd=4, background='black')
+		self.frame.pack(fill=BOTH)
+		self.canvas=Canvas(self.frame, height=height, width=width, bd=0,
+						   highlightthickness=0, background=background)
+		self.scale=self.canvas.create_polygon(0, 0, width, 0,
+											  width, height, 0, height,
+											  fill=fillColor)
+		self.label=self.canvas.create_text(self.canvas.winfo_reqwidth() / 2,
+										   height / 2, text=labelText,
+										   anchor="c", fill=labelColor)
+		self.update()
+		self.canvas.pack(side=TOP, fill=X, expand=NO)
+		
+		self.master.update_idletasks()
+		sw = self.master.winfo_screenwidth()
+		sh = self.master.winfo_screenheight()
+		self.master.geometry("+%d+%d" % \
+							 (sw/2 - (self.master.winfo_reqwidth()/2),
+							  sh/2 - (self.master.winfo_reqheight() / 2)))
+		self.master.update_idletasks()
+
+	def __del__(self):
+		self.master.withdraw()
+		self.update()
+		self.master.destroy()
+		
+	def set(self, newValue, newMax=None):
+		if newMax:
+			self.max = newMax
+		self.value = newValue
+		self.update()
+
+	def update(self):
+		# Trim the values to be between min and max
+		value=self.value
+		if value > self.max:
+			value = self.max
+		if value < self.min:
+			value = self.min
+
+		# Adjust the rectangle
+		self.canvas.coords(self.scale, 0, 0, 0, self.height,
+						   float(value) / self.max * self.width, self.height,
+						   float(value) / self.max * self.width, 0)
+
+		# And update the label
+		if self.doLabel:
+			self.canvas.itemconfig(self.label)
+			if value:
+				if value >= 0:
+					pvalue = int((float(value) / float(self.max)) * 100.0)
+				else:
+					pvalue = 0
+				self.canvas.itemconfig(self.label, text=self.labelFormat
+									   % pvalue)
+			else:
+				self.canvas.itemconfig(self.label, text='')
+		self.canvas.update_idletasks()
+
+class DanceBar(ProgressBar):
+	"""
+	Indicate progress for a long running task.
+
+	This is for when you **don't** know how long it'll take, but want
+	to let the user know you're still alive & running.
+	"""
+	def set(self, newValue=None):
+		if newValue:
+			self.value = newValue
+		else:
+			self.value = (self.value + 1) % 100
+		self.update()
+
+	def update(self):
+		value = self.value % 25
+		x1 = (float(value) / 25.0 * self.width)
+		x2 = (float(value+1) / 25.0 * self.width)
+
+		self.canvas.coords(self.scale, x1, 0, x1-10, self.height,
+						   x2-10, self.height, x2, 0)
+		self.canvas.update_idletasks()
+		
+
+class DancingBear:
+	__pos = 0
+	def __init__(self, s='.'):
+		if s is None:
+			sys.stderr.write('\n')
+			DancingBear.__pos = 0
+		else:
+			sys.stderr.write("%s" % s)
+			DancingBear.__pos = DancingBear._pos + len(s)
+			if DancingBear._pos > 50:
+				sys.stderr.write('\n')
+				DancingBear.__pos = 0
+			sys.stderr.flush()
+
+def dance(s='.'):
+	DancingBear(s)
+
+	
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)

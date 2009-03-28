@@ -29,14 +29,14 @@ Sat Jul  9 13:03:54 2005 mazer
    up the import structure for this module
 
  - removed eyegraph/tkplotcanvas stuff, replaced with iplot/grace
- 
+
 Sun Jul 24 15:46:07 2005 mazer
 
  - added SYNCLEVEL option to set intensity of on for syncpulse
- 
+
  - added plotskip to rig menu -- if plotskip > 1, then it specifies
    the stride for plotting the eyetraces in the iplot window.
-   
+
  - added plotall to rig menu to turn off plotting of s0, p0 and
    raster (for speed), if so desired..
 
@@ -101,7 +101,7 @@ Thu Nov 10 15:35:13 2005 mazer
 
 - modified PypeApp.encode() to optionally take tuple and encode each
   item of the tuple with the same timestamp.
-  
+
 Mon Jan 16 11:18:57 2006 mazer
 
 - added marktime() method for debugging --> hitting '=' in userdpy
@@ -116,7 +116,7 @@ Thu Mar 23 11:45:11 2006 mazer
 
 - changed candy1/candy2 -> bounce/slideshow and added rig parameter
   to disable the noise background during slideshows..
-  
+
 Thu Mar 30 10:18:18 2006 mazer
 
 - deleted framebuffer arg to PypeApp() and added psych arg
@@ -125,7 +125,7 @@ Tue Apr  4 11:47:37 2006 mazer
 
 - added arguments to eyeset() to allow tasks to muck with the
   xgain,ygain,xoffset and yoffset values
-  
+
 Fri Apr 14 09:21:34 2006 mazer
 
 - added LandingZone class -- see notes in class definition
@@ -167,17 +167,17 @@ Thu Sep 28 10:16:02 2006 mazer
 
   - max_ntrials -- maximum number of trials to run before stopping.
     only correct and error trials count.
-	
+
   - max_correct -- maximum number of CORRECT trials to run before stopping.
-  
+
   - max_ui -- maximum number of SEQUENTIAL ui trials before stopping.
-  
+
   - uimax -- still exists and all the associated code, but this is
     really used only by the task -- user's responsible for coding
     up the handler. the max_* parameters are handled directly by
     pype and the run is terminated automatically when the stopping
     conditions are met.
-	
+
   In all cases, setting these values to zero means they won't be used.
   Either max_ntrials should be set OR max_correct, but not both!
 
@@ -188,7 +188,7 @@ Mon Dec  4 09:26:10 2006 mazer
   app.allow_ints (must be true to alarm to get raised). When the
   alarm goes off an 'Alarm' exception is raised the next time idlefn()
   gets called, just like Bar events::
-  
+
     usage: app.set_alarm(ms=##) or app.set_alarm(clear=1)
 
 Tue Apr  3 10:41:33 2007 mazer
@@ -203,7 +203,7 @@ Mon May 21 10:28:23 2007 mazer
   going in collaboration with the mccormick lab. Note that this is in
   a worksheet, instead of the Config file so that it's easy for tasks to
   be conditionalize based on the current setting!
-  
+
 Sun May 27 15:08:51 2007 mazer
 
 - Added 'save_tmp' to sub_common worksheet -- this will let you write
@@ -259,7 +259,7 @@ Mon Jan 26 13:44:01 2009 mazer
 - added KEYBAR option for config file to allow leftshift key to
   generate BarTransition interupts like a regular bar input.. Mouse
   must be the display window!
-    
+
 Tue Jan 27 12:18:09 2009 mazer
 
 - cleaned and simplified up audio initialization procedure
@@ -269,6 +269,10 @@ Fri Mar 13 16:25:24 2009 mazer
 - clean up of code, function names (privatizing stuff) and docs
 
 - removed the gui=1 arg for pype -- this is NEVER used..
+
+Fri Mar 27 17:50:18 2009 mazer
+
+- moved eye candy routines (bounce & slideshow) into separate module.
 
 """
 
@@ -299,7 +303,7 @@ except ImportError:
 	sys.exit(1)
 
 #####################################################################
-#  import frequently accessed pype modules 
+#  import frequently accessed pype modules
 #####################################################################
 from pypedebug import *
 from rootperm import *
@@ -311,6 +315,7 @@ from events import *
 from guitools import *
 from dacq import *
 from pypeerrors import *
+from candy import bounce, slideshow
 
 import userdpy
 import pypeversion
@@ -328,11 +333,11 @@ def pypeapp():
 
 class PypeApp:
 	"""Pype Application Class.
-	
+
 	Toplevel class for all pype programs -- one instance of this
 	class is instantiated when the pype control gui is loaded. More
 	than one of these per system is a fatal error.
-	
+
 	The PypeApp class has methods & instance variables for just about
 	everything a user would want to do.
 	"""
@@ -341,17 +346,16 @@ class PypeApp:
 
 	def __init__(self, psych=0):
 		"""
-		Initialize a PypeApp instance, with side effects ::
-		
-				1. FrameBuffer instance is created, which means the
-				hardware screen will be opened automatically.  Right
-				now, PypeApp guesses about the size & depth of the
-				display to simplify things for the user.  This could
-				change.
-			 
-				2. The DACQ hardware is opened, if possible.
-		
-				3. PypeApp gui is built and opened on screen
+		Initialize a PypeApp instance, with side effects:
+
+		- FrameBuffer instance is created, which means the hardware
+		  screen will be opened automatically.  Right now, PypeApp
+		  guesses about the size & depth of the display to simplify
+		  things for the user.  This could change.
+
+		- The DACQ hardware is opened, if possible.
+
+		- PypeApp gui is built and opened on screen
 
 		Don't initialize more than one instance of this class.  If you
 		do an exception will be raised.  An alternative (for later
@@ -393,7 +397,7 @@ class PypeApp:
 
 		# start pype logging output with blank line..
 		#sys.stderr.write('\n')
-		
+
 		cfile = pype_hostconfigfile()
 		Logger("pype: loading config from '%s'\n" % cfile)
 		self.config = pype_hostconfig()
@@ -401,7 +405,7 @@ class PypeApp:
 		if os.environ.has_key('PYPEDEBUG'):
 			Logger("pype: Entering debug mode")
 			self.config.set('DEBUG', '1', override=1)
-		
+
 		debug(self.config.iget('DEBUG'))
 
 		if debug():
@@ -450,7 +454,6 @@ class PypeApp:
 		if state is None:
 			# no state file -- make sure tallycount's initialized..
 			self.tallycount = {}
-				
 
 		self.psych = psych
 		self.terminate = 0
@@ -549,7 +552,7 @@ class PypeApp:
 		mb.addmenuitem('Set', 'checkbutton',
 					   label='Show traces',
 					   variable=self.show_eyetraces)
-		mb.addmenuitem('Set', 'command', 
+		mb.addmenuitem('Set', 'command',
 					   label='Toggle TRAINING mode',
 					   command=self.tog_training)
 
@@ -561,7 +564,7 @@ class PypeApp:
 		self.make_taskmenu(self._loadmenu)
 
 		self._loadmenu.addmenu('Help', '', side=RIGHT)
-		self._loadmenu.addmenuitem('Help', 'command', 
+		self._loadmenu.addmenuitem('Help', 'command',
 								   label='About Pype', command=AboutPype)
 
 
@@ -831,14 +834,14 @@ class PypeApp:
 
 		self._candy = 0
 		b = Button(cpane, text="bounce",
-				   command=lambda s=self: _bounce(s),
+				   command=lambda s=self: bounce(s),
 				   bg='white')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "following the bouncing ball")
 		self._button_bounce = b
 
 		b = Button(cpane, text="slideshow",
-				   command=lambda s=self: _slideshow(s),
+				   command=lambda s=self: slideshow(s),
 				   bg='white')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "slide show from $(PYPERC)/candy.lst")
@@ -875,7 +878,7 @@ class PypeApp:
 
 		# EYE COIL PARAMS ######################################
 		f = Frame(setables, borderwidth=1, relief=GROOVE)
-		f.pack(expand=0, fill=X, side=TOP)
+		f.pack(expand=0, fill=X, side=TOP, pady=10)
 
 		b = Button(f, text="Update",
 				   command=self.eyeset)
@@ -895,7 +898,7 @@ class PypeApp:
 		b = Button(f, image=self.icons['left'],
 				   command=lambda s=self: s.eyeshift(x=1, y=0))
 		b.pack(expand=0, side=LEFT)
-		self.balloon.bind(b, "shift offsets left (immediate effect)")			
+		self.balloon.bind(b, "shift offsets left (immediate effect)")
 		b = Button(f, image=self.icons['right'],
 				   command=lambda s=self: s.eyeshift(x=-1, y=0))
 		b.pack(expand=0, side=LEFT)
@@ -910,10 +913,6 @@ class PypeApp:
 				   command=lambda s=self: s.eyeshift(x=0, y=1))
 		b.pack(expand=0, side=LEFT)
 		self.balloon.bind(b, "shift offsets down (immediate effect)")
-
-		Label(setables,
-			  text='Control-<arrow keys> in UserDisplay to tweak eye pos',
-			  fg='blue').pack(expand=0, fill=X, side=TOP, pady=5)
 
 		v = _safeLookup(state, 'eye_tweak', 1)
 		self._eye_tweak = Pmw.Counter(setables,
@@ -971,9 +970,9 @@ class PypeApp:
 		self._eye_yoff.pack(expand=0, side=TOP, pady=2, anchor=W)
 
 		Label(setables,
-			  text='Use the "Update" button to set these and eye_smooth!',
-			  bg='white').pack(expand=0, fill=X, side=BOTTOM)
-
+			  text="Use C-Arrows in UserDisplay to adjust and\n"+
+			       "the 'Update' button to lock values in").pack(\
+			expand=0, fill=X, side=TOP, pady=10)
 
 		Pmw.alignlabels([self._eye_tweak,
 						 self._eye_xgain, self._eye_ygain,
@@ -1043,11 +1042,11 @@ class PypeApp:
 		# just for testing and debugging.
 		# NOTE: No attempt is made to make sure the built in commands don't
 		# conflict with user commands.
-		
+
 		eyelink_opts = self.config.get('EYELINK_OPTS')
 		if len(eyelink_opts) > 0:
 			eyelink_opts = eyelink_opts + ':'
-			
+
 		eyelink_opts = eyelink_opts + 'pupil_crosstalk_fixup = %s' % \
 					   self.config.get('PUPILXTALK')
 		eyelink_opts = eyelink_opts + ':active_eye=both'
@@ -1059,7 +1058,7 @@ class PypeApp:
 		# streams (from Sol).
 		eyelink_opts = eyelink_opts + ':heuristic_filter = 0 0'
 		eyelink_opts = eyelink_opts + ':pup_size_diameter = NO'
-		
+
 		os.environ['XXEYELINK_OPTS'] = eyelink_opts
 		os.environ['XXEYELINK_CAMERA'] = self.config.get('EYELINK_CAMERA')
 		if self.config.iget('SWAP_XY'):
@@ -1131,7 +1130,7 @@ class PypeApp:
 		self.rig_common.set('mon_fps', '%g' % fps)
 		self.idlefb()
 		Logger('pype: estimated fps = %g\n' % fps)
-		
+
 		# drop root access
 		# Tue Jul 12 10:01:53 2005 mazer --
 		#  dropping root access causes the ALSA libs to bitch. I'm
@@ -1173,7 +1172,7 @@ class PypeApp:
 		#  this is for multichannel recording systems:
 		#    - Plexon MAP box (via PlexNet API)
 		#	 - Tucker-Davis (via pype's tdt.py client-server module)
-		#    
+		#
 		self.xdacq = None
 		self.xdacq_data_store = None
 		self.plex = None
@@ -1181,7 +1180,7 @@ class PypeApp:
 
 		plexhost = self.config.get('PLEXHOST')
 		tdthost = self.config.get('TDTHOST')
-		
+
 		if self.sub_common.queryv('training'):
 			Logger('pype: xdacq disabled in training mode\n')
 		elif len(plexhost) > 0 and len(tdthost) > 0:
@@ -1195,7 +1194,7 @@ class PypeApp:
 				self.xdacq = 'plexon'
 
 				mb.addmenu('PlexNet', '', '')
-				mb.addmenuitem('PlexNet', 'command', 
+				mb.addmenuitem('PlexNet', 'command',
 							   label='query plexnet',
 							   command=self.status_plex)
 				mb.addmenuitem('PlexNet', 'separator')
@@ -1226,13 +1225,13 @@ class PypeApp:
 			except socket.error:
 				self.tdt = None
 				Logger('pype: no connection to tdt @ %s.\n' % tdthost, popup=1)
-				
+
 			if self.tdt:
 				mb.addmenu('TDT', '', '')
-				mb.addmenuitem('TDT', 'command', 
+				mb.addmenuitem('TDT', 'command',
 							   label='save hoops',
 							   command=self.tdt.save)
-				mb.addmenuitem('TDT', 'command', 
+				mb.addmenuitem('TDT', 'command',
 							   label='restore hoops',
 							   command=self.tdt.restore)
 
@@ -1258,9 +1257,6 @@ class PypeApp:
 		self.recording = 0
 		self.record_state(0)
 
-		
-			
-
 	def tog_training(self, toggle=1):
 		"""INTERNAL"""
 		if toggle:
@@ -1268,12 +1264,12 @@ class PypeApp:
 			self.sub_common.set('training', '%d' % s)
 		else:
 			s = self.sub_common.queryv('training')
-			
+
 		if s:
 			self.training.configure(text='TRAINING')
 		else:
 			self.training.configure(text='')
-		
+
 	def udpy_showhide(self):
 		"""INTERNAL"""
 		self.udpy.showhide()
@@ -1294,6 +1290,7 @@ class PypeApp:
 		"""
 		Safe wrapper for setting state flags instead of
 		letting user's set app.running etc by hand
+
 		"""
 		if not (running is -1):
 			self.running = running
@@ -1306,6 +1303,7 @@ class PypeApp:
 		"""Query to see if a task is running.
 
 		Returns: 0 or 1
+
 		"""
 		return self.running
 
@@ -1313,12 +1311,14 @@ class PypeApp:
 		"""Query to see if current task is paused.
 
 		Returns: 0 or 1
+
 		"""
 		return self.paused
 
 	def set_result(self, type=None):
 		"""Save the result of this trial (or clear saved results if called
 		with no arguments.
+
 		"""
 
 		# combination of self.tally() and self.history()
@@ -1331,16 +1331,16 @@ class PypeApp:
 			self.__runstats_update(type[0])
 
 	def get_result(self, nback=1):
-		"""Get the nth to last saved result.
-		
+		"""Get the nth to last saved trial result code.
+
 		Note that get_result(1) is result from last trial, not get_result(0)
+
 		"""
 		if len(self._results):
 			return self._results[-nback]
 		else:
 			return None
-		
-	
+
 	def tally(self, type=None, clear=None, cleartask=None):
 		ctask = self.task_name
 		if clear:
@@ -1361,10 +1361,10 @@ class PypeApp:
 				del self.tally_recent[0]; self.tally_recent.append(type)
 			except AttributeError:
 				self.tally_recent = [''] * 5
-				
+
 		ks = self.tallycount.keys()
 		ks.sort()
-		
+
 		(ntot, s) = (0, '')
 		keys = self.tallycount.keys()
 		keys.sort()
@@ -1407,7 +1407,7 @@ class PypeApp:
 			d['datasrc'] = self.xdacq
 		else:
 			d['datasrc'] = 'None'
-			
+
 		return d
 
 	def make_taskmenu(self, menubar):
@@ -1423,19 +1423,19 @@ class PypeApp:
 			if os.path.isdir(d) and not (m[0] == '_'):
 				self.add_tasks(menubar, "~"+m, d)
 		self.add_tasks(menubar, 'cwd', '.')
-		
+
 		try:
 			# these were added to the search path in pyperun...
 			dirs = os.environ['PYPETASKPATH'].split(':')
 			for d in dirs:
 				self.add_tasks(menubar, posixpath.basename(d), d)
-			
+
 		except KeyError:
 			pass
 
 	def add_tasks(self, menubar, dropname, dir):
 		import glob
-		
+
 		if dir[-1] == '/':
 			g = glob.glob(dir+'*.py')
 		else:
@@ -1461,7 +1461,7 @@ class PypeApp:
 						comments[tasks[-1]] = ''
 			tasks.sort()
 
-			menubar.addmenuitem(dropname, 'command', 
+			menubar.addmenuitem(dropname, 'command',
 								label='Reload current',
 								command=self.newloadtask)
 			menubar.addmenuitem(dropname, 'separator')
@@ -1485,10 +1485,11 @@ class PypeApp:
 		Load a task, if taskname==None and dir==None then we reload the current
 		task, if possible.  If ask is true, then pop up a dialog box to ask for
 		a filename..
+
 		"""
 		import imp
 		import filebox
-		
+
 		if ask:
 			(f, mode) = filebox.Open(pattern='*.py')
 			if f is None:
@@ -1496,7 +1497,7 @@ class PypeApp:
 			dir = posixpath.dirname(f)
 			taskname = posixpath.basename(f)
 			if taskname[-3:] == '.py':
-				taskname = taskname[:-3]		
+				taskname = taskname[:-3]
 
 		if taskname is None:
 			if self.task_name is None:
@@ -1504,7 +1505,7 @@ class PypeApp:
 				return None
 			taskname = self.task_name
 			dir = self.task_dir
-			
+
 		try:
 			if dir:
 				(file, pathname, descr) = imp.find_module(taskname, [dir])
@@ -1517,7 +1518,7 @@ class PypeApp:
 				else:
 					taskname = posixpath.basename(taskname)
 					if taskname[-3:] == '.py':
-						taskname = taskname[:-3]		
+						taskname = taskname[:-3]
 					(file, pathname, descr) = imp.find_module(taskname, [dir])
 		except ImportError:
 			warn('Error', "Task doesn't exist.")
@@ -1557,17 +1558,15 @@ class PypeApp:
 
 			if main:
 				task.main(self)
-				
+
 		return task
 
 	def set_canvashook(self, fn=None, data=None):
 		"""
 		Set function to call when unbound key is pressed in the
-		udy canvas window. Function should take three args::
-		
-		  def hookfn(data, key, ev):
-		  		..code..
-				
+		udy canvas window. Function should take three arguments,
+		e.g., **def hookfn(data, key, ev):...**.
+
 		Where data is whatever you want the function to have
 		and key is the string containing the key pressed and
 		ev is the full event, in case you want (x,y) etc.
@@ -1577,7 +1576,7 @@ class PypeApp:
 
 		This function returns the old hookfn and hookdata values
 		so they can be saved and restored.
-		
+
 		"""
 		oldfn = self.udpy.userhook
 		olddata = self.udpy.userhook_data
@@ -1612,7 +1611,7 @@ class PypeApp:
 				get_traceback(1)
 				self.eye_xgain = 1.0
 		self._eye_xgain.setentry(self.eye_xgain)
-		
+
 		if not ygain is None:
 			self.eye_ygain = ygain
 		else:
@@ -1622,7 +1621,7 @@ class PypeApp:
 				get_traceback(1)
 				self.eye_ygain = 1.0
 		self._eye_ygain.setentry(self.eye_ygain)
-		
+
 		if not xoff is None:
 			self.eye_xoff = int(round(xoff))
 		else:
@@ -1632,7 +1631,7 @@ class PypeApp:
 				get_traceback(1)
 				self.eye_xoff = 0
 		self._eye_xoff.setentry(self.eye_xoff)
-		
+
 		if not yoff is None:
 			self.eye_yoff = int(round(yoff))
 		else:
@@ -1642,7 +1641,6 @@ class PypeApp:
 				get_traceback(1)
 				self.eye_yoff = 0
 		self._eye_yoff.setentry(self.eye_yoff)
-		
 
 		# JAM 07-Feb-2003: prior to today monitor dimensions were not
 		# taken into account in computing the gain values because we
@@ -1704,6 +1702,7 @@ class PypeApp:
 
 		Returns the first part of socket.gethostname(),	if a
 		hostname is actually defined, otherwise returns 'NOHOST'.
+
 		"""
 		import socket
 		try:
@@ -1718,6 +1717,7 @@ class PypeApp:
 		whether this particular file is a "task" or a "module".
 
 		returns: (["task" or "module" or None], comment-string)
+
 		"""
 		import re
 
@@ -1762,7 +1762,7 @@ class PypeApp:
 			# save common params worksheet
 			self.rig_common.save()
 			self.sub_common.save()
-			
+
 	def __readstate(self):
 		try:
 			file = open(self.__get_statefile_name(), 'r')
@@ -1787,7 +1787,7 @@ class PypeApp:
 			self.__runstats['nui'] = 0
 		elif resultcode is not None:
 			r = resultcode[0]
-			
+
 			if r is 'C':
 				self.__runstats['ncorrect'] = self.__runstats['ncorrect'] + 1
 				self.__runstats['nui'] = 0
@@ -1814,36 +1814,34 @@ class PypeApp:
 					 '%d correct trials trials. Stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_ui')
-			n = self.__runstats['max_ui'] 
+			n = self.__runstats['max_ui']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
 				warn('Warning',
 					 '%d sequential UI trials. Stopping.' % n, wait=0)
 
-		s = ''
-		s = s + 'ncorrect    = %d\n' % self.__runstats['ncorrect']
-		s = s + 'nerror      = %d\n' % self.__runstats['nerror']
-		s = s + 'nui         = %d\n' % self.__runstats['nui']
-		s = s + 'ntrials     = %d\n' % (self.__runstats['ncorrect'] + self.__runstats['nerror'])
-		
-		s = s + '\n'
-		s = s + 'max_ntrials = %d\n' % self.sub_common.queryv('max_ntrials')
-		s = s + 'max_correct = %d\n' % self.sub_common.queryv('max_correct')
-		s = s + 'max_ui      = %d\n' % self.sub_common.queryv('max_ui')
-
-		s = s + '\n'
-		s = s + 'running     = %d' % self.isrunning()
+		s = string.join((
+			'ncorrect    = %d' % self.__runstats['ncorrect'],
+			'nerror      = %d' % self.__runstats['nerror'],
+			'nui         = %d' % self.__runstats['nui'],
+			'ntrials     = %d' % (self.__runstats['ncorrect'] +
+									self.__runstats['nerror']),
+			'---------------------',
+			'max_ntrials = %d' % self.sub_common.queryv('max_ntrials'),
+			'max_correct = %d' % self.sub_common.queryv('max_correct'),
+			'max_ui      = %d' % self.sub_common.queryv('max_ui'),
+			'---------------------',
+			'running     = %d' % self.isrunning()), '\n')
 
 		self.statsw.configure(text=s)
-				
+
 
 
 	def trial_ui(self, uimax=None):
 		"""This trial was un-initiated.."""
 		if uimax is None:
 			uimax = self.sub_common.queryv('uimax')
-			
-		self.tiralstats['uicount'] = self.trialstats['uicount'] + 1
+			trialstats['uicount'] = self.trialstats['uicount'] + 1
 		if uimax and (self.trialstats['uicount']  > uimax):
 			warn('Warning',
 				 'UI Count exceeded.\nTime: %s\nPlease intervene.\n' %
@@ -1891,13 +1889,13 @@ class PypeApp:
 
 	def __start(self):
 		self.__start_helper(temp=None)
-		
+
 	def __starttmp(self):
 		self.__start_helper(temp=1)
 
 	def __start_helper(self, temp=None):
 		self.__savestate()
-		
+
 		if self.startfn:
 			if not self.running:
 				self._loadmenu.disableall()
@@ -1918,7 +1916,7 @@ class PypeApp:
 					if self.record_selectfile() is None:
 						Logger('pype: run aborted\n')
 						return
-					
+
 				# If elog is in use, then at the end of each run insert
 				# (or update, since force=1) data on this file in the
 				# sql database.
@@ -1944,14 +1942,14 @@ class PypeApp:
 					# trial counter..
 					(server, tank, block) = self.tdt.newblock(record=1)
 					Logger('pype: tdt data = %s %s\n' % (tank, block))
-						
+
 				self._sbut1.config(text='stop')
 				self._sbut2.config(text='stop')
 				self.udpy.stop(command=self.__start_helper)
 				self._allowabort = 1
 
 				self.console.clear()
-				
+
 				# clear/reset result stack at the start of the run..
 				self.set_result()
 
@@ -1990,7 +1988,7 @@ class PypeApp:
 				elif self.xdacq == 'tdt':
 					# recording's done -- direct output back to TempBlk
 					self.tdt.newblock(record=0)
-						
+
 			else:
 				self._sbut1.config(state=DISABLED)
 				self._sbut2.config(state=DISABLED)
@@ -1999,13 +1997,14 @@ class PypeApp:
 				self.udpy.eye_clear()
 		else:
 			self.tk.bell()
-		
+
 	def shutdown(self):
 		"""
 		*Internal* (should never be called by user/application directly)
 		Sets the terminate flag in this instance of PypeApp. This
 		will eventually cause the PypeApp to exit, once the current
 		run is stopped.
+
 		"""
 		if self.running:
 			if self.tk:
@@ -2019,6 +2018,7 @@ class PypeApp:
 		"""
 		Returns current 'time', as determined by the DACQ module.
 		This is the veridical time in ms...
+
 		"""
 		return dacq_ts()
 
@@ -2033,8 +2033,9 @@ class PypeApp:
 		"""
 		Get last measured eye position and time of measurement.
 		Returns: (time_ms, xpos_pix, ypos_pix)
+
 		"""
-		
+
 		ts = dacq_ts()
 		if (self._last_eyepos) is None or (ts > self._last_eyepos):
 			self._eye_x = dacq_eye_read(0)
@@ -2043,33 +2044,37 @@ class PypeApp:
 		return (self._last_eyepos, self._eye_x, self._eye_y)
 
 	def eyepos(self):
-		"""
-		Get last measured eye position, no time info.
+		"""Get last measured eye position, no time info.
+
 		Returns: (xpos_pix, ypos_pix)
+
 		"""
 		(t, x, y) = self.eye_txy()
 		return (x, y)
-	
 
 	def looking_at(self, x=0, y=0):
-		"""
-		Tell pype where the monkey's supposed to be looking.
-		
+		"""Tell pype where the monkey's supposed to be looking.
+
 		This is crucial for the F8 key -- when you hit F8 telling
 		pype to rezero the eyeposition, it assumes that the monkey
 		is looking at this location (in pixels) when you strike the
 		key.
-		""" 
+
+		"""
 		self._eyetarg_x = x
 		self._eyetarg_y = y
 
 	def eyeshift(self, x=0, y=0, reset=None, zero=None):
-		"""
-		Adjust X & Y offsets to set DC-offsets for eye position
-		--------------------------------------------------------
-		if (reset) --> set x/y offsets to (0,0)
-		if (zero)  --> set x/y offset to current gaze position
-		otherwise  --> shift the offsets by (x*xincr, y*yincr); use a a lambda expression if you want to shift in a callback function to set the options.
+		"""Adjust X & Y offsets to set DC-offsets for eye position
+
+		- if (reset) --> set x/y offsets to (0,0)
+
+		- if (zero)  --> set x/y offset to current gaze position
+
+		- otherwise --> shift the offsets by (x*xincr, y*yincr); use a
+		  lambda expression if you want to shift in a callback
+		  function to set the options.
+
 		"""
 		if reset:
 			x, y = 0, 0
@@ -2096,7 +2101,8 @@ class PypeApp:
 				 "I'm sorry Ben, but I can't do that (drain juice).", wait=0)
 
 	def idlefn(self, ms=None, update=1, toplevel=None, fast=None):
-		"""
+		"""Idle function -- call me to kill time.
+
 		The idle function -- this function should be call periodically
 		by everything.  Whenever the program's looping or busy waiting
 		for something (bar to go up/down, timer to expire etc), the
@@ -2112,8 +2118,9 @@ class PypeApp:
 		there should be a way to set user/app specific keybindings
 		just like the user buttons.
 
-		NOTE: anywhere this is called you **MUST** catch the *UserAbort*
-		exception!!!
+		**NOTE:**
+		anywhere this is called you **MUST** catch the *UserAbort* exception!!!
+
 		"""
 
 
@@ -2183,7 +2190,7 @@ class PypeApp:
 					pass
 				else:
 					print "<pygame key code: %d>" % ks
-			if c == 'F1':				
+			if c == 'F1':
 				if not self.running:
 					self.juice_on()
 					w = warn('Warning', "Juicer is OPEN!!!")
@@ -2251,7 +2258,7 @@ class PypeApp:
 			t = Timer()
 			while t.ms() < ms:
 				self.idlefn()
-				
+
 	def history(self, c=None, init=0):
 		"""
 		Maintains a 'history stack' ala cortex.  Cortex did do somethings
@@ -2259,10 +2266,11 @@ class PypeApp:
 		defined in the __init__() function above, you can overright it,
 		if you like..  Called with no arguments, history stack will be
 		cleared.
+
 		"""
 
 		LEN = 40
-		
+
 		if init:
 			self._histstr = ''
 		else:
@@ -2293,16 +2301,17 @@ class PypeApp:
 			beep(0, 10)
 			beep(500, 100)
 			beep(0, 10)
-			
+
 	def warn_run_start(self):
 		self.warningbeep(1)
-		
+
 	def warn_run_stop(self):
 		self.warningbeep(0)
 
 	def warn_trial_correct(self):
 		"""
 		Currently a NOP, but could be used for positive feedback.
+
 		"""
 		warble(3*440, 100)
 		pass
@@ -2310,6 +2319,7 @@ class PypeApp:
 	def warn_trial_incorrect(self, flash=1000):
 		"""
 		Beep and possibly flash screen red for a short time.
+
 		"""
 		warble(440, 100)
 		if flash:
@@ -2376,6 +2386,7 @@ class PypeApp:
 		the current state of the reward schedule settings
 
 		Returns the actual size of the reward (ms open) delivered
+
 		"""
 
 		# if var==0, then ms is the exact time of the drop, if var>0
@@ -2392,7 +2403,7 @@ class PypeApp:
 		else:
 			# user specified ms, no variance
 			var = 0
-		
+
 		if ms == 0:
 			return
 
@@ -2430,7 +2441,7 @@ class PypeApp:
 		#  automatically encode the actual reward size (ms open) in
 		#  the data file
 		self.encode('ACT_' + REWARD + '%d' % actual_reward_size)
-		
+
 		return actual_reward_size
 
 	def __reward2(self, t):
@@ -2439,6 +2450,7 @@ class PypeApp:
 		function. The point is to call juice_drip() in a separate thread
 		and to block over rewards from being delivered until this one's
 		finished.
+
 		"""
 		self._rewardlock.acquire()
 		self.juice_drip(t)
@@ -2449,7 +2461,7 @@ class PypeApp:
 			pp_juice(1)
 		else:
 			dacq_juice(1)
-			
+
 	def juice_off(self):
 		if self.pport:
 			pp_juice(0)
@@ -2466,6 +2478,7 @@ class PypeApp:
 		"""
 		Check to see if the LEFT_SHIFT key is down in the framebuffer
 		window.
+
 		"""
 		import pygame.key, pygame.event
 		pygame.event.pump()
@@ -2475,6 +2488,7 @@ class PypeApp:
 		"""
 		Check to see if the RIGHT_SHIFT key is down in the framebuffer
 		window.
+
 		"""
 		import pygame.key, pygame.event
 		pygame.event.pump()
@@ -2482,13 +2496,14 @@ class PypeApp:
 
 	def barchanges(self, reset=None):
 		"""
-		NEW: Sun Mar  9 13:38:36 2003 mazer
-		
+		(NEW: Sun Mar  9 13:38:36 2003 mazer)
+
 		This counts transitions on the bar line -- should be reset
 		at once you're sure monkey's grabbed the bar and then monitored
 		for any increases..  Increments each time there's a state
 		change (0->1 or 1->0).  Sampled at DACQ frequency (~1khz), so
 		as to avoid loosing signals during CPU intensive graphics.
+
 		"""
 		if reset:
 			return dacq_bar_transitions(1)
@@ -2504,6 +2519,7 @@ class PypeApp:
 
 		Don't even THINK about calling this outside a try/except
 		wrapper or you're asking for trouble...
+
 		"""
 		if enable:
 			dacq_bar_genint(1)
@@ -2522,8 +2538,9 @@ class PypeApp:
 		CALL TO idlefn(). To clear the alarm (before it goes off), call
 		with no args. There is only ONE alarm/timer per dacq process!
 
-		Note: this requires app.allow_ints to be true in order to
-		      work!
+		**NOTE:**
+		This requires app.allow_ints to be true in order to work!
+
 		"""
 		if ms:
 			dacq_set_alarm(ms_from_now)
@@ -2574,16 +2591,15 @@ class PypeApp:
 				return
 		else:
 			pass
-			
 
 	def debug_handler(self, signal, frame):
 		"""This is for catching SIGUSR2's for debugging.."""
 		import traceback
-		
+
 		sys.stderr.write('\n------------------------------Recieved SIGUSR2:\n')
 		traceback.print_stack(frame)
 		keyboard()
-			
+
 	def bardown(self):
 		if self.lshiftdown():
 			return 1
@@ -2600,16 +2616,19 @@ class PypeApp:
 
 	def joybut(self, n):
 		"""
-		Query the nth joystick button (starting with #0)
-		 -1: no such butten
+		Query the nth joystick button (starting with #0)::
+
+		  -1: no such butten
 		  0: button up
 		  1: button down
+
 		"""
 		return dacq_jsbut(n)
 
 	def joyaxis(self):
 		"""
 		Query the joystick axis state. Returns (x,y)
+
 		"""
 		return (dacq_js_x(), dacq_js_y())
 
@@ -2646,6 +2665,7 @@ class PypeApp:
 		"""
 		Close application -- shutdown the DACQ interface and framebuffer
 		and restore the X11 bell.
+
 		"""
 		import exceptions
 		self.unloadtask()
@@ -2655,7 +2675,7 @@ class PypeApp:
 				del self._testpat
 			except AttributeError:
 				pass
-		
+
 		if self.fb:
 			self.fb.close()
 			self.fb = None
@@ -2674,13 +2694,13 @@ class PypeApp:
 		if self.plex is not None:
 			self.plex.drain(terminate=1)
 			Logger('pype: closed connection to plexon.\n')
-			
+
 		try:
 			self.udpy.fidinfo(file=subjectrc('last.fid'))
 			self.udpy.savepoints(subjectrc('last.pts'))
 		except AttributeError:
 			pass
-		
+
 		if self.tk:
 			# only do the state thing if in GUI mode
 			self.__savestate()
@@ -2696,7 +2716,7 @@ class PypeApp:
 				Logger('%s ' % sname)
 			Logger('\n')
 		Logger('pype: bye bye.\n')
-				
+
 
 	def repinfo(self, msg=None):
 		self.__repinfo.configure(text=msg)
@@ -2759,6 +2779,7 @@ class PypeApp:
 		timer.  This should be called at the start of every trial, always
 		at the same point in the trial.  All timestamping will be relative
 		to this call.
+
 		"""
 
 		# bump up the data collect process priorities
@@ -2768,7 +2789,7 @@ class PypeApp:
 			# if rt_sched is set in the rig menu, switch scheduler mode
 			# to real time for the duration of the trial
 			dacq_set_rt(1)
-		
+
 		self.record_buffer = []
 
 		# Thu Oct 23 15:51:34 2008 mazer
@@ -2777,18 +2798,18 @@ class PypeApp:
 		#   ensure that the plexon has time to register onset of new
 		#   trial, therefore, the timestamp should be recorded when
 		#   record_state() returns, not before it's called.
-		# 
+		#
 		# - So the t=self.encode(START) has been moved from right
 		#   before the self.record_state(1) to right after
-		
+
 		# tell plexon trial is BEGINNING
 		self.record_state(1)
 		t = self.encode(START)
-		
+
 		# Mon Oct 27 12:56:47 2008 mazer
 		# - log full 'time of day' for start event
 		self.encode('TOD_START %f' % time.time())
-		
+
 		self.recording = 1
 
 		# start with fresh eye trace..
@@ -2801,20 +2822,21 @@ class PypeApp:
 		"""
 		Possibly clean up after a trial, right now all this does is
 		reset the eye trace
+
 		"""
 
-		# Thu Oct 23 15:53:43 2008 mazer 
+		# Thu Oct 23 15:53:43 2008 mazer
 		# see note about re self.encode(START) -- this has been moved
 		# to right AFTER the self.record_state(0) call to avoid
 		# problems with plexon sync..
-		
+
 		self.udpy.eye_clear()
 
 		# tell plexon trial is OVER
 		self.recording = 0
 		self.record_state(0)
 		t = self.encode(STOP)
-		
+
 		# Mon Oct 27 12:56:47 2008 mazer
 		# - log full 'time of day' for start event
 		self.encode('TOD_STOP %f' % time.time())
@@ -2826,7 +2848,7 @@ class PypeApp:
 
 		if self.plex is not None:
 			self.xdacq_data_store = _get_plexon_events(self.plex, fc=40000)
-			
+
 	def status_plex(self):
 		if self.plex is not None:
 			Logger("pype: plexon units --")
@@ -2844,7 +2866,7 @@ class PypeApp:
 				l = self._last_recstate
 			except:
 				self._last_recstate = dacq_ts()
-				
+
 			if self.xdacq is 'plexon':
 				warn = 1
 				while (dacq_ts() - self._last_recstate) < 250:
@@ -2869,6 +2891,7 @@ class PypeApp:
 		Begin recording eye trace data now. Or, stop recording eye
 		data now.  Be sure to call this before you save data with
 		record_write() below!
+
 		"""
 		if on:
 			dacq_adbuf_toggle(1)
@@ -2888,11 +2911,11 @@ class PypeApp:
 		Insert <code> into the per-trial buffer along with the current
 		trial timestamp (relative to the last call to start_trial.
 
-		Like that?  encode() is a CORTEX-ism
+		Thu Nov 10 15:37:09 2005 mazer
 
-		Thu Nov 10 15:37:09 2005 mazer 
- 		  If code is a tuple, then encode all the items in the tuple
+		- If code is a tuple, then encode all the items in the tuple
 		  with the same timestamp.
+
 		"""
 
 		t = dacq_ts()
@@ -2907,9 +2930,10 @@ class PypeApp:
 		"""
 		Wrapper for get_spikes_now() method... (just for backwards
 		compatibility).
+
 		"""
 		return self.get_spikes_now()
-	
+
 	def get_spikes_now(self):
 		"""
 		This is gets the spike data out from the ad/ad server in
@@ -2917,6 +2941,7 @@ class PypeApp:
 		generate dynamic stimuli etc.  It should not be considered
 		the final data, only an approximation, particularly if you're
 		still recording data when you call this.
+
 		"""
 		n = dacq_adbuf_size()
 		t = zeros(n)
@@ -2941,7 +2966,10 @@ class PypeApp:
 		NOT be considered the final data, particularly if you're
 		still in record mode when you call this function
 
-		Returns: t, x, y VECTORS!!
+		Returns: Numeric vectors **t**, **x** and **y**  containing x, y
+		eye position and time (in ms) data from start of trial up to the
+		current time.
+
 		"""
 		n = dacq_adbuf_size()
 		t = zeros(n)
@@ -2958,6 +2986,7 @@ class PypeApp:
 	def get_photo_now(self):
 		"""
 		This function extracts the current photodiode trace.
+
 		"""
 		n = dacq_adbuf_size()
 		t = zeros(n)
@@ -2973,12 +3002,14 @@ class PypeApp:
 		"""
 		Returns COPY of current recorded event buffer, all the same
 		warnings as the other get_XXXXX_now() methods above..
+
 		"""
 		return self.record_buffer[:]
-		
+
 	def record_write(self, result=None, rt=None, pdict=None, taskinfo=None):
 		"""
 		Write the current record to the specified datafile.
+
 		"""
 
 		if (self.record_file == '/dev/null') and \
@@ -2986,7 +3017,7 @@ class PypeApp:
 			fast_tmp = 1
 		else:
 			fast_tmp = 0
-			
+
 		# force taskinfo to be a tuple..
 		if type(taskinfo) != TupleType:
 			taskinfo = (taskinfo,)
@@ -3048,7 +3079,7 @@ class PypeApp:
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
 		self.photo_times = _find_ttl(self.eyebuf_t, p0,
 									  photo_thresh, photo_polarity)
-		
+
 		spike_thresh = int(self.rig_common.queryv('spike_thresh'))
 		spike_polarity = int(self.rig_common.queryv('spike_polarity'))
 		self.spike_times = _find_ttl(self.eyebuf_t, s0,
@@ -3063,7 +3094,7 @@ class PypeApp:
 							   others=((p0, 'photos'),
 									   (s0, 'spikes')),
 							   raster=self.spike_times)
-				
+
 		self.udpy.info.configure(text= "%d spk // %d sync" %
 								 (len(self.spike_times), len(self.photo_times)))
 
@@ -3076,8 +3107,10 @@ class PypeApp:
 		if not fast_tmp and self.record_file:
 			# dump the event stream
 			info = (result, rt, pdict) + taskinfo
-			# note: added p0. s0 raw trace saving, 16-mar-2002
 
+			#
+			# note: added p0. s0 raw trace saving, 16-mar-2002
+			#
 			#
 			# Wed Sep 11 14:36:42 2002 mazer
 			#
@@ -3100,7 +3133,7 @@ class PypeApp:
 			#				this vector to save space. c5 and c6 aren't
 			#				currently implemented
 			#  rec[12]		pupil area data (if available) in same format
-			#			    as the eye [xy]-position data above. This is new
+			#				as the eye [xy]-position data above. This is new
 			#				as of 08-feb-2003 (JAM)
 			#
 			#  ** added rec[13] 31-oct-2005 (JAM) **
@@ -3108,13 +3141,12 @@ class PypeApp:
 			#				a list of (timestamp, unit) pairs, with timestamps
 			#				in ms and unit's following the standard plexon
 			#				naming scheme (01a, 02a, 02b etc..)
-			
 
 			if self.xdacq == 'tdt':
 				# insert tdt tank info into the parameter table for this
 				# trial so we can recover the data later.
 				(server, tank, block, tnum) = self.tdt.getblock()
-				
+
 				# str() here convert UTF8 strings back to plain old ascii,
 				# which is the only thing the p2m can currently handle. small
 				# risk here -- don't use international chars for datafile names!
@@ -3134,11 +3166,11 @@ class PypeApp:
 				   (c0, c1, c2, c3, c4, None, None),
 				   list(self.eyebuf_pa),
 				   self.xdacq_data_store]
-			
+
 				   # note the None's in the line above are logical
 				   # place holders for c2,c3, which are hardcoded
 				   # as p0 and s0
-				   
+
 			f = open(self.record_file, 'a')
 			labeled_dump('encode', rec, f, 1)
 			f.close()
@@ -3150,6 +3182,7 @@ class PypeApp:
 	def record_note(self, tag, note):
 		"""
 		Insert note into current datafile
+
 		"""
 		if self.record_file:
 			rec = [NOTE, tag, note]
@@ -3162,7 +3195,7 @@ class PypeApp:
 
 		subject = self.sub_common.queryv('subject')
 		train = self.sub_common.queryv('training')
-		
+
 		if train:
 			cell = 0
 		else:
@@ -3183,7 +3216,7 @@ class PypeApp:
 					next = n + 1
 			except ValueError:
 				pass
-			
+
 		try:
 			return "%s%04d.%s.%03d" % (subject, int(cell),
 									   self.task_name, next)
@@ -3197,7 +3230,7 @@ class PypeApp:
 		animal = self.sub_common.queryv('subject')
 		train = self.sub_common.queryv('training')
 		full_animal = self.sub_common.queryv('full_subject')
-		
+
 		if len(animal) == 0 or len(full_animal) == 0:
 			warn('Warning (elog)',
 				 "Set both 'subject' and 'full_subject' first!")
@@ -3210,7 +3243,7 @@ class PypeApp:
 			exper = "%s%04d" % (animal, 1)
 		# update cell slot in worksheets with exper
 		self.sub_common.set('cell', exper)
-		
+
 		if train:
 			exper = exper[:-4] + '0000'
 		self._exper = exper
@@ -3230,24 +3263,21 @@ class PypeApp:
 				pass
 
 		return "%s.%s.%03d" % (exper, self.task_name, next)
-		
 
 	def _guess(self):
 		if self.use_elog:
 			return self._guess_elog()
 		else:
 			return self._guess_fallback()
-		
-		
+
 	def record_done(self):
 		self.record_note('pype', 'run ends')
 		self.record_file = None
 		self._recfile()
-			
 
 	def record_selectfile(self, fname=None):
 		import filebox
-		
+
 		if not fname is None:
 			self.record_file = fname
 		else:
@@ -3282,7 +3312,7 @@ class PypeApp:
 		# the monitor parameters, just in case they get lost
 		# or forgotten..
 		self.record_note('userparams', self.config.dict)
-		
+
 		return 1
 
 	def idlefb(self):
@@ -3312,7 +3342,7 @@ class PypeApp:
 				s.fill((1,255,1))
 				s.alpha[:]=128
 				s.blit()
-						   
+
 			self.fb.sync(0)
 			self.fb.flip()
 
@@ -3322,16 +3352,15 @@ class PypeApp:
 
 	def plotEyetraces(self, t=None, x=None, y=None, others=None, raster=None):
 		import iplot
-		
+
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
 			oldgraph = attach(self._eyetrace_window)
 
-			
 			skip = int(self.rig_common.queryv('plotskip'))
 			if skip < 1:
 				skip = 1
-				
+
 			all = int(self.rig_common.queryv('plotall'))
 			if not all:
 				# we must be in a hurry, so don't plot everything...
@@ -3363,7 +3392,7 @@ class PypeApp:
 			hold_off()
 			xrange(start - t0, stop - t0)
 			ylabel('red=x grn=y')
-			
+
 			pnum = pnum + 1
 			# plot the others
 			for (data, name) in others:
@@ -3372,7 +3401,7 @@ class PypeApp:
 				ylabel(name)
 				xrange(start - t0, stop - t0)
 				pnum = pnum + 1
-				
+
 			if raster:
 				# stop xmgrace error message for empty rasters..
 				if len(raster) > 1:
@@ -3387,11 +3416,12 @@ class PypeApp:
 			# attach() returns the current handle, so save it
 			# (might be different if new or reopened window..)
 			self._eyetrace_window  = attach(oldgraph)
-			
+
 def pype_hostconfigfile():
 	"""
 	Return Read host-specfic Config file.
 	Config file lives in $(PYPERC)/Config.{HOST_NAME}
+
 	"""
 	h = string.split(socket.gethostname(), '.')[0]
 	return pyperc('Config.%s' % h)
@@ -3401,18 +3431,19 @@ def pype_hostconfig():
 	Read host-specific config file into a Config
 	object and return the object (looks like a
 	dictionary).
+
 	"""
 	import configvars
-	
+
 	cfile = pype_hostconfigfile()
 	return configvars.defaults(cfile)
 
 	#return Config(pype_hostconfigfile())
 
-		
+
 def _CanOnlyBeOne():
 	"""Count number of pype programs currently running.
-	
+
 	Try to figure out if there are already pype processes running
 	(actually look for any processes attached to the standard shared
 	memory segment (id: 0xDA01). This is ugle, slow and a hack. **BUT**
@@ -3421,6 +3452,7 @@ def _CanOnlyBeOne():
 
 	If npypes() > 0, you really shouldn't start up another pype
 	instance!
+
 	"""
 	p = os.popen("ipcs -m | grep da01 | awk '{print $6}'", 'r')
 	nproc = p.read()
@@ -3440,12 +3472,15 @@ def _find_ttl(t, x, thresh=500, polarity=1):
 	Find downward going TTL pulses in x.  Returns list of onset times.
 
 	Sat Mar 27 15:07:07 2004 mazer
-	  pol == 1 --> time of first (negative going) above threshold sample
-	  pol != 1 --> time of first (positive going) below threshold sample
 
-	  This is BACKWARDS .. back we're NOT going to change it..
+	- pol == 1 --> time of first (negative going) above threshold sample
+
+	- pol != 1 --> time of first (positive going) below threshold sample
+
+	This is BACKWARDS .. but we're NOT going to change it..
+
 	"""
-	
+
 	times = []
 	inpulse = 0
 	if polarity > 0:
@@ -3474,9 +3509,10 @@ class _EyeGraph:
 		raise FatalPypeError
 
 def _safeLookup(dict, key, default):
-	"""	
-	Lookup value in dictionary, if it doesn't exist, return
-	a default value.
+	"""Lookup value in dictionary
+
+	If key doesn't exist, return a default value.
+
 	"""
 	try:
 		return dict[key]
@@ -3487,17 +3523,19 @@ def subject():
 	"""Get the current subject id string.
 
 	This is usually supplied by starting pype with the -s argument.
+
 	"""
 	try:
 		return os.environ['SUBJECT']
 	except KeyError:
 		return 'none'
-	
+
 def subjectrc(s=""):
 	"""Get current subject's private .pyperc directory.
 
 	Each subject has a directory inside ~/.pyperc that's used to
 	store subject-specific configuration data and state parameters.
+
 	"""
 	return pyperc('_' + subject() + '/' + s)
 
@@ -3506,6 +3544,7 @@ def pyperc(s=""):
 	"""
 	If $(PYPERC) is set, then use $(PYPERC) as the base for the
 	user's .pyperc directory. Otherwise use "~/.pyperc".
+
 	"""
 	if os.environ.has_key('PYPERC'):
 		rc = os.environ['PYPERC']
@@ -3514,20 +3553,16 @@ def pyperc(s=""):
 	else:
 		# this is more portable than os.environ['HOME']
 		rc = os.path.expanduser('~') + '/.pyperc/'
-		
+
 	return rc+s
 
 def pypedir(s=None):
-	"""
-	"""
 	if s:
 		return os.environ['PYPEDIR']+'/'+s
 	else:
 		return os.environ['PYPEDIR']+'/'
 
 def libdir(s=None):
-	"""
-	"""
 	if s:
 		return os.environ['PYPEDIR']+'/lib/'+s
 	else:
@@ -3539,7 +3574,7 @@ class FixWin:
 		self.icon = None
 		self.text = None
 		self.set(x, y, size)
-		
+
 		# Mon Jan 23 09:57:24 2006 mazer
 		#  This effectively turns the fixwin from a circle into an
 		#  ellipse. If vbias>1, ellipse is elongated in the
@@ -3552,7 +3587,9 @@ class FixWin:
 		self.vbias = vbias
 
 	def __del__(self):
-		"""Remove icon, if one exists and disable in dacq process."""
+		"""Remove icon, if one exists and disable in dacq process.
+
+		"""
 		self.genint(0)
 		self.clear()
 		self.off()
@@ -3566,7 +3603,7 @@ class FixWin:
 			# in theory you could loose a pending interupt here, but it
 			# should be unlikely.
 			self._post_fixbreak = 0
-		
+
 	def set(self, x=None, y=None, size=None):
 		self.x = x
 		self.y = y
@@ -3574,32 +3611,45 @@ class FixWin:
 
 	def reset(self):
 		dacq_fixwin_reset(0)
-		
+
 	def on(self):
-		"""Turn on -- increases load in dacq process"""
+		"""Turn fix window on - increases load in dacq process.
+
+		"""
 		dacq_fixwin(0, self.x, self.y, self.size, self.vbias)
 
 	def off(self):
-		"""Turn off -- decreases load in dacq process"""
+		"""Turn fix window off - decreases load in dacq process.
+
+		"""
 		dacq_fixwin(0, 0, 0, -1, 0.0)
 
 	def inside(self):
-		"""Check to see if eye is inside fixwin"""
+		"""Check to see if eye is inside fixwin.
+
+		"""
 		if self.app and self.app.config.iget('DACQ_TESTMODE'):
 			return 1
 		return dacq_fixwin_state(0)
 
 	def broke(self):
-		"""Check to see if eye moved out of window, since acquired"""
+		"""Check to see if eye moved out of window, since acquired.
+
+		"""
 		if self.app and self.app.config.iget('DACQ_TESTMODE'):
 			return 0
 		return dacq_fixwin_broke(0)
 
 	def break_time(self):
-		"""Get the exact break time"""
+		"""Get the exact time fixation was broken.
+
+		"""
 		return dacq_fixwin_break_time(0)
 
 	def draw(self, color='grey', dash=None, text=None):
+		"""Draw fixation window on user display.
+
+		"""
 		self.clear()
 		self.icon = self.app.udpy.icon(self.x, self.y,
 									   2*self.size, 2*self.size*self.vbias,
@@ -3609,6 +3659,9 @@ class FixWin:
 											   text=text)
 
 	def clear(self):
+		"""Remove fixation window from user display.
+
+		"""
 		if self.icon:
 			self.app.udpy.icon(self.icon)
 			self.icon = None
@@ -3633,8 +3686,9 @@ class LandingZone:
 	Eyes must stay inside the zone for fixtime_ms before it's
 	considered a fixation insize the zone. Use fixtime_ms=0 if
 	you want to accept pass throughs w/o fixations.
+
 	"""
-	
+
 	def __init__(self, x, y, size, fixtime, app):
 		self.app = app
 		self.icon = None
@@ -3642,7 +3696,7 @@ class LandingZone:
 		self.size2 = size**2
 		self.fixtime = fixtime
 		self.entered_at = None
-		
+
 	def __del__(self):
 		self.clear()
 
@@ -3651,6 +3705,7 @@ class LandingZone:
 		If you have multiple landing zones, you can sit in a loop, use
 		app.eye_txy() to query time and eye position ONCE, and then apply
 		it to multiple landing zones by passing in (x,y) values
+
 		"""
 		if t is None:
 			(t, x, y) = self.app.eye_txy()
@@ -3663,13 +3718,13 @@ class LandingZone:
 		else:
 			self.entered_at = None
 			return 0
-			
+
 	def draw(self, color='grey', dash=None, text=None):
 		self.clear()
 		self.icon = self.app.udpy.icon(self.x, self.y,
 									   2*self.size, 2*self.size*self.vbias,
 									   color=color, type=2, dash=dash)
-		
+
 	def clear(self):
 		if self.icon:
 			self.app.udpy.icon(self.icon)
@@ -3687,8 +3742,9 @@ class SectorLandingZone:
 	you want to accept pass throughs w/o fixations.
 
 	See LandingZone for additional details about usage.
+
 	"""
-	
+
 	def __init__(self, xo, yo,
 				 inner_pix, outer_pix, angle_deg, subtense_deg,
 				 fixtime_ms, app):
@@ -3701,7 +3757,7 @@ class SectorLandingZone:
 		self.subtense = math.pi * subtense_deg / 180.0
 		self.fixtime = fixtime_ms
 		self.entered_at = None
-		
+
 	def __del__(self):
 		self.clear()
 
@@ -3710,8 +3766,8 @@ class SectorLandingZone:
 		If you have multiple landing zones, you can sit in a loop, use
 		app.eye_txy() to query time and eye position ONCE, and then apply
 		it to multiple landing zones by passing in (x,y) values
+
 		"""
-		
 		if t is None:
 			(t, x, y) = self.app.eye_txy()
 
@@ -3731,7 +3787,7 @@ class SectorLandingZone:
 		else:
 			self.entered_at = None
 			return 0
-			
+
 	def draw(self, color='grey', dash=None, text=None):
 		x = self.xo + (self.inner+self.outer)/2.0 + math.cos(self.angle)
 		y = self.xo + (self.inner+self.outer)/2.0 + math.sin(self.angle)
@@ -3740,11 +3796,11 @@ class SectorLandingZone:
 									   self.outer-self.inter,
 									   self.outer-self.inter,
 									   color=color, type=1, dash=dash)
-		
+
 	def clear(self):
 		if self.icon:
 			self.app.udpy.icon(self.icon)
-			self.icon = None		
+			self.icon = None
 
 class Timer:
 	def __init__(self):
@@ -3761,25 +3817,14 @@ class Timer:
 		return 1000 * (dacq_ts() - self._start_at)
 
 class Holder:
-        """Dummy class just to hold info (ie, just a handle)."""
-        pass
+	"""Dummy class
 
-class DancingBear:
-	__pos = 0
-	def __init__(self, s='.'):
-		if s is None:
-			sys.stderr.write('\n')
-			DancingBear.__pos = 0
-		else:
-			sys.stderr.write("%s" % s)
-			DancingBear.__pos = DancingBear._pos + len(s)
-			if DancingBear._pos > 50:
-				sys.stderr.write('\n')
-				DancingBear.__pos = 0
-			sys.stderr.flush()
+	This is just a handle to hold task-related information. You
+	can hang things off it and then pickle it or stash it for
+	later use.
 
-def dance(s='.'):
-	DancingBear(s)
+	"""
+	pass
 
 def debug(set=None):
 	global __DEBUGFLAG
@@ -3795,9 +3840,12 @@ def debug(set=None):
 		return __DEBUGFLAG
 
 def loadwarn(fname):
-	"""
-	Print a warning on stderr to indicate a module has been
-	loaded.
+	"""Log load-file working to console
+
+	Prints a warning on stderr to indicate a module has been
+	loaded. Typically used by tasks to announce that they've been
+	loaded into a running pype instance.
+
 	"""
 	if debug():
 		Logger("pype: loading '%s'\n" % fname)
@@ -3806,6 +3854,7 @@ def now(military=1):
 	"""
 	Return a simple timestring of the form HHMM or HHMM[am|pm]
 	depending on whether 'military' is true or false.
+
 	"""
 	(year, month, day, h, m, s, x1, x2, x3) = time.localtime(time.time())
 	if military:
@@ -3816,171 +3865,18 @@ def now(military=1):
 		else:
 			return "%02d:%02d PM" % (h-12, m)
 
-def _bounce(app):
-	if app.running: return
-
-	if not app.tk:
-		raise GuiOnlyFunction, 'candy'
-
-	# cancel candy if it's running..
-	if app._candy:
-		app.led(0)
-		app._sbut1.config(state=NORMAL)
-		app._sbut2.config(state=NORMAL)
-		app.udpy.stop(command=None)
-		
-		app._candy = 0
-		app.udpy_note('')
-		return
-	else:
-		app.led(1)
-		app._sbut1.config(state=DISABLED)
-		app._sbut2.config(state=DISABLED)
-		app.udpy.stop(command=lambda app=app: _bounce(app))
-
-		app._candy = 1
-		app.console.clear()
-		app.console.writenl('bounce running')
-
-	x, y, n = 0, 0, 0
-	slist = []
-	sync = 0
-	while app._candy:
-		if n == 0:
-			dx = uniform(10, 20)
-			dy = uniform(10, 20)
-			sync = not sync
-		n = (n + 1) % 50
-		c = (uniform(1, 255, integer=1),
-			 uniform(1, 255, integer=1),
-			 uniform(1, 255, integer=1))
-		s = Sprite(20, 20, x, y, fb=app.fb)
-		s.fill(color=c)
-		slist.append(s)
-		app.fb.clear(color=(128,128,128))
-		app.udpy.icon()
-		for s in slist:
-			s.blit()
-			app.udpy.icon(s.x,s.y,s.w,s.h)
-
-		app.fb.sync(sync)
-		app.fb.flip()
-		if len(slist) > 10:
-			slist = slist[1:]
-		app.idlefn()
-
-		x = x + dx
-		y = y + dy
-		if (x > (app.fb.w/3)) or (x < -(app.fb.w/3)):
-			dx = -dx
-			x = x + dx
-		if (y > (app.fb.h/3)) or (y < -(app.fb.h/3)):
-			dy = -dy
-			y = y + dy
-
-	app.udpy.icon()
-	for s in slist:
-		del s
-	app.fb.clear(color=(1, 1, 1), flip=1)
-	app.idlefb()
-
-def _slideshow(app):
-	if app.running: return
-
-	if not app.tk:
-		raise GuiOnlyFunction, 'candy'
-
-	# cancel candy if it's running..
-	if app._candy:
-		app.led(0)
-		app._sbut1.config(state=NORMAL)
-		app._sbut2.config(state=NORMAL)
-		app.udpy.stop(command=None)
-
-		app._candy = 0
-		app.udpy_note('')
-		return
-	else:		
-		app.led(1)
-		app._sbut1.config(state=DISABLED)
-		app._sbut2.config(state=DISABLED)
-		app.udpy.stop(command=lambda app=app: _slideshow(app))
-		
-		try:
-			f = open(pyperc('candy.lst'), 'r')
-			l = f.readlines()
-			f.close()
-		except IOError:
-			warn('Error',
-				 'make %s to use this feature.' % pyperc('candy.lst'))
-			return
-		app._candy = 1
-		app.console.clear()
-		app.console.writenl('slideshow running')
-
-	itag = None
-	bg = Sprite(x=0, y=0, fb=app.fb,
-				width=app.fb.w, height=app.fb.h)
-	if app.sub_common.queryv('show_noise'):
-		bg.noise(0.50)
-	
-	while app._candy:
-		x = uniform(-200,200)
-		y = uniform(-200,200)
-		while 1:
-			inum = int(uniform(0,len(l)))
-			fname = l[inum][:-1]
-			if not posixpath.exists(fname):
-				continue
-			app.console.writenl(fname)
-			try:
-				s = Sprite(fname=fname, fb=app.fb, x=x, y=x)
-				if s.w > 10 and s.h > 10:
-					break
-			except:
-				get_traceback(1)
-				app.write('dud file: %s\n' % fname)
-		maxd = 512.0
-		if s.w > maxd:
-			m = maxd / s.w
-			s.scale(int(m * s.w), int(m * s.h))
-		elif s.h > maxd:
-			m = maxd / s.h
-			s.scale(int(m * s.w), int(m * s.h))
-			
-		app.fb.clear(color=(1, 1, 1), flip=0)
-		bg.blit()
-		s.blit()
-		app.fb.flip()
-		if not itag is None:
-			app.udpy.icon(itag)
-		itag = app.udpy.icon(x, y, s.w, s.h, color='blue')
-		app.idlefn(ms=5000)
-		del s
-	try:
-		del s
-	except NameError:
-		pass
-
-	app.udpy.icon()
-	
-	app.fb.clear(color=(1, 1, 1), flip=1)
-	app.idlefb()
-
-	if not itag is None:
-		app.udpy.icon(itag)
-
 def _get_plexon_events(plex, fc=40000):
 	"""
 	Drain the Plexon network-based database of timestamp events
 	until we hit a StopExtChannel event (this is from the pype-plexon
 	TTL sync line). All events left in the tank (post-trial) will
 	be discarded.
+
 	"""
 	from PlexHeaders import Plex
 
 	events = None
-	
+
 	hit_stop = 0
 	while not hit_stop:
 		tank, ndropped = plex.drain()
@@ -4006,15 +3902,13 @@ def _get_plexon_events(plex, fc=40000):
 					# use fc (sample freq in hz) to convert timestmaps to ms
 					events.append((int(0.5 + float(ts - zero_ts) / fc * 1000.0),
 								   Channel, Unit))
-					
+
 	return events
 
 def _goto_error(title):
-	"""
-	Open editor window at the last error for debugging
-	"""
+	"""Open editor window at the last error for debugging"""
 	import traceback
-	
+
 	(etype, evalue, tb) = sys.exc_info()
 	stack = traceback.extract_tb(tb)
 	(fname, line, fn, text) = stack[-1]

@@ -2,10 +2,11 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-**Interface to pygame.mixer**
+**Soundcard interface**
 
-New sound I/O module. Simplified pure-python interace to the pygame
-sound/mixer subsytem.
+This basically provides a simple interace to pygame.mixer to generate
+simple sounds using the soundcard. Simplified pure-python interace to
+the pygame sound/mixer subsytem.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 

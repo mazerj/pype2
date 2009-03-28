@@ -20,16 +20,16 @@ __id__       = '$Id$'
 
 def keyboard(banner='Type EOF/^D to continue'):
 	"""Clone of the matlab keyboard() function.
-	
+
 	Drop down into interactive shell for debugging
-    Use it like the matlab keyboard command -- dumps you into
-    interactive shell where you can poke around and look at
+	Use it like the matlab keyboard command -- dumps you into
+	interactive shell where you can poke around and look at
 	variables in the current stack frame
-	
-    The idea and code are stolen from something Fredrick
+
+	The idea and code are stolen from something Fredrick
 	Lundh posted on the web a while back.
-	
-    """
+
+	"""
 
 	import code, sys
 
@@ -115,21 +115,22 @@ def ppDict(d):
 		
 def get_exception():
 	"""
-	This returns the most recent exception -- useful for an
-	'except:' clause with no matching exception pattern (not
-	recommended!).
+	This returns the most recent exception -- useful for an 'except:'
+	clause with no matching exception pattern (not recommended!).
 
 	In general, the value turned by this function will be something
 	like <type 'exceptions.EXCEPTION_NAME'>, since exceptions are
-	supposed to be classes. For example:
-	    try:
-	         x = 1/0
-		except:
-		     print get_exception()
-	will yeild:
-      <type 'exceptions.ZeroDivisionError'>
-	which can be imported from the 'exceptions' module if you want
-	to check the value against something..
+	supposed to be classes. For example::
+	
+	  >> try:
+	  >>		x = 1/0
+	  >> except:
+	  >>	     print get_exception()
+	  
+	will result in <type 'exceptions.ZeroDivisionError'>. This can be
+	imported from the 'exceptions' module if you want to check the
+	value against something.
+	
 	"""
 	import sys
 	

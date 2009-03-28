@@ -1,7 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-Basic statistics modules (works with Numeric; depends on **pstat.py**)
+**Basic statistics modules (works with Numeric; depends on pstat.py)**
 
 Author -- Gary Strangman (see source code for copyright & originalnotes)
 

@@ -3,7 +3,8 @@
 
 \ls ./src/pype/*.py | \
     grep -v gracePlot.py | grep -v grace_np.py | grep -v blt | \
-    grep -v PlexHeaders.py | \
+    grep -v PlexHeaders.py | grep -v pstat.py | grep -v stats.py | \
+    grep -v mplot.py | grep -v stimlib.py | \
     xargs epydoc --docformat "restructuredtext en" --html \
     --simple-term --parse-only -v --no-private \
     -o ./pypedocs -n pype

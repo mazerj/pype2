@@ -91,6 +91,7 @@ __id__       = '$Id$'
 # Comments and/or additions are welcome (send e-mail to:
 # strang@nmr.mgh.harvard.edu).
 # 
+
 """
 pstat.py module
 

@@ -1,7 +1,11 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-Retrieve spike timestamps from tdt datatank using network api (ttank.py)
+**TDT 'Tank' query tools**
+
+Module lets you Retrieve spike timestamps from tdt datatank using
+the ttank.py network API.
+
 """
 
 __author__   = '$Author$'

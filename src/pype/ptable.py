@@ -24,7 +24,7 @@ Mon Aug 14 13:46:27 2006 mazer
 Fri Feb 13 11:15:35 2009 mazer
 
 - changed load/save format to a human-readable (non-pickled) version
-  change should be transparent -- old pickle versions will get read
+  change should be transparent - old pickle versions will get read
   and new text versions written from now on..
 
 Wed Mar 11 11:08:19 2009 mazer
@@ -72,7 +72,7 @@ def is_dir(s, evaluate=None):
 	if evaluate:
 		return (r, s)
 	return r
-	
+
 def is_file(s, evaluate=None):
 	"""
 	entry must be name of an EXISTING file
@@ -109,11 +109,11 @@ def is_any(s, evaluate=None):
 def is_boolean(s, evaluate=None):
 	"""
 	entry must be some sort of boolean flag
-	
+
 	- 1,yes,on,true -> 1
-	
+
 	- 0,no,off,false -> 0
-	
+
 	"""
 	try:
 		x = string.lower(s)
@@ -144,7 +144,7 @@ def is_int(s, evaluate=None):
 	"""
 	entry must be simple integer (positive, negative or zero)
 	"""
-	
+
 	try:
 		i = int(s)
 		r = VALID
@@ -211,7 +211,7 @@ def is_lteq_zero(s, evaluate=None):
 	"""
 	entry must be less than or equal to zero.
 	"""
-	
+
 	try:
 		i = int(s)
 		if i <= 0:
@@ -410,12 +410,12 @@ def is_iparam(s, evaluate=None):
 def is_cdf(s, evaluate=None):
 	"""
 	entry must describe a **cummulative distribution function**.
-	
+
 	Basically, ensure that value is an integer or a vector
 	describing a valid cummulative PDF.	 If an integer, then
 	return a n-length cdf of uniform prob (eg, [1/n, 1/n .. 1/n])
 	Otherwise, normalize the vector to have unity area.
-	
+
 	IMPROVED: 23-mar-2002 JM --> changed so you don't have
 	to make stuff add to 1.0, evaluating divides by the
 	sum to force it to add up to 1.0...
@@ -466,19 +466,16 @@ def is_list(s, evaluate=None):
 				stride = 1
 			else:
 				stride = v[2]
-				
 			r = VALID
 			if inc:
 				val = range(v[0], v[1]+1, stride);
 			else:
 				val = range(v[0], v[1], stride);
-				
 			if evaluate:
 				return (r, val)
 			return r
 	except:
 		pass
-		
 
 	try:
 		val = eval(s)
@@ -493,7 +490,7 @@ def is_list(s, evaluate=None):
 
 	if evaluate:
 		return (r, val)
-	
+
 	return r
 
 def _unpack_slot(slot):
@@ -511,7 +508,7 @@ def _unpack_slot(slot):
 		pass
 	if name is None:
 		raise FatalPypeError, 'ptable:_unpack_slot bad worksheet slot'
-	
+
 	return (name, default, validate, descr, runlock)
 
 class ParamTable:
@@ -523,7 +520,7 @@ class ParamTable:
 		self._locks = {}
 
 		self.tablename = 'noname'
-		
+
 		if file:
 			try:
 				self._file = pype.subjectrc(file)
@@ -532,7 +529,7 @@ class ParamTable:
 			self.tablename = file
 		else:
 			self._file = None
-			
+
 		self.altfile = altfile
 
 		f = Frame(parent)
@@ -547,10 +544,10 @@ class ParamTable:
 				   command=self.view).pack(expand=0, fill=X, side=LEFT)
 
 		f = Pmw.ScrolledFrame(parent, usehullsize=1)
-		
+
 		f.pack(expand=1, fill=BOTH)
 		self.balloon = Pmw.Balloon(parent, master=1, relmouse='both')
-		
+
 		entries = []
 		self.names = []
 		for slot in self._table:
@@ -588,20 +585,20 @@ class ParamTable:
 				else:
 					self.balloon.bind(e, "???")
 				e.component('entry').configure(bg='white', width=75)
-				xxx = Frame(lf, height=12, width=12)
-				xxx.pack_propagate(0)
-				xxx.pack(side=LEFT)
+				tmpf = Frame(lf, height=12, width=12)
+				tmpf.pack_propagate(0)
+				tmpf.pack(side=LEFT)
 				if locks:
 					if runlock == _KEEPLOCKED:
-						lockbut = Label(xxx, text = '')
+						lockbut = Label(tmpf, text = '')
 					else:
-						lockbut = Button(xxx, text = '',\
+						lockbut = Button(tmpf, text = '',\
 										 command=lambda n=name: \
 										 self.lockfield(n, toggle=1))
 					lockbut.pack(fill=BOTH, expand=1)
 
 					if runlock == _KEEPLOCKED:
-						# runlock==_KEEPLOCKED(-1): usr can NEVER set this value!
+						# usr can NEVER set this value!
 						e.component('entry').configure(state=DISABLED)
 						e.component('label').configure(fg='red')
 						lockbut.configure(state=DISABLED)
@@ -623,26 +620,26 @@ class ParamTable:
 
 	def get(self, evaluate=1, mergewith=None, readonly=1):
 		"""Lookup value from parameter table.
-		
+
 		Returns a dictionary containing all the values in
 		the parameter table.  Dictionary keys are the slot
 		names.	Default is to evaluate the parameters, which
 		means they should come back correctly) typed (ie,
 		is_int's should come back as Integers).
 
-		**evaluate[=1]** -- Enable or disable calling of validation
-          functions. All values will probaly be strings if this is
-          disabled.
-		
-		**mergewith[=<dict>]** -- pass in an existing dictionary and
-          results will be merged into the existing dictionary, new
-          merged dictionary is returned.
+		**evaluate** - Enable or disable calling of validation
+		functions. All values will probaly be strings if this is
+		disabled.
 
-		**readonly[=1]** -- validate readonly fields?
-		
+		**mergewith** - optional existing dictionary and results will
+		be merged into the existing dictionary, new merged dictionary
+		is returned.
+
+		**readonly[=1]** - validate readonly fields?
+
 		**NOTE:**
 		THIS DICTIONARY WILL HAVE PRIORITY
-		
+
 		"""
 
 		if mergewith:
@@ -656,7 +653,7 @@ class ParamTable:
 				continue
 			v = self.query(name)
 			if evaluate:
-				# Wed Mar 11 11:08:13 2009 mazer 
+				# Wed Mar 11 11:08:13 2009 mazer
 				# store raw string version of param in dictionary in addition
 				# to the evaluated version for future reference..  only do
 				# this if evaluating
@@ -717,11 +714,11 @@ class ParamTable:
 	def save(self, file=None):
 		"""
 		Save a dictionary containing the values from the table/worksheet.
-		Uses plain ascii file format -- no pickle anymore..
+		Uses plain ascii file format - no pickle anymore..
 		"""
 		if file is None:
 			file = self._file
-			
+
 		f = open(file, 'w')
 
 		(ok, x) = self.get(evaluate=0)
@@ -731,7 +728,7 @@ class ParamTable:
 			(ok, x) = self.get(evaluate=0)
 			cPickle.dump(x, f)
 			cPickle.dump(self._locks, f)
-			
+
 		if 1:
 			# new human-readable text version
 			for k in x.keys():
@@ -741,12 +738,12 @@ class ParamTable:
 					lock = ''
 				f.write('%s!!%s!!%s!!%s\n' % (posixpath.basename(file)[:-4],
 											  k, lock, x[k]))
-				
+
 		f.close()
 
 	def load(self, file=None):
 		"""
-		Load pickled table database -- note that the pickled dictionary
+		Load pickled table database - note that the pickled dictionary
 		will be unpickled, but only those values referenced in the table
 		will actually be used.	The rest (ie, obsolete) are discarded.
 		This way you can safely inherit from previous modules w/o
@@ -787,10 +784,10 @@ class ParamTable:
 		except:
 			# then try as string version (new-style)
 			return self._loadt(file=file)
-		
+
 	def _loadp(self, file=None):
 		"""
-		This is the actual load function -- the load() method is
+		This is the actual load function - the load() method is
 		a wrapper that lets the user select alternative files in
 		the event the application-specficied file doesn't exist.
 		"""

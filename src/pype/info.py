@@ -1,7 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-** internal information **
+**Information about library versions**
 
 Wed Feb  1 09:41:40 2006 mazer
 - Print useful info about installed versions of dependent libraries

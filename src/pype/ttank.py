@@ -1,7 +1,9 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-TTank.X ONLY interface  -- see tdt.py for complete docs..
+**Tucker-Davis TTank.X interface**
+
+TTank.X ONLY interface - see tdt.py for complete docs.
 """
 
 __author__   = '$Author$'

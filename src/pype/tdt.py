@@ -1,6 +1,8 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
+**Tucker-Davis Interface tools**
+
 Simple python client/server system to provide remote access
 to TDT COM interface from a linux box (or anyother system
 running python) over the network.
@@ -23,7 +25,7 @@ a pickled tuple of length 2. Either::
 
   (1, result-object)
   (None, None)
-  
+
 The first value indicates whether an error occured during
 execution. If it's 1, then execution was a sucess and the result is
 returned.
@@ -41,7 +43,7 @@ Socket Classes derrived from::
 
    Socket utilities class by Amey R Pathak
    src: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/200946
-	
+
 """
 
 __author__   = '$Author$'
@@ -59,7 +61,7 @@ try:
 	from pypedebug import keyboard
 except ImportError:
 	pass
-		
+
 try:
 	from Numeric import *
 except ImportError:
@@ -110,7 +112,7 @@ class _Socket:
 					# unexpected SIGNAL came in before data, just retry..
 					# this is likely to be something like a fixwin break
 					# during data collection..
-					
+
 					# I'm pretty sure this only happens when no data has
 					# been read, so there should be no loss..
 					sys.stderr.write('warning: tdt recv caught EINTR\n')
@@ -121,7 +123,7 @@ class _Socket:
 					# otherwise, god knows what caused it, better raise
 					# a proper exception for debuggin..
 					raise
-	
+
 	def Receive(self, size=1024):
 		import struct
 		buf = self._recv(struct.calcsize('!I'))
@@ -137,19 +139,19 @@ class _Socket:
 
 	def Close(self):
 		self.sock.close()
-		
+
 class _SocketServer(_Socket):
 	def __init__(self, host = socket.gethostname(), port = PORT):
 		self.host, self.port = host, port
 		self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.sock.bind((self.host, self.port))
 		self.remoteHost = None
-		
+
 	def Listen(self):
 		self.sock.listen(1)
 		self.conn, self.remoteHost = self.sock.accept()
 		self.remoteHost = self.remoteHost[0]
-			
+
 	def __str__(self):
 		return '<_SocketServer '+\
 			   str(self.host)+':'+str(self.port)+'>'
@@ -165,7 +167,7 @@ class _SocketClient(_Socket):
 		self.conn.settimeout(None)
 		# generates exception on failure-to-connect
 		self.conn.connect((self.remoteHost, self.remotePort))
-		
+
 	def __str__(self):
 		return '<_SocketClient '+\
 			   str(self.remoteHost)+':'+str(self.remotePort)+'>'
@@ -174,7 +176,7 @@ class TDTServer:
 	"""
 	Wrapper object for the server. To setup a server, you simply
 	do something like this:
-	
+
 	  s = Server()
 	  s.listen()
 
@@ -203,23 +205,23 @@ class TDTServer:
 		Set up connections to the TDT COM server
 		"""
 		global TDevAcc, TTank
-			
+
 		log('Connecting to TDT servers...')
 
 		connections = 0
-		
+
 		if TDevAcc.ConnectServer(self.Server):
 			log('..connect to %s:TDevAcc' % self.Server)
 			connections = connections + 1
 		else:
 			log('..no connection to %s:TDevAcc' % self.Server)
-			
+
 		if TTank.ConnectServer(self.Server, 'Me'):
 			log('..connect to %s:TTank.X' % self.Server)
 			connections = connections + 2
 		else:
 			log('..no connection %s:TTank.X' % self.Server)
-			
+
 		return connections
 
 	def listen(self):
@@ -261,10 +263,10 @@ class TDTServer:
 				if DEBUG:
 					log('(%s,"%s") <- %s' % (ok, result, x))
 					log('[%.3fs elapsed]' % (et, ))
-					
+
 				if ok is None:
 					log('%s' % sys.exc_value)
-					
+
 			log("client closed connection.")
 			if TTank:
 				log('TTank.X closing tank')
@@ -278,13 +280,13 @@ class TDTServer:
 
 			server.Close()
 			log()
-			
+
 class TDTClient:
 	def __init__(self, server):
 		self.server = server
 		self.client = None
 		self.open_conn()
-		
+
 	def __repr__(self):
 		return '<TDTClient server=%s TDevAcc=%d TTank=%d>' % \
 			   (self.server, self.gotTDevAcc, self.gotTTank)
@@ -304,7 +306,7 @@ class TDTClient:
 		c = cPickle.loads(self.client.Receive())
 		self.gotTDevAcc = (1 & c) > 0
 		self.gotTTank = (2 & c) > 0
-		
+
 	def close_conn(self):
 		"""
 		Shut down connection.
@@ -318,8 +320,10 @@ class TDTClient:
 		Command string (cmd) should be a valid python expression
 		that can be eval'ed in the remote envrionment. Access to
 		the Tucker-Davis API is via:
-		  TDevAcc (for the direct DSP interface), or,
-		  TTank (for access to the data tank)
+
+		- TDevAcc (for the direct DSP interface), or,
+
+		- TTank (for access to the data tank)
 
 		The return value is a pair: (statusFlag, resultValue), where
 		statusFlag is 1 for normal evaluation and 0 for an error and
@@ -358,11 +362,13 @@ class TDTClient:
 		Query current run mode for the TDT device.
 
 		Run modes are defined by TDT as follows (and also declared
-		as global constants/vars in this file):
+		as global constants/vars in this file)::
+		
 		  IDLE = 0		# dsp completely idle
 		  STANDBY = 1	# running, no display, no tank..
 		  PREVIEW = 2	# running, not saving to tank
 		  RECORD = 3	# running and saving all data
+		  
 		"""
 		if not mode is None:
 			self.tdev_invoke('SetSysMode', mode)
@@ -472,7 +478,7 @@ class TDTClient:
 		else:
 			self.tdev_mode(PREVIEW)
 			newblock = self.ttank_invoke('GetHotBlock')
-			
+
 		# and return the tank & block name --> this is enough info to
 		# find the record later..
 		tank = self.tdev_invoke('GetTankName')
@@ -517,7 +523,7 @@ class TDTClient:
 				self.tdev_invoke('SetTargetVal', 'Amp1.aSnip~%d' % n, t)
 				self.tdev_invoke('WriteTargetVEX',
 								 'Amp1.cSnip~%d' % n, 0, 'F32', h)
-			
+
 def loopforever():
 	while 1:
 		try:

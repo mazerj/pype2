@@ -735,21 +735,21 @@ def deg2pix(d, deg):
 
 def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	"""Find all saccades in a trial
-	
+
 	Thu Apr 5 13:33:12 2001 mazer
-	
+
 	This function is carefully hand tuned. The steps are as follows:
-	
+
 	- decimates eye signal back down to 120hz (iscan speed)
-	
+
 	- compute the velocity signal
-	
+
 	- smooth velocity with a running average (5pt)
-	
+
 	- find velocity spikes that exceed thresh
-	
+
 	- Two saccades within <mindur>ms are essentially considered to be
-      one noisy saccade and the second one is discarded::
+	  one noisy saccade and the second one is discarded::
 
 		vel  /\                   /\                     /\       / ...
 		 ___/  \_________________/  \___________________/  \_____/
@@ -757,25 +757,25 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 		       |                |   |                 |
 		       t0               t1  t2                t3
 		                            <-------------------------------
-		                            |                 |   |          
+		                            |                 |   |
 		                            t0                t1  t2
-									
+
 	- So, to compute a real fixation triggered PSTH, you allign allthe
-      rasters up on 't2' and only count spikes from t0-t3.
+	  rasters up on 't2' and only count spikes from t0-t3.
 
 	- The output of this function is a complicated list::
-	
+
 	    [
 	    (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
 	    (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
 	    (t0,t1,t2,t3,t0i,t1i,t2i,t3i,fx,fy,fv,l_fx,l_fy,l_fv),
 	    ....
 	    ]
-	  
+
 	  tN's are the times of the events shown in the diagram above,
 	  while tNi's the indices of those events back into the d.eye[xyt]
 	  arrays.
-	
+
 	  fx,fy are the mean x & y positions between t2-t3 and l_fx, l_fy
 	  are the position of the last fixation.  fv and l_fv refer to the
 	  calibration state of fx/fy and l_fx/l_fy respectively.  If fv is
@@ -784,12 +784,12 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	  SUPPLIED.
 
 	Mon Oct	 7 10:59:13 2002 mazer
-	
+
 	- Added maxthresh -- if (vel > maxthresh), assume it's a blink and
 	  don't put it in the list..
-	  
+
 	"""
-	
+
 	start = 0
 	stop = len(d.eyet)
 
@@ -809,7 +809,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 		# guess at sampling period in ms:
 		fs = mean(diff(d.eyet))
 		decimate_by = int(0.5 + (8.0 / fs))
-		
+
 	if decimate > 1:
 		t = decimate(d.eyet[start:stop], decimate_by)
 		x = decimate(d.eyex[start:stop], decimate_by)
@@ -822,7 +822,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	dx = x[1:] - x[0:-1]
 	dy = y[1:] - y[0:-1]
 	dt = t[1:] - t[0:-1]
-	
+
 	dxy = ((dx**2 + dy ** 2) ** .5) / dt
 	dxy = smooth(dxy, 2)
 
@@ -846,7 +846,7 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 			realti = t[ix]
 			ix0 = ix
 			break
-		
+
 	if realti is None:
 		# no fixations found..
 		return []
@@ -920,15 +920,18 @@ def findfix(d, thresh=2, dur=50, anneal=10, start=None, stop=None):
 	events.
 
 	NOTE: start and stop are index values, NOT TIMES!
-	
+
 	Returns list of tuples::
-	
-	  [(start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
+
+	  [
+	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
 	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos),
 	   .......
-	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos)]
+	   (start_ix, stop_ix, start_ms, stop_ms, mean_xpos, mean_ypos)
+	  ]
 
 	Note: 100 deg/sec -> 1800pix/sec -> 1.8pix/ms
+
 	"""
 
 	# calculate v (velocity profile from XY position)
@@ -991,12 +994,11 @@ def fatal_unpickle_error():
 		sys.stderr.write(' PYTHONPATH=%s\n' % os.environ['PYTHONPATH'])
 		sys.stderr.write('***************************************\n')
 		sys.stderr.write(get_traceback())
-		
-								 
+
 def parseargs(argv, **kw):
 	newargv = []
 	newargv.append(argv[0])
-	
+
 	for arg in argv[1:]:
 		if arg[0] == '-':
 			l = string.split(arg, '=')
@@ -1018,5 +1020,3 @@ else:
 		loadwarn(__name__)
 	except ImportError:
 		pass
-		
-

@@ -1,7 +1,11 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-Simple (useful) vector operations. Tries to use Numeric, if available.
+**Simple vector operations**
+
+Implements a bunch of common but useful vector operations using
+Numeric (if possible). If Numeric's not available, tries to fall
+back to (slower) raw-python.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 

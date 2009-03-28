@@ -1,7 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-Ancient version of sprite.py **DO NOT USE**
+**Ancient version of sprite.py -- DO NOT USE**
 
 Author -- James A. Mazer (james.mazer@yale.edu)
 

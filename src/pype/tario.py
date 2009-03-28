@@ -1,7 +1,7 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-Simple wrapper to read tarfiles through pipes.
+**Read tar/tar.gz files through pipes**
 
 This is *not* a very efficient implementation.
 
