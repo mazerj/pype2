@@ -29,14 +29,14 @@ Mon Jun 25 12:21:40 2007 mazer
 
 Thu Jun 28 10:41:43 2007 mazer
 
-- Switched use of ScrolledText to Pmw.ScrolledText -- didn't realize
+- Switched use of ScrolledText to Pmw.ScrolledText - didn't realize
   there was a Tkinter version (that doesn't properly resize!). Hmmm,
-  actually this is a problem -- doesn't work for Tally window, so I
+  actually this is a problem - doesn't work for Tally window, so I
   reverted back to Tkinter's version..
 
 Thu Mar 26 15:55:05 2009 mazer
 
-- Merged in pbar.py (progress bar) stuff -- should have been here
+- Merged in pbar.py (progress bar) stuff - should have been here
   all along.
 
 Fri Mar 27 13:39:49 2009 mazer
@@ -50,6 +50,8 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
+import time
+import string
 from Tkinter import *
 import Pmw
 import pypeversion
@@ -131,9 +133,19 @@ class Logger:
 	logwindow = None
 	buffered = []
 	msgs = {}
+	
 	def __init__(self, text=None, window=None, popup=None, once=None):
-		import time
+		# handle multi-line message recursively..
+		if text:
+			if not text[-1] == '\n':
+				text = text + '\n'
+			s = string.split(text, '\n')
+			if len(s) > 2:
+				for n in range(len(s)-1):
+					Logger(text=s[n], window=window, popup=popup, once=once)
+				return
 
+		# otherwise, this is single-line message, just log it..
 		if once:
 			if Logger.msgs.has_key(text):
 				return
@@ -143,7 +155,7 @@ class Logger:
 		if not text is None:
 			(year, month, day,
 			 hour, min, sec, x1, x2, x3) = time.localtime(time.time())
-			text = '%02d:%02d:%02d -- %s' % (hour, min, sec, text)
+			text = '%02d:%02d:%02d: %s' % (hour, min, sec, text)
 		
 		if window:
 			Logger.logwindow = window
@@ -468,7 +480,7 @@ class ProgressBar:
 	Indicate progress for a long running task.
 
 	This is for when you know how long something is going to
-	take -- you can specify the percentage done.
+	take - you can specify the percentage done.
 	"""
 
 	def __init__(self, width=200, height=22,

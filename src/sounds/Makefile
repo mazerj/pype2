@@ -4,7 +4,7 @@ FILES = *
 
 install:
 	for i in $(FILES); \
-		do (cp $$i $(PYPEDIR)/lib);\
+		do (cp $$i $(PYPEDIR)/pype);\
 		done
 
 clean:

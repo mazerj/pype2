@@ -122,13 +122,12 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-import sys, types, string, os
+import sys, types, string, os, posix
 import math, Numeric, time
 from vectorops import *
 from pype import *
+import tdtspikes, ttank
 import re
-
-from pypedebug import keyboard
 
 class PypedataTimeError(Exception):
 	"""Serious bad voodoo in the datafile!
@@ -252,8 +251,6 @@ class PypeRecord:
 		
 	def debugprint(self, params=1, events=1, rest=1, spikes=1, syncs=1,
 				   file=sys.stderr):
-		from pypedebug import ppDict
-		
 		file.write("================================\n")
 		file.write("taskname='%s'\n	 %s\n" % (self.taskname,
 											  type(self.taskname)))
@@ -498,7 +495,6 @@ class PypeFile:
 	def __init__(self, fname, filter=None, status=None, quiet=None):
 		flist = string.split(fname, '+')
 		if len(flist) > 1:
-			import posix
 			if flist[0][-3:] == '.gz':
 				cmd = 'gunzip --quiet -c %s ' % string.join(flist,' ')
 			else:
@@ -510,15 +506,13 @@ class PypeFile:
 		elif fname[-3:] == '.gz':
 			# it appears MUCH faster to open a pipe to gunzip
 			# than to use the zlib/gzip module..
-			import posix
 			self.fp = posix.popen('gunzip --quiet <%s 2>/dev/null' % fname, 'r')
 			if not quiet:
 				sys.stderr.write('decompressing: %s\n' % fname)
 			self.fname = fname[:-3]
 			self.zfname = fname[:]
 		elif not posixpath.exists(fname) and \
-			 posixpath.exists(fname+'.gz'):
-			import posix
+				 posixpath.exists(fname+'.gz'):
 			# if .gz file exists and the named file does not,
 			# try using the .gz file instead...
 			self.fname = fname
@@ -640,8 +634,6 @@ class PypeFile:
 		return rec
 
 	def tdtpull(self, rec):
-		import tdtspikes, ttank
-
 		n = rec.recnum
 
 		try:
@@ -857,7 +849,6 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 	state = 2
 	SList = [];
 	fx, fy, fv, lfx, lfy, lfv = None, None, None, None, None, None
-	#keyboard()
 	for ix in range(ix0, len(dxy)):
 		realix = ix * decimate_by
 		realti = t[ix]

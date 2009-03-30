@@ -82,8 +82,8 @@ install: dummy_server \
 	cp dummy_server $(PYPEDIR)/bin
 	cp das16_server $(PYPEDIR)/bin
 	cp das08_server $(PYPEDIR)/bin
-	cp dacq.py $(PYPEDIR)/lib
-	cp _dacqmodule.so $(PYPEDIR)/lib
+	cp dacq.py $(PYPEDIR)/pype
+	cp _dacqmodule.so $(PYPEDIR)/pype
 	#cp libeyelinkcore.so $(PYPEDIR)/lib
 	if [ -x comedi_server ]; then cp comedi_server $(PYPEDIR)/bin; fi;
 

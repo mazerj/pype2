@@ -9,7 +9,7 @@ build:
 		done
 
 install: build
-	@cp *.py $(PYPEDIR)/lib
+	@cp *.py $(PYPEDIR)/pype
 
 clean:
 	@/bin/rm -f *.py

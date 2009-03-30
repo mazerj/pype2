@@ -26,7 +26,7 @@ from Dialog import Dialog
 
 import os
 import fnmatch
-
+import string
 
 dialogstates = {}
 
@@ -50,8 +50,6 @@ def _comparedatafiles(a, b):
     - and this is the 3rd (0,1,2) datafile collected for cell m0037
                              
     """
-    
-    import string
     try:
         if int(string.split(a, '.')[2]) > int(string.split(b, '.')[2]):
             return -1

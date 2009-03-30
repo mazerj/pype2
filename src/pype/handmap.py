@@ -60,10 +60,12 @@ __id__       = '$Id$'
 
 import sys
 import math
+import cPickle
 
 from pype import *
 from Tkinter import *
 from events import *
+import pypedebug
 
 def _bool(state):
 	if state:
@@ -113,7 +115,6 @@ class _Probe:
 			self.load()
 		except:
 			# [[effort to remove all unnamed exceptions:
-			import pypedebug
 			pypedebug.get_traceback(1)
 			# effort to remove all unnamed exceptions:]]
 			reporterror()
@@ -124,7 +125,6 @@ class _Probe:
 		self.clear()
 
 	def save(self):
-		import cPickle
 		x = Holder()
 
 		x.lock = self.lock
@@ -153,7 +153,6 @@ class _Probe:
 		file.close()
 		
 	def load(self):
-		import cPickle
 		try:
 			file = open(pyperc('hmapstim'), 'r')
 			x = cPickle.load(file)

@@ -227,9 +227,7 @@ def LoadTimestampFile(filename, search=1):
 		return None
 
 def FindTimestampFile(pypefile, search=None):
-	import os
-	import string
-	import posixpath
+	import os, string, posixpath
 
 	f = '%s.plx.ts' % pypefile
 	if posixpath.exists(f):

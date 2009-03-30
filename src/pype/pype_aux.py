@@ -30,7 +30,14 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-import random, sys, time, posixpath
+import random
+import sys
+import time
+import posixpath
+import os
+import re
+import string
+import cPickle
 
 _tic = None
 
@@ -110,8 +117,6 @@ class Timestamp:
 
 class Logfile:
 	def __init__(self, filename, autodate=None, autonum=None):
-		import os
-
 		if filename:
 			if autodate:
 				filename = "%s.%s" % (filename,
@@ -345,8 +350,6 @@ def param_expand(s, integer=None):
 	**returns** -- float or integer matching parameter string
 	specification.
 	"""
-	import re, string
-
 	if integer:
 		return int(round(param_expand(s, integer=None)))
 
@@ -432,22 +435,20 @@ def labeled_dump(label, obj, f, bin=0):
 	Prepends ascii tag line and then dumps a pickled
 	version of the object.
 	"""
-	from cPickle import dump
 	f.write('<<<%s>>>\n' % label)
-	dump(obj, f, bin)
+	cPickle.dump(obj, f, bin)
 
 def labeled_load(f):
 	"""Wrapper for cPickle.load.
 
 	Inverse of labeled_dump().
 	"""
-	from cPickle import load
 	while 1:
 		l = f.readline()
 		if not l:
 			return None, None
 		elif l[:3] == '<<<' and l[-4:] == '>>>\n':
-			return l[3:-4], load(f)
+			return l[3:-4], cPickle.load(f)
 
 def pp_encode(e):
 	"""Pretty-print an event list.

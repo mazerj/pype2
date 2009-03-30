@@ -43,13 +43,18 @@ import math
 import os
 import sys
 import types
+import cPickle
+import string
 from Tkinter import *
-from guitools import *
+import tkSimpleDialog
 import Pmw
-from pype_aux import lastfile, nextfile, Timestamp
-from filebox import Open, SaveAs
-from beep import beep
 
+from pype import *
+from guitools import *
+import pype_aux
+import beep
+import sprite
+import filebox
 
 class UserDisplay:
 	def __init__(self, master, cwidth=1024, cheight=768,
@@ -359,14 +364,12 @@ class UserDisplay:
 		self._eye_ly = y
 		self._canvas.coords(self.eye, x-sz, y-sz, x+sz, y+sz);
 
-		from sprite import Sprite
-		self.scount.config(text="%d sprites" % len(Sprite.__list__))
+		self.scount.config(text="%d sprites" % len(sprite.Sprite.__list__))
 
 
 	def showsprites(self):
-		from sprite import Sprite
 		for n in range(0, len(Sprite.__list__)):
-			Logger('%d: "%s"\n' % (n, Sprite.__list__[n]))
+			Logger('%d: "%s"\n' % (n, sprite.Sprite.__list__[n]))
 
 	def fb2can(self, x, y=None):
 		"""convert frame buffer coords to canvas coords"""
@@ -570,7 +573,7 @@ class UserDisplay:
 			self._canvas.delete(t)
 			self.points.remove(self.points[nearest])
 		else:
-			beep(4000, 10)
+			beep.beep(4000, 10)
 
 	def querypoint(self, x, y):
 		"""
@@ -600,12 +603,9 @@ class UserDisplay:
 
 	def savepoints(self, filename=None):
 		"""Save points to file"""
-		import cPickle
 		if filename is None:
-			from filebox import SaveAs
-			from pype import subjectrc
-			(filename, mode) = SaveAs(initialdir=subjectrc(),
-									  pattern="*.pts", append=None)
+			(filename, mode) = filebox.SaveAs(initialdir=subjectrc(),
+											  pattern="*.pts", append=None)
 		if filename:
 			file = open(filename, 'w')
 			cPickle.dump(self.points, file)
@@ -613,12 +613,9 @@ class UserDisplay:
 
 	def loadpoints(self, filename=None, merge=None):
 		"""Load points from file (pickle file make by savepoints)"""
-		import cPickle
 		if filename is None:
-			from filebox import Open
-			from pype import subjectrc
-			(filename, mode) = Open(initialdir=subjectrc(),
-									pattern="*.pts")
+			(filename, mode) = filebox.Open(initialdir=subjectrc(),
+											pattern="*.pts")
 			if filename is None:
 				return
 		try:
@@ -645,13 +642,9 @@ class UserDisplay:
 		One point per line containing X and Y position in
 		pixels separated by commas or spaces
 		"""
-		import string
-
 		if filename is None:
-			from filebox import Open
-			from pype import subjectrc
-			(filename, mode) = Open(initialdir=subjectrc(),
-									pattern="*.asc")
+			(filename, mode) = filebox.Open(initialdir=subjectrc(),
+											pattern="*.asc")
 			if filename is None:
 				return
 		try:
@@ -864,7 +857,7 @@ class UserDisplay:
 				)
 		if file:
 			fp = open(file, 'w')
-			fp.write('%% %s\n' % Timestamp())
+			fp.write('%% %s\n' % pype_aux.Timestamp())
 			fp.write('% fiduciary mark data\n')
 			fp.write('%\n')
 			fp.write('% fix position (x,y) in framebuf coords:\n')
@@ -890,7 +883,6 @@ class UserDisplay:
 		return (xs, ys, r)
 
 	def loadfidmarks(self, file=None):
-		from string import split
 		if file is None:
 			(file, mode) = Open(initialdir=os.getcwd(),
 								pattern='*.fid')
@@ -901,13 +893,13 @@ class UserDisplay:
 				l = fp.readline()
 				if not l: break
 				if l[0] == 'f':
-					(foo, x, y) = split(l)
+					(foo, x, y) = string.split(l)
 					self._fixset(x=int(x), y=int(y))
 				elif l[0] == 'p':
-					(foo, n, x, y) = split(l)
+					(foo, n, x, y) = string.split(l)
 					self._putfidmark(int(x), int(y), update=0)
 				if l[0] == 'm':
-					(foo, n, x, y) = split(l)
+					(foo, n, x, y) = string.split(l)
 					self.markstack.append((int(x), int(y)))
 					self.markstack = self.markstack[-2:]
 					self.drawbox()
@@ -928,7 +920,7 @@ class UserDisplay:
 				except ValueError:
 					initf = "%s%s.fid" % (subj, cell)
 		else:
-			initf=nextfile('marks.%04d.fid')
+			initf=pype_aux.nextfile('marks.%04d.fid')
 
 		if file is None:
 			(file, mode) = SaveAs(initialdir=os.getcwd(),
@@ -1055,13 +1047,11 @@ class UserDisplay:
 		self._fixset(x=0, y=0)
 
 	def _fixxy(self, ev=None):
-		from tkSimpleDialog import askstring
-		from string import split
-
-		s = askstring('fixspot', 'new fixspot:',
-					  initialvalue='%d,%d' % (self.fix_x, self.fix_y))
+		s = tkSimpleDialog.askstring('fixspot', 'new fixspot:',
+									 initialvalue='%d,%d' % \
+									 (self.fix_x, self.fix_y))
 		if s:
-			s = split(s, ',')
+			s = string.split(s, ',')
 			if len(s) == 2:
 				self._fixset(x=int(s[0]), y=int(s[1]))
 
@@ -1105,23 +1095,21 @@ class FID:
 			self.file = file
 
 	def _load(self, file):
-		from string import split
-
 		f = open(file, 'r')
 		while 1:
 			l = f.readline()
 			if not l:
 				break
 			if l[0] == 'f':
-				(foo, x, y) = split(l)
+				(foo, x, y) = string.split(l)
 				self.fx = int(x)
 				self.fy = int(y)
 			elif l[0] == 'p':
-				(foo, n, x, y) = split(l)
+				(foo, n, x, y) = string.split(l)
 				self.x.append(int(x))
 				self.y.append(int(y))
 			elif l[0] == 'r':
-				(foo, cx, cy, r) = split(l)
+				(foo, cx, cy, r) = string.split(l)
 				self.cx = float(cx)
 				self.cy = float(cy)
 				self.r = float(r)

@@ -16,7 +16,7 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-import os, sys, posixpath
+import os, sys, posixpath, stat
 
 class SimpleConfig:
     def __init__(self, fname):
@@ -31,8 +31,6 @@ class SimpleConfig:
             self.fname = os.path.expanduser('~') + '/' + fname
 
     def _load(self):
-        import os, stat
-        
         if not posixpath.exists(self.fname):
             self._config = {}
         else:

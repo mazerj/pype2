@@ -52,15 +52,20 @@ __revision__ = '$Revision$'
 __id__       = '$Id$'
 
 import sys
+import os
+import time
 import errno
 import time
 import socket
 import cPickle
+import struct
+import traceback
+import types
 
 try:
-	from pypedebug import keyboard
+	import win32com.client
 except ImportError:
-	pass
+	pass								# only works on windows machines..
 
 try:
 	from Numeric import *
@@ -79,7 +84,6 @@ PORT=10000
 DEBUG=1
 
 def log(msg=None):
-	import sys, os, time
 	if msg is None:
 		sys.stderr.write('\n')
 	else:
@@ -90,7 +94,6 @@ def log(msg=None):
 
 class _Socket:
 	def Send(self, data):
-		import struct
 		self.conn.send(struct.pack('!I', len(data)))
 		return self.conn.sendall(data)
 
@@ -125,7 +128,6 @@ class _Socket:
 					raise
 
 	def Receive(self, size=1024):
-		import struct
 		buf = self._recv(struct.calcsize('!I'))
 		if not len(buf):
 			raise EOFError, '_Socket.Receive()'
@@ -193,7 +195,6 @@ class TDTServer:
 	def __init__(self, Server='Local', tk=None):
 		# importing win32com stuff will fail on a unix box, so be
 		# ready to print an error message and die..
-		import win32com.client
 		global TDevAcc, TTank
 
 		self.Server = Server
@@ -226,7 +227,6 @@ class TDTServer:
 
 	def listen(self):
 		global TDevAcc, TTank
-		import traceback
 
 		while 1:
 			server = _SocketServer()
@@ -340,8 +340,6 @@ class TDTClient:
 		return (ok, result)
 
 	def tdev_invoke(self, method, *args):
-		import types
-
 		(ok, result) = self._sendtuple(('TDevAcc', method, args,))
 		if ok:
 			return result
@@ -349,8 +347,6 @@ class TDTClient:
 			raise TDTError, 'TDev Error; cmd=<%s>; err=<%s>' % (method, result)
 
 	def ttank_invoke(self, method, *args):
-		import types
-
 		(ok, result) = self._sendtuple(('TTank', method, args,))
 		if ok:
 			return result

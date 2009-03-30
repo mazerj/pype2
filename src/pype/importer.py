@@ -13,36 +13,26 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-import __builtin__
-import imp, sys
+import __builtin__, imp, sys
 from guitools import Logger
 
+_original_import =  __builtin__.__import__
 
-def __new_import__(*args):
-    if not __data__.has_key(args[0]):
-        fp, pathname, description = imp.find_module(args[0])
-        if fp is not None:
-            fp.close()
-            # only report non-python imports
-            if not pathname.startswith('/usr/lib/python'):
-                Logger("{import '%s' <- '%s'}\n" % \
-                       (args[0], pathname))
-        __data__[args[0]] = 1
+def _verbose_import(*args):
+    fp, pathname, description = imp.find_module(args[0])
+    if fp is not None:
+        fp.close()
+        # only report non-python imports
+        if not pathname.startswith('/usr/lib/python'):
+            Logger("importing '%s' from '%s'\n" % (args[0], pathname))
     return apply(__original_import__, args)
 
-
-__data__ = {}
 __original_import__ = __builtin__.__import__
 
-def importer(on=1):
-    if __builtin__.__import__ == __new_import__:
-        was = 1
+def importer(report=1):
+    if report:
+        __builtin__.__import__ = _verbose_import
     else:
-        was = 0
-        
-    if on:
-        __builtin__.__import__ = __new_import__
-    else:
-        __builtin__.__import__ = __original_import__
+        __builtin__.__import__ = _original_import
 
-    return was
+

@@ -14,7 +14,7 @@ import glob
 import tdt
 
 #from pype import *
-from pypedebug import *
+import pypedebug
 
 class Controller:
     def __init__(self, app, tdthost):
@@ -40,7 +40,6 @@ class Controller:
         except:
             warn('tdt save', 'Error saving TDT hoops');
 			# [[effort to remove all unnamed exceptions:
-			import pypedebug
 			pypedebug.get_traceback(1)
 			reporterror()
 			# effort to remove all unnamed exceptions:]]
@@ -63,8 +62,7 @@ class Controller:
         except:
             warn('tdt restore', 'Error restoring TDT hoops');
 			# [[effort to remove all unnamed exceptions:
-			import pypedebug
-			pypedebug.get_traceback(1)
+			get_traceback(1)
 			# effort to remove all unnamed exceptions:]]
             reporterror()
 

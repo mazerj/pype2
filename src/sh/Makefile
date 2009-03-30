@@ -1,6 +1,6 @@
 include ../../make.defs
 
-SHFILES = pypesetup pypeconfig pypekill pypenv-batch pype pypenv
+SHFILES = pypesetup pypedocs pypeconfig pypekill pypenv-batch pype pypenv
 
 install:
 	for i in $(SHFILES); \

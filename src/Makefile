@@ -3,7 +3,7 @@ include ../make.defs
 DACQDIR = dacq3
 DUMMYDIR= dummy-dacq
 PYDIR   = pype
-SUBDIRS = sh icons sounds sample-tasks Plexon p2m tools
+SUBDIRS = sh sample-tasks Plexon p2m tools
 
 install: install-subdirs install-py install-dacq
 
@@ -14,14 +14,15 @@ install-shared: install-subdirs install-py-shared install-dummydacq
 install-subdirs:
 	@mkdir -p $(PYPEDIR)
 	@mkdir -p $(PYPEDIR)/bin
+	@mkdir -p $(PYPEDIR)/pype
 	@mkdir -p $(PYPEDIR)/lib
 	@mkdir -p $(PYPEDIR)/Tasks
 	@mkdir -p $(PYPEDIR)/../p2m
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; $(MAKE) install);\
 		done
-	@rm -rf $(PYPEDIR)/lib/Pmw*
-	@sh pmw.sh $(PYPEDIR)/lib
+	@rm -rf $(PYPEDIR)/pype/Pmw*
+	@sh pmw.sh $(PYPEDIR)/pype
 
 install-p2m:
 	@mkdir -p $(PYPEDIR)/../p2m

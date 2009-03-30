@@ -11,9 +11,19 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-import sys, time
+import sys
+import os
+import time
+import traceback
 import socket
 import cPickle
+import struct
+import types
+
+try:
+	import win32com.client
+except ImportError:
+	pass							# only works on windows machines..
 
 class TDTError(Exception): pass
 
@@ -32,12 +42,10 @@ DEBUG=0
 
 class _Socket:
 	def Send(self, data):
-		import struct
 		self.conn.send(struct.pack('!I', len(data)))
 		return self.conn.sendall(data)
 	
 	def Receive(self, size=8192):
-		import struct
 		buf = self.conn.recv(struct.calcsize('!I'))
 		if not len(buf):
 			raise EOFError, '_Socket.Receive()'
@@ -86,9 +94,6 @@ class _SocketClient(_Socket):
 
 class TTankServer:
 	def __init__(self, Server='Local', tk=None):
-		# this throws ImportError under linxu; should be caught
-		import win32com.client
-
 		# only need global decl to Modify TTank!
 		global TTank
 		self.Server = Server
@@ -96,7 +101,6 @@ class TTankServer:
 		TTank = win32com.client.Dispatch('TTank.X')
 
 	def log(self, msg=None):
-		import sys, os, time
 		if msg is None:
 			sys.stderr.write('\n')
 		else:
@@ -126,8 +130,6 @@ class TTankServer:
 		TTank.ReleaseServer()
 
 	def listen(self):
-		import traceback
-		
 		server = _SocketServer()
 		while 1:
 			self.log('Waiting for client connection')
@@ -223,8 +225,6 @@ class TTank:
 		return (ok, result)
 
 	def invoke(self, method, *args):
-		import types
-
 		(ok, result) = self._send(('TTank', method, args,))
 		if ok:
 			return result

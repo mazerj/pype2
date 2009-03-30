@@ -20,9 +20,11 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
+import pype
 from Tkinter import *
-from pype import *
 from pype_aux import uniform
+import posixpath
+from sprite import *
 
 def bounce(app):
 	if app.running: return
@@ -85,7 +87,6 @@ def bounce(app):
 		if (y > (app.fb.h/3)) or (y < -(app.fb.h/3)):
 			dy = -dy
 			y = y + dy
-
 	app.udpy.icon()
 	for s in slist:
 		del s
@@ -93,9 +94,6 @@ def bounce(app):
 	app.idlefb()
 
 def slideshow(app):
-	import posixpath
-	import pype
-	
 	if app.running: return
 
 	if not app.tk:

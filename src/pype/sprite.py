@@ -89,6 +89,7 @@ import pwd
 import types
 import math
 import copy
+import exceptions
 
 from Numeric import *
 import pygame
@@ -102,11 +103,14 @@ import pygame.surfarray
 import pygame.transform
 import pygame.movie
 from pygame.constants import *
-from spritetools import *
+import Image
 
-from rootperm import *
-from pypedebug import keyboard
+
+import pype
+from rootperm import root_take, root_drop
 from guitools import Logger
+from stats import mean, stdev
+from spritetools import *
 
 try:
 	# Shinji added 17-Jan-2006:
@@ -142,6 +146,15 @@ def _pygl_setxy(x, y):
 	# 24-jan-2006 shinji
 	glRasterPos2i(0,0)
 	glBitmap(0, 0, 0, 0, x, y, '\0')
+
+def checklshift():
+	pygame.event.pump()
+	return KMOD_LSHIFT & pygame.key.get_mods()
+
+def checkrshift():
+	pygame.event.pump()
+	return KMOD_RSHIFT & pygame.key.get_mods()
+
 
 class FrameBuffer:
 	def __init__(self, dpy, width, height, bpp, fullscreen,
@@ -389,8 +402,6 @@ class FrameBuffer:
 		exact frame rate and keep track of in with your data.
 
 		"""
-		from pype import Timer
-
 		# try to estimate current frame rate
 		oldsync = self.phdiode_mode
 		self.phdiode_mode = 0
@@ -401,7 +412,7 @@ class FrameBuffer:
 
 		intervals = []
 		
-		t = Timer()
+		t = pype.Timer()
 
 		# page flip for up to a second..
 		self.flip()
@@ -422,7 +433,6 @@ class FrameBuffer:
 		# interval
 		# this is ROUGH median -- if len(intervals) is odd, then it's
 		# not quite right, but it should be close enough..
-		from stats import mean, stdev
 		sd = stdev(intervals)
 		m = mean(intervals)
 		k = []
@@ -482,7 +492,6 @@ class FrameBuffer:
 		get called automatically.
 
 		"""
-		import exceptions
 		try:
 			del self._sync_low
 			del self._sync_high
@@ -638,8 +647,7 @@ class FrameBuffer:
 
 		pygame.display.flip()
 		if self.fliptimer is None:
-			from pype import Timer
-			self.fliptimer = Timer()
+			self.fliptimer = pype.Timer()
 		else:
 			elapsed = self.fliptimer.ms()
 			self.fliptimer.reset()
@@ -652,18 +660,6 @@ class FrameBuffer:
 
 		if not self.opengl:
 			self.screen.set_at((0,0), self.screen.get_at((0,0)))
-
-		if 0:
-			ar = float(self.w) / float(self.h)
-			w = 256
-			h = int(0.5 + w / ar)
-			i = Image.fromstring('RGBA', self.screen.get_size(),
-								 pygame.image.tostring(self.screen, 'RGBA'))
-			i = i.resize((w,h))
-			self._snap = ImageTk.PhotoImage(i)
-			i = self.app.udpy._canvas.create_image(self.w-w, 0,
-												   anchor=Tkinter.NW,
-												   image=self._snap)
 
 	def string(self, x, y, s, color, flip=None, prefill=None, size=30):
 		"""Draw string on framebuffer
@@ -823,7 +819,6 @@ class FrameBuffer:
 		returns PIL Image structure containing the snapshot (can
 		be converted th PhotoImage for display in Tkinter/Canvas..)
 		"""
-		import Image
 		pil = Image.fromstring('RGBA', self.screen.get_size(),
 							   pygame.image.tostring(self.screen, 'RGBA'))
 		if filename:
@@ -1276,8 +1271,6 @@ class Sprite(_ImageBase):
 		**returns** -- PhotoImage represenation of the sprite's pixels.
 
 		"""
-		import Image, ImageTk
-
 		if alpha:
 			im = self.im.convert()
 			im.set_alpha(alpha)

@@ -9,13 +9,15 @@ install-shared: pypeversion install-pypelib \
 
 install-pypelib:
 	@for i in $(FILES); \
-		do (cp $$i $(PYPEDIR)/lib);\
+		do (cp $$i $(PYPEDIR)/pype);\
 		done
 	@echo ""
 	@cp cour.ttf $(PYPEDIR)/lib
-	@cp pypeversion.py $(PYPEDIR)/lib
+	@cp pypeversion.py $(PYPEDIR)/pype
 	@rm pypeversion.py
 	@(cd ./icons ; $(MAKE) install)
+	@cp testpat.pgm $(PYPEDIR)/lib
+	@rm $(PYPEDIR)/pype/__init__.py
 
 install-pyperun:
 	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.template | \

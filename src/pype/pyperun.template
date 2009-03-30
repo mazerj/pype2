@@ -37,8 +37,9 @@ Mon Sep 18 10:00:05 2006 mazer
   SUBJECT       subject id (for subject-specific config files)
 """
 
-debug = 0
-showdir = 0
+_debug = 0
+_showdir = 0
+_showimports = 1
 
 import sys, posixpath, os, glob, string, traceback
 
@@ -47,17 +48,17 @@ original_argv = sys.argv[:]
 av = []
 for a in sys.argv:
     if a == '--debug':
-        debug = 1
+        _debug = 1
     elif a[:2] == 's=':
         os.environ['SUBJECT'] = a[2:]
     elif a == '--dir':
-        showdir = 1
+        _showdir = 1
     else:
         av.append(a)
 sys.argv = av
 
-if debug:
-    os.environ['PYPEDEBUG'] = "yes"
+if _debug:
+    os.environ['PYPEEDEBUG'] = "yes"
     sys.stderr.write('orig argv: %s\n' % original_argv)
     sys.stderr.write('     argv: %s\n' % sys.argv)
 
@@ -95,7 +96,7 @@ def run_python_script(fullname, debug):
 
 		sys.argv[0] = pathname
         try:
-            if debug:
+            if _debug:
                 sys.stderr.write("[script '%s' from '%s']\n" % \
                                  (fullname, pathname))
             mod = imp.load_module('__main__', fp, pathname, description)
@@ -116,7 +117,7 @@ if not os.environ.has_key('PYPEDIR'):
     sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
                      os.environ['PYPEDIR'])
 
-if showdir:
+if _showdir:
     print os.environ['PYPEDIR']
     sys.exit(0)
 
@@ -134,9 +135,13 @@ if showdir:
 
 original_path = sys.path[:]
 
+# Sun Mar 29 15:07:18 2009 mazer
+# removed pd+'lib' and added pd to search path -- pype's now a proper package
 pd = os.environ['PYPEDIR']+'/'
-for d in [pd+'Tasks', pd+'lib', pd+'Modules', '.']:
-    addpath(d)
+for d in ['pype', 'Tasks', 'Modules']:
+    addpath(pd + d)
+addpath('.')
+    
 
 # PREFIX specific user-defined paths that can contain. PYPEPATH should
 # be a standard colon-delimted set of paths to search
@@ -156,16 +161,10 @@ if os.environ.has_key('LD_LIBRARY_PATH'):
 # now that $PYPEDIR is partially setup, pype and pype modules
 # should be importable...
 
-# 1st check to see that Numeric and pygame are properly installed:
-from info import libinfo
-info = libinfo()
-for k in ('numeric', 'pygame'):
-    if info[k] is None:
-        sys.stderr.write("Error: %s not installed locally.\n" % k)
-        sys.exit(1)
-
 try:
-	import pype
+    from pype import *
+    from info import libinfo
+    from importer import importer
 except ImportError:
 	(etype, evalue, tb) = sys.exc_info()
 	stack = traceback.extract_tb(tb)
@@ -174,25 +173,34 @@ except ImportError:
     sys.stderr.write("file:%s line:%d --> %s\n" % (fname, line, evalue))
 	sys.exit(1)
 
+
+# 1st check to see that Numeric and pygame are properly installed:
+info = libinfo()
+for k in ('numeric', 'pygame'):
+    if info[k] is None:
+        sys.stderr.write("Error: %s not installed locally.\n" % k)
+        sys.exit(1)
+
 # add the ~/.pyperc directories to the python search path
 for i in ['Tasks', 'Modules']:
-    addpath(pype.pyperc(i))
+    addpath(pyperc(i))
 
-for d in glob.glob(pype.pyperc('Tasks/*')):
+for d in glob.glob(pyperc('Tasks/*')):
     if os.path.isdir(d):
         addpath(d)
 
-import importer
-
-if debug:
-    importer.importer(on=1)
-    sys.stderr.write('Search Path:\n')
+if _showimports:
+    importer(report=1)
+    
+if _debug:
+    sys.stderr.write('-- Search Path -------------\n')
     for d in sys.path:
         if len(d) > 0:
             if d in original_path:
                 sys.stderr.write('   %s\n' % d)
             else:
                 sys.stderr.write(' + %s\n' % d)
+    sys.stderr.write('----------------------------\n')
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
     # *** Invoked as pypenv ***
@@ -227,7 +235,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
         # and let run_python_script() replace the -s with the module
         # name and then go ahead and load+run the module.
         sys.argv = sys.argv[2:]
-        if run_python_script(sys.argv[0], debug) == 0:
+        if run_python_script(sys.argv[0], _debug) == 0:
             sys.stderr.write("Can't find module '%s'\n" % sys.argv[0])
             sys.exit(1)
 else:
@@ -238,12 +246,12 @@ else:
     # parse command line
 
     # make sure subject dir exists, if it doesn't go ahead and make it
-    if not posixpath.exists(pype.subjectrc()):
+    if not posixpath.exists(subjectrc()):
         sys.stderr.write('Subject dir does not exist.\n')
-        sys.stderr.write('Building: %s\n' % pype.subjectrc())
+        sys.stderr.write('Building: %s\n' % subjectrc())
         try:
-            os.mkdir(pype.subjectrc())
-            os.chown(pype.subjectrc(), os.getuid(), os.getgid())
+            os.mkdir(subjectrc())
+            os.chown(subjectrc(), os.getuid(), os.getgid())
         except:
             sys.exit(0)
     
@@ -259,12 +267,14 @@ else:
     # startup pype with gui
 	from pype import *
 
-    istate = importer.importer(on=0)
+    if _showimports:
+        importer(report=0)
 	try:
 		app = PypeApp(psych=psych)
 	except FatalPypeError:
 		sys.exit(1)
-    importer.importer(on=istate)
+    if _showimports:
+        importer(report=1)
 
     if len(av) > 0:
         taskname = posixpath.splitext(av[0])[0]
@@ -278,8 +288,5 @@ else:
     while not app.terminate:
         app.idlefn(toplevel=1)
 	app.close()
-    #sys.stderr.write('<closed app>')
     sys.exit(0)
     
-#sys.stderr.write('<pyperun exiting>')
-

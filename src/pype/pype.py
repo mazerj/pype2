@@ -284,7 +284,14 @@ __id__       = '$Id$'
 #####################################################################
 #  system level imports
 #####################################################################
-import sys, os
+import sys
+import os
+import re
+import socket
+import traceback
+import imp
+import exceptions
+import glob
 import string
 import posixpath, posix
 import signal
@@ -295,6 +302,10 @@ import cPickle
 import thread
 from types import *
 from Tkinter import *
+try:
+	import Pmw
+except ImportError:
+	Pmw = None
 
 try:
 	from Numeric import *
@@ -316,11 +327,13 @@ from guitools import *
 from dacq import *
 from pypeerrors import *
 from candy import bounce, slideshow
-
+import PlexHeaders, PlexNet, pype2tdt
+import info
+import filebox
+import iplot
 import userdpy
 import pypeversion
-
-from pygame.constants import *
+import configvars
 
 def pypeapp():
 	"""
@@ -366,10 +379,7 @@ class PypeApp:
 		"""
 
 		# need Pmw (python megawidgets Tkinter addon) for gui
-
-		try:
-			import Pmw
-		except ImportError:
+		if Pmw is None:
 			sys.stderr.write('%s: missing `Pmw` package\n' % __name__)
 			raise PypeFatalError
 
@@ -970,7 +980,7 @@ class PypeApp:
 		self._eye_yoff.pack(expand=0, side=TOP, pady=2, anchor=W)
 
 		Label(setables,
-			  text="Use C-Arrows in UserDisplay to adjust and\n"+
+			  text="Use Ctrl-Arrows in UserDisplay to adjust and\n"+
 			       "the 'Update' button to lock values in").pack(\
 			expand=0, fill=X, side=TOP, pady=10)
 
@@ -1105,8 +1115,10 @@ class PypeApp:
 
 		root_drop()
 		if self.config.iget('NO_AUDIO'):
+			from beep import _Beeper
+			_Beeper(disable=1)
 			# disable the beep subsystem:
-			nobeep()
+			Logger('pype: audio disabled by user config\n')
 		else:
 			if self.config.get('AUDIODRIVER'):
 				audiodriver = self.config.get('AUDIODRIVER')
@@ -1187,7 +1199,6 @@ class PypeApp:
 			Logger('pype: either PLEXHOST *or* TDTHOST (disabled!!)\n', popup=1)
 		elif self.xdacq is None and len(plexhost) > 0:
 			try:
-				import PlexNet
 				self.plex = PlexNet.PlexNet(plexhost,
 											self.config.iget('PLEXPORT'))
 				Logger('pype: connected to plexnet @ %s.\n' % plexhost)
@@ -1212,7 +1223,6 @@ class PypeApp:
 			tankname = subject() + \
 					   '%04d%02d%02d' % time.localtime(time.time())[0:3]
 			try:
-				import pype2tdt
 				self.tdt = pype2tdt.Controller(self, tdthost)
 				Logger('pype: connected to tdt @ %s.\n' % tdthost)
 				t = self.tdt.settank(tankdir, tankname)
@@ -1240,7 +1250,6 @@ class PypeApp:
 			   'pype: PYPERC=%s\n' % pyperc() +
 			   'pype: CWD=%s\n' % os.getcwd())
 		if debug():
-			import info
 			info.print_version_info()
 
 		if self.psych:
@@ -1411,8 +1420,6 @@ class PypeApp:
 		return d
 
 	def make_taskmenu(self, menubar):
-		import glob
-
 		self.add_tasks(menubar, 'sys', pypedir('Tasks'))
 		self.add_tasks(menubar, 'pyperc', pyperc('Tasks'))
 		files = glob.glob(pyperc('Tasks/*'))
@@ -1434,8 +1441,6 @@ class PypeApp:
 			pass
 
 	def add_tasks(self, menubar, dropname, dir):
-		import glob
-
 		if dir[-1] == '/':
 			g = glob.glob(dir+'*.py')
 		else:
@@ -1487,9 +1492,6 @@ class PypeApp:
 		a filename..
 
 		"""
-		import imp
-		import filebox
-
 		if ask:
 			(f, mode) = filebox.Open(pattern='*.py')
 			if f is None:
@@ -1704,7 +1706,6 @@ class PypeApp:
 		hostname is actually defined, otherwise returns 'NOHOST'.
 
 		"""
-		import socket
 		try:
 			return string.split(socket.gethostname(), '.')[0]
 		except:
@@ -1719,8 +1720,6 @@ class PypeApp:
 		returns: (["task" or "module" or None], comment-string)
 
 		"""
-		import re
-
 		re_task = re.compile('.*#.*!TASK!.*')
 		re_module = re.compile('.*#.*!MODULE!.*')
 		comment = None
@@ -2480,9 +2479,7 @@ class PypeApp:
 		window.
 
 		"""
-		import pygame.key, pygame.event
-		pygame.event.pump()
-		return KMOD_LSHIFT & pygame.key.get_mods()
+		return checklshift()
 
 	def rshiftdown(self):
 		"""
@@ -2490,9 +2487,7 @@ class PypeApp:
 		window.
 
 		"""
-		import pygame.key, pygame.event
-		pygame.event.pump()
-		return KMOD_RSHIFT & pygame.key.get_mods()
+		return checktshift()
 
 	def barchanges(self, reset=None):
 		"""
@@ -2594,8 +2589,6 @@ class PypeApp:
 
 	def debug_handler(self, signal, frame):
 		"""This is for catching SIGUSR2's for debugging.."""
-		import traceback
-
 		sys.stderr.write('\n------------------------------Recieved SIGUSR2:\n')
 		traceback.print_stack(frame)
 		keyboard()
@@ -2667,7 +2660,6 @@ class PypeApp:
 		and restore the X11 bell.
 
 		"""
-		import exceptions
 		self.unloadtask()
 
 		if self._testpat:
@@ -3191,8 +3183,6 @@ class PypeApp:
 			f.close()
 
 	def _guess_fallback(self):
-		import glob
-
 		subject = self.sub_common.queryv('subject')
 		train = self.sub_common.queryv('training')
 
@@ -3225,8 +3215,6 @@ class PypeApp:
 									   self.task_name, next)
 
 	def _guess_elog(self):
-		import glob, elogapi
-
 		animal = self.sub_common.queryv('subject')
 		train = self.sub_common.queryv('training')
 		full_animal = self.sub_common.queryv('full_subject')
@@ -3276,8 +3264,6 @@ class PypeApp:
 		self._recfile()
 
 	def record_selectfile(self, fname=None):
-		import filebox
-
 		if not fname is None:
 			self.record_file = fname
 		else:
@@ -3351,8 +3337,6 @@ class PypeApp:
 		self.show_eyetrace_stop = stop
 
 	def plotEyetraces(self, t=None, x=None, y=None, others=None, raster=None):
-		import iplot
-
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
 			oldgraph = attach(self._eyetrace_window)
@@ -3433,8 +3417,6 @@ def pype_hostconfig():
 	dictionary).
 
 	"""
-	import configvars
-
 	cfile = pype_hostconfigfile()
 	return configvars.defaults(cfile)
 
@@ -3873,8 +3855,6 @@ def _get_plexon_events(plex, fc=40000):
 	be discarded.
 
 	"""
-	from PlexHeaders import Plex
-
 	events = None
 
 	hit_stop = 0
@@ -3907,8 +3887,6 @@ def _get_plexon_events(plex, fc=40000):
 
 def _goto_error(title):
 	"""Open editor window at the last error for debugging"""
-	import traceback
-
 	(etype, evalue, tb) = sys.exc_info()
 	stack = traceback.extract_tb(tb)
 	(fname, line, fn, text) = stack[-1]
