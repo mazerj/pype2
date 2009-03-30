@@ -41,6 +41,8 @@ Mon Mar 30 12:13:15 2009 mazer
   about the channels argument: it's number of channels not a
   mono/stereo boolean flag!
 
+  This actually seems to have changed between pygame-1.7 and -1.8..
+
 Mon Mar 30 12:31:57 2009 mazer
 
 - actually the 12/8/2005 notes are now incorrect -- are are
@@ -82,15 +84,25 @@ class _Beeper:
 			try:
 				# negative values for word size indicates to driver
 				# that samples are 'signed'
-				pygame.mixer.init(22050, -16, 2, 8192)
+				if pygame.version.ver[:3] == '1.7':
+					pygame.mixer.init(22050, -16, 1, 8192)
+				else:
+					pygame.mixer.init(22050, -16, 2, 8192)
 			except pygame.error:
 				Logger('_Beeper: probable hardware access error -- disabled\n')
 				_Beeper._disabled = 1
 				return
 				
 			i = pygame.mixer.get_init()
-			Logger('_Beeper: %d hz, %d bits, chans=%d\n' % i)
 			(_Beeper.dafreq, _Beeper.bits, _Beeper.chans) = i
+			if pygame.version.ver[:3] == '1.7':
+				Logger('_Beeper: old pygame.mixer!\n')
+				if _Beeper.chans:
+					_Beeper.chans = 2
+				else:
+					_Beeper.chans = 1
+			Logger('_Beeper: %d hz, %d bits, chans=%d\n' % \
+				   (_Beeper.dafreq, _Beeper.bits, _Beeper.chans))
 			_Beeper.cache = {}
 			_Beeper._init = 0
 		
