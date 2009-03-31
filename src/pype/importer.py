@@ -25,7 +25,7 @@ def _verbose_import(*args):
         # only report non-python imports
         if not pathname.startswith('/usr/lib/python'):
             Logger("importing '%s' from '%s'\n" % (args[0], pathname))
-    return apply(__native_imp__, args)
+    return apply(_native_imp, args)
 
 def importer(report=1):
     if report:

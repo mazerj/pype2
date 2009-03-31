@@ -274,6 +274,12 @@ Fri Mar 27 17:50:18 2009 mazer
 
 - moved eye candy routines (bounce & slideshow) into separate module.
 
+Tue Mar 31 12:48:08 2009 mazer
+
+- new test pattern! automatically scaled to fit the display buffer
+
+- added TESTPAT config-file option for user/rig-specific test pattern
+
 """
 
 __author__   = '$Author$'
@@ -328,7 +334,7 @@ from dacq import *
 from pypeerrors import *
 from candy import bounce, slideshow
 import PlexHeaders, PlexNet, pype2tdt
-import info
+from info import print_version_info
 import filebox
 import iplot
 import userdpy
@@ -405,20 +411,20 @@ class PypeApp:
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
 
-		# start pype logging output with blank line..
-		#sys.stderr.write('\n')
-
-		cfile = pype_hostconfigfile()
-		Logger("pype: loading config from '%s'\n" % cfile)
+		cfgfile = pype_hostconfigfile()
+		Logger("pype: loading config from '%s'\n" % cfgfile)
 		self.config = pype_hostconfig()
 
+		# you can set debug mode by:
+		#   - running with --debug argument
+		#   - setenv PYPEDEBUG=1
+		#   - setting DEBUG: 1 in the Config.$HOST file
 		if os.environ.has_key('PYPEDEBUG'):
-			Logger("pype: Entering debug mode")
+			Logger("pype: running in debug mode")
 			self.config.set('DEBUG', '1', override=1)
-
 		debug(self.config.iget('DEBUG'))
-
 		if debug():
+			sys.stderr.write('config settings:\n')
 			self.config.show(sys.stderr)
 
 		# Thu Mar  1 20:53:51 2007 mazer
@@ -426,15 +432,17 @@ class PypeApp:
 		#   $ELOG should be set to point to the path for the elog
 		#   library or source code for elog (wherever elogapi.py
 		#   lives). By default use the tradition method..
-		self.use_elog = 0
 		if os.environ.has_key('ELOG'):
-			sys.path = sys.path + [os.environ['ELOG']]
+			_addpath(os.environ['ELOG'])
 			try:
 				import elogapi
 				self.use_elog = 1
 				Logger("pype: connecting to ELOG database system.\n")
 			except ImportError:
 				Logger("pype: warning -- ELOG api not available.\n")
+				self.use_elog = 0
+		else:
+			self.use_elog = 0
 
 		# these MUST be set from now on..
 		monw = self.config.fget('MONW', -1)
@@ -1131,7 +1139,7 @@ class PypeApp:
 		root_take()
 
 		self.init_framebuffer()
-		self._testpat = None
+
 		# added automatic detection of framerate (13-jan-2004 JAM):
 		fps = self.fb.calcfps(duration=250)
 		if self.config.iget('FPS') and self.config.iget('FPS') != fps:
@@ -1245,12 +1253,14 @@ class PypeApp:
 							   label='restore hoops',
 							   command=self.tdt.restore)
 
-		Logger('pype build: %s by %s\n' % \
-			   (pypeversion.PypeBuildDate, pypeversion.PypeBuildBy) +
+		Logger('pype: build %s by %s on %s\n' % \
+			   (pypeversion.PypeBuildDate, pypeversion.PypeBuildBy,
+				pypeversion.PypeBuildHost) +
 			   'pype: PYPERC=%s\n' % pyperc() +
 			   'pype: CWD=%s\n' % os.getcwd())
+		
 		if debug():
-			info.print_version_info()
+			print_version_info()
 
 		if self.psych:
 			self.fb.hide()
@@ -1429,16 +1439,11 @@ class PypeApp:
 			#   skip names starting with an underscores (ie, disabled)
 			if os.path.isdir(d) and not (m[0] == '_'):
 				self.add_tasks(menubar, "~"+m, d)
-		self.add_tasks(menubar, 'cwd', '.')
-
-		try:
-			# these were added to the search path in pyperun...
-			dirs = os.environ['PYPETASKPATH'].split(':')
+		self.add_tasks(menubar, 'CWD', '.')
+		if os.environ.has_key('PYPEPATH'):
+			dirs = os.environ['PYPEPATH'].split(':')
 			for d in dirs:
 				self.add_tasks(menubar, posixpath.basename(d), d)
-
-		except KeyError:
-			pass
 
 	def add_tasks(self, menubar, dropname, dir):
 		if dir[-1] == '/':
@@ -1515,7 +1520,6 @@ class PypeApp:
 				dir = posixpath.dirname(taskname)
 				if len(dir) == 0:
 					dir = None
-					# use PYTHONPATH/sys.path to search:
 					(file, pathname, descr) = imp.find_module(taskname)
 				else:
 					taskname = posixpath.basename(taskname)
@@ -1669,7 +1673,6 @@ class PypeApp:
 							  opengl=self.config.iget('OPENGL'))
 
 		self.fb.app = self
-
 		g = self.config.fget('GAMMA')
 		if self.fb.set_gamma(g):
 			Logger("pype: gamma set to %f\n" % g)
@@ -2662,11 +2665,10 @@ class PypeApp:
 		"""
 		self.unloadtask()
 
-		if self._testpat:
-			try:
-				del self._testpat
-			except AttributeError:
-				pass
+		try:
+			del self._testpat
+		except:
+			pass
 
 		if self.fb:
 			self.fb.close()
@@ -3303,18 +3305,22 @@ class PypeApp:
 
 	def idlefb(self):
 		if self.fb:
-			if self._testpat is None:
-				if posixpath.exists(pyperc('testpat')):
+			try:
+				testpat = self._testpat
+			except AttributeError:
+				t = self.config.get('TESTPAT')
+				if t and posixpath.exists(t):
+					fname = t
+				elif posixpath.exists(pyperc('testpat')):
 					fname = pyperc('testpat');
 				else:
-					fname = libdir('testpat.pgm');
-				try:
-					self._testpat = Sprite(x=0, y=0,
-										   fname=fname,
-										   fb=self.fb, depth=99, on=1)
-				except:
-					get_traceback(1)
-					pass
+					fname = libdir('testpat.png');
+				# load new test pattern and scale to fit frame buffer
+				s = Sprite(x=0, y=0,
+						   fname=fname, fb=self.fb, depth=99, on=1)
+				s.scale(self.fb.w, self.fb.h)
+				self._testpat = s
+					
 			self.fb.clear((1,1,1))
 			if self._testpat:
 				self._testpat.blit(force=1)
@@ -3899,6 +3905,18 @@ def _goto_error(title):
 		# try emacs first, then fall back to gedit (should be everywhere)
 		os.system("(emacs +%d %s || gedit +%d %s) &" % \
 				  (line, fname, line, fname))
+
+def _addpath(d, atend=None):
+    """
+    Add directory to the HEAD (or TAIL) of the python search path.
+	
+	**NOTE:**
+	This function also lives in pyperun.py.template.
+    """
+    if atend:
+        sys.path = sys.path + [d]
+    else:
+        sys.path = [d] + sys.path
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

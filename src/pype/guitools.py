@@ -429,23 +429,20 @@ class AboutPype:
 		
 		if AboutPype._w is None:
 			AboutPype._w = Toplevel()
-			AboutPype._w.title('PypeAbout')
-			AboutPype._w.iconname('PypeAbout')
+			AboutPype._w.title('About')
+			AboutPype._w.iconname('About')
 			icon = Label(AboutPype._w,
 						 relief=FLAT, image=splash, pady=10)
 			icon.pack(expand=1, fill=BOTH)
 
-			t = """
-pype: python physiology environment
-Copyright (c) 1999 Jamie Mazer
-Version %s
-Installed: %s""" % (PypeVersion, PypeInstallDate)
-			text = Label(AboutPype._w, text=t)
+			t = "pype: python physiology environment\n" + \
+				"Version %s\n" % pypeversion.PypeVersion + \
+				"Copyright (c) 1999-2009 James A. Mazer\n" + \
+				"Built: %s" % pypeversion.PypeInstallDate
+			text = Label(AboutPype._w, text=t,fg='blue')
 			text.pack(expand=1, fill=BOTH)
 
 			AboutPype._w.protocol("WM_DELETE_WINDOW", self._withdraw)
-			b = Button(AboutPype._w, text='Close', command=self._withdraw)
-			b.pack(expand=1, fill=X)
 			undermouse(AboutPype._w)
 		else:
 			undermouse(AboutPype._w)

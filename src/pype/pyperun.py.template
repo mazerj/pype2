@@ -2,152 +2,116 @@
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
 """
-Author
--------------------
-James A. Mazer (mazer@socrates.berkeley.edu)
+**Pype loader**
 
-Description
--------------------
+Note that \%\%PYPEDIR\%\% gets expanded using sed (textually)
+by the Buildfile system during the compile/install procedure!
 
-Functions
--------------------
 
-Classes
--------------------
+Author -- James A. Mazer (james.mazer@yale.edu)
 
-Revision History
--------------------
+**Revision History**
+
 Wed Dec 26 15:58:28 2001 mazer
-  Front end loader for "pype".  This is like the old pype shell
-  script, but it's pure python (execept that it needs root access
-  via pypeboot...
 
-  Usage:
-		pyperun [task]     -> run with gui & framebuffer
-        pyperun -s [args]  -> interactive shell (aka pypenv)
+- Front end loader for "pype".  This is like the old pype shell
+  script, but it's pure python (execept that it needs root access
+  via pypeboot::
+
+    usage: pyperun [task]     -> run with gui & framebuffer
+           pyperun -s [args]  -> interactive shell (aka pypenv)
 
 Mon Sep 18 10:00:05 2006 mazer
-  Notes about variables
+  Notes about variables::
 
-  PYPEDIR       This is the install directory for pype
-  PYPERC        User's configuration directory. This defaults to
-                ~/.pyperc, unless overridden with an environment
-                variable
-  PYPETASKPATH  colon-delimited search path
-  SUBJECT       subject id (for subject-specific config files)
+    PYPEDIR       This is the install directory for pype
+    PYPERC        User's configuration directory. This defaults to
+                  ~/.pyperc, unless overridden with an environment
+                  variable
+    PYPEPATH      colon-delimited search path
+    SUBJECT       subject id (for subject-specific config files)
+
 """
 
 _debug = 0
-_showdir = 0
+_show_pypedir = 0
 _showimports = 0
 
-import sys, posixpath, os, glob, string, traceback
+import sys
+import posixpath
+import os
+import glob
+import string
+import traceback
+import code
+import platform
+import imp
 
+def _addpath(d, atend=None):
+    """Add directory to the HEAD (or TAIL) of the python search path."""
+    if atend:
+        sys.path = sys.path + [d]
+    else:
+        sys.path = [d] + sys.path
 
-original_argv = sys.argv[:]
+def _run_script(fullname):
+    """Run module as script -- script name include .py extension."""
+    name = posixpath.basename(fullname)
+    if name[-3:] == '.py':
+        name = name[:-3]                # strip .py extension
+
+    p = [string.join(fullname.split('/')[0:-1],'/')]
+    trylist = ((None, name), (None,name+'.py'), (p, name), (p, name+'.py'))
+    for path, fname in trylist:
+        try:
+            if path:
+                fp, pathname, description = imp.find_module(fname, path)
+            else:
+                fp, pathname, description = imp.find_module(fname)
+            sys.argv[0] = pathname
+            try:
+                # load module as __main__ to make it run as script
+                mod = imp.load_module('__main__', fp, pathname, description)
+            finally:
+                fp.close()
+            return 1
+        except ImportError:
+            pass
+    return 0
+
 av = []
 for a in sys.argv:
-    if a == '--debug':
-        _debug = 1
-    elif a[:2] == 's=':
+    if a[:2] == 's=':
         os.environ['SUBJECT'] = a[2:]
     elif a == '--dir':
-        _showdir = 1
+        _show_pypedir = 1
+    elif a == '--debug':
+        _debug = 1
+        _showimports = 1
+        os.environ['PYPEDEBUG'] = "1"
     else:
         av.append(a)
 sys.argv = av
 
-if _debug:
-    os.environ['PYPEEDEBUG'] = "yes"
-    sys.stderr.write('orig argv: %s\n' % original_argv)
-    sys.stderr.write('     argv: %s\n' % sys.argv)
 
-def addpath(d, end=None):
-    """
-    Add directory to the HEAD (or TAIL) of the python search path.
-    """
-    if end:
-        sys.path = sys.path + [d]
-    else:
-        sys.path = [d] + sys.path + [d]
-
-def run_python_script(fullname, debug):
-    """
-    Run module as script -- script name SHOULD have .py extension!!
-    """
-    import imp
-
-    name = posixpath.basename(fullname)
-
-    # strip the .py off, if it's there..
-    if name[(len(name)-3):] == '.py':
-        name = name[:-3]
-
-    p = [string.join(fullname.split('/')[0:-1],'/')]
-	for path, fname in ((None, name), (None,name+'.py'),
-                        (p, name), (p,name+'.py')):
-        try:
-            if path is None:
-                fp, pathname, description = imp.find_module(fname)
-            else:
-                fp, pathname, description = imp.find_module(fname, path)
-        except ImportError:
-            continue
-
-		sys.argv[0] = pathname
-        try:
-            if _debug:
-                sys.stderr.write("[script '%s' from '%s']\n" % \
-                                 (fullname, pathname))
-            mod = imp.load_module('__main__', fp, pathname, description)
-        finally:
-            fp.close()
-        return 1
-    return 0
-	
-if not os.environ.has_key('HOME'):
-	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
-	sys.exit(1)
-
-#
-# NOTE: \%\%PYPEDIR\%\% gets expanded by the Buildfile system!
-#
 if not os.environ.has_key('PYPEDIR'):
     os.environ['PYPEDIR'] = "%%PYPEDIR%%"
     sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
                      os.environ['PYPEDIR'])
 
-if _showdir:
+if _show_pypedir:
     print os.environ['PYPEDIR']
     sys.exit(0)
 
-# rest of this section sets up the python search path to find
-# all the pype modules and tasks
+if not os.environ.has_key('HOME'):
+	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
+	sys.exit(1)
 
-# setup the path as follows:
-#  <current directory>
-#  <$PYPERC/Tasks>
-#  <$PYPERC/Modules>
-#  <$PYPEDIR/Tasks>
-#  <$PYPEDIR/lib> (this used to be $PYPEDIR/Modules, but changed 14-jan-04)
-#  ...everything in original $PYTHONPATH...
-#  where, $PYPERC defaults to $HOME/.pyperc if it's not specified
-
-original_path = sys.path[:]
-
-# Sun Mar 29 15:07:18 2009 mazer
-# removed pd+'lib' and added pd to search path -- pype's now a proper package
+# add $PYPEDIR.{pype,Taks,Modules} to python search path
+_original_path = sys.path[:]
 pd = os.environ['PYPEDIR']+'/'
 for d in ['pype', 'Tasks', 'Modules']:
-    addpath(pd + d)
-addpath('.')
-    
-
-# PREFIX specific user-defined paths that can contain. PYPEPATH should
-# be a standard colon-delimted set of paths to search
-if os.environ.has_key('PYPETASKPATH'):
-    for d in string.split(os.environ['PYPETASKPATH'], ':')[::-1]:
-        addpath(d)
+    _addpath(pd + d)
 
 # Fri Dec 13 17:12:22 2002 mazer
 #  -- add $PYPEDIR/lib onto LD_LIBRARY_PATH
@@ -157,13 +121,11 @@ if os.environ.has_key('PYPETASKPATH'):
 if os.environ.has_key('LD_LIBRARY_PATH'):
     os.environ['LD_LIBRARY_PATH'] = os.environ['PYPEDIR'] + '/lib:' + \
                                     os.environ['LD_LIBRARY_PATH']
-
 # now that $PYPEDIR is partially setup, pype and pype modules
 # should be importable...
 
 try:
     from pype import *
-    from info import libinfo
     from importer import importer
 except ImportError:
 	(etype, evalue, tb) = sys.exc_info()
@@ -173,21 +135,21 @@ except ImportError:
     sys.stderr.write("file:%s line:%d --> %s\n" % (fname, line, evalue))
 	sys.exit(1)
 
-
-# 1st check to see that Numeric and pygame are properly installed:
-info = libinfo()
-for k in ('numeric', 'pygame'):
-    if info[k] is None:
-        sys.stderr.write("Error: %s not installed locally.\n" % k)
-        sys.exit(1)
+# add user-specified PYPEPATH directories (if any) -- colon deliminated
+if os.environ.has_key('PYPEPATH'):
+    for d in string.split(os.environ['PYPEPATH'], ':')[::-1]:
+        _addpath(d)
 
 # add the ~/.pyperc directories to the python search path
 for i in ['Tasks', 'Modules']:
-    addpath(pyperc(i))
+    _addpath(pyperc(i))
 
 for d in glob.glob(pyperc('Tasks/*')):
     if os.path.isdir(d):
-        addpath(d)
+        _addpath(d)
+
+# lastly, add current directory to allow local overrides!
+_addpath('.')
 
 if _showimports:
     importer(report=1)
@@ -195,89 +157,54 @@ if _showimports:
 if _debug:
     sys.stderr.write('-- Search Path -------------\n')
     for d in sys.path:
-        if len(d) > 0:
-            if d in original_path:
-                sys.stderr.write('   %s\n' % d)
-            else:
-                sys.stderr.write(' + %s\n' % d)
+        if len(d) and (not d in _original_path):
+            sys.stderr.write(' + %s\n' % d)
     sys.stderr.write('----------------------------\n')
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
-    # *** Invoked as pypenv ***
-    # 
-    # pypenv is really a shell script that does:
-    #   exec pyperun -s $*
-    # So, the -s argument indicates run as a standard python
-    # interpreter (with the path set to include pype stuff).
-    # Otherwise, you get the full blow pype GUI.
+    # Invoked with -s argument -- typially as pypenv
+    #   - could be eithre as script or for interactive session
     if len(sys.argv) == 2:
-        # This means there's not command line arguments, so we want to
-        # just drop into an interactive shell. First we see if the
-        # IPython packages is installed for a fancier shell..
-        # interactive mode, drop into an interactive shell
-        try:
-            from IPython.Shell import xxIPShellEmbed
-            ipshell = IPShellEmbed([])
-            ipshell()
-        except ImportError:
-            # IPython's not installed, fall back to standard python
-            # interactive shell
-            import code
-            sys.stdout.write("<<<<pypenv: interactive python shell>>>>\n")
-            code.interact()
+        # no command line args (beyond -s) -- startup an interactive session
+        code.interact(banner='pype interactive shell (python %s)' % \
+                      platform.python_version())
     else:
-        # Last possibility for pypenv is that we've been invoked with
-        # command line options. Command line options are assumed to
-        # be a module to load and run, just like a standard python
-        # program.
-        #
-        # Tod do that, we trim .../pyperun from the head of sys.argv
-        # and let run_python_script() replace the -s with the module
-        # name and then go ahead and load+run the module.
+        # with command line args -- run as script:
+        #  - trim pyperun (this script) from sys.argv[] and then
+        #    call _run_script to replace '-s' with requested module
+        #    name, load and run.
         sys.argv = sys.argv[2:]
-        if run_python_script(sys.argv[0], _debug) == 0:
-            sys.stderr.write("Can't find module '%s'\n" % sys.argv[0])
+        if _run_script(sys.argv[0]) == 0:
+            sys.stderr.write("pyperun: can't find '%s'\n" % sys.argv[0])
             sys.exit(1)
 else:
-    # *** Invoked as pype ***
-    #
-    # This means we want to startup in full GUI mode, but
-    # we're 
-    # parse command line
-
-    # make sure subject dir exists, if it doesn't go ahead and make it
+    # Invoked as plain old 'pype' -- full gui interface startup
+    #  - make sure the subject directory exists
+    #  - check to see if in psychophysics mode (-p)
+    #  - and then startup the gui
     if not posixpath.exists(subjectrc()):
-        sys.stderr.write('Subject dir does not exist.\n')
-        sys.stderr.write('Building: %s\n' % subjectrc())
         try:
             os.mkdir(subjectrc())
             os.chown(subjectrc(), os.getuid(), os.getgid())
-        except:
-            sys.exit(0)
-    
-    av = []
+        except OSError:
+            sys.stderr("Can't create subject directory!\n");
+            sys.exit(1)
+
     psych = 0
-    for n in range(1, len(sys.argv)):
-        if sys.argv[n] == '-p':
-            # psychophysics mode (withdraw framebuffer)
-            psych = 1
+    args = []
+    for a in sys.argv[1:]:
+        if a == '-p':
+            psych = 1      # psychophysics mode (withdraw framebuffer on start)
         else:
-            av.append(sys.argv[n])
+            args.append(a)
 
-    # startup pype with gui
-	from pype import *
-
-    if _showimports:
-        importer(report=0)
 	try:
 		app = PypeApp(psych=psych)
 	except FatalPypeError:
 		sys.exit(1)
-    if _showimports:
-        importer(report=1)
 
-    if len(av) > 0:
-        taskname = posixpath.splitext(av[0])[0]
+    if len(args) > 0:
+        taskname = posixpath.splitext(args[0])[0]
 		try:
 			app.newloadtask(taskname)
 		except ImportError:

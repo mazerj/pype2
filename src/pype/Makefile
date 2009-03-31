@@ -16,7 +16,7 @@ install-pypelib:
 	@cp pypeversion.py $(PYPEDIR)/pype
 	@rm pypeversion.py
 	@(cd ./icons ; $(MAKE) install)
-	@cp testpat.pgm $(PYPEDIR)/lib
+	@cp testpat.png $(PYPEDIR)/lib
 	@rm $(PYPEDIR)/pype/__init__.py
 
 install-pyperun:
@@ -45,10 +45,11 @@ install-pypebin:
 
 pypeversion:
 	@sed 's/%%INSTALLDATE%%/$(shell date)/' \
-		<pypeversion.template >pypeversion.py
+		<pypeversion.py.template >pypeversion.py
 	@echo 'PypeBuildDir = "$(shell pwd)"' >>pypeversion.py
 	@echo 'PypeBuildBy = "$(USER)"' >>pypeversion.py
 	@echo 'PypeBuildDate = "$(shell date)"' >>pypeversion.py
+	@echo 'PypeBuildHost = "$(HOST)"' >>pypeversion.py
 
 
 build:

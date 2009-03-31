@@ -1,5 +1,6 @@
-#include <stdio.h>
-#include <unistd.h>
+#include <stdio.h>		/* for stderr() */
+#include <unistd.h>		/* for geteuid() */
+#include <stdlib.h>		/* for exit() */
 
 main(int ac, char **av)
 {

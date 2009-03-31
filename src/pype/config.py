@@ -28,6 +28,7 @@ import sys
 import os
 import posixpath
 import string
+import types
 
 class Config:
 	def __init__(self, fname):
@@ -68,7 +69,12 @@ class Config:
 		keys = self.dict.keys()
 		keys.sort()
 		for k in keys:
-			f.write('%s=%s\n' % (k, self.dict[k]))
+			v = self.dict[k]
+			vt = type(v)
+			if (vt is types.StringType) and len(v) == 0:
+				f.write('\t%s=<empty string>\n' % k)
+			else:
+				f.write('\t%s=%s %s\n' % (k, v, vt))
 
 	def load(self, fname):
 		d = {}

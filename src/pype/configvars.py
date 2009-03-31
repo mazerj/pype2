@@ -12,6 +12,10 @@ Tue Jun 26 14:21:36 2007 mazer
 - abstract out from pype.py to put all config vars in a single
   file for documentation/code-clarity purposes.
 
+Tue Mar 31 13:59:22 2009 mazer
+
+- added TESTPAT
+
 """
 __author__   = '$Author$'
 __date__     = '$Date$'
@@ -80,6 +84,9 @@ def defaults(srcfile):
     c.set('SYNCX', '-10000')            # X location of sync square CENTER (pix)
     c.set('SYNCY', '-10000')            # Y location of sync square CENTER (pix)
     c.set('SYNCLEVEL', '255')           # gray scale value of sync-on
+
+    c.set('TESTPAT', None)              # filename for test pattern
+    
 
     # BLOCKED should probably just go away or be figured out automatically
     # based on SYNC{X,Y,SIZE}

@@ -75,6 +75,12 @@ Fri Jan 23 12:37:10 2009 mazer
 
   - why does ALPHAMASKS need hard coding?
 
+Tue Mar 31 12:21:17 2009 mazer
+
+- made lower right-hand corner default syncpulse position
+
+- fb.phdiode_mode --> fb.sync_mode
+
 """
 
 __author__   = '$Author$'
@@ -92,7 +98,12 @@ import copy
 import exceptions
 
 from Numeric import *
-import pygame
+try:
+	import pygame
+except ImportError:
+	sys.stderr.write('missing `pygame` package.\n' % __name__)
+	sys.exit(1)
+	
 import pygame.display
 import pygame.event
 import pygame.mouse
@@ -157,9 +168,9 @@ def checkrshift():
 
 
 class FrameBuffer:
-	def __init__(self, dpy, width, height, bpp, fullscreen,
-				 bg=1, sync=1, syncsize=50, syncx=-1, syncy=-1, synclevel=255,
-				 opengl=0):
+	def __init__(self, dpy, width, height, bpp, fullscreen, bg=1,
+				 sync=1, syncsize=50, syncx=-10000, syncy=-10000,
+				 synclevel=255, opengl=0):
 		"""FrameBuffer class (SDL<-pygame<-pype).
 
 		This class provides a simple wrapper for the pygame interface
@@ -186,31 +197,36 @@ class FrameBuffer:
 		photodiode that can be used to detect the presence or
 		absence of the syncpulse).
 
+		**syncx, syncy** -- Position of the sync pulse generator spot
+		in standard sprite coordinates -- (0,0) is screen center,
+		positive to left and up. Note that this indicates the position
+		for the **center* of the sync spot, so if you're on the
+		corner, you should probably double the size to get the
+		expected value.  Default position is lower right hand corner.
+
 		**syncsize** -- size of sync pulse in pixels (sync pulse will be
 		syncsize x syncsize pixels and located in the lower right
-		corner of the screen.
+		corner of the screen (if syncsize <= 0, then sync pulses are
+		disabled -- same as sync=0)
 
 		**opengl** -- boolean flag indicating whether or not to run
 		in OpenGL mode  (added 17-jan-2006 shinji)
 
 		**pype** -- optional pype app handle
 
-		**returns** --
-		None.
+		**returns** -- None.
 
-		**NOTE** --
+		**NOTE:**
 		Only one instance allowed per application!
 
 		"""
-
-		self.keystack = []
-		self.phdiode_mode = sync
 
 		if fullscreen:
 			self.flags = FULLSCREEN | DOUBLEBUF | HWSURFACE
 		else:
 			self.flags = DOUBLEBUF | HWSURFACE
 
+		self.keystack = []
 
 		# you can't have fullscreen unless you're root
 		if (not _got_root()) and (self.flags & FULLSCREEN):
@@ -302,8 +318,22 @@ class FrameBuffer:
 
 		# note: for historical reasons, bg is a scalar -- grayscale only..
 		self.bg = bg
+
+		# this allows user to disable the sync pulse from the
+		# config file:
+		if syncsize <= 0 or (not sync):
+			self.sync_mode = 0
+		else:
+			self.sync_mode = 1
+
+		# if location of sync pulse is not specified (-10000), then
+		# put it in the lower right corner by default
+		if syncx < self.w:
+			syncx = int(round(self.w/2))
+		if syncy < self.h:
+			syncy = int(round(-self.h/2))
 		
-		if self.phdiode_mode:
+		if self.sync_mode:
 			# pre-build sync/photodiode driving sprites:
 			self._sync_low = Sprite(syncsize, syncsize, syncx, syncy,
 									name='sync_low', on=1, fb=self)
@@ -403,8 +433,8 @@ class FrameBuffer:
 
 		"""
 		# try to estimate current frame rate
-		oldsync = self.phdiode_mode
-		self.phdiode_mode = 0
+		oldsync = self.sync_mode
+		self.sync_mode = 0
 		self.clear((1,1,1))
 		self.flip()
 		self.clear((2,2,2))
@@ -423,7 +453,7 @@ class FrameBuffer:
 			intervals.append(b-a)
 			a = b
 
-		self.phdiode_mode = oldsync
+		self.sync_mode = oldsync
 
 		if len(intervals) <= 1:
 			Logger('sprite: failed to estimate frames per second, using 60Hz\n')
@@ -628,7 +658,7 @@ class FrameBuffer:
 		are that the hardware doesn't support blocking on flips.
 
 		"""
-		if self.phdiode_mode:
+		if self.sync_mode:
 			if self._sync_state == 1:
 				self._sync_high.blit()
 			elif self._sync_state == 0:
