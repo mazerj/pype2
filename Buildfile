@@ -16,7 +16,7 @@ setenv:
 	@echo "setenv PYTHONEXE $(PYTHONEXE)"
 	@echo "setenv PYPEDIR $(PYPEDIR)"
 
-all: install wrapper
+all: install wrapper docs clobber
 
 all-nodacq: install-nodacq wrapper
 

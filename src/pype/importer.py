@@ -16,7 +16,7 @@ __id__       = '$Id$'
 import __builtin__, imp, sys
 from guitools import Logger
 
-_original_import =  __builtin__.__import__
+_native_imp =  __builtin__.__import__
 
 def _verbose_import(*args):
     fp, pathname, description = imp.find_module(args[0])
@@ -25,14 +25,12 @@ def _verbose_import(*args):
         # only report non-python imports
         if not pathname.startswith('/usr/lib/python'):
             Logger("importing '%s' from '%s'\n" % (args[0], pathname))
-    return apply(__original_import__, args)
-
-__original_import__ = __builtin__.__import__
+    return apply(__native_imp__, args)
 
 def importer(report=1):
     if report:
         __builtin__.__import__ = _verbose_import
     else:
-        __builtin__.__import__ = _original_import
+        __builtin__.__import__ = _native_imp
 
 

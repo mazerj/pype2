@@ -39,7 +39,7 @@ Mon Sep 18 10:00:05 2006 mazer
 
 _debug = 0
 _showdir = 0
-_showimports = 1
+_showimports = 0
 
 import sys, posixpath, os, glob, string, traceback
 
