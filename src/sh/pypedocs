@@ -1,0 +1,3 @@
+#!/bin/sh
+
+firefox file:$PYPEDIR/docs/index.html
