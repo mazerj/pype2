@@ -166,8 +166,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
     #   - could be eithre as script or for interactive session
     if len(sys.argv) == 2:
         # no command line args (beyond -s) -- startup an interactive session
-        code.interact(banner='pype interactive shell (python %s)' % \
-                      platform.python_version())
+        code.interact(banner='[pype interactive shell]')
     else:
         # with command line args -- run as script:
         #  - trim pyperun (this script) from sys.argv[] and then

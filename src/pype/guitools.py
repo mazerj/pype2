@@ -595,23 +595,24 @@ class DanceBar(ProgressBar):
 		
 
 class DancingBear:
-	__pos = 0
-	def __init__(self, s='.'):
-		if s is None:
+	_cursorPos = 0
+	def __init__(self, ticker='.'):
+		if ticker is None:
 			sys.stderr.write('\n')
-			DancingBear.__pos = 0
+			DancingBear._cursorPos = 0
 		else:
-			sys.stderr.write("%s" % s)
-			DancingBear.__pos = DancingBear._pos + len(s)
-			if DancingBear._pos > 50:
-				sys.stderr.write('\n')
-				DancingBear.__pos = 0
+			ticker = "%s" % ticker
+			DancingBear._cursorPos = DancingBear._cursorPos + len(ticker)
+			if DancingBear._cursorPos > 50:
+				ticker = ticker + '\n'
+				DancingBear._cursorPos = 0
+			sys.stderr.write(ticker)
 			sys.stderr.flush()
 
-def dance(s='.'):
-	DancingBear(s)
+def dance(ticker='.'):
+	"""Indicate longer-term progress by calling this periodically."""
+	DancingBear(ticker)
 
-	
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)
 	sys.exit(1)

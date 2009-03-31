@@ -114,7 +114,7 @@ import pygame.surfarray
 import pygame.transform
 import pygame.movie
 from pygame.constants import *
-import Image
+import PIL.Image, PIL.ImageTk
 
 
 import pype
@@ -849,8 +849,8 @@ class FrameBuffer:
 		returns PIL Image structure containing the snapshot (can
 		be converted th PhotoImage for display in Tkinter/Canvas..)
 		"""
-		pil = Image.fromstring('RGBA', self.screen.get_size(),
-							   pygame.image.tostring(self.screen, 'RGBA'))
+		pil = PIL.Image.fromstring('RGBA', self.screen.get_size(),
+								   pygame.image.tostring(self.screen, 'RGBA'))
 		if filename:
 			if size:
 				pil.resize(size).save(filename)
@@ -1306,9 +1306,9 @@ class Sprite(_ImageBase):
 			im.set_alpha(alpha)
 		else:
 			im = self.im
-		self.pil_im = Image.fromstring('RGBA', im.get_size(),
-									   pygame.image.tostring(im, 'RGBA'))
-		self.pim = ImageTk.PhotoImage(self.pil_im)
+		self.pil_im = PIL.Image.fromstring('RGBA', im.get_size(),
+										   pygame.image.tostring(im, 'RGBA'))
+		self.pim = PIL.ImageTk.PhotoImage(self.pil_im)
 
 		# NOTE: by making .pim this a object member, it keeps a handle
 		#       on the PhotoImage to prevent GC..
