@@ -20,14 +20,14 @@ install-pypelib:
 	@rm $(PYPEDIR)/pype/__init__.py
 
 install-pyperun:
-	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.template | \
+	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.py.template | \
 	 sed "s@%%PYTHONEXE%%@$(PYTHONEXE)@g" >pyperun
 	@cp pyperun $(PYPEDIR)/bin
 	@chmod +x $(PYPEDIR)/bin/pyperun
 	@rm pyperun
 
 install-pyperun-shared:
-	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.template | \
+	@sed "s@%%PYPEDIR%%@$(PYPEDIR)@g" <pyperun.py.template | \
 	 sed "s@%%PYTHONEXE%%@/usr/bin/env python@g" >pyperun
 	@cp pyperun $(PYPEDIR)/bin
 	@chmod +x $(PYPEDIR)/bin/pyperun
