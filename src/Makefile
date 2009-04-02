@@ -25,7 +25,6 @@ install-subdirs:
 	@sh pmw.sh $(PYPEDIR)/pype
 
 install-p2m:
-	@mkdir -p $(PYPEDIR)/../p2m
 	(cd p2m ; $(MAKE) install)
 
 

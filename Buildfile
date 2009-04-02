@@ -89,19 +89,6 @@ docs:
 
 
 ###############################################################
-#      external programs/libraries
-###############################################################
-
-x-rig:
-	cd External; $(MAKE) rig-install
-
-x-workstation:
-	cd External; $(MAKE) workstation-install
-
-x-clean:
-	cd External; $(MAKE) clean
-
-###############################################################
 
 uninstall: 
 	echo  "Uninstall must be done manually!"
@@ -111,6 +98,9 @@ uninstall:
 ###############################################################
 
 # useful svn targets
+#
+#  these are not used, but probably should be...
+#
 
 unstable:
 	@if [ -e RELEASE ]; then svn mv RELEASE UNSTABLE; fi
