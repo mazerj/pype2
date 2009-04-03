@@ -7,7 +7,7 @@
 # usage: sh pmw.sh pwm.tgz dest-dir
 #
 
-x=`pwd`
+x=`pwd`/Pmw
 
 mkdir /tmp/$$
 cd /tmp/$$

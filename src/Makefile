@@ -22,7 +22,7 @@ install-subdirs:
 		do (cd $$i ; $(MAKE) install);\
 		done
 	@rm -rf $(PYPEDIR)/pype/Pmw*
-	@sh pmw.sh $(PYPEDIR)/pype
+	@sh Pmw/pmw.sh $(PYPEDIR)/pype
 
 install-p2m:
 	(cd p2m ; $(MAKE) install)
