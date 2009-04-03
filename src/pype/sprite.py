@@ -178,43 +178,43 @@ class FrameBuffer:
 		window, X11-DGA fullscreen buffer or even a raw framebuffer
 		using /dev/fb0.
 
-		**dpy** -- string containing name of X11 display to contact (None
+		**dpy** - string containing name of X11 display to contact (None
 		for default, taken from os.environ['DISPLAY']
 
-		**width, height** -- width and height of requested display in pixels
+		**width, height** - width and height of requested display in pixels
 
-		**bpp** -- bits per pixel, typically 24 or 32
+		**bpp** - bits per pixel, typically 24 or 32
 
-		**fullscreen** -- boolean flag indicating full screen or not
+		**fullscreen** - boolean flag indicating full screen or not
 
-		**bg** -- default background color. This can be a color tripple (r,g,b)
+		**bg** - default background color. This can be a color tripple (r,g,b)
 		or a grey scale value. Actually, it can be anything that the
 		_C() function in this module can parse.
 
-		**sync** -- boolean flag indicating whether or not to setup (and
+		**sync** - boolean flag indicating whether or not to setup (and
 		subsequently use) a sync pulse placed on the monkey's video
 		display for external synchronization (this is to drive
 		photodiode that can be used to detect the presence or
 		absence of the syncpulse).
 
-		**syncx, syncy** -- Position of the sync pulse generator spot
-		in standard sprite coordinates -- (0,0) is screen center,
+		**syncx, syncy** - Position of the sync pulse generator spot
+		in standard sprite coordinates - (0,0) is screen center,
 		positive to left and up. Note that this indicates the position
-		for the **center* of the sync spot, so if you're on the
+		for the **center** of the sync spot, so if you're on the
 		corner, you should probably double the size to get the
 		expected value.  Default position is lower right hand corner.
 
-		**syncsize** -- size of sync pulse in pixels (sync pulse will be
+		**syncsize** - size of sync pulse in pixels (sync pulse will be
 		syncsize x syncsize pixels and located in the lower right
 		corner of the screen (if syncsize <= 0, then sync pulses are
-		disabled -- same as sync=0)
+		disabled - same as sync=0)
 
-		**opengl** -- boolean flag indicating whether or not to run
+		**opengl** - boolean flag indicating whether or not to run
 		in OpenGL mode  (added 17-jan-2006 shinji)
 
-		**pype** -- optional pype app handle
+		**pype** - optional pype app handle
 
-		**returns** -- None.
+		**returns** - None.
 
 		**NOTE:**
 		Only one instance allowed per application!
@@ -290,12 +290,12 @@ class FrameBuffer:
 			self.maxbpp = pygame.display.mode_ok((self.w, self.h),
 												 self.flags, bpp)
 		except pygame.error:
-			Logger('FrameBuffer: check X server -- can''t start pygame!');
+			Logger('FrameBuffer: check X server - can''t start pygame!');
 			sys.exit(1)
 			
 		if self.maxbpp == 0:
 			Logger('sprite: requested %dx%d %d\n' % (self.w, self.h, bpp))
-			Logger('sprite: no joy -- mode not available\n')
+			Logger('sprite: no joy - mode not available\n')
 			sys.exit(1)
 
 
@@ -316,7 +316,7 @@ class FrameBuffer:
 		Logger('framebuffer: dev=%s%s %dx%d %dbbp\n' % \
 			   (self.driver, mode, self.w, self.h, self.maxbpp))
 
-		# note: for historical reasons, bg is a scalar -- grayscale only..
+		# note: for historical reasons, bg is a scalar - grayscale only..
 		self.bg = bg
 
 		# this allows user to disable the sync pulse from the
@@ -422,9 +422,9 @@ class FrameBuffer:
 		frame rate. To circumvent this, we just flip the page a few
 		times and compute the median inter-frame interval.
 
-		**duration** (ms) -- period of time to flip/test
+		**duration** (ms) - period of time to flip/test
 
-		**returns** -- float, current frame rate in Hz.
+		**returns** - float, current frame rate in Hz.
 
 		**NOTE:**
 		This is always going to be a rought estimate, you should
@@ -461,7 +461,7 @@ class FrameBuffer:
 
 		# compute estimated frame rate (Hz) based on median inter-frame
 		# interval
-		# this is ROUGH median -- if len(intervals) is odd, then it's
+		# this is ROUGH median - if len(intervals) is odd, then it's
 		# not quite right, but it should be close enough..
 		sd = stdev(intervals)
 		m = mean(intervals)
@@ -470,7 +470,7 @@ class FrameBuffer:
 			if sd == 0 or abs(i-m) < (2*sd):
 				k.append(i)
 		if len(k) < 1:
-			Logger('sprite: calcfps -- no photodiode? Assuming 60\n')
+			Logger('sprite: calcfps - no photodiode? Assuming 60\n')
 			return 60
 		km = mean(k)
 		if km > 0.0:
@@ -485,17 +485,17 @@ class FrameBuffer:
 		Not all hardware supports hardware gamma correction, so this
 		may not always work.
 
-		**r** -- if this is the only argument supplied, then this is the
+		**r** - if this is the only argument supplied, then this is the
 		simply luminance gamma value and all three guns are set to
 		this value.
 
-		**g,b** -- green and blue gamma values. If you specify g, you'ld
+		**g,b** - green and blue gamma values. If you specify g, you'ld
 		better specify b as well..
 
 		Arguments are floating point numbers (1.0 is no gamma correction
 		at all).
 
-		**returns** -- TRUE on success (ie., if the hardware supports
+		**returns** - TRUE on success (ie., if the hardware supports
 		gamma correction)
 
 		"""
@@ -506,9 +506,9 @@ class FrameBuffer:
 	def cursor(self, on=0):
 		"""Turn display of the mouse cursor on or off.
 
-		**on** -- boolean; 1 to turn the cursor on, 0 to turn it off
+		**on** - boolean; 1 to turn the cursor on, 0 to turn it off
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		pygame.mouse.set_visible(on);
@@ -534,20 +534,20 @@ class FrameBuffer:
 
 		Internal method for coordinate transformations
 		pygame/SDL uses the standard device system used by
-		most graphics libraries -- that is, (0,0) refers to
+		most graphics libraries - that is, (0,0) refers to
 		the upper left corner of the screen, positive x values
 		go to the right, positive y values down the screen. This
 		takes an (x,y) pair in world coordinates ((0,0) at screen
 		center, positive x to the right, positive y up the screen).
 
-		**x, y** -- world coordinates
+		**x, y** - world coordinates
 
-		**sflip** -- boolean; if true, then the y-coord is flipped (ie,
+		**sflip** - boolean; if true, then the y-coord is flipped (ie,
 		stays in device coords).
 
-		**returns** -- x, y in coordinates
+		**returns** - x, y in coordinates
 
-		**NOTE** -- users should never call this directly!!!
+		**NOTE** - users should never call this directly!!!
 
 		"""
 		if y is None:
@@ -586,11 +586,11 @@ class FrameBuffer:
 
 		Set the status of the sync pulse.
 
-		**state** -- boolean; 1=light, 0=dark
+		**state** - boolean; 1=light, 0=dark
 
-		**flip** -- boolean; do a page flip afterwards?
+		**flip** - boolean; do a page flip afterwards?
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		self._sync_state = state
@@ -602,9 +602,9 @@ class FrameBuffer:
 
 		Toggle the status of the sync pulse. Light->dark; dark->light.
 
-		**flip** -- boolean; do a page flip afterwards?
+		**flip** - boolean; do a page flip afterwards?
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		self.sync(not self._sync_state, flip=flip)
@@ -615,14 +615,14 @@ class FrameBuffer:
 		Clear framebuffer to specified color (or default background
 		color, if no color is specfied).
 
-		**color** -- color to fill with (scalar pixel value for solid
-		grey; triple scalars for an rgb value -- anything _C()
+		**color** - color to fill with (scalar pixel value for solid
+		grey; triple scalars for an rgb value - anything _C()
 		in this module understands is ok). If no color is specified,
 		then self.bg is used (set in the __init__ method).
 
-		**flip** -- boolean; do a page flip afterwards?
+		**flip** - boolean; do a page flip afterwards?
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		if color is None:
@@ -684,7 +684,7 @@ class FrameBuffer:
 			if (self.maxfliptime > 0) and (elapsed > self.maxfliptime):
 				Logger('warning: %dms flip\n' % elapsed)
 
-		# JAM 12/10/2002 -- something on the sdl newsgroup suggested that
+		# JAM 12/10/2002 - something on the sdl newsgroup suggested that
 		#   flip doesn't actually block until you try to read or write
 		#   the screen surface.. just in case that's true
 
@@ -698,20 +698,20 @@ class FrameBuffer:
 		at the specified location. This is primarily useful for running
 		psychophysical studies and debugging.
 
-		**x, y** -- coordinates of string *CENTER*
+		**x, y** - coordinates of string *CENTER*
 
-		**s** -- string to write
+		**s** - string to write
 
-		**color** -- RGB or greyscale color (anything _C() understands)
+		**color** - RGB or greyscale color (anything _C() understands)
 
-		**flip** -- boolean; flip after write
+		**flip** - boolean; flip after write
 
-		**prefill** -- if specified then fill the string's bounding
+		**prefill** - if specified then fill the string's bounding
 		box  with the specified color (again good for _C())
 
-		**size** -- font size in pixels
+		**size** - font size in pixels
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTE:** Requires the SDL_ttf package
 
@@ -783,13 +783,13 @@ class FrameBuffer:
 		Return the next key in the keyboard input queue and pop
 		the keystroke off the queue stack.
 
-		**wait** -- boolean flag indicating whether or not to wait
+		**wait** - boolean flag indicating whether or not to wait
 		for a keystroke to occur.
 
-		**down** -- boolean flag indicating whether to only accept
+		**down** - boolean flag indicating whether to only accept
 		downstrokes (default is true)
 
-		**returns** -- keystroke value; negative for key-up, positive
+		**returns** - keystroke value; negative for key-up, positive
 		for key-down, 0 if no keystrokes are available in the queue.
 
 		"""
@@ -827,7 +827,7 @@ class FrameBuffer:
 		Push a keystroke event back onto the keyboard queue. Keyboard queue
 		is simulated in pype as a stack, see getkey() method for details.
 
-		**c** -- keystroke to push back (same syntax as getkey() method above.
+		**c** - keystroke to push back (same syntax as getkey() method above.
 
 		"""
 		self.keystack.append(c)
@@ -838,11 +838,11 @@ class FrameBuffer:
 		Take snapshot of the framebuffer and write it to the specified
 		file.
 
-		**filename** -- name of output file; PIL is used to write the
+		**filename** - name of output file; PIL is used to write the
 		file and PIL automatically determines the filetype from
 		filename's extension.
 
-		**size** -- optional size of the snapshot; PIL is used to rescale
+		**size** - optional size of the snapshot; PIL is used to rescale
 		the image to this size. If size is left unspecified, then
 		the snapshot is written at the screen's true resolution.
 
@@ -863,13 +863,13 @@ class FrameBuffer:
 	def rectangle(self, cx, cy, w, h, color, width=0):
 		"""Draw rectangle directly on framebuffer
 
-		**cx, cy** -- world coords of the rectangle's **CENTER**
+		**cx, cy** - world coords of the rectangle's **CENTER**
 
-		**w, h** -- width and height of the rectangle in pixels
+		**w, h** - width and height of the rectangle in pixels
 
-		**color** -- _C() legal color specification
+		**color** - _C() legal color specification
 
-		**width** -- 0 means fill the rectangle with the specfied color,
+		**width** - 0 means fill the rectangle with the specfied color,
 		anything else means draw the outline of the rectangle in
 		the specified color with strokes of the specified width.
 
@@ -900,15 +900,15 @@ class FrameBuffer:
 
 		Use pygame primitive to draw a straight line on the framebuffer
 
-		**start** -- (x,y) world coords of line's starting point
+		**start** - (x,y) world coords of line's starting point
 
-		**stop** -- (x,y) world coords of line's ending point
+		**stop** - (x,y) world coords of line's ending point
 
-		**color** -- any color acceptable to _C()
+		**color** - any color acceptable to _C()
 
-		**width** -- width of line in  pixels
+		**width** - width of line in  pixels
 
-		**flip** -- boolean; flip after write
+		**flip** - boolean; flip after write
 
 		"""
 		color = _C(color)
@@ -936,16 +936,16 @@ class FrameBuffer:
 	def circle(self, cx, cy, r, color, width=0):
 		"""Draw circle directly on framebuffer
 
-		**cx, cy** -- center coords of the circle
+		**cx, cy** - center coords of the circle
 
-		**r** -- radius in pixels
+		**r** - radius in pixels
 
-		**color** -- anything _C() understands
+		**color** - anything _C() understands
 
-		**width** -- width of circle in pixels. If width==0, then
+		**width** - width of circle in pixels. If width==0, then
 		the circle gets filled instead of just drawing an outline
 
-		Tue Apr 25 10:14:33 2006 mazer --
+		Tue Apr 25 10:14:33 2006 mazer -
 		GL coords are different!!! circles were flipped/mirrored
 		around the x-axis in GL-mode!!!!
 
@@ -979,16 +979,16 @@ def zoomdown(fb, cx, cy, width=100, height=100,
 	based on the fb.bg color. Boxes are drawn in the specified
 	color and then erased by redrawing in the default bg color.
 
-	**cx, cy** -- center of point to highlight/draw attention to
+	**cx, cy** - center of point to highlight/draw attention to
 
-	**width, height** -- initial size of the highlight box
+	**width, height** - initial size of the highlight box
 
-	**color** -- color of highlight box
+	**color** - color of highlight box
 
-	**nsteps** -- number of steps to highlight with; time for this
+	**nsteps** - number of steps to highlight with; time for this
 	function to execute should be roughly (nsteps*16ms)
 
-	**returns** -- None
+	**returns** - None
 
 	"""
 	if nsteps is None:
@@ -1031,7 +1031,7 @@ class _SurfArrayAccess:
 
 	def refresh(self, im):
 		"""
-		Underlying sprite array has changed -- update link/cache.
+		Underlying sprite array has changed - update link/cache.
 		This is for when the sprite is resized or rescaled, etc
 		"""
 		self.im = im
@@ -1048,7 +1048,7 @@ class _SurfArrayAccess:
 			array[idx] = value
 
 class _ImageBase:
-	"""INTERNAL -- do not instantiate!
+	"""INTERNAL - do not instantiate!
 
 	Simple base class for Sprites, Movies etc. The _ImageBase class
 	simply provides a standard mechanism for implementing common
@@ -1062,7 +1062,7 @@ class _ImageBase:
 		.w              width in pixels
 		.h              height in pixels
 
-	**NOTE** -- This class is never intended to be instantiated by
+	**NOTE** - This class is never intended to be instantiated by
 	a user or anything other than the Sprite and MpegMovie
 	classes.
 	"""
@@ -1106,7 +1106,7 @@ class Sprite(_ImageBase):
 
 	**WARNING**
 
-	- Don't access the .im member of this class directly -- this
+	- Don't access the .im member of this class directly - this
 	  is a pygame/pype internal member and shouldn't really be exposed
 	  to the user.  Instead, use the .array and .alpha members and
 	  standard *Numeric* functions/methods.
@@ -1126,30 +1126,30 @@ class Sprite(_ImageBase):
 				 name=None, icolor='black', centerorigin=0):
 		"""Sprite instantiation function
 
-		**width, height** -- width and height of sprite in pixels
+		**width, height** - width and height of sprite in pixels
 
-		**x, y** -- initial sprite position (pixels in world coordinates)
+		**x, y** - initial sprite position (pixels in world coordinates)
 
-		**depth** -- depth of sprite (for DisplayList below). The DisplayList
+		**depth** - depth of sprite (for DisplayList below). The DisplayList
 		class draws sprites in depth order, with large depths being
 		draw first (ie, 0 is the top-most layer of sprites)
 
-		**on** (boolean) -- sprite on or off. If the sprite is off, then
+		**on** (boolean) - sprite on or off. If the sprite is off, then
 		the blit method won't actually perform the blit (see
 		blit method for exceptions).
 
-		**dx, dy** -- linear motion for sprite; if these are set, then
+		**dx, dy** - linear motion for sprite; if these are set, then
 		each time the sprite is blitted, the position is changed
 		by the specified amount.
 
-		**fname** -- name of file to load pixel data from
+		**fname** - name of file to load pixel data from
 
-		**name** -- debugging name (string) of the sprite; if not set, then
+		**name** - debugging name (string) of the sprite; if not set, then
 		either the filename or a unique random name is used instead.
 
-		**icolor** -- color to draw icon on the UserDisplay
+		**icolor** - color to draw icon on the UserDisplay
 
-		**centerorigin** -- this determines whether the sprite's internal
+		**centerorigin** - this determines whether the sprite's internal
 		coordinate system has (0,0) at center or in the upper left
 		corner. Default is origin in upper left corner!
 
@@ -1262,9 +1262,9 @@ class Sprite(_ImageBase):
 		This allows reading pixel values from sprites using
 		foo[x,y] syntax.
 
-		**x, y** -- x, y coords of pixel to read
+		**x, y** - x, y coords of pixel to read
 
-		**returns** --
+		**returns** -
 		returns length 4 tuple: (r, g, b, alpha)
 
 		**NOTE:**
@@ -1281,7 +1281,7 @@ class Sprite(_ImageBase):
 		This allows writing pixel values from spites using
 		foo[x,y] syntax.
 
-		*x, y* -- x, y coords of pixel to read
+		*x, y* - x, y coords of pixel to read
 		value - new color of pixel (r,g,b,alpha) quad..
 
 		**NOTE:**
@@ -1296,9 +1296,9 @@ class Sprite(_ImageBase):
 
 		This depends on the python imaging library (PIL)
 
-		**alpha** -- (optional) alpha value for the PhotoImage
+		**alpha** - (optional) alpha value for the PhotoImage
 
-		**returns** -- PhotoImage represenation of the sprite's pixels.
+		**returns** - PhotoImage represenation of the sprite's pixels.
 
 		"""
 		if alpha:
@@ -1319,10 +1319,10 @@ class Sprite(_ImageBase):
 
 		Set transparency of the *entire* sprite to this value.
 
-		**a** -- alpha value (0-255; 0 is fully transparent, 255 is
+		**a** - alpha value (0-255; 0 is fully transparent, 255 is
 		fully opaque).
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		self.alpha[:] = a
@@ -1330,15 +1330,15 @@ class Sprite(_ImageBase):
 	def line(self, x1, y1, x2, y2, color, width=1):
 		"""Draw line of specified color in sprite
 
-		**x1,y1** -- starting coords of line in world coords
+		**x1,y1** - starting coords of line in world coords
 
-		**x2,y2** -- ending coords of line in world coords
+		**x2,y2** - ending coords of line in world coords
 
-		**color** -- line color in _C() parseable format
+		**color** - line color in _C() parseable format
 
-		**width** -- line width in pixels
+		**width** - line width in pixels
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTE:**
 		This is not the same syntax as the FrameBuffer.line() method!!
@@ -1357,9 +1357,9 @@ class Sprite(_ImageBase):
 		Set's all pixels in the sprite to the indicated color, or black
 		if no color is specified.
 
-		**color** -- _C() parseable color specification
+		**color** - _C() parseable color specification
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		color = _C(color)
@@ -1370,9 +1370,9 @@ class Sprite(_ImageBase):
 
 		Like clear method above, but requires color to be specified
 
-		**color** -- _C() parseable color specification
+		**color** - _C() parseable color specification
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		color = _C(color)
@@ -1384,10 +1384,10 @@ class Sprite(_ImageBase):
 		Fill sprite with binary white noise. Threshold can be used
 		to specified the DC level of the noise.
 
-		**thresh** -- threshold value [0-1] for binarizing the noise
+		**thresh** - threshold value [0-1] for binarizing the noise
 		signal. Default's to 0.5 (half black/half white)
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		from RandomArray import uniform
@@ -1405,15 +1405,15 @@ class Sprite(_ImageBase):
 
 		Only pixels inside the circle are affected.
 
-		**color** -- _C() parseable color spec
+		**color** - _C() parseable color spec
 
-		**r** -- circle radius in pixels
+		**r** - circle radius in pixels
 
-		**x, y** -- circle center position in world coords (defaults to 0,0)
+		**x, y** - circle center position in world coords (defaults to 0,0)
 
-		**width** -- pen width in pixels, if 0, then draw a filled circle
+		**width** - pen width in pixels, if 0, then draw a filled circle
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTE:**
 		Be careful about 'centerorigin'
@@ -1441,14 +1441,14 @@ class Sprite(_ImageBase):
 		Pixels inside the circle are filled, rest of the sprite
 		is make 100% transparent.
 
-		**color** -- _C() parseable color spec
+		**color** - _C() parseable color spec
 
-		**r** -- radius of circular mask
+		**r** - radius of circular mask
 
-		**x, y** -- center coords of circular mask in pixels (world
+		**x, y** - center coords of circular mask in pixels (world
 		coordinates)
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		color = _C(color)
@@ -1483,13 +1483,13 @@ class Sprite(_ImageBase):
 	def rect(self, x, y, w, h, color):
 		"""Draw a *filled* rectangle of the specifed color on a sprite.
 
-		**x, y** -- world coords for rectangle's center
+		**x, y** - world coords for rectangle's center
 
-		**w, h** -- width and height of rectangle in pixels
+		**w, h** - width and height of rectangle in pixels
 
-		**color** -- _C() parseable color spec
+		**color** - _C() parseable color spec
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTES:**
 		- be careful about 'centerorigin'
@@ -1507,12 +1507,12 @@ class Sprite(_ImageBase):
 
 		Read/write single pixels from sprite. This is very slow!
 
-		**x,y** -- world coords of pixel to read or write
+		**x,y** - world coords of pixel to read or write
 
-		**val** -- if specified, then set the pixel at (x,y) to this
+		**val** - if specified, then set the pixel at (x,y) to this
 		value, otherwise, read the pixel at (x,y)
 
-		**returns** -- value of pixel at (x,y)
+		**returns** - value of pixel at (x,y)
 
 		**NOTE:**
 		This is just a wrapper for pix_octr() below!
@@ -1525,12 +1525,12 @@ class Sprite(_ImageBase):
 		Read/write single pixels from sprite. This is very slow!
 		"octr" stands for "object coordinates"
 
-		**x, y** -- world coords of pixel to read or write
+		**x, y** - world coords of pixel to read or write
 
-		**val** -- if specified, then set the pixel at (x,y) to this
+		**val** - if specified, then set the pixel at (x,y) to this
 		value, otherwise, read the pixel at (x,y)
 
-		**returns** -- value of pixel at (x,y)
+		**returns** - value of pixel at (x,y)
 		"""
 		(x, y) = self.XY((x, y))
 		if val is None:
@@ -1545,12 +1545,12 @@ class Sprite(_ImageBase):
 		"rc" stands for "raw coords"
 
 
-		**x, y** -- DEVICE coords of pixel to read or write
+		**x, y** - DEVICE coords of pixel to read or write
 
-		**val** -- if specified, then set the pixel at (x,y) to this
+		**val** - if specified, then set the pixel at (x,y) to this
 		value, otherwise, read the pixel at (x,y)
 
-		**returns** -- value of pixel at (x,y)
+		**returns** - value of pixel at (x,y)
 
 		**NOTE:**
 		same as pix() & pix_octr() method, but uses DEVICE coords instead
@@ -1569,9 +1569,9 @@ class Sprite(_ImageBase):
 		Flip image on x-axis or y-axis, whatever's true. Uses
 		pygame.transform primitives, so it's fast.
 
-		**xaxis,yaxis** (boolean) -- which axis to flip on
+		**xaxis,yaxis** (boolean) - which axis to flip on
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		new = pygame.transform.flip(self.im, xaxis, yaxis)
@@ -1597,16 +1597,16 @@ class Sprite(_ImageBase):
 		Rotate sprite image about the sprite's center.
 		Uses pygame.transform primitives.
 
-		**angle** -- angle of rotation in degrees
+		**angle** - angle of rotation in degrees
 
-		**preserve_size** -- boolean; if true, the rotated sprite
+		**preserve_size** - boolean; if true, the rotated sprite
 		is clipped back down to the size of the original image.
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTES:**
 
-		- 'trim' ignored for now -- don't even remember what it was
+		- 'trim' ignored for now - don't even remember what it was
 		  for... totally obsolete now.
 
 		- this is NOT invertable! Multiple rotations will accumulate
@@ -1642,11 +1642,11 @@ class Sprite(_ImageBase):
 		to save the original image data, first clone() and then
 		scale().
 
-		**new_width** -- new width in pixels
+		**new_width** - new width in pixels
 
-		**new_height** -- new height in pixels
+		**new_height** - new height in pixels
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTE:**
 		This is NOT invertable! Scaling down and back up
@@ -1671,13 +1671,13 @@ class Sprite(_ImageBase):
 		"""Resize this sprite using rotozoom
 
 		This does combined scale and rotation and smooths on the
-		fly -- probbaly not as fast as scale(), but will look better.
+		fly - probbaly not as fast as scale(), but will look better.
 
-		**scale** -- floating point scale factor
+		**scale** - floating point scale factor
 
-		**angle** -- angle in degrees to rotate CCW
+		**angle** - angle in degrees to rotate CCW
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTE:**
 		This is NOT invertable! Scaling down and back up will
@@ -1699,7 +1699,7 @@ class Sprite(_ImageBase):
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
 
 	def circmask(self, x, y, r):
-		"""hard vignette in place --- was image_circmask"""
+		"""hard vignette in place -- was image_circmask"""
 		mask = where(less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
 		a[:] = mask * a
@@ -1713,11 +1713,11 @@ class Sprite(_ImageBase):
 		of the sprite, so when it's blitted the region outside
 		the aperture is masked out (fully transparent, alpha=0)
 
-		**r** -- radius in pixels
+		**r** - radius in pixels
 
-		**x,y** -- optional aperture center in pixels (world coords)
+		**x,y** - optional aperture center in pixels (world coords)
 
-		**returns** -- None
+		**returns** - None
 		"""
 		d = where(less((((self.ax-x)**2)+((self.ay+y)**2))**0.5, r),
 				  255, 0).astype(UnsignedInt8)
@@ -1732,11 +1732,11 @@ class Sprite(_ImageBase):
 		of the sprite, so when it's blitted the region outside
 		the aperture is masked out (fully transparent, alpha=0)
 
-		**r1,r2** -- inner,outer radii in pixels
+		**r1,r2** - inner,outer radii in pixels
 
-		**x,y** -- optional aperture center in pixels (world coords)
+		**x,y** - optional aperture center in pixels (world coords)
 
-		**returns** -- None
+		**returns** - None
 		"""
 		d = 255 - (255 * (((((self.ax-x)**2)+\
 							((self.ay+y)**2))**0.5)-r1) / (r2-r1))
@@ -1751,13 +1751,13 @@ class Sprite(_ImageBase):
 		*directly to the image data* (under the assumption that the
 		background is a solid fill pattern with color 'bg').
 
-		**r1,t2** -- inner,outer radii in pixels
+		**r1,t2** - inner,outer radii in pixels
 
-		**bg** -- background color in _C() compatible format
+		**bg** - background color in _C() compatible format
 
-		**x,y** -- coords of mask center; pixels in world coords
+		**x,y** - coords of mask center; pixels in world coords
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		d = 1.0 - ((hypot(self.ax-x, self.ay+y) - r1) / (r2 - r1))
@@ -1781,11 +1781,11 @@ class Sprite(_ImageBase):
 		Reduce sprite's contrast. Modifies sprite's image data.
 		v = (1-mult)*(v-mean), where v is the pixel values.
 
-		**mult** -- scale factor
+		**mult** - scale factor
 
-		**meanval** -- assumed mean pixel value [0-255]
+		**meanval** - assumed mean pixel value [0-255]
 
-		**returns** -- None
+		**returns** - None
 
 		**NOTE:**
 		this assumes the mean value of the image data is 'meanval',
@@ -1803,9 +1803,9 @@ class Sprite(_ImageBase):
 		Threshold (binarize) sprite's image data
 		v =  (v > thresh) ? 255 : 1, where v is pixel value
 
-		**t** -- threshold (0-255)
+		**t** - threshold (0-255)
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
@@ -1829,7 +1829,7 @@ class Sprite(_ImageBase):
 	def toggle(self):
 		"""Flip on/off flag.
 
-		**returns** -- current state of flag.
+		**returns** - current state of flag.
 
 		"""
 		if self._on:
@@ -1841,7 +1841,7 @@ class Sprite(_ImageBase):
 	def state(self):
 		"""Get current on/off flag state.
 
-		**returns** -- boolean on/off flag
+		**returns** - boolean on/off flag
 
 		"""
 		return self._on
@@ -1849,9 +1849,9 @@ class Sprite(_ImageBase):
 	def moveto(self, x, y):
 		"""Move sprite to new location
 
-		**x,y** (pixels) -- framebuffer coords of new location
+		**x,y** (pixels) - framebuffer coords of new location
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		self.x = x
@@ -1862,9 +1862,9 @@ class Sprite(_ImageBase):
 
 		Shifts sprite by dx,dy pixels relative to current position.
 
-		**dx,dy** (pixels) -- framebuffer coords of new location
+		**dx,dy** (pixels) - framebuffer coords of new location
 
-		**returns** -- None
+		**returns** - None
 
 		"""
 		self.x = self.x + dx
@@ -1873,15 +1873,15 @@ class Sprite(_ImageBase):
 	def blit(self, x=None, y=None, fb=None, flip=None, force=0, fast=None):
 		"""Copy sprite to screen (block transfer)
 
-		**x,y** (pixels) -- optional new screen location
+		**x,y** (pixels) - optional new screen location
 
-		**fb** -- frame buffer
+		**fb** - frame buffer
 
-		**flip** (boolean) -- flip after blit?
+		**flip** (boolean) - flip after blit?
 
-		**force** (boolean) -- override on/off flag?
+		**force** (boolean) - override on/off flag?
 
-		**fast** -- ignored (use *flastblit()* instead)
+		**fast** - ignored (use *flastblit()* instead)
 
 		**NOTE:**
 		- x,y,fb etc are all internal properties of each sprite. You
@@ -2002,15 +2002,15 @@ class Sprite(_ImageBase):
 		Generates a **new** sprite from the specified sub-region of
 		current sprite.
 
-		**x,y** (pixels) -- coordinates of subregion (0,0) is upper
+		**x,y** (pixels) - coordinates of subregion (0,0) is upper
 		left corner of parent/src sprite
 
-		**w,h** (pixels) -- width and height of subregion
+		**w,h** (pixels) - width and height of subregion
 
-		**center** (boolean) -- Does (x,y) refer to the center or
+		**center** (boolean) - Does (x,y) refer to the center or
 		upper left corner of sprite?
 
-		**returns** -- new sprite
+		**returns** - new sprite
 
 		**NOTE:** (Wed Apr 19 14:32:03 2006 mazer)
 		Despite what the pygame docs say about subsurface(), this
@@ -2135,11 +2135,11 @@ class Sprite(_ImageBase):
 
 	def save_alpha(self, fname, mode='w'):
 		"""DO NOT USE"""
-		raise SpriteObsolete, 'save_alpha method obsolete -- pre-pygame!'
+		raise SpriteObsolete, 'save_alpha method obsolete - pre-pygame!'
 
 	def old_subimage(self, x, y, w, h, center=None):
 		"""DO NOT USE"""
-		raise SpriteObsolete, 'save_alpha method obsolete -- pre-pygame!'
+		raise SpriteObsolete, 'save_alpha method obsolete - pre-pygame!'
 
 class MpegMovie(_ImageBase):
 	"""Mpeg movie player
@@ -2155,16 +2155,16 @@ class MpegMovie(_ImageBase):
 				 x=0, y=0, fb=None, name=None, icolor='black'):
 		"""MpegMovie instantiation function
 
-		**mpgfile** -- full name (and path) of mpg file.
+		**mpgfile** - full name (and path) of mpg file.
 
-		**x,y** (pixels) -- location (center) where movie should
+		**x,y** (pixels) - location (center) where movie should
 		be positioned on screen.
 
-		**fb** -- framebuffer (required for playback).
+		**fb** - framebuffer (required for playback).
 
-		**name** -- spritge name for debugging
+		**name** - spritge name for debugging
 
-		**icolor** -- icon color for user display
+		**icolor** - icon color for user display
 
 		"""
 
@@ -2188,7 +2188,7 @@ class MpegMovie(_ImageBase):
 		ahead 999,999 frames and then queries smpeg for the current
 		video frame number.
 
-		**returns** -- movie length in frames
+		**returns** - movie length in frames
 
 		"""
 		self.m.set_display(self.fb.screen,
@@ -2200,12 +2200,12 @@ class MpegMovie(_ImageBase):
 	def showframe(self, n):
 		"""Render n-th frame directly to framebuffer.
 
-		**n** -- frame number to render (starting with 0)
+		**n** - frame number to render (starting with 0)
 
-		**returns** -- current frame number or **None** at the end
+		**returns** - current frame number or **None** at the end
 		of the movie
 
-		**NOTE** --
+		**NOTE** -
 		This function does a page flip automatically (in fact, I don't
 		know how to stop it from doing that).
 
@@ -2238,26 +2238,26 @@ class PolySprite:
 				 depth=0, name=None):
 		"""PolySprite instantiation method
 
-		**points** (pixels) -- polygon vertices. List of (x,y) pairs, where
+		**points** (pixels) - polygon vertices. List of (x,y) pairs, where
 		(0,0) is screen center, positive y is up, positive x is to the right.
 
-		**color** -- line color
+		**color** - line color
 
-		**fb** -- framebuffer
+		**fb** - framebuffer
 
-		**line** (boolean) -- lines only? (otherwise draw filled polygon)
+		**line** (boolean) - lines only? (otherwise draw filled polygon)
 
-		**closed** (boolean) -- open or closed polygon?
+		**closed** (boolean) - open or closed polygon?
 
-		**width** (pixesl) -- line width
+		**width** (pixesl) - line width
 
-		**on** (boolean) -- just like regular Sprite class
+		**on** (boolean) - just like regular Sprite class
 
-		**depth** -- depth of sprite (for DisplayList below). The DisplayList
+		**depth** - depth of sprite (for DisplayList below). The DisplayList
 		class draws sprites in depth order, with large depths being
 		draw first (ie, 0 is the top-most layer of sprites)
 
-		**name** -- debugging name (string) of the sprite; if not set, then
+		**name** - debugging name (string) of the sprite; if not set, then
 		either the filename or a unique random name is used instead.
 
 		"""
@@ -2352,12 +2352,12 @@ class DisplayList:
 	def __init__(self, fb, bg=None):
 		"""Instantiation method
 
-		**fb** -- framebuffer associated with this list. This is sort of
+		**fb** - framebuffer associated with this list. This is sort of
 		redundant, since each sprite knows which framebuffer it lives
 		on too. It's currently only used for clearing and flipping the
 		framebuffer after updates.
 
-		**bg** -- optional background color
+		**bg** - optional background color
 
 		"""
 
@@ -2394,10 +2394,10 @@ class DisplayList:
 	def delete(self, s=None):
 		"""Delete sprite from display list
 
-		**s** (sprite) -- sprite (or list of sprites) to delete, or
+		**s** (sprite) - sprite (or list of sprites) to delete, or
 		None for delete all sprites.
 
-		**NOTE** -- Same as clear() and delete_all() methods if called
+		**NOTE** - Same as clear() and delete_all() methods if called
 		with no arguments.
 
 		"""
@@ -2450,7 +2450,7 @@ class DisplayList:
 			self.fb.flip()
 
 	def _print(self):
-		"""INTERNAL -- for debugging only"""
+		"""INTERNAL - for debugging only"""
 		for s in self.sprites:
 			Logger("%s\n" % s)
 
@@ -2467,7 +2467,7 @@ def barsprite(w, h, angle, color, **kw):
 
 	This _really_ should be a class that inherits from Sprite().
 
-	**return** -- sprite containing the requested bar
+	**return** - sprite containing the requested bar
 
 	"""
 	s = apply(Sprite, (w, h), kw)
@@ -2491,18 +2491,18 @@ def fixsprite(x, y, fb, fix_size, color, bg):
 	fixation target :-) Target is a solid filled circle of the
 	specified color.
 
-	**x,y** (pixels) -- location of target (center)
+	**x,y** (pixels) - location of target (center)
 
-	**fb** -- frame buffer
+	**fb** - frame buffer
 
-	**fix_size** (pixels) -- radius of target (use _ZERO_ for single pixel
+	**fix_size** (pixels) - radius of target (use _ZERO_ for single pixel
 	target)
 
-	**color** -- fill color
+	**color** - fill color
 
-	**bg** -- background color
+	**bg** - background color
 
-	**returns** -- new sprite containing the target
+	**returns** - new sprite containing the target
 
 	"""
 	if fix_size > 0:
@@ -2523,20 +2523,20 @@ def fixsprite2(x, y, fb, fix_size, fix_ring, color, bg):
 	Generates a sprite containing a circular fixation target
 	surrounded by an annulus of black (to increase detectability).
 
-	**x,y** (pixels) -- location of target (center)
+	**x,y** (pixels) - location of target (center)
 
-	**fb** -- frame buffer
+	**fb** - frame buffer
 
-	**fix_size** (pixels) -- radius of target (use _ZERO_ for single pixel
+	**fix_size** (pixels) - radius of target (use _ZERO_ for single pixel
 	target)
 
-	**fix_ring** (pixels) -- radius of annulus
+	**fix_ring** (pixels) - radius of annulus
 
-	**color** -- fill color
+	**color** - fill color
 
-	**bg** -- background color
+	**bg** - background color
 
-	**returns** -- new sprite containing the target
+	**returns** - new sprite containing the target
 
 	"""
 
@@ -2593,16 +2593,16 @@ def _C(color):
 def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0):
 	"""Quickly setup and initialize framebuffer
 
-	**dpy** (string) -- display string
+	**dpy** (string) - display string
 
-	**w,h** (pixels) -- width and height of display
+	**w,h** (pixels) - width and height of display
 
-	**bpp** (int) -- bits per pixel (display depth)
+	**bpp** (int) - bits per pixel (display depth)
 
-	**flags** -- pygame/SDL flags. If you have to ask, you shouldn't
+	**flags** - pygame/SDL flags. If you have to ask, you shouldn't
 	be using this feature or function...
 
-	**returns** -- live frame buffer
+	**returns** - live frame buffer
 
 	"""
 	return FrameBuffer(dpy, w, h, bpp, fullscreen, sync=None, opengl=opengl)

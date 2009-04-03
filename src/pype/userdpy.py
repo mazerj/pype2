@@ -65,18 +65,18 @@ class UserDisplay:
 		screen that shows a shadow/copy of what the subject is viewing
 		plus other useful information and fiduciary marks.
 
-		**master** -- parent window (None for make new toplevel window)
+		**master** - parent window (None for make new toplevel window)
 
-		**cwidth,cheight** -- width and height of framebuffer we're
+		**cwidth,cheight** - width and height of framebuffer we're
 		shadowing.
 
-		**pix_per_dva** -- pixels per degree visual angle
+		**pix_per_dva** - pixels per degree visual angle
 
-		**blocked** -- x,y coords of the upper left corner of the *blocked*
+		**blocked** - x,y coords of the upper left corner of the *blocked*
 		region of the display (blocked by photodiode). This is just marked
 		out so the user doesn't forget...
 
-		**app** -- PypeApp handle
+		**app** - PypeApp handle
 
 		**NOTE:** Just because most of these arguments are keywords
 		(and therefore optional), doesn't mean they're not
@@ -705,7 +705,7 @@ class UserDisplay:
 		Autmoatically-draw a DisplayList object as a set of icons on the
 		UserDisplay (faster than exact copies).
 
-		**displaylist** -- DisplayList or None for clear all.
+		**displaylist** - DisplayList or None for clear all.
 
 		"""
 
