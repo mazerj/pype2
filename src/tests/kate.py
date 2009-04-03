@@ -94,10 +94,7 @@ def noisemask(mod_depth,mod_image,sprites):
     return sprites
 
 
-from psycho import *
-
-fb = PsychoFrameBuffer(None, 256, 256, 32, dga=None, gamma=1.0,
-                       flags=DOUBLEBUF|HWSURFACE)
+fb = quickinit(dpy=":0.0", w=256, h=256, bpp=32, fullscreen=0, opengl=1)
 
 N=128
 s = Sprite(width=N, height=N, x=0, y=0, depth=0, \

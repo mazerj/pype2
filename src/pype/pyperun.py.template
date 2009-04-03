@@ -55,28 +55,33 @@ def _addpath(d, atend=None):
         sys.path = [d] + sys.path
 
 def _run_script(fullname):
+
     """Run module as script -- script name include .py extension."""
     name = posixpath.basename(fullname)
     if name[-3:] == '.py':
         name = name[:-3]                # strip .py extension
 
-    p = [string.join(fullname.split('/')[0:-1],'/')]
-    trylist = ((None, name), (None,name+'.py'), (p, name), (p, name+'.py'))
-    for path, fname in trylist:
+    modname = [string.join(fullname.split('/')[0:-1],'/')]
+    trylist = ((name, None), (name+'.py', None),
+               (name, modname), (name+'.py', modname))
+
+    # look for the modulate in standard locations, load it if you
+    # find it, otherwise return 1
+    for fname, path in trylist:
         try:
             if path:
                 fp, pathname, description = imp.find_module(fname, path)
             else:
                 fp, pathname, description = imp.find_module(fname)
+        except ImportError:
+            fp = None
+        if fp:
             sys.argv[0] = pathname
             try:
-                # load module as __main__ to make it run as script
                 mod = imp.load_module('__main__', fp, pathname, description)
             finally:
                 fp.close()
             return 1
-        except ImportError:
-            pass
     return 0
 
 av = []
@@ -174,7 +179,7 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
         #    name, load and run.
         sys.argv = sys.argv[2:]
         if _run_script(sys.argv[0]) == 0:
-            sys.stderr.write("pyperun: can't find '%s'\n" % sys.argv[0])
+            sys.stderr.write("pyperun: can't find module '%s'\n" % sys.argv[0])
             sys.exit(1)
 else:
     # Invoked as plain old 'pype' -- full gui interface startup

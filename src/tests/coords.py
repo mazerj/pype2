@@ -1,9 +1,6 @@
 #!/usr/bin/env pypenv
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
 
-"""
-Wedge generator for kate
-"""
 
 import sys
 
@@ -11,7 +8,6 @@ from Numeric import *
 from sprite import *
 from pygame.constants import *
 from spritetools import *
-from psycho import *
 
 def g2rgb(a):
     return transpose(array([a, a, a]), axes=[1,2,0])
@@ -35,8 +31,7 @@ def show(s):
 
 N = 128
 
-fb = PsychoFrameBuffer(None, 256, 256, 32, dga=None, gamma=1.0,
-                       flags=DOUBLEBUF|HWSURFACE)
+fb = quickinit(dpy=":0.0", w=256, h=256, bpp=32, fullscreen=0, opengl=1)
 
 s = Sprite(width=N, height=N, x=0, y=0, depth=0, \
            fb=fb, on=1, image=None, dx=0, dy=0,
