@@ -3,7 +3,7 @@ include ../make.defs
 DACQDIR = dacq3
 DUMMYDIR= dummy-dacq
 PYDIR   = pype
-SUBDIRS = sh sample-tasks Plexon p2m tools
+SUBDIRS = sh systasks Plexon p2m tools
 
 install: install-subdirs install-py install-dacq
 

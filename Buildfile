@@ -73,7 +73,7 @@ clean:
 		done
 	@cd src/wrapper ; $(MAKE) clean
 
-clobber: clean x-clean
+clobber: clean
 
 docs:
 	ls ./src/pype/*.py | \
