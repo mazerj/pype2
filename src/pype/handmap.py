@@ -215,6 +215,7 @@ class _Probe:
 		s = s +		"(1-6) color______%s\n" % self.colorname
 		s = s +		" q/w: len________%d\n" % self.length
 		s = s +		" e/r: wid________%d\n" % self.width
+		s = s +		"   j: jitter_____%s\n" % _bool(self.jitter)
 		s = s +		"   d: drift______%s\n" % _bool(self.drift)
 		s = s +		" t/T: drift_amp__%d pix\n" % self.drift_amp
 		s = s +		" y/Y: drft_freq__%.1f Hz\n" % self.drift_freq
