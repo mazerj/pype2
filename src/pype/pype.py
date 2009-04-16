@@ -3217,6 +3217,8 @@ class PypeApp:
 									   self.task_name, next)
 
 	def _guess_elog(self):
+		import elogapi
+		
 		animal = self.sub_common.queryv('subject')
 		train = self.sub_common.queryv('training')
 		full_animal = self.sub_common.queryv('full_subject')
