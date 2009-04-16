@@ -28,8 +28,8 @@ from Numeric import *
 import RandomArray
 from PIL import Image
 
-import pygame.image
-import pygame.surfarray
+#import pygame.image
+#import pygame.surfarray
 
 from sprite import *
 from sprite import _C
@@ -61,11 +61,15 @@ class NumSprite:
 		
 		if fname:
 			# load image data from file using pygame tools
+			self.frompil(Image.open(fname))
+
+			""" with pygame:
 			s = pygame.image.load(fname)
 			array = pygame.surfarray.array3d(s).copy()
 			self.array = array.astype(UnsignedInt8)
 			alpha = pygame.surfarray.array_alpha(s).copy()
 			self.alpha = alpha.astype(UnsignedInt8)
+			"""
 
 			""" with numpy:
 			a = PIL.Image.open(fname)
@@ -178,13 +182,22 @@ class NumSprite:
 
 	def frompil(self, i):
 		a = array(i.tostring()).astype(UnsignedInt8)
-		a = reshape(a, (i.size[1], i.size[0], 4))
-		a = transpose(a, axes=[1,0,2])
-		self.array = a[:,:,0:3]
-		self.alpha = a[:,:,3]
+		bpp = a.shape[0] / i.size[1] / i.size[0]
+		if bpp == 4:
+			# RGBA
+			a = reshape(a, (i.size[1], i.size[0], 4))
+			a = transpose(a, axes=[1,0,2])
+			self.array = a[:,:,0:3]
+			self.alpha = a[:,:,3]
+		elif bpp == 3:
+			# RGB
+			a = reshape(a, (i.size[1], i.size[0], 3))
+			self.array = transpose(a, axes=[1,0,2])
+			self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
+			self.alpha[:] = 255
 
 	def rotate(self, angle, preserve_size=1, trim=0):
-		self.frompil(self.topil().rotate(angle, expand=(not preserve_size)))
+		self.frompil(self.topil().rotate(-angle, expand=(not preserve_size)))
 		self.setdims()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
@@ -324,7 +337,7 @@ import copy
 if 1:
 	s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)
 	#s.save('foo.jpg')
-	s.scale(50,50)
+	#s.scale(50,50)
 	s.rotate(45, preserve_size=0)
 	s.blit(flip=1)
 	keyboard()
