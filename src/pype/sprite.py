@@ -79,7 +79,13 @@ Tue Mar 31 12:21:17 2009 mazer
 
 - made lower right-hand corner default syncpulse position
 
-- fb.phdiode_mode --> fb.sync_mode
+- fb.phdiode_mode -> fb.sync_mode
+
+Fri Apr 17 10:45:46 2009 mazer
+
+- added mouse options for FrameBuffer/quickinit
+
+- improved noise() function (added color flag) (from numsprite.py)
 
 """
 
@@ -98,6 +104,7 @@ import copy
 import exceptions
 
 from Numeric import *
+from RandomArray import uniform
 try:
 	import pygame
 except ImportError:
@@ -170,7 +177,7 @@ def checkrshift():
 class FrameBuffer:
 	def __init__(self, dpy, width, height, bpp, fullscreen, bg=1,
 				 sync=1, syncsize=50, syncx=-10000, syncy=-10000,
-				 synclevel=255, opengl=0):
+				 synclevel=255, opengl=0, mouse=0):
 		"""FrameBuffer class (SDL<-pygame<-pype).
 
 		This class provides a simple wrapper for the pygame interface
@@ -213,6 +220,8 @@ class FrameBuffer:
 		in OpenGL mode  (added 17-jan-2006 shinji)
 
 		**pype** - optional pype app handle
+
+		**mouse** - show mouse cursor? default is no
 
 		**returns** - None.
 
@@ -358,6 +367,8 @@ class FrameBuffer:
 		self.maxfliptime = 0
 		self.fliptimer = None
 
+		if mouse:
+			self.cursor(1)
 
 	def __del__(self):
 		"""Cleanup function.
@@ -1378,7 +1389,7 @@ class Sprite(_ImageBase):
 		color = _C(color)
 		self.im.fill(color)
 
-	def noise(self, thresh=0.5):
+	def noise(self, thresh=0.5, color=None):
 		"""Fill sprite with noise
 
 		Fill sprite with binary white noise. Threshold can be used
@@ -1390,15 +1401,13 @@ class Sprite(_ImageBase):
 		**returns** - None
 
 		"""
-		from RandomArray import uniform
-
-		if thresh is None:
-			n = uniform(1, 255, shape=shape(self.alpha[:]))
-		else:
-			n = where(greater(uniform(0, 1, shape=shape(self.alpha[:])),
-							  thresh), 255, 1)
-		self.array[:] = transpose(array([n, n, n]),
-								  axes=[1,2,0]).astype(UnsignedInt8)[:]
+		for n in range(3):
+			if color or n == 0:
+				m = uniform(1, 255, shape=(self.w, self.h))
+				if not thresh is None:
+					m = where(greater(m, thresh*255), 255, 1)
+			self.array[:,:,n] = m[:].astype(UnsignedInt8)
+		
 
 	def circlefill(self, color, r=None, x=None, y=None, width=0):
 		"""Draw *filled* circle in sprite
@@ -1699,7 +1708,7 @@ class Sprite(_ImageBase):
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
 
 	def circmask(self, x, y, r):
-		"""hard vignette in place -- was image_circmask"""
+		"""hard vignette in place - was image_circmask"""
 		mask = where(less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
 		a[:] = mask * a
@@ -1797,13 +1806,13 @@ class Sprite(_ImageBase):
 		pixs[:] = (float(meanval) + ((1.0-mult) * \
 			   (pixs.astype(Float)-float(meanval)))).astype(UnsignedInt8)
 
-	def thresh(self, t):
+	def thresh(self, threshval):
 		"""Threshold sprite image data
 
 		Threshold (binarize) sprite's image data
 		v =  (v > thresh) ? 255 : 1, where v is pixel value
 
-		**t** - threshold (0-255)
+		**threshval** - threshold (0-255)
 
 		**returns** - None
 
@@ -2571,7 +2580,7 @@ def _C(color):
 	"""
 	try:
 		if len(color) == 1:
-			# color is grayscale --> convert to rgba
+			# color is grayscale -> convert to rgba
 			color = (color, color, color, 255)
 		elif len(color) == 3:
 			# color is list or tuple of length 3, add alpha=255
@@ -2580,7 +2589,7 @@ def _C(color):
 			# color is list or tuple of length 3, add nothing
 			color = color
 	except TypeError:
-		# color is grayscale --> convert to rgba
+		# color is grayscale -> convert to rgba
 		if color < 255:
 			color = (color, color, color, 255)
 		else:
@@ -2590,7 +2599,7 @@ def _C(color):
 					 color&ALPHAMASKS[3])
 	return color
 
-def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0):
+def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0, mouse=1):
 	"""Quickly setup and initialize framebuffer
 
 	**dpy** (string) - display string
@@ -2599,13 +2608,18 @@ def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0):
 
 	**bpp** (int) - bits per pixel (display depth)
 
-	**flags** - pygame/SDL flags. If you have to ask, you shouldn't
-	be using this feature or function...
+
+	**fullscreen** (bool) - full screen mode (default is no)
+	
+	**opengl** (bool) - use OpenGL backend? (default is no)
+
+	**mouse** (bool) - now mouse cursor? (default is no)
 
 	**returns** - live frame buffer
 
 	"""
-	return FrameBuffer(dpy, w, h, bpp, fullscreen, sync=None, opengl=opengl)
+	return FrameBuffer(dpy, w, h, bpp, fullscreen,
+					   sync=None, opengl=opengl, mouse=mouse)
 
 
 # these are just here to generate useful error messages

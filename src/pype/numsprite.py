@@ -14,34 +14,19 @@ Tue Apr  7 10:34:35 2009 mazer
 
 """
 
-import os
-import sys
-import posix
-import pwd
-import types
 import math
 import copy
-import exceptions
 import time
 
 from Numeric import *
-import RandomArray
+from RandomArray import uniform
 from PIL import Image
-
-#import pygame.image
-#import pygame.surfarray
-
-from sprite import *
 from sprite import _C
-from sprite import _pygl_setxy
-
 from pypedebug import keyboard
 
 class NumSprite:
+	"""Pure Numeric-based Sprite object.
 	"""
-	Numeric-based Sprite object.
-	"""
-
 	_count = 0
 	
 	def __init__(self, width=100, height=100, x=0, y=0, depth=0, \
@@ -62,32 +47,17 @@ class NumSprite:
 		if fname:
 			# load image data from file using pygame tools
 			self.frompil(Image.open(fname))
-
-			""" with pygame:
-			s = pygame.image.load(fname)
-			array = pygame.surfarray.array3d(s).copy()
-			self.array = array.astype(UnsignedInt8)
-			alpha = pygame.surfarray.array_alpha(s).copy()
-			self.alpha = alpha.astype(UnsignedInt8)
-			"""
-
-			""" with numpy:
-			a = PIL.Image.open(fname)
-			self.array = numpy.array(a)
-			...
-			"""
 		elif image:
-			# make a copy of the source sprite/image
-			self.array = image.array.copy()
-			self.alpha = image.alpha.copy()
+			raise Error
 		else:
 			# new RGBA image from scratch
 			self.array = zeros((width, height, 3), UnsignedInt8)
 			self.alpha = zeros((width, height), UnsignedInt8)
 			self.alpha[:] = 255
 
-		# set dimensions based on loaded shape
-		self.setdims()
+		# set dimensions automatically based on shape of instantiated
+		# Numeric arrays
+		self._setdims()
 
 		if name:
 			self.name = name
@@ -97,14 +67,24 @@ class NumSprite:
 			self.name = "numsprite%d" % NumSprite._count
 		NumSprite._count = NumSprite._count + 1
 
-	def setdims(self):
+	def clone(self):
+		new = NumSprite(x=self.x, y=self.y,
+						width=self.w,height=self.h,
+						dx=self.dx, dy=self.dy, depth=self.depth,
+						fb=self.fb, on=self._on, icolor=self.icolor,
+						centerorigin=self.centerorigin)
+		new.array = copy.copy(self.array)
+		new.alpha = copy.copy(self.alpha)
+		new._setdims()
+		new.name = 'Clone of %s' % self.name
+		return new
+
+	def _setdims(self):
 		(self.w, self.h) = self.alpha.shape
 		(self.iw, self.ih) = (self.w, self.h)
 
 		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
 		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
-
-	
 
 	def __repr__(self):
 		return '<NumSprite "%s" @ (%d,%d) depth=%d>' % \
@@ -117,16 +97,8 @@ class NumSprite:
 		self.array[key] = value
 
 	def asPhotoImage(self, alpha=None):
-		m = self.array.copy()
-		a = self.alpha.copy()
-		if alpha:
-			a[:] = alpha
-			
-		m = concatenate((self.array, self.alpha[:,:,NewAxis]),
-						axis=2)
-		s = m.tostring()
-		#?? s = transpose(m, axes=[1,0,2])[::-1,:,:].tostring()
-		self.pil_im = PIL.Image.fromstring('RGBA', (self.w, self.h), s)
+		# save handles to prevent garbage collection..
+		self.pil_im = self.topil()
 		self.pim = PIL.ImageTk.PhotoImage(self.pil_im)
 		return self.pim
 
@@ -145,10 +117,10 @@ class NumSprite:
 	def noise(self, thresh=0.5, color=None):
 		for n in range(3):
 			if color or n == 0:
-				m = RandomArray.uniform(1, 255, shape=shape(self.array)[0:2])
+				m = uniform(1, 255, shape=shape(self.array)[0:2])
 				if not thresh is None:
 					m = where(greater(m, thresh*255), 255, 1)
-			self.array[:,:,n] = m[:]
+			self.array[:,:,n] = m[:].astype(UnsignedInt8)
 
 	def circlefill(self, color, r, x=0, y=0, width=0):
 		ar = (((self.ax-x)**2)+((self.ay+y)**2))**0.5
@@ -198,7 +170,7 @@ class NumSprite:
 
 	def rotate(self, angle, preserve_size=1, trim=0):
 		self.frompil(self.topil().rotate(-angle, expand=(not preserve_size)))
-		self.setdims()
+		self._setdims()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
 		self.rotate(angle=angle, preserver_size=preserve_size, trim=trim)
@@ -209,7 +181,7 @@ class NumSprite:
 	def scale(self, new_width, new_height):
 		self.frompil(self.topil().resize((new_width, new_height),
 										 Image.NEAREST))
-		self.setdims()
+		self._setdims()
 
 	def circmask(self, r, x=0, y=0):
 		d = (((self.ax-x)**2)+((self.ay+y)**2))**0.5
@@ -229,13 +201,26 @@ class NumSprite:
 		self.alpha[:,:] = d[:,:].astype(UnsignedInt8)
 
 	def alpha_gradient2(self, r1, r2, bg, x=0, y=0):
-		raise Error
+		d = 1.0 - ((hypot(self.ax-x, self.ay+y) - r1) / (r2 - r1))
+		alpha = clip(d, 0.0, 1.0)
+		bgi = zeros((alpha.shape[0],alpha.shape[1],3))
+		try:
+			for n in range(len(bg)):
+				bgi[:,:,n] = bg[n]
+		except TypeError:
+			bgi[:] = bg
+		for n in range(3):
+			self.array[:,:,n] = ((alpha * self.array[:,:,n]).astype(Float) + \
+								((1.0-alpha) * bgi[:,:,n])).astype(UnsignedInt8)
+		self.alpha[:] = 255;
 
 	def dim(self, mult, meanval=128.0):
-		self.array = meanval + ((1.0-mult) * (self.array-meanval))
+		self.array = meanval + \
+					 ((1.0-mult) * (self.array-meanval)).astype(UnsignedInt8)
 
-	def thresh(self, t):
-		raise Error
+	def thresh(self, threshval):
+		self.array = where(less(self.array, threshval), \
+						   1, 255).astype(UnsignedInt8)
 
 	def on(self):
 		self._on = 1
@@ -261,39 +246,43 @@ class NumSprite:
 	def save(self, fname):
 		"""Use PIL to save image."""
 		self.topil().save(fname)
-		
+
+	def fastblit(self):
+		self.blit(fast=1)
+
+	def render(self, clear=None):
+		m = concatenate((self.array, self.alpha[:,:,NewAxis]), axis=2)
+		self._rendered = transpose(m, axes=[1,0,2])[::-1,:,:].tostring()
+
 	def blit(self, x=None, y=None, fb=None, flip=None, force=0, fast=None):
-		# note: fast is ignored now
 		if not force and not self._on:
 			return
 
 		if fb is None:
 			fb = self.fb
-
-		if self.fb is None:
+		if fb is None:
 			Logger("No fb associated with sprite on blit\n")
 			return None
 
-		# save position, if specified, else used saved position
-		if x is None:	x = self.x
-		else:			self.x = x
-
-		if y is None:	y = self.y
-		else:			self.y = y
+		# use specified position OR saved position
+		# and update saved position to actual position.
+		self.x = x or self.x
+		self.y = y or self.y
 
 		# x,y coords specify destination of sprite CENTER.
 		# Convert to FB coords (place (0,0) corner in (0,0)@UL coords)
-		scx = fb.hw + x - (self.w / 2)
-		scy = fb.hh - y - (self.h / 2)
+		scx = fb.hw + self.x - (self.w / 2)
+		scy = fb.hh + self.y - (self.h / 2)
 
-		# blit and optional page flip..
-		scy = fb.hh + y - (self.h / 2)
-		_pygl_setxy(scx, scy)
-
-		m = concatenate((self.array, self.alpha[:,:,NewAxis]), axis=2)
-		s = transpose(m, axes=[1,0,2])[::-1,:,:].tostring()
+		if not fast:
+			self.render()
 			
-		glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE, s)
+		# 24-jan-2006 shinji (was in _pygl_setxy)
+		# A trick for the OpenGL position setting to let us blit
+		# image even if the part of sprite is outside the screen.
+		glRasterPos2i(0,0)
+		glBitmap(0, 0, 0, 0, scx, scy, '\0')
+		glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE, self._rendered)
 		
 		if flip:
 			fb.flip()
@@ -304,21 +293,11 @@ class NumSprite:
 		return 1
 
 	def setdir(self, angle, vel):
-		import math
 		angle = math.pi * angle / 180.0
 		self.dx = vel * math.cos(angle)
 		self.dy = vel * math.sin(angle)
 
-	def fastblit(self):
-		raise Error
-
-	def render(self, clear=None):
-		raise Error
-
 	def subimage(self, x, y, w, h, center=None):
-		raise Error
-
-	def clone(self):
 		raise Error
 
 	def line(self, x1, y1, x2, y2, color, width=1):
@@ -330,67 +309,104 @@ class NumSprite:
 	def rotozoom(self, scale=1.0, angle=0.0):
 		raise Error
 
-fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
 
-import copy
+def testset():
+	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
 
-if 1:
-	s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)
-	#s.save('foo.jpg')
-	#s.scale(50,50)
-	s.rotate(45, preserve_size=0)
-	s.blit(flip=1)
-	keyboard()
-
-if 0:
-	s = NumSprite(x=0, y=0, width=200, height=100, fb=fb)
-	s.fill((128,128,128,255))
-	s.array[:,0:30,0]=255
-	s.array[:,30:60,1]=255
-	s.array[:,60:,2]=255
-	
-	#s.circmask(25)
-	#s.alpha_aperture(25)
-	s.alpha_gradient(25,45)
-	#s.dim(0.50)
-	
-	s.blit(flip=1)
-	keyboard()
-
-if 0:
-	s = NumSprite(x=0, y=-200, width=200, height=200, fb=fb)
-	cosgrat(s, 5, 0, 45)
-	alphaGaussian(s, 50)
-	s.blit()
-
-	o = Sprite(x=0, y=200, width=200, height=200, fb=fb)
-	cosgrat(o, 5, 0, 45)
-	alphaGaussian(o, 50)
-	o.blit()
-
-if 0:
-	print 'starting'
-	for i in [1, 0]:
-		for b in [1, 0]:
-			for f in [1, 0]:
-				if i:
-					s = NumSprite(x=0, y=0, width=200, height=200, fb=fb)
-					print 'numsprite', 'blit=%d' % b, 'flip=%d' % f
+	if 1:
+		N = 200
+		for num in [1, 0]:
+			start = time.time()
+			for n in range(N):
+				if num:
+					s = NumSprite(x=0, y=0, width=25, height=25, fb=fb)
 				else:
-					s = Sprite(x=0, y=0, width=200, height=200, fb=fb)
-					print 'sprite', 'blit=%d' % b, 'flip=%d' % f
-				nf = 100
-				phi = 0
-				cosgrat(s, 5, phi, 45)
-				start = time.time()
-				for n in range(nf):
+					s = Sprite(x=0, y=0, width=25, height=25, fb=fb)
+				s.noise(color=1)
+				s.scale(100,100)
+				s.blit()
+				fb.flip()
+			stop = time.time()
+			print 'num=%d' % num, N/(stop-start), 'fps'
+
+	if 0:
+		s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)
+		#s.save('foo.jpg')
+		#s.scale(50,50)
+		s.rotate(45, preserve_size=0)
+		s.blit(flip=1)
+		keyboard()
+
+	if 0:
+		s = NumSprite(x=0, y=0, width=200, height=100, fb=fb)
+		s.fill((128,128,128,255))
+		s.array[:,0:30,0]=255
+		s.array[:,30:60,1]=255
+		s.array[:,60:,2]=255
+
+		s2 = s.clone()
+		s2.moveto(-100,-100)
+
+		#s.circmask(25)
+		#s.alpha_aperture(25)
+		#s.alpha_gradient(25,45)
+		s.alpha_gradient2(25,45, (255,0,0))	
+		#s.dim(0.50)
+
+		s2.blit(flip=0)
+		s.blit(flip=1)
+		keyboard()
+
+	if 0:
+		s = NumSprite(x=0, y=-200, width=200, height=200, fb=fb)
+		cosgrat(s, 5, 0, 45)
+		alphaGaussian(s, 50)
+		s.blit()
+
+		o = Sprite(x=0, y=200, width=200, height=200, fb=fb)
+		cosgrat(o, 5, 0, 45)
+		alphaGaussian(o, 50)
+		o.blit()
+
+	if 0:
+		print 'starting'
+		for i in [1, 0]:
+			for b in [1, 0]:
+				for f in [1, 0]:
+					if i:
+						s = NumSprite(x=0, y=0, width=200, height=200, fb=fb)
+						print 'numsprite', 'blit=%d' % b, 'flip=%d' % f
+					else:
+						s = Sprite(x=0, y=0, width=200, height=200, fb=fb)
+						print 'sprite', 'blit=%d' % b, 'flip=%d' % f
+					nf = 100
+					phi = 0
 					cosgrat(s, 5, phi, 45)
-					alphaGaussian(s, 25)
-					if b:
-						fb.clear((0,0,0))
-						s.blit()
-					if f:
-						fb.flip()
-					phi = (phi + 10) % 360
-				stop = time.time()
-				print ' ', nf/(stop-start), 'fps'
+					start = time.time()
+					for n in range(nf):
+						cosgrat(s, 5, phi, 45)
+						alphaGaussian(s, 25)
+						if b:
+							fb.clear((0,0,0))
+							s.blit()
+						if f:
+							fb.flip()
+						phi = (phi + 10) % 360
+					stop = time.time()
+					print ' ', nf/(stop-start), 'fps'
+	
+
+if __name__ == '__main__':
+	import cProfile,pstats
+
+	f = '/tmp/testset.prof'
+	cProfile.run('testset()', f)
+	p = pstats.Stats(f)
+	p.strip_dirs().sort_stats('time').print_stats()
+	
+else:
+	try:
+		from pype import loadwarn
+		loadwarn(__name__)
+	except ImportError:
+		pass
