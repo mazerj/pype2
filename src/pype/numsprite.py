@@ -14,15 +14,27 @@ Tue Apr  7 10:34:35 2009 mazer
 
 """
 
+__author__   = '$Author: $'
+__date__     = '$Date: $'
+__revision__ = '$Revision: $'
+__id__       = '$Id: $'
+
 import math
 import copy
-import time
 
-from Numeric import *
-from RandomArray import uniform
+NUMPY = 0
+if NUMPY:
+	from numpy import *
+	from numpy.random import uniform
+else:
+	from Numeric import *
+	from RandomArray import uniform
+	
 from PIL import Image
 from sprite import _C
+
 from pypedebug import keyboard
+import time
 
 class NumSprite:
 	"""Pure Numeric-based Sprite object.
@@ -46,7 +58,7 @@ class NumSprite:
 		
 		if fname:
 			# load image data from file using pygame tools
-			self.frompil(Image.open(fname))
+			self.fromPIL(Image.open(fname))
 		elif image:
 			raise Error
 		else:
@@ -64,8 +76,19 @@ class NumSprite:
 		elif fname:
 			self.name = "file:%s" % fname
 		else:
-			self.name = "numsprite%d" % NumSprite._count
+			self.name = "NumSprite-%d" % NumSprite._count
 		NumSprite._count = NumSprite._count + 1
+
+	def _setdims(self):
+		(self.w, self.h) = self.alpha.shape
+		(self.iw, self.ih) = (self.w, self.h)
+
+		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
+		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
+
+	def __repr__(self):
+		return '<NumSprite "%s"@(%d,%d) %x%x depth=%d>' % \
+			   (self.name, self.x, self.y, self.w, self.h, self.depth)
 
 	def clone(self):
 		new = NumSprite(x=self.x, y=self.y,
@@ -79,26 +102,9 @@ class NumSprite:
 		new.name = 'Clone of %s' % self.name
 		return new
 
-	def _setdims(self):
-		(self.w, self.h) = self.alpha.shape
-		(self.iw, self.ih) = (self.w, self.h)
-
-		self.ax, self.ay = genaxes(self.w, self.h, inverty=0)
-		self.xx, self.yy = genaxes(self.w, self.h, inverty=1)
-
-	def __repr__(self):
-		return '<NumSprite "%s" @ (%d,%d) depth=%d>' % \
-			   (self.name, self.x, self.y, self.depth)
-
-	def __getitem__(self, key):
-		return self.array[key]
-
-	def __setitem__(self, key, value):
-		self.array[key] = value
-
 	def asPhotoImage(self, alpha=None):
 		# save handles to prevent garbage collection..
-		self.pil_im = self.topil()
+		self.pil_im = self.toPIL()
 		self.pim = PIL.ImageTk.PhotoImage(self.pil_im)
 		return self.pim
 
@@ -117,7 +123,10 @@ class NumSprite:
 	def noise(self, thresh=0.5, color=None):
 		for n in range(3):
 			if color or n == 0:
-				m = uniform(1, 255, shape=shape(self.array)[0:2])
+				if NUMPY:
+					m = uniform(1, 255, size=self.array.shape[0:2])
+				else:
+					m = uniform(1, 255, shape=self.array.shape[0:2])
 				if not thresh is None:
 					m = where(greater(m, thresh*255), 255, 1)
 			self.array[:,:,n] = m[:].astype(UnsignedInt8)
@@ -146,30 +155,50 @@ class NumSprite:
 			self.array = self.array[:,::-1,:]
 			self.alpha = self.alpha[:,::-1]
 
-	def topil(self):
-		m = concatenate((self.array, self.alpha[:,:,NewAxis]),
-						axis=2)
-		s = transpose(m, axes=[1,0,2])[:,:,:].tostring()
-		return PIL.Image.fromstring('RGBA', (self.w, self.h), s)
+	def toPIL(self):
+		m = concatenate((self.array, self.alpha[:,:,NewAxis]), axis=2)
+		m = transpose(m, axes=[1,0,2])
+		if NUMPY:
+			return Image.fromarray(m)
+		else:
+			return PIL.Image.fromstring('RGBA', (self.w, self.h), m.tostring())
 
-	def frompil(self, i):
-		a = array(i.tostring()).astype(UnsignedInt8)
-		bpp = a.shape[0] / i.size[1] / i.size[0]
-		if bpp == 4:
-			# RGBA
-			a = reshape(a, (i.size[1], i.size[0], 4))
+	def fromPIL(self, i):
+		if NUMPY:
+			a = asarray(i)
 			a = transpose(a, axes=[1,0,2])
-			self.array = a[:,:,0:3]
-			self.alpha = a[:,:,3]
-		elif bpp == 3:
-			# RGB
-			a = reshape(a, (i.size[1], i.size[0], 3))
-			self.array = transpose(a, axes=[1,0,2])
-			self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
-			self.alpha[:] = 255
+			print a.shape
+			if a.shape[2] == 3:
+				# RGB
+				self.array = a[:,:,0:3]
+				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
+				self.alpha[:] = 255
+			elif a.shape[2] == 4:
+				# RGBA
+				self.array = a[:,:,0:3]
+				self.alpha = a[:,:,3]
+			else:
+				raise Error
+		else:
+			a = array(i.tostring()).astype(UnsignedInt8)
+			bpp = a.shape[0] / i.size[1] / i.size[0]
+			if bpp == 4:
+				# RGBA
+				a = reshape(a, (i.size[1], i.size[0], 4))
+				a = transpose(a, axes=[1,0,2])
+				self.array = a[:,:,0:3]
+				self.alpha = a[:,:,3]
+			elif bpp == 3:
+				# RGB
+				a = reshape(a, (i.size[1], i.size[0], 3))
+				self.array = transpose(a, axes=[1,0,2])
+				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
+				self.alpha[:] = 255
+			else:
+				raise Error
 
 	def rotate(self, angle, preserve_size=1, trim=0):
-		self.frompil(self.topil().rotate(-angle, expand=(not preserve_size)))
+		self.fromPIL(self.toPIL().rotate(-angle, expand=(not preserve_size)))
 		self._setdims()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
@@ -179,7 +208,7 @@ class NumSprite:
 		self.rotate(angle=-angle, preserver_size=preserve_size, trim=trim)
 
 	def scale(self, new_width, new_height):
-		self.frompil(self.topil().resize((new_width, new_height),
+		self.fromPIL(self.toPIL().resize((new_width, new_height),
 										 Image.NEAREST))
 		self._setdims()
 
@@ -245,7 +274,7 @@ class NumSprite:
 
 	def save(self, fname):
 		"""Use PIL to save image."""
-		self.topil().save(fname)
+		self.toPIL().save(fname)
 
 	def fastblit(self):
 		self.blit(fast=1)
@@ -313,7 +342,7 @@ class NumSprite:
 def testset():
 	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
 
-	if 1:
+	if 0:
 		N = 200
 		for num in [1, 0]:
 			start = time.time()
@@ -329,9 +358,9 @@ def testset():
 			stop = time.time()
 			print 'num=%d' % num, N/(stop-start), 'fps'
 
-	if 0:
+	if 1:
 		s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)
-		#s.save('foo.jpg')
+		s.save('foo.jpg')
 		#s.scale(50,50)
 		s.rotate(45, preserve_size=0)
 		s.blit(flip=1)

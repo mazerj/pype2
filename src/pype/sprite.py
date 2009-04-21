@@ -524,6 +524,9 @@ class FrameBuffer:
 		"""
 		pygame.mouse.set_visible(on);
 
+	def cursorpos(self):
+		return pygame.mouse.get_pos()
+
 	def close(self):
 		"""Close framebuffer device.
 
@@ -1263,8 +1266,8 @@ class Sprite(_ImageBase):
 		Print method. Return printable string composed of
 		the name, position and depth of the sprite
 		"""
-		return '<Sprite "%s" @ (%d,%d) depth=%d>' % \
-			   (self.name, self.x, self.y, self.depth)
+		return '<Sprite "%s"@(%d,%d) %x%x depth=%d>' % \
+			   (self.name, self.x, self.y, self.w, self.h, self.depth)
 
 	def __getitem__(self, key):
 		"""INTERNAL

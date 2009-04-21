@@ -1262,10 +1262,6 @@ class PypeApp:
 		if debug():
 			print_version_info()
 
-		if self.psych:
-			self.fb.hide()
-			self.udpy_showhide()
-
 		if dacq_jsbut(-1):
 			self.console.writenl("warning: joystick replaces bar input",
 								 color='blue')
@@ -1275,6 +1271,11 @@ class PypeApp:
 
 		self.recording = 0
 		self.record_state(0)
+
+		if self.psych:
+			self.fb.hide()
+			self.udpy_showhide()
+		
 
 	def tog_training(self, toggle=1):
 		"""INTERNAL"""
