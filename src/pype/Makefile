@@ -47,9 +47,9 @@ pypeversion:
 	@sed 's/%%INSTALLDATE%%/$(shell date)/' \
 		<pypeversion.py.template >pypeversion.py
 	@echo 'PypeBuildDir = "$(shell pwd)"' >>pypeversion.py
-	@echo 'PypeBuildBy = "$(USER)"' >>pypeversion.py
+	@echo 'PypeBuildBy = "$(shell logname)"' >>pypeversion.py
 	@echo 'PypeBuildDate = "$(shell date)"' >>pypeversion.py
-	@echo 'PypeBuildHost = "$(HOST)"' >>pypeversion.py
+	@echo 'PypeBuildHost = "$(shell hostname)"' >>pypeversion.py
 
 
 build:
