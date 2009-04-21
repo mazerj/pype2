@@ -17,12 +17,12 @@ Tue Apr  7 10:34:35 2009 mazer
 __author__   = '$Author: $'
 __date__     = '$Date: $'
 __revision__ = '$Revision: $'
-__id__       = '$Id: $'
+__id__       = '$Id$'
 
 import math
 import copy
 
-NUMPY = 0
+NUMPY = 1
 if NUMPY:
 	from numpy import *
 	from numpy.random import uniform
@@ -159,24 +159,22 @@ class NumSprite:
 		m = concatenate((self.array, self.alpha[:,:,NewAxis]), axis=2)
 		m = transpose(m, axes=[1,0,2])
 		if NUMPY:
-			return Image.fromarray(m)
+			return Image.fromarray(m, 'RGBA')
 		else:
 			return PIL.Image.fromstring('RGBA', (self.w, self.h), m.tostring())
 
 	def fromPIL(self, i):
 		if NUMPY:
-			a = asarray(i)
-			a = transpose(a, axes=[1,0,2])
-			print a.shape
+			a = transpose(asarray(i), axes=[1,0,2])
 			if a.shape[2] == 3:
 				# RGB
-				self.array = a[:,:,0:3]
+				self.array = a[:,:,0:3].astype(UnsignedInt8)
 				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
 				self.alpha[:] = 255
 			elif a.shape[2] == 4:
 				# RGBA
-				self.array = a[:,:,0:3]
-				self.alpha = a[:,:,3]
+				self.array = a[:,:,0:3].astype(UnsignedInt8)
+				self.alpha = a[:,:,3].astype(UnsignedInt8)
 			else:
 				raise Error
 		else:
@@ -202,10 +200,10 @@ class NumSprite:
 		self._setdims()
 
 	def rotateCCW(self, angle, preserve_size=1, trim=0):
-		self.rotate(angle=angle, preserver_size=preserve_size, trim=trim)
+		self.rotate(angle=-angle, preserve_size=preserve_size, trim=trim)
 
 	def rotateCW(self, angle, preserve_size=1, trim=0):
-		self.rotate(angle=-angle, preserver_size=preserve_size, trim=trim)
+		self.rotate(angle=angle, preserve_size=preserve_size, trim=trim)
 
 	def scale(self, new_width, new_height):
 		self.fromPIL(self.toPIL().resize((new_width, new_height),
@@ -360,9 +358,10 @@ def testset():
 
 	if 1:
 		s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)
-		s.save('foo.jpg')
+		s.alpha_gradient(100,200)
+		#s.save('foo.jpg')
 		#s.scale(50,50)
-		s.rotate(45, preserve_size=0)
+		s.rotateCW(45, preserve_size=0)
 		s.blit(flip=1)
 		keyboard()
 
@@ -430,8 +429,8 @@ if __name__ == '__main__':
 
 	f = '/tmp/testset.prof'
 	cProfile.run('testset()', f)
-	p = pstats.Stats(f)
-	p.strip_dirs().sort_stats('time').print_stats()
+	#p = pstats.Stats(f)
+	#p.strip_dirs().sort_stats('time').print_stats()
 	
 else:
 	try:
