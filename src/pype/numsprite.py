@@ -14,9 +14,9 @@ Tue Apr  7 10:34:35 2009 mazer
 
 """
 
-__author__   = '$Author: $'
-__date__     = '$Date: $'
-__revision__ = '$Revision: $'
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
 __id__       = '$Id$'
 
 import math
