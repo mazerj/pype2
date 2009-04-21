@@ -33,6 +33,11 @@ Mon Sep 18 10:00:05 2006 mazer
 
 """
 
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
+
 _debug = 0
 _show_pypedir = 0
 _showimports = 0
@@ -128,6 +133,16 @@ if os.environ.has_key('LD_LIBRARY_PATH'):
                                     os.environ['LD_LIBRARY_PATH']
 # now that $PYPEDIR is partially setup, pype and pype modules
 # should be importable...
+
+if sys.argv[1] == '-v' or sys.argv[1] == '--version':
+    from pypeversion import *
+    print "pype version:", PypeVersion
+    print "         svn:", __revision__
+    print "   installed:", PypeInstallDate
+    print " b uild from:", PypeBuildDir
+    print "    build by: %s@%s" % (PypeBuildBy, PypeBuildHost)
+    print "    build on:", PypeBuildDate
+    sys.exit(0)
 
 try:
     from pype import *
