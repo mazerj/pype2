@@ -1,10 +1,10 @@
 #!/bin/sh
 
-if [ $(whoami) != "root" ]; then
-  echo "Are you sure you want to do this as $(whoami)?"
-  echo -n "hit ctrl-c to abort, return to continue"
-  read xxx
-fi
+### if [ $(whoami) != "root" ]; then
+###   echo "Are you sure you want to do this as $(whoami)?"
+###   echo -n "hit ctrl-c to abort, return to continue"
+###   read xxx
+### fi
 
 export PYTHONVER=$(./pydetect -v)
 export PYTHONFULLVER=$(./pydetect -vv)

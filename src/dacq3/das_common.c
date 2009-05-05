@@ -68,6 +68,10 @@
 **     and then usleep for a bit to reduce CPU load. original
 **     behavior can be restored by #defining SPIN_SAMPLE (which
 **     averages over the 1ms interval in a tight loop).
+**
+** Tue May  5 14:40:33 2009 mazer 
+**   - removed EYELINK_TEST mode completely..
+**   - changed private XXxxx env vars to XX_xxxx
 */
 
 #include <unistd.h>
@@ -77,6 +81,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <sched.h>
+#include <math.h>
 
 #include "psems.h"
 #ifdef CHANGE_NAME
@@ -87,12 +92,12 @@
 //#define SPIN_SAMPLE 1
 
 static char *_tmodes[] = {
-  "ANALOG", "ISCAN", "EYELINK", "EYELINK_TEST", "NONE"
+  "ANALOG", "ISCAN", "EYELINK", "EYEJOY", "NONE"
 };
 #define ANALOG		0
 #define ISCAN		1
 #define EYELINK		2
-#define EYELINK_TEST	3
+#define EYEJOY		3
 #define NONE		4
 
 #define INSIDE		1
@@ -188,7 +193,7 @@ static void mainloop(void)
   unsigned long jstime;
 
   register float sx=0, sy=0;
-  int si, sn;
+  int si, sn, last;
   float sbx[MAXSMOOTH], sby[MAXSMOOTH];
 
   /*
@@ -196,7 +201,7 @@ static void mainloop(void)
    * x/y are the raw values
    */
   calx = caly = x = y = pa = -1;
-
+  y = x = 0.0;
   for (si = 0; si < MAXSMOOTH; si++) {
     sbx[si] = sby[si] = 0.0;
   }
@@ -281,6 +286,26 @@ static void mainloop(void)
     }
     ts = last_ts = timestamp(0);
 #endif
+
+    if (usbjs_dev > 0) {
+      if (usbjs_query(usbjs_dev, &jsbut, &jsnum, &jsval, &jstime)) {
+	if (jsbut) {
+	  /* button press: jsnum is button number, jsval is up/down */
+	  if (jsnum < NJOYBUT) {
+	    LOCK(semid);
+	    dacq_data->js[jsnum] = jsval;
+	    UNLOCK(semid);
+	  }
+	} else if (jsbut == 0 && jsnum == 0) {
+	  /* x-axis motion, jsval indicates the current value */
+	  dacq_data->js_x = jsval;
+	} else if (jsbut == 0 && jsnum == 1) {
+	  /* y-axis motion, jsval indicates the current value */
+	  dacq_data->js_y = jsval;
+	}
+      }
+    }
+
     switch (tracker_mode)
       {
       case NONE:
@@ -298,19 +323,20 @@ static void mainloop(void)
 	  pa = tp;
 	}
 	break;
-      case EYELINK_TEST:
-	if (eyelink_read(&tx, &ty, &tp, &eyelink_t, &eyelink_new) == 0) {
-	  tx = ty = tp = -1;
-	}
+      case EYEJOY:
 	LOCK(semid);
-	x = dacq_data->adc[0];
-	y = dacq_data->adc[1];
+	x = x + (dacq_data->js_x > 0 ? 1 : dacq_data->js_x < 0 ? -1 : 0)/100.0;
+	y = y - (dacq_data->js_y > 0 ? 1 : dacq_data->js_y < 0 ? -1 : 0)/100.0;
+	dacq_data->adc[0] = x;
+	dacq_data->adc[1] = y;
 	UNLOCK(semid);
+	pa = -1;
 	break;
       default:
 	x = dacq_data->adc[0];
 	y = dacq_data->adc[1];
 	pa = -1;
+	break;
       }
 
     if (swap_xy) {
@@ -350,31 +376,29 @@ static void mainloop(void)
     UNLOCK(semid);
     
     /* read digital input lines */
-    dig_in();
-
-    /* Fri Mar 10 10:05:30 2006 mazer 
-     * Check joystick for mock-digital inputs, if joystick's been
-     * initialized. Right now this is just a stub...
-     */
-    if (usbjs_dev > 0) {
-      if (usbjs_query(usbjs_dev, &jsbut, &jsnum, &jsval, &jstime)) {
-	if (jsbut) {
-	  /* button press: jsnum is button number, jsval is up/down */
-	  if (jsnum < NJOYBUT) {
-	    LOCK(semid);
-	    dacq_data->js[jsnum] = jsval;
-	    UNLOCK(semid);
+    if (usbjs_dev >= 0) {
+      /* if joystick device is available (even if it's not
+       * being used as an eye tracker, use buttons as digital inputs..
+       */
+      for (i = 0; i < 4; i++) {
+	LOCK(semid);
+	last = dacq_data->din[i];
+	dacq_data->din[i] = dacq_data->js[i];
+	if (dacq_data->din[i] != last) {
+	  dacq_data->din_changes[i] += 1;
+	  if (dacq_data->din_intmask[i]) {
+	    dacq_data->int_class = INT_DIN;
+	    dacq_data->int_arg = i;
+	    kill(getppid(), SIGUSR1);
 	  }
-	} else if (jsbut == 0 && jsnum == 0) {
-	  /* x-axis motion, jsval indicates the current value */
-	  dacq_data->js_x = jsval;
-	} else if (jsbut == 0 && jsnum == 1) {
-	  /* y-axis motion, jsval indicates the current value */
-	  dacq_data->js_y = jsval;
 	}
+	UNLOCK(semid);
       }
+    } else {
+      /* otherwise, fall back to comedi DIO lines etc */
+      dig_in();
     }
-    
+
     /* set digital output lines, only if the strobe's been set */
     LOCK(semid);
     k = dacq_data->dout_strobe;
@@ -423,28 +447,17 @@ static void mainloop(void)
       dacq_data->adbuf_y[k] = dacq_data->eye_y;
       dacq_data->adbuf_pa[k] = dacq_data->eye_pa;
 
-      if (tracker_mode == EYELINK_TEST) {
-	/* in test mode, analog channels 0,1,4 are filled with
-	 * the eyelink data (x,y,pupil area)
-	 */
-	dacq_data->adbufs[0][k] = (int)(tx > 0 ? tx+0.5 : tx-0.5);
-	dacq_data->adbufs[1][k] = (int)(ty > 0 ? ty+0.5 : ty-0.5);
-	dacq_data->adbufs[2][k] = (int)((x > 0) ? (x+0.5) : (x-0.5));
-	dacq_data->adbufs[3][k] = (int)((y > 0) ? (y+0.5) : (y-0.5));
-	dacq_data->adbufs[4][k] = (int)(tp > 0 ? tp+0.5 : tp-0.5);
-      } else {
-	/* otherwise, the raw analog values are stuffed in, which
-	 * are usually raw x,y values off the coil, unless you're
-	 * using them for something else (and have iscan/eyelink)
-	 */
-	for (ii=0; ii < NADC; ii++) {
-	  dacq_data->adbufs[ii][k] = dacq_data->adc[ii];
-	}
-	/* Mon Jan 16 09:25:34 2006 mazer 
-	 *  set up saving EDF-time to c4 channel for debugging
-	 dacq_data->adbuf_c4[k] = eyelink_t;
-	 */
+      /* the raw analog values are stuffed in, which
+       * are usually raw x,y values off the coil, unless you're
+       * using them for something else (and have iscan/eyelink)
+       */
+      for (ii=0; ii < NADC; ii++) {
+	dacq_data->adbufs[ii][k] = dacq_data->adc[ii];
       }
+      /* Mon Jan 16 09:25:34 2006 mazer 
+       *  set up saving EDF-time to c4 channel for debugging
+       dacq_data->adbuf_c4[k] = eyelink_t;
+      */
       if (++dacq_data->adbuf_ptr > ADBUFLEN) {
 	dacq_data->adbuf_overflow++;
 	dacq_data->adbuf_ptr = 0;
@@ -573,7 +586,7 @@ int main(int ac, char **av, char **envp)
   }
 
   // get requested analog input range for comedi device (+- ARANGE volts)
-  if ((p = getenv("XXARANGE")) != NULL) {
+  if ((p = getenv("XX_ARANGE")) != NULL) {
     double d;
     if (sscanf(p, "%lf", &d) == 1) {
       arange = d;
@@ -587,20 +600,14 @@ int main(int ac, char **av, char **envp)
     iscan_init(av[2]);
   } else if (av[1] && (strcmp(av[1], "-eyelink") == 0)) {
     eyelink_init(av[2]);
+  } else if (av[1] && (strcmp(av[1], "-eyejoy") == 0)) {
+    tracker_mode = EYEJOY;
   } else if (av[1] && (strcmp(av[1], "-notracker") == 0)) {
     tracker_mode = NONE;
     fprintf(stderr, "%s: no tracker mode\n", progname);
-  } else if (getenv("EYELINK_TEST") != NULL) {
-    eyelink_init(getenv("EYELINK_TEST"));
-    if (tracker_mode == EYELINK) {
-      tracker_mode = EYELINK_TEST;
-      fprintf(stderr, "*** eyelink test mode SUCCESS!\n");
-    } else {
-      fprintf(stderr, "*** eyelink test mode FAILED!\n");
-    }
   }
 
-  if (getenv("XXSWAP_XY")) {
+  if (getenv("XX_SWAP_XY")) {
     /* this option is useful ONLY if the camera is rotated, like with
      * the original software release for the eyelink ELCL...
      */
@@ -608,7 +615,7 @@ int main(int ac, char **av, char **envp)
     fprintf(stderr, "%s: swapping X and Y\n", progname);
   }
 
-  if ((p = getenv("XXUSBJS")) != NULL) {
+  if ((p = getenv("XX_USBJS")) != NULL) {
     usbjs_dev = usbjs_init(p);
     if (usbjs_dev < 0) {
       fprintf(stderr, "%s: can't open joystick %s\n", progname, p);

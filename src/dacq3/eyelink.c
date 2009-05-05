@@ -7,6 +7,9 @@
 **
 ** Thu Dec 18 11:40:34 2008 mazer 
 **   - split out from das_common.c
+**
+** Tue May  5 16:26:16 2009 mazer 
+**   - changed private XXxxx env vars to XX_xxxx
 */
 
 
@@ -45,12 +48,12 @@ static void eyelink_init(char *ip_address)
   }
   set_offline_mode();
 
-  /* 16-apr-2003: step through the XXEYELINK_OPTS env var (commands
+  /* 16-apr-2003: step through the XX_EYELINK_OPTS env var (commands
    * separated by :'s) and set each command to the eyelink, while
    * echoing to the console..  This variable is setup by pype before
    * dacq_start() gets called..
    */
-  opts = getenv("XXEYELINK_OPTS");
+  opts = getenv("XX_EYELINK_OPTS");
   for (q = p = opts; *p; p++) {
     if (*p == ':') {
       *p = 0;
@@ -62,7 +65,7 @@ static void eyelink_init(char *ip_address)
   }
 
   /* this should be "0" or "1", default to 1 */
-  p = getenv("XXEYELINK_CAMERA");
+  p = getenv("XX_EYELINK_CAMERA");
   if (p == NULL || sscanf(p, "%d", &eyelink_camera) != 1) {
     eyelink_camera = 1;
   }
@@ -119,7 +122,7 @@ static void eyelink_halt()
 {
   char *p;
 
-  if (tracker_mode == EYELINK || tracker_mode == EYELINK_TEST) {
+  if (tracker_mode == EYELINK) {
     stop_recording();
     set_offline_mode();
     tracker_mode = ANALOG;

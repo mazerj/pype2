@@ -19,6 +19,9 @@
 ** Tue Apr  3 08:37:59 2007 mazer 
 **   cleaned up error messages for comedit to make it easier to track
 **   down problems with non-DAS/ComputerBoards cards (like NI-6025E).
+**
+** Tue May  5 15:58:44 2009 mazer 
+**   joystick junk moved into separate JS device in das_common.c
 */
 
 #include <sys/types.h>
@@ -40,8 +43,6 @@
 #include "sigs.h"
 #include "psems.h"
 #include "debug.h"
-
-#include "das16.h"
 
 static char *progname = NULL;
 static DACQINFO *dacq_data = NULL;
@@ -85,7 +86,6 @@ static int comedi_init()
   comedi_range *r;
   int n;
 
-  // open comedi device... we're assuming it's at /dev/comedi0
   if (!(comedi_dev = comedi_open(comedi_devname))) {
     fprintf(stderr, "%s: can't find comedi board.\n", progname);
     return(0);
@@ -96,19 +96,20 @@ static int comedi_init()
 	  progname, comedi_get_board_name(comedi_dev), devname);
 
   if (strncmp(devname, "das16", 5) == 0) {
-    use8255 = 0;
     fprintf(stderr, "%s: 8255 disabled.\n", progname);
+    use8255 = 0;
   } else if (strncmp(devname, "das08", 5) == 0) {
-    use8255 = 0;
     fprintf(stderr, "%s: 8255 disabled.\n", progname);
+    use8255 = 0;
   } else {
-    use8255 = 1;
     fprintf(stderr, "%s: 8255 enabled.\n", progname);
+    use8255 = 1;
   }
 
   if (strcmp(comedi_get_board_name(comedi_dev), "pci-das08") == 0) {
-      pci_das08 = 1;
-      fprintf(stderr, "%s: pci-das08 detected, delaying input\n", progname);
+    // see notes below about DAC settling times in ad_in()
+    fprintf(stderr, "%s: pci-das08 detected, 'delaying' input\n", progname);
+    pci_das08 = 1;
   }
 
   // find which comedi subdevices correspond the the facilities we need
@@ -118,7 +119,6 @@ static int comedi_init()
   } else {
     fprintf(stderr, "%s: analog input OK\n", progname);
   }
-
 
   n = comedi_get_n_channels(comedi_dev, analog_in);
   fprintf(stderr, "%s: %d analog inputs available.\n", progname, n);
@@ -133,9 +133,7 @@ static int comedi_init()
       comedi_perror("analog_range");
     }
   } else {
-    /*
-     * for DAS08, which doesn't have programmable ranges -- just use 0!
-     */
+    // DAS08 doesn't have programmable ranges -- use 0
     analog_range = 0;
   }
   r = comedi_get_range(comedi_dev, analog_in, 0, analog_range);
@@ -188,8 +186,7 @@ static int ad_in(int chan)
   if (dummymode) {
     return(0);
   } else {
-    // need to set aref correctly
-    // this could be either AREF_GROUND or AREF_COMMON
+    // need to set aref correctly: either AREF_GROUND or AREF_COMMON
     if (pci_das08) {
       // das08 is screwy -- needs time for multiplexer to settle:
       success = comedi_data_read_delayed(comedi_dev,analog_in,
@@ -206,7 +203,7 @@ static int ad_in(int chan)
 	comedi_perror("comedi_data_read");
       }
     }
-    // NB lsampl is an unsigned int; we are casting to int. it won't
+    // note: lsampl is an unsigned int; we are casting to int. it won't
     // matter for 12 bit cards
     return((int)sample);
   }
@@ -217,13 +214,13 @@ static void dig_in()
   int i, success, bits, last;
 
   if (dummymode) {
-    /* these are hardcoded for polarity of devices down in naf */
+    // just lock these down -- polarities are
+    // from the old taks -- hardcoded to work in NAF...
     LOCK(semid);
     dacq_data->din[0] = 0;	/* monkey bar NOT down */
     dacq_data->din[2] = 1;	/* user button 2 NOT down */
     dacq_data->din[3] = 1;	/* user button 1 NOT down */
     UNLOCK(semid);
-    return;
   } else {
     if (use8255) {
       success = comedi_dio_bitfield(comedi_dev,dig_io,PCI_NOWRITEMASK,&bits);
@@ -235,15 +232,7 @@ static void dig_in()
     for (i = 0; i < 4; i++) {
       LOCK(semid);
       last = dacq_data->din[i];
-      if (usbjs_dev < 0) {
-	/* no joystick: use digital inputs */
-	dacq_data->din[i] = ((bits & 1<<i) != 0);
-      } else {
-	/* joystick present: REPLACES digital inputs.
-	 * This means the dig in ports will be completely ignored!
-	 */
-	dacq_data->din[i] = dacq_data->js[i];
-      }
+      dacq_data->din[i] = ((bits & 1<<i) != 0);
       if (dacq_data->din[i] != last) {
 	dacq_data->din_changes[i] += 1;
 	if (dacq_data->din_intmask[i]) {

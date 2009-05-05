@@ -383,6 +383,9 @@ int dacq_start(int boot, int testmode, char *tracker_type,
 	} else if (strcmp(tracker_type, "ANALOG") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting analog\n");
 	  execlp(dacq_server, dacq_server, NULL);
+	} else if (strcmp(tracker_type, "EYEJOY") == 0) {
+	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
+	  execlp(dacq_server, dacq_server, "-eyejoy", NULL);
 	} else if (strcmp(tracker_type, "NONE") == 0) {
 	  //fprintf(stderr, "dacqmodule: starting w/o tracker\n");
 	  execlp(dacq_server, dacq_server, "-notracker", NULL);

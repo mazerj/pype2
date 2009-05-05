@@ -61,9 +61,7 @@ def bounce(app):
 			dy = uniform(10, 20)
 			sync = not sync
 		n = (n + 1) % 50
-		c = (uniform(1, 255, integer=1),
-			 uniform(1, 255, integer=1),
-			 uniform(1, 255, integer=1))
+		c = (int(uniform(1, 255)),int(uniform(1, 255)),int(uniform(1, 255)))
 		s = Sprite(20, 20, x, y, fb=app.fb)
 		s.fill(color=c)
 		slist.append(s)

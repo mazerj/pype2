@@ -236,7 +236,6 @@ Mon Sep 10 15:48:27 2007 mazer
   NOT be the first one on the path, so loadwarn() was failing (ie,
   it always reported the 1st module named 'file' on the path).
 
-
 Thu Sep 27 17:16:55 2007 mazer
 
 - adding TDT support:
@@ -279,6 +278,15 @@ Tue Mar 31 12:48:08 2009 mazer
 - new test pattern! automatically scaled to fit the display buffer
 
 - added TESTPAT config-file option for user/rig-specific test pattern
+
+Mon Apr 27 16:20:55 2009 mazer
+
+- removed KEYBAR stuff. This was slightly problematic/deceptive -- it
+  depended on calling idlefn() at the right times and the timing is
+  completely deceptive.. if you want to debug plug in a joystick or
+  joypad and do it the right way..
+
+- likewise, also got rid of the lshiftsown/rshiftdown PypeApp methods
 
 """
 
@@ -812,11 +820,14 @@ class PypeApp:
 		elif et == 'ANALOG':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '0')
+		elif et == 'EYEJOY':
+			self.rig_common.set('eyetracker', et)
+			self.rig_common.set('eyelag', '0')
 		elif et == 'NONE':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '0')
 		else:
-			Logger("%pype: s is not a valid EYETRACKER.\n" % et)
+			Logger("pype: %s is not a valid EYETRACKER.\n" % et)
 			raise PypeFatalError
 
 		self._sbut1 = Button(cpane, text="start",
@@ -1080,13 +1091,13 @@ class PypeApp:
 		os.environ['XXEYELINK_OPTS'] = eyelink_opts
 		os.environ['XXEYELINK_CAMERA'] = self.config.get('EYELINK_CAMERA')
 		if self.config.iget('SWAP_XY'):
-			os.environ['XXSWAP_XY'] = '1'
+			os.environ['XX_SWAP_XY'] = '1'
 
 		# possibly have the dacq module initialize a usb joystick device
 		if len(self.config.get('USB_JS_DEV')) > 0:
-			os.environ['XXUSBJS'] = self.config.get('USB_JS_DEV')
+			os.environ['XX_USBJS'] = self.config.get('USB_JS_DEV')
 
-		os.environ['XXARANGE'] = self.config.get('ARANGE')
+		os.environ['XX_ARANGE'] = self.config.get('ARANGE')
 
 		dacq_start(1,
 				   self.config.iget('DACQ_TESTMODE'),
@@ -1265,9 +1276,6 @@ class PypeApp:
 		if dacq_jsbut(-1):
 			self.console.writenl("warning: joystick replaces bar input",
 								 color='blue')
-
-		self.keybar = self.config.iget('KEYBAR', default=0)
-		self.keybar_state = self.lshiftdown()
 
 		self.recording = 0
 		self.record_state(0)
@@ -2137,12 +2145,6 @@ class PypeApp:
 			self._post_alarm = 0
 			raise Alarm
 
-		if self.keybar:
-			s = self.lshiftdown()
-			if self.allow_ints and (not s == self.keybar_state):
-				s = self.keybar_state
-				raise BarTransition
-
 		if fast:
 			return
 
@@ -2163,28 +2165,33 @@ class PypeApp:
 				while t.ms() < ms:
 					pass
 		elif ms is None:
-			# emergency gamepad keys (ie, when display's not visible)
-			#              js#1 alone  ==> response bar (like monkey bar)
-			# axis-down + #1 (aka bar) ==> STOP TASK
-			#           axis-down + #2 ==> zero eyes
-			#           axis-down + #3 ==> emergency exit
+			# If gamepad/joystick attached -- use as follows:
+			#  0,1,2,3 --> SIMULATEED DIGITAL I/O LINES (comedi_server handles)
+			#  4,5,6,7 --> special functions, see below
+			# NOTE: 0,1,2.. refers to "labels" 1,2,3...
 			#
+			# 0 ("1"): Response Bar
+			# 1 ("2"): Juice squirter (aka SW1)
+			# 2 ("3"): userdefined switch 2 (aka SW2)
+			# 3 ("4"): not used
+			# 4 ("5"): alternate stop button
+			# 5 ("6"): alternate F8 (zero eye tracker)
+			# 6+7 ("7"+"8"): emergency quit hotkey
 
-			if not dacq_js_y < 0:
-				# button 0 (labeled 1) is BAR
-				if dacq_jsbut(1):
-					# button 1 (labeled 2) is stop run
+			if dacq_jsbut(-1):
+				"""
+				for n in range(10):
+					print dacq_jsbut(n),
+				print
+				"""
+				if dacq_jsbut(4):
 					if self.running:
-						# stop now as if user his stop button
 						self.__start_helper()
-				elif dacq_jsbut(2):
-					# button 2 (labeled 3) is like F8
+				elif dacq_jsbut(5):
 					self.eyeshift(zero=1)
-				elif dacq_jsbut(3):
-					# button 2 (labeled 3) is emergency die...
+				elif dacq_jsbut(6) and dacq_jsbut(7):
 					sys.stderr.write('JOYSTICK PARACHUTE DEPLOYED!\n')
 					sys.exit(0)
-
 
 			(c, ev) = self.keyque.pop()
 			if 0 and (c is None) and self.fb:
@@ -2477,22 +2484,6 @@ class PypeApp:
 		else:
 			dacq_juice_drip(int(0.5+ms))
 
-	def lshiftdown(self):
-		"""
-		Check to see if the LEFT_SHIFT key is down in the framebuffer
-		window.
-
-		"""
-		return checklshift()
-
-	def rshiftdown(self):
-		"""
-		Check to see if the RIGHT_SHIFT key is down in the framebuffer
-		window.
-
-		"""
-		return checktshift()
-
 	def barchanges(self, reset=None):
 		"""
 		(NEW: Sun Mar  9 13:38:36 2003 mazer)
@@ -2598,9 +2589,7 @@ class PypeApp:
 		keyboard()
 
 	def bardown(self):
-		if self.lshiftdown():
-			return 1
-		elif self.pport:
+		if self.pport:
 			return pp_bar()
 		else:
 			if self.flip_bar:
@@ -3875,16 +3864,16 @@ def _get_plexon_events(plex, fc=40000):
 
 		for e in tank:
 			(Type, Channel, Unit, ts, waveform) = e
-			if Type == Plex.PL_ExtEventType and \
-				   Channel == Plex.PL_StartExtChannel:
+			if Type == PlexHeaders.Plex.PL_ExtEventType and \
+				   Channel == PlexHeaders.Plex.PL_StartExtChannel:
 				if events is not None:
 					Logger("pype: double trigger\n")
 					return None
 				events = []
 				zero_ts = ts
 			elif events is not None:
-				if Type == Plex.PL_ExtEventType and \
-					   Channel == Plex.PL_StopExtChannel:
+				if Type == PlexHeaders.Plex.PL_ExtEventType and \
+					   Channel == PlexHeaders.Plex.PL_StopExtChannel:
 					hit_stop = 1
 					# drain rest of tank, then return
 				else:

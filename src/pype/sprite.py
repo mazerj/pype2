@@ -294,7 +294,16 @@ class FrameBuffer:
 		self.h = height
 		self.hw = width / 2
 		self.hh = height / 2
-		
+
+		if not (self.flags & FULLSCREEN):
+			# stick screen in upper right corner... this is UGLY!!
+			p = os.popen("xdpyinfo | grep dimension | awk '{print $2}'", 'r')
+			s = p.read()[:-1]
+			p.close()
+			(dw, dh) = map(int, string.split(s, 'x'))
+			pos = (dw - self.w, 0)
+			os.environ['SDL_VIDEO_WINDOW_POS'] = '%d,%d' % pos
+			
 		try:
 			self.maxbpp = pygame.display.mode_ok((self.w, self.h),
 												 self.flags, bpp)
