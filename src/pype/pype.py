@@ -568,6 +568,9 @@ class PypeApp:
 		mb.addmenuitem('File', 'command',
 					   label='Graphics info',
 					   command=lambda s=self: s.fb.printinfo())
+		mb.addmenuitem('File', 'command',
+					   label='Show sprites',
+					   command=lambda s=self:s.showsprites())
 		mb.addmenuitem('File', 'separator')
 		mb.addmenuitem('File', 'command',
 					   label='Save state', command=self.__savestate)
@@ -634,6 +637,9 @@ class PypeApp:
 
 		self.__repinfo = Label(f, text=None)
 		self.__repinfo.pack(side=RIGHT)
+
+		self.__ledbar = Label(f, text=None)
+		self.__ledbar.pack(side=RIGHT)
 
 		f2 = Frame(self.tk, borderwidth=3, relief=GROOVE)
 		f2.pack(expand=1)
@@ -1088,8 +1094,8 @@ class PypeApp:
 		eyelink_opts = eyelink_opts + ':heuristic_filter = 0 0'
 		eyelink_opts = eyelink_opts + ':pup_size_diameter = NO'
 
-		os.environ['XXEYELINK_OPTS'] = eyelink_opts
-		os.environ['XXEYELINK_CAMERA'] = self.config.get('EYELINK_CAMERA')
+		os.environ['XX_EYELINK_OPTS'] = eyelink_opts
+		os.environ['XX_EYELINK_CAMERA'] = self.config.get('EYELINK_CAMERA')
 		if self.config.iget('SWAP_XY'):
 			os.environ['XX_SWAP_XY'] = '1'
 
@@ -1104,7 +1110,8 @@ class PypeApp:
 				   self.config.get('EYETRACKER'),
 				   self.config.get('DACQ_SERVER'),
 				   self.config.get('EYETRACKER_DEV'))
-
+		
+		self.drawledbar()
 		self.dacq_going = 1
 		self.eyeset()
 
@@ -1326,6 +1333,20 @@ class PypeApp:
 			self.paused = paused
 		if not (led is -1):
 			self.led(led)
+
+	def drawledbar(self):
+		x = ("[ ]", "[*]")
+		t = x[dacq_bar()] + x[dacq_sw1()] + x[dacq_sw2()]
+		if dacq_jsbut(-1):
+			t = t + " ("
+			for n in range(10):
+				if dacq_jsbut(n):
+					t = t+('%d'%n)
+				else:
+					t = t+'.'
+			t = t + ")"
+		self.__ledbar.configure(text=t)
+		
 
 	def isrunning(self):
 		"""Query to see if a task is running.
@@ -2177,13 +2198,7 @@ class PypeApp:
 			# 4 ("5"): alternate stop button
 			# 5 ("6"): alternate F8 (zero eye tracker)
 			# 6+7 ("7"+"8"): emergency quit hotkey
-
 			if dacq_jsbut(-1):
-				"""
-				for n in range(10):
-					print dacq_jsbut(n),
-				print
-				"""
 				if dacq_jsbut(4):
 					if self.running:
 						self.__start_helper()
@@ -2264,6 +2279,9 @@ class PypeApp:
 
 			if self.taskidle:
 				self.taskidle(self)
+
+			self.drawledbar()
+			
 		else:
 			t = Timer()
 			while t.ms() < ms:
@@ -3079,8 +3097,8 @@ class PypeApp:
 									   (s0, 'spikes')),
 							   raster=self.spike_times)
 
-		self.udpy.info.configure(text= "%d spk // %d sync" %
-								 (len(self.spike_times), len(self.photo_times)))
+		self.udpy.info("[%dspks %dsyncs]" %
+					   (len(self.spike_times), len(self.photo_times)))
 
 
 		# Completely wipe the buffers -- don't let them accidently
@@ -3398,6 +3416,10 @@ class PypeApp:
 			# attach() returns the current handle, so save it
 			# (might be different if new or reopened window..)
 			self._eyetrace_window  = attach(oldgraph)
+
+	def showsprites(self):
+		for n in range(0, len(Sprite.__list__)):
+			Logger('%d: "%s"\n' % (n, sprite.Sprite.__list__[n]))
 
 def pype_hostconfigfile():
 	"""

@@ -162,31 +162,29 @@ class UserDisplay:
 					   label='show shortcuts', command=self.help)
 
 
-		self.scount = Button(f, text="<>", command=self.showsprites)
-		self.scount.pack(side=RIGHT)
+		self.gridinterval = pix_per_dva
+		Label(f, text="%d pix/div" % self.gridinterval).pack(side=RIGHT)
 
-		self.info = Label(f, text="", fg='red')
-		self.info.pack(side=RIGHT, padx=20)
-
+		self._info = Label(f, text='', fg='red')
+		self._info.pack(side=RIGHT, padx=20)
+	
 		self._stopbutton = Button(f, bg='red', fg='white', text='STOP')
 		self._stopbutton.pack(side=RIGHT, padx=20)
 		self._stopbutton.forget()
 
 		self._canvas = Canvas(self.frame)
 		self._canvas.pack()
-		self._canvas.configure(width=cwidth, height=cheight,
-							   cursor='tcross', bg='grey80')
+		self._canvas.configure(width=cwidth, height=cheight)
 
 		f = Frame(self.frame)
 		f.pack(expand=1, side=BOTTOM, fill=X)
 
-		self.xypos = Label(f, text="")
-		self.xypos.pack(side=LEFT)
+		if 0:
+			self.xypos = Label(f, text="")
+			self.xypos.pack(side=LEFT)
+		else:
+			self.xypos = None
 		self._mouse_motion(ev=None)
-
-		self.gridinterval = pix_per_dva
-		l = Label(f, text="%d pix/div" % self.gridinterval)
-		l.pack(side=RIGHT)
 
 		self.mousex = 0
 		self.mousey = 0
@@ -195,7 +193,6 @@ class UserDisplay:
 
 		self.popup = Menu(self._canvas, tearoff=0)
 
-		self.popup.add_command(label="User Display Menu")
 		self.popup.add_command(label="Fixspot here",
 							   command=self._fixset)
 		self.popup.add_command(label="Set fixspot to (0,0)",
@@ -206,6 +203,9 @@ class UserDisplay:
 							   command=self.setbox)
 		self.popup.add_command(label="Clear box",
 							   command=self.clearbox)
+		self.popup.add_separator()
+		self.popup.add_command(label="close")
+
 		self._canvas.bind("<Button-1>", self.do_popup)
 
 		self._canvas.bind("<Motion>", self._mouse_motion)
@@ -228,7 +228,7 @@ class UserDisplay:
 
 		self._blocked = blocked
 		self._axis = []
-		self._drawaxis(0, 0, self.w, self.h)
+		self._drawaxis(self.w, self.h)
 
 		self._eye_trace = []
 		self._eye_trace_maxlen = 50
@@ -255,6 +255,9 @@ class UserDisplay:
 
 		self.bind_but3(fn=None, arg=None)
 		self._canvas.bind("<Button-3>", self.invoke_but3)
+
+	def info(self, msg=''):
+		self._info.configure(text=msg)
 
 	def showhide(self):
 		if self.visible:
@@ -364,13 +367,6 @@ class UserDisplay:
 		self._eye_ly = y
 		self._canvas.coords(self.eye, x-sz, y-sz, x+sz, y+sz);
 
-		self.scount.config(text="%d sprites" % len(sprite.Sprite.__list__))
-
-
-	def showsprites(self):
-		for n in range(0, len(Sprite.__list__)):
-			Logger('%d: "%s"\n' % (n, sprite.Sprite.__list__[n]))
-
 	def fb2can(self, x, y=None):
 		"""convert frame buffer coords to canvas coords"""
 		if y is None:
@@ -383,66 +379,43 @@ class UserDisplay:
 			(x, y) = x
 		return(x - (self.w2), (self.h - y) - self.h2)
 
-	def _drawaxis(self, x, y, cw, ch):
-		cardinal = 'yellow'
-		major = 'grey50'
-		minor = 'grey75'
-		r = 20 * self.gridinterval;
-
+	def _drawaxis(self, cw, ch):
+		cursor = 'tcross'
+		background = 'gray80'
+		cardinal = 'black'
+		dots = 'gray50'
+		
+		self._canvas.configure(cursor=cursor, bg=background)
+		
 		if self._blocked:
+			# mark region blocked by photodiode..
 			(x1, y1) = self.fb2can(self._blocked[0], self._blocked[1])
 			self._canvas.create_line(x1, ch, x1, y1, width=3, fill='black')
 			self._canvas.create_line(x1, y1, cw, y1, width=3, fill='black')
 
-		n = 0
-		for i in range(0, 20):
-			xx = self.gridinterval * i
-			(x1, y1) = self.fb2can(xx, 0)
-			(x2, y2) = self.fb2can(-xx, 0)
-			if xx == 0:
-				self._axis.append(
-					self._canvas.create_line(x1, 0, x1, ch,
-											 width=2, fill=cardinal))
-			elif n == 0:
-				self._axis.append(
-					self._canvas.create_line(x1, 0, x1, ch,
-											 width=1, fill=major))
-				self._axis.append(
-					self._canvas.create_line(x2, 0, x2, ch,
-											 width=1, fill=major))
-			else:
-				self._axis.append(
-					self._canvas.create_line(x1, 0, x1, ch,
-											 width=1, fill=minor))
-				self._axis.append(
-					self._canvas.create_line(x2, 0, x2, ch,
-											 width=1, fill=minor))
-			n = (n + 1) % 5
+		# draw cardinal axis (0,0)
+		(x, y) = self.fb2can(0, 0)
+		self._canvas.create_line(x, 0, x, ch, width=1,
+								 fill='black', dash=(7,2))
+		self._canvas.create_line(0, y, cw, y, width=1,
+								 fill='black', dash=(7,2))
 
-		n = 0
-		for i in range(0, 20):
-			yy = self.gridinterval * i
-			(x1, y1) = self.fb2can(0, yy)
-			(x2, y2) = self.fb2can(0, -yy)
-			if yy == 0:
-				self._axis.append(
-					self._canvas.create_line(0, y1, cw, y1,
-											 width=2, fill=cardinal))
-			elif n == 0:
-				self._axis.append(
-					self._canvas.create_line(0, y1, cw, y1,
-											 width=1, fill=major))
-				self._axis.append(
-					self._canvas.create_line(0, y2, cw, y2,
-											 width=1, fill=major))
-			else:
-				self._axis.append(
-					self._canvas.create_line(0, y1, cw, y1,
-											 width=1, fill=minor))
-				self._axis.append(
-					self._canvas.create_line(0, y2, cw, y2,
-											 width=1, fill=minor))
-			n = (n + 1) % 5
+		# gridinterval is pix/deg
+		d = self.gridinterval
+		(xo, yo) = self.fb2can(0,0)
+		for x in range(0, cw/2, d):
+			for y in range(0, ch/2, d):
+				for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
+					if x == 0 or y == 0:
+						continue
+					elif (x%5) == 0 or (y%5) == 0:
+						w = 1
+					else:
+						w = 0
+					b = self._canvas.create_rectangle(xo+(sx*x)-w,yo+(sy*y)-w,
+													  xo+(sx*x)+w,yo+(sy*y)+w,
+													  outline=c, fill=dots)
+					self._axis.append(b)
 
 	def clearbox(self):
 		self.setbox(clear=1)
@@ -691,8 +664,9 @@ class UserDisplay:
 		else:
 			(self.mousex, self.mousey) = self.can2fb(ev.x, ev.y)
 			(x, y, fx, fy) = (self.mousex, self.mousey, self.fix_x, self.fix_y)
-		s = "[%4d,%4d][rel %4d,%4d]" % (x, y, x-fx, y-fy)
-		self.xypos.configure(text=s)
+		if self.xypos:
+			s = "[%4d,%4d][rel %4d,%4d]" % (x, y, x-fx, y-fy)
+			self.xypos.configure(text=s)
 
 	def _mouse_enter(self, ev):
 		self._canvas.focus_set()
@@ -1059,19 +1033,21 @@ class UserDisplay:
 		if menu is None:
 			self.taskpopup = Menu(self._canvas, tearoff=0)
 			self.taskpopup.add_command(label="No taskpopup")
+			self.taskpopup.add_separator()
+			self.taskpopup.add_command(label="close")
 		else:
 			self.taskpopup = menu
 		self._canvas.bind("<Button-2>", self.do_taskpopup)
 
 	def do_taskpopup(self, event):
 		try:
-			self.taskpopup.tk_popup(event.x_root, event.y_root, 0)
+			self.taskpopup.tk_popup(event.x_root, event.y_root)
 		finally:
 			self.taskpopup.grab_release()
 
 	def do_popup(self, event):
 		try:
-			self.popup.tk_popup(event.x_root, event.y_root, 0)
+			self.popup.tk_popup(event.x_root, event.y_root)
 		finally:
 			self.popup.grab_release()
 

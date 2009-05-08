@@ -134,12 +134,13 @@ if os.environ.has_key('LD_LIBRARY_PATH'):
 # now that $PYPEDIR is partially setup, pype and pype modules
 # should be importable...
 
-if sys.argv[1] == '-v' or sys.argv[1] == '--version':
+
+if len(sys.argv) > 1 and (sys.argv[1] == '-v' or sys.argv[1] == '--version'):
     from pypeversion import *
     print "pype version:", PypeVersion
     print "         svn:", __revision__
     print "   installed:", PypeInstallDate
-    print " b uild from:", PypeBuildDir
+    print "  build from:", PypeBuildDir
     print "    build by: %s@%s" % (PypeBuildBy, PypeBuildHost)
     print "    build on:", PypeBuildDate
     sys.exit(0)
