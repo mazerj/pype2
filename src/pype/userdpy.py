@@ -414,7 +414,7 @@ class UserDisplay:
 						w = 0
 					b = self._canvas.create_rectangle(xo+(sx*x)-w,yo+(sy*y)-w,
 													  xo+(sx*x)+w,yo+(sy*y)+w,
-													  outline=c, fill=dots)
+													  outline=dots, fill=dots)
 					self._axis.append(b)
 
 	def clearbox(self):
