@@ -1345,7 +1345,14 @@ class PypeApp:
 				else:
 					t = t+'.'
 			t = t + ")"
-		self.__ledbar.configure(text=t)
+		try:
+			last = self.__lastledbar
+		except AttributeError:
+			last = ""
+			
+		if not last == t:
+			self.__ledbar.configure(text=t)
+			self.__lastledbar = t
 		
 
 	def isrunning(self):

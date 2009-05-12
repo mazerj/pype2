@@ -383,7 +383,6 @@ class UserDisplay:
 		cursor = 'tcross'
 		background = 'gray80'
 		cardinal = 'black'
-		dots = 'gray50'
 		
 		self._canvas.configure(cursor=cursor, bg=background)
 		
@@ -409,9 +408,11 @@ class UserDisplay:
 					if x == 0 or y == 0:
 						continue
 					elif (x%5) == 0 or (y%5) == 0:
-						w = 1
+						w = 0
+						dots = 'gray20'
 					else:
 						w = 0
+						dots = 'gray60'
 					b = self._canvas.create_rectangle(xo+(sx*x)-w,yo+(sy*y)-w,
 													  xo+(sx*x)+w,yo+(sy*y)+w,
 													  outline=dots, fill=dots)
