@@ -400,10 +400,10 @@ class UserDisplay:
 								 fill='black', dash=(7,2))
 
 		# gridinterval is pix/deg
-		d = self.gridinterval
+		d = int(round(self.gridinterval))
 		(xo, yo) = self.fb2can(0,0)
-		for x in range(0, cw/2, d):
-			for y in range(0, ch/2, d):
+		for x in range(0, int(round(cw/2)), d):
+			for y in range(0, int(round(ch/2)), d):
 				for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
 					if x == 0 or y == 0:
 						continue
