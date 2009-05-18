@@ -67,6 +67,8 @@ from Tkinter import *
 from events import *
 import pypedebug
 
+from pype_aux import uniform
+
 def _bool(state):
 	if state:
 		return 'ON'
