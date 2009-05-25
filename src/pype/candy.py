@@ -46,7 +46,7 @@ def bounce(app):
 		app.led(1)
 		app._sbut1.config(state=DISABLED)
 		app._sbut2.config(state=DISABLED)
-		app.udpy.stop(command=lambda app=app: _bounce(app))
+		app.udpy.stop(command=lambda app=app: bounce(app))
 
 		app._candy = 1
 		app.console.clear()
@@ -111,7 +111,7 @@ def slideshow(app):
 		app.led(1)
 		app._sbut1.config(state=DISABLED)
 		app._sbut2.config(state=DISABLED)
-		app.udpy.stop(command=lambda app=app: _slideshow(app))
+		app.udpy.stop(command=lambda app=app: slideshow(app))
 
 		try:
 			f = open(pype.pyperc('candy.lst'), 'r')

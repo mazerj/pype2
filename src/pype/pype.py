@@ -288,6 +288,14 @@ Mon Apr 27 16:20:55 2009 mazer
 
 - likewise, also got rid of the lshiftsown/rshiftdown PypeApp methods
 
+Mon May 25 17:02:17 2009 mazer
+
+- settled on TASKPATH for adding things to the task search path. Again,
+  this is a colon-deliminate list of directories. Each directory name
+  (terminal node of path) must be unique!! (This is a PMW/Tkinter issue).
+  You can specified as both a config var in ~/.pyperrc AND/OR using the
+  enviornment var..
+
 """
 
 __author__   = '$Author$'
@@ -620,7 +628,7 @@ class PypeApp:
 			self.uname = os.environ['LOGNAME']
 		else:
 			self.uname = '???'
-		self.userinfo = Label(tmp, text="user=%s subject=%s" % \
+		self.userinfo = Label(tmp, text="usr=%s subj=%s" % \
 							  (self.uname, subject()))
 		self.userinfo.pack(side=RIGHT)
 
@@ -641,25 +649,18 @@ class PypeApp:
 		self.__ledbar = Label(f, text=None)
 		self.__ledbar.pack(side=RIGHT)
 
-		f2 = Frame(self.tk, borderwidth=3, relief=GROOVE)
+		f2 = Frame(self.tk)				# entire lower section.. not visible!
 		f2.pack(expand=1)
 
-		book = Pmw.NoteBook(f2)
-		book.grid(row=0, column=1, sticky=N+S)
-
-		console = book.add('console')
-		info = book.add('info')
-		tally = book.add('tally')
-		stats = book.add('stats')
-		setables = book.add('eyeStuff')
-
-		cpane = Frame(f2, borderwidth=3, relief=GROOVE)
-		cpane.grid(row=0, column=0, sticky=N+S)
-		self.buttonframe = cpane
+		f = Frame(f2)
+		f.grid(row=0, column=0, sticky=N+S)		
+		
+		c1pane = Frame(f, borderwidth=1, relief=RIDGE)
+		c1pane.pack(expand=0, fill=X, side=TOP)
 
 		hostname = self.__gethostname()
-		b = Checkbutton(cpane, text='subj/cell', relief=RAISED, pady=4)
-		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		b = Checkbutton(c1pane, text='subj parm', relief=RAISED, anchor=W)
+		b.pack(expand=0, fill=X, side=TOP, pady=4)
 
 		sub_common = DockWindow(checkbutton=b, title='subj/cell')
 		self.sub_common = ParamTable(sub_common,
@@ -729,8 +730,8 @@ class PypeApp:
 		# set warning label if training mode
 		self.tog_training(toggle=0)
 
-		b = Checkbutton(cpane, text='rig params', relief=RAISED, pady=4)
-		b.pack(expand=0, fill=X, side=TOP, pady=2)
+		b = Checkbutton(c1pane, text='rig parm', relief=RAISED, anchor=W)
+		b.pack(expand=0, fill=X, side=TOP, pady=4)
 		rig_common = DockWindow(checkbutton=b,
 								title='rig (%s)' % hostname)
 		self.rig_common = ParamTable(rig_common,
@@ -836,46 +837,45 @@ class PypeApp:
 			Logger("pype: %s is not a valid EYETRACKER.\n" % et)
 			raise PypeFatalError
 
-		self._sbut1 = Button(cpane, text="start",
-							 command=self.__start, fg='red')
+		c2pane = Frame(f, borderwidth=3, relief=RIDGE)
+		c2pane.pack(expand=0, fill=X, side=TOP)
+
+		self._sbut1 = Button(c2pane, text="start",
+							 command=self.__start, bg='light green')
 		self._sbut1.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(self._sbut1, 'save data to file')
 
-		self._sbut2 = Button(cpane, text="tmp start",
-							 command=self.__starttmp, fg='red')
+		self._sbut2 = Button(c2pane, text="temp",
+							 command=self.__starttmp, bg='light green')
 		self._sbut2.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(self._sbut2, "save to temp file (ie, don't save)")
 
-		b = Button(cpane, text="new cell", command=self.new_cell)
+		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
+		c3pane.pack(expand=0, fill=X, side=TOP)
+
+		b = Button(c3pane, text="new cell", command=self.new_cell)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "create a new cell number")
 
-		# Sun Jul 24 21:48:56 2005 mazer
-		#  this is automatic now -- userdisplay calls set_fxfy() each
-		#  time the fixspot get's set
-		#b = Button(cpane, text="use fx,fy", command=self.set_fxfy)
-		#b.pack(expand=0, fill=X, side=TOP, pady=2)
-		#self.balloon.bind(b, "set 'fix_x' and 'fix_y' from user display")
-
-		b = Button(cpane, text="reward",
+		b = Button(c3pane, text="reward",
 				   command=self.reward)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
-		self.balloon.bind(b, "trigger a reward (same as F4)")
+		self.balloon.bind(b, "give reward (same as F4)")
 
-		b = Button(cpane, text="start beep",
+		b = Button(c3pane, text="beep",
 				   command=lambda s=self: s.warningbeep(1))
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
-		self.balloon.bind(b, "make start sound w/o starting")
+		self.balloon.bind(b, "play start sound w/o starting")
 
 		self._candy = 0
-		b = Button(cpane, text="bounce",
+		b = Button(c3pane, text="bounce",
 				   command=lambda s=self: bounce(s),
 				   bg='white')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "following the bouncing ball")
 		self._button_bounce = b
 
-		b = Button(cpane, text="slideshow",
+		b = Button(c3pane, text="slides",
 				   command=lambda s=self: slideshow(s),
 				   bg='white')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
@@ -884,11 +884,19 @@ class PypeApp:
 
 		self.eyegraph = _EyeGraph(self)
 
-		self._cpane = cpane
+		self._cpane = c3pane
+
+		book = Pmw.NoteBook(f2)
+		book.grid(row=0, column=1, sticky=N+S+E)
+		console = book.add('Console')
+		info = book.add('Info')
+		tally = book.add('Tally')
+		stats = book.add('PerfStats')
+		setables = book.add('Tracker')
 
 		# INFO CONSOLES ######################################
-		self.console = Info(console, height=40, width=55, bg='white')
-		self.info = Info(info, height=40, width=55, bg='gray80')
+		self.console = Info(console, bg='white')
+		self.info = Info(info, bg='gray80')
 
 		# STATS WINDOW ######################################
 		self.statsw = Label(stats, text='', anchor=W, justify=LEFT,
@@ -906,16 +914,16 @@ class PypeApp:
 		b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
 		self.balloon.bind(b, "clear tally statistics")
 
-		self.tallyw = Info(tally, height=40, width=55, bg='gray90')
+		self.tallyw = Info(tally, bg='gray90')
 
 		self.__runstats_update(clear=1)
 		self.tally(type=None)
 
 		# EYE COIL PARAMS ######################################
-		f = Frame(setables, borderwidth=1, relief=GROOVE)
-		f.pack(expand=0, fill=X, side=TOP, pady=10)
+		f = Frame(setables)
+		f.pack(expand=0, fill=X, side=TOP)
 
-		b = Button(f, text="Update",
+		b = Button(f, text="update",
 				   command=self.eyeset)
 		b.pack(expand=0, fill=Y, side=LEFT, pady=0)
 		self.balloon.bind(b, "apply all values in this notebook")
@@ -929,19 +937,17 @@ class PypeApp:
 				   command=lambda s=self: s.eyeshift(reset=1))
 		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "reset offset's to 0,0 (immediate effect)")
-
 		b = Button(f, image=self.icons['left'],
 				   command=lambda s=self: s.eyeshift(x=1, y=0))
-		b.pack(expand=0, side=LEFT)
+		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets left (immediate effect)")
 		b = Button(f, image=self.icons['right'],
 				   command=lambda s=self: s.eyeshift(x=-1, y=0))
-		b.pack(expand=0, side=LEFT)
+		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets right (immediate effect)")
-
 		b = Button(f, image=self.icons['up'],
 				   command=lambda s=self: s.eyeshift(x=0, y=-1))
-		b.pack(expand=0, side=LEFT)
+		b.pack(expand=0, fill=Y, side=LEFT)
 		self.balloon.bind(b, "shift offsets up (immediate effect)")
 
 		b = Button(f, image=self.icons['down'],
@@ -1050,16 +1056,18 @@ class PypeApp:
 		self.dpy_w = self.config.iget('DPYW')
 		self.dpy_h = self.config.iget('DPYH')
 
-		# status line
-		self._status = Label(f2, text="", anchor=W, fg="red")
-		self._status.grid(row=1, column=0, columnspan=3, sticky=W+E)
-		self.balloon.bind(self._status, 'plain old status line')
-
 		# history info
-		self._hist = Label(f2, text="", anchor=W, font=fixed)
+		self._hist = Label(f2, text="", anchor=W, font=fixed,
+						   borderwidth=1, relief=RIDGE)
 		self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
 		self.balloon.bind(self._hist, "recent trial result codes")
 		self.history(init=1)
+
+		# status line
+		self._status = Label(f2, text="", anchor=W, fg="red",
+							 borderwidth=1, relief=RIDGE)
+		self._status.grid(row=1, column=0, columnspan=3, sticky=W+E)
+		self.balloon.bind(self._status, 'plain old status line')
 
 		self.led(0)
 
@@ -1467,8 +1475,8 @@ class PypeApp:
 		return d
 
 	def make_taskmenu(self, menubar):
-		self.add_tasks(menubar, 'sys', pypedir('Tasks'))
-		self.add_tasks(menubar, 'pyperc', pyperc('Tasks'))
+		self.add_tasks(menubar, 'system', pypedir('Tasks'))
+		self.add_tasks(menubar, '~pyperc', pyperc('Tasks'))
 		files = glob.glob(pyperc('Tasks/*'))
 		for d in files:
 			m = posixpath.basename(d)
@@ -1476,14 +1484,22 @@ class PypeApp:
 			#   skip names starting with an underscores (ie, disabled)
 			if os.path.isdir(d) and not (m[0] == '_'):
 				self.add_tasks(menubar, "~"+m, d)
-		self.add_tasks(menubar, 'CWD', '.')
-		if os.environ.has_key('PYPETASKPATH'):
-			dirs = os.environ['PYPETASKPATH'].split(':')
-			for d in dirs:
+		self.add_tasks(menubar, 'cwd', '.')
+
+		pathlist = []
+		if self.config.get('TASKPATH', None):
+			pathlist.append(self.config.get('TASKPATH', None))
+		if os.environ.has_key('TASKPATH'):
+			pathlist.append(os.environ['TASKPATH'])
+
+		for p in pathlist:
+			for d in p.split(':'):
 				try:
 					self.add_tasks(menubar, posixpath.basename(d), d)
 				except ValueError:
-					Logger("pype: %s in PYPETASKPATH is duplicate.\n" % d)
+					Logger("pype: %s in $TASKPATH is a duplicate.\n" % d +
+						   "      Terminal directory names must be unique;\n" +
+						   "      skipped duplicates\n")
 
 	def add_tasks(self, menubar, dropname, dir):
 		if dir[-1] == '/':
@@ -1986,8 +2002,8 @@ class PypeApp:
 					(server, tank, block) = self.tdt.newblock(record=1)
 					Logger('pype: tdt data = %s %s\n' % (tank, block))
 
-				self._sbut1.config(text='stop')
-				self._sbut2.config(text='stop')
+				self._sbut1.config(text='stop', bg="red")
+				self._sbut2.config(text='stop', bg="red")
 				self.udpy.stop(command=self.__start_helper)
 				self._allowabort = 1
 
@@ -2018,8 +2034,10 @@ class PypeApp:
 					dacq_set_rt(0)
 					self.idlefb()
 					self._allowabort = 0
-					self._sbut1.config(text='start', state=NORMAL)
-					self._sbut2.config(text='tmp start', state=NORMAL)
+					self._sbut1.config(text='start',
+									   bg="light green", state=NORMAL)
+					self._sbut2.config(text='temp',
+									   bg="light green", state=NORMAL)
 					self._button_bounce.config(state=NORMAL)
 					self._button_slideshow.config(state=NORMAL)
 					self._loadmenu.enableall()
@@ -2321,7 +2339,10 @@ class PypeApp:
 				else:
 					self._histstr = self._histstr + c
 		if self.tk:
-			self._hist.config(text="trial hist: " + self._histstr)
+			if len(self._histstr):
+				self._hist.config(text='run hist: ' + self._histstr)
+			else:
+				self._hist.config(text='')
 
 	def alarm(self):
 		for i in range(1):

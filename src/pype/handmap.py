@@ -116,6 +116,7 @@ class _Probe:
 		self.p2 = 0.0
 		self.l = None
 		self.l2 = None
+		self.l3 = None
 		#self.txt = None
 		self.bg = 128.0
 		self.showinfo = 1
@@ -218,7 +219,7 @@ class _Probe:
 		s = s +		"  o: offset_____%s\n" % _bool(self.xoff)
 		s = s +		"  u: on/off_____%s\n" % _bool(self.on)
 		s = s +		"  M: bar mode___%s\n" % BARMODES[self.barmode]
-		if self.barmode > 0:
+		if self.barmode in (CART, HYPER, POLAR):
 			s = s + "  {:  radfrq=%.1f\n" % self.p1
 			s = s + "  }:  polrty=%.1f\n" % self.p2
 		s = s +		"8,9: a__________%d/%d\n" % (a1, a2)
@@ -258,9 +259,9 @@ class _Probe:
 		if self.l2:
 			self.app.udpy._canvas.delete(self.l2)
 			self.l2 = None
-		#if self.txt:
-		#	self.app.udpy._canvas.delete(self.txt)
-		#	self.txt = None
+		if self.l3:
+			self.app.udpy._canvas.delete(self.l3)
+			self.l3 = None
 		self.app.udpy_note('')
 		
 	def reset(self):
@@ -347,7 +348,7 @@ class _Probe:
 			else:
 				phase = 90.0;
 
-			if self.barmode == 0:
+			if self.barmode == BAR:
 				self.s = Sprite(width=self.width, height=self.length,
 								fb=self.app.fb, depth=99)
 				if color is None:
@@ -355,7 +356,7 @@ class _Probe:
 				else:
 					self.s.fill(color)
 				self.s.rotateCCW(self.a, 0, 1)
-			elif self.barmode == 1:
+			elif self.barmode == CART:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
 								fb=self.app.fb, depth=99)
@@ -365,7 +366,7 @@ class _Probe:
 				singrat(self.s, abs(self.p1), phase, self.a,
 						1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
-			elif self.barmode == 2:
+			elif self.barmode == HYPER:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
 								fb=self.app.fb, depth=99)
@@ -375,7 +376,7 @@ class _Probe:
 				hypergrat(self.s, abs(self.p1), phase, self.a,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
-			elif self.barmode == 3:
+			elif self.barmode == POLAR:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
 								fb=self.app.fb, depth=99)
@@ -389,25 +390,26 @@ class _Probe:
 				polargrat(self.s, abs(self.p1), abs(self.p2), phase, pol,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
-			elif self.barmode == 4:
+			elif self.barmode == RDP:
 				# rds
 				l = self.length
-				self.s = Sprite(width=l/15, height=l/5, fb=self.app.fb, depth=99)
-				self.s.scale(l, l)
-				self.s.alpha_aperture(l/2)
+				self.s = Sprite(width=l/3, height=l/3, fb=self.app.fb, depth=99)
 				if color is None:
 					c = (255,255,255)
 				else:
 					c = color
 				simple_rdp(self.s, fraction=0.10,
 						   fgcolor=c, bgcolor=(self.bg,self.bg,self.bg))
+				self.s.scale(l, l)
+				self.s.alpha_aperture(l/2)
 				
-			if self.barmode > 0:
+			if not self.barmode == BAR:
 				self.showprobe()
+				
 			self.lastx = None
 			self.lasty = None
 
-		if self.barmode == 4:
+		if self.barmode == RDP:
 			simple_rdp(self.s, self.a, self.drift_freq)
 
 		x = self.x
@@ -416,12 +418,6 @@ class _Probe:
 			dt = t - self.drift;
 			d = self.drift_amp * \
 				math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.)
-
-			# This was WRONG. Not sure why it ever worked!!!
-			#y = y + d * math.sin(-math.pi * (90. + self.a) / 180.)
-			#x = x + d * math.cos(-math.pi * (90. + self.a) / 180.)
-
-			# This should now be correct:
 			y = y + d * math.sin(math.pi * self.a / 180.)
 			x = x + d * math.cos(math.pi * self.a / 180.)
 
@@ -442,38 +438,43 @@ class _Probe:
 			self.s.off()
 
 		(x, y) = self.app.udpy.fb2can(x, y)
+
+		# compute line for long axis (orientation indicator)
 		l2 = self.length / 2.0
 		_tsin = l2 * math.sin(math.pi * (270.0 - self.a) / 180.0)
 		_tcos = l2 * math.cos(math.pi * (270.0 - self.a) / 180.0)
-		y1 = y + _tsin
-		x1 = x + _tcos
-		y2 = y - _tsin
-		x2 = x - _tcos
-		xx1 = x - l2
-		xx2 = x + l2
-		yy1 = y - l2
-		yy2 = y + l2
+		(x1, y1) = (x + _tcos, y + _tsin)
+		(x2, y2) = (x - _tcos, y - _tsin)
+		(xx1, yy1) = (x - l2, y - l2)
+		(xx2, yy2) = (x + l2, y + l2)
+
+		# compute line for short axis (direction indicator)
+		dx = (self.width/2.0)*math.cos(math.pi * -self.a / 180.0)
+		dy = (self.width/2.0)*math.sin(math.pi * -self.a / 180.0)
 			
 		if self.l:
-			if self.barmode == 0:
+			if self.barmode == BAR:
 				self.app.udpy._canvas.coords(self.l, x1, y1, x2, y2)
 			else:
 				self.app.udpy._canvas.coords(self.l, xx1, yy1, xx2, yy2)
 			self.app.udpy._canvas.coords(self.l2, x1, y1, x2, y2)
+			self.app.udpy._canvas.coords(self.l3, x, y, x+dx, y+dy)
 		else:
-			if self.barmode == 0:
+			if self.barmode == BAR:
 				self.l = self.app.udpy._canvas.create_line(x1, y1, x2, y2)
 			else:
 				self.l = self.app.udpy._canvas.create_oval(xx1, yy1, xx2, yy2)
 			self.l2 = self.app.udpy._canvas.create_line(x1, y1, x2, y2,
 														fill='pink', width=2)
+			self.l3 = self.app.udpy._canvas.create_line(x, y, x+dx, y+dy,
+														fill='blue', width=2)
 
 		if color:
 			fill = "#%02x%02x%02x" % color
 		else:
 			fill = 'orange'
 			
-		if self.barmode == 0:
+		if self.barmode == BAR:
 			self.app.udpy._canvas.itemconfigure(self.l, fill=fill,
 												width=self.width)
 		else:
