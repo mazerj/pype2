@@ -32,6 +32,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
   - added callback option to the UserDisplay class to support time
     marking from pype.py (see notes in pype.py)
 
+- Fri May 22 15:58:59 2009 mazer
+
+  - changed button-1 function to button-3 to avoid problems with WM..
+
 """
 
 __author__   = '$Author$'
@@ -206,7 +210,7 @@ class UserDisplay:
 		self.popup.add_separator()
 		self.popup.add_command(label="close")
 
-		self._canvas.bind("<Button-1>", self.do_popup)
+		self._canvas.bind("<Button-3>", self.do_popup)
 
 		self._canvas.bind("<Motion>", self._mouse_motion)
 		self._canvas.bind("<Enter>", self._mouse_enter)
@@ -252,9 +256,6 @@ class UserDisplay:
 		self.msg_win = None
 
 		self.set_taskpopup()
-
-		self.bind_but3(fn=None, arg=None)
-		self._canvas.bind("<Button-3>", self.invoke_but3)
 
 	def info(self, msg=''):
 		self._info.configure(text=msg)
@@ -1051,14 +1052,6 @@ class UserDisplay:
 			self.popup.tk_popup(event.x_root, event.y_root)
 		finally:
 			self.popup.grab_release()
-
-	def bind_but3(self, fn=None, arg=None):
-		self.but3_fn = fn
-		self.but3_arg = arg
-
-	def invoke_but3(self, event):
-		if self.but3_fn:
-			self.but3_fn(self.but3_arg, event)
 
 class FID:
 	def __init__(self, file=None):

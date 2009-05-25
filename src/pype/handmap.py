@@ -69,12 +69,19 @@ import pypedebug
 
 from pype_aux import uniform
 
+BAR=0
+CART=1
+HYPER=2
+POLAR=3
+RDP=4
+
+BARMODES = {BAR:'bar', CART:'cart', HYPER:'hyper', POLAR:'polar', RDP:'rdp'}
+
 def _bool(state):
 	if state:
 		return 'ON'
 	else:
 		return 'OFF'
-	
 
 class _Probe:
 	def __init__(self, app):
@@ -89,8 +96,8 @@ class _Probe:
 		self.y = 100
 		self.colorn = 0
 		self.drift = 0
-		self.drift_freq = 0.1;
-		self.drift_amp = 50
+		self.drift_freq = 0.1;			# ~cycles/sec
+		self.drift_amp = 50				# pixels
 		self.jitter = 0
 		self.xoff = 0
 		self.yoff = 0
@@ -104,14 +111,14 @@ class _Probe:
 		self.blinkper = 300
 		self.inten = 100
 		self.colorstr = None
-		self.barmode = 0
-		self.barmodes = ('bar', 'cart', 'hyper', 'polar')
+		self.barmode = BAR
 		self.p1 = 1.0
 		self.p2 = 0.0
 		self.l = None
 		self.l2 = None
 		#self.txt = None
 		self.bg = 128.0
+		self.showinfo = 1
 		
 		try:
 			self.load()
@@ -204,36 +211,45 @@ class _Probe:
 		rx = self.x - self.app.udpy.fix_x
 		ry = self.y - self.app.udpy.fix_y
 
-		s =			"  key action	 value\n"
-		s = s +		"   z: lock_______%s\n" % _bool(self.lock)
-		s = s +		"   o: offset_____%s\n" % _bool(self.xoff)
-		s = s +		"   u: on/off_____%s\n" % _bool(self.on)
-		s = s +		"   M: bar mode___%s\n" % self.barmodes[self.barmode]
+		s = ""
+		#s =	s +		" key action	 value\n"
+		s = s +		"  H: hide/show\n"
+		s = s +		"  z: lock_______%s\n" % _bool(self.lock)
+		s = s +		"  o: offset_____%s\n" % _bool(self.xoff)
+		s = s +		"  u: on/off_____%s\n" % _bool(self.on)
+		s = s +		"  M: bar mode___%s\n" % BARMODES[self.barmode]
 		if self.barmode > 0:
-			s = s + "      (p1 = %.1f)\n" % self.p1
-			s = s + "      (p2 = %.1f)\n" % self.p2
-		s = s +		" 8,9: a__________%d/%d\n" % (a1, a2)
-		s = s +		" n/m: rgb________%s\n" % repr(self.colorshow)
-		s = s +		"(1-6) color______%s\n" % self.colorname
-		s = s +		" q/w: len________%d\n" % self.length
-		s = s +		" e/r: wid________%d\n" % self.width
-		s = s +		"   j: jitter_____%s\n" % _bool(self.jitter)
-		s = s +		"   d: drift______%s\n" % _bool(self.drift)
-		s = s +		" t/T: drift_amp__%d pix\n" % self.drift_amp
-		s = s +		" y/Y: drft_freq__%.1f Hz\n" % self.drift_freq
-		s = s +		"   b: blink______%s\n" % _bool(self.blink)
-		s = s +		"   B: clr blink__%s\n" % _bool(self.cblink)
-		s = s +		" p/P: blnk per___%d ms\n" % self.blinkper
-		s = s +		" i/I: inten______%d\n" % self.inten
-		ecc1 = math.sqrt(rx * rx + ry * ry)
-		ecc2 = math.sqrt(rx * rx + ry * ry) / self.app.udpy.gridinterval
-		a = (180.0 * math.atan2(ry, rx) / math.pi)
-		if a < 0:
-			a = a + 360.0
-		s = s +		" RELPOS=(%4d,%4d)px\n" % (rx, ry)
-		s = s +		"    ECC=%3dpx / %.1fd\n" %  (round(ecc1), ecc2)
-		s = s +		"  THETA=%.0fdeg" % round(a)
-		return s
+			s = s + "  {:  radfrq=%.1f\n" % self.p1
+			s = s + "  }:  polrty=%.1f\n" % self.p2
+		s = s +		"8,9: a__________%d/%d\n" % (a1, a2)
+		try:
+			c = '#'+string.join(map(lambda x:"%02x"%x, self.colorshow),'')
+		except TypeError:
+			c = 'noise'
+		s = s +     "n/m: rgb________%s\n" % c
+		s = s +		"1-6: color______%s\n" % self.colorname
+		s = s +		"q/w: len________%d\n" % self.length
+		s = s +		"e/r: wid________%d\n" % self.width
+		s = s +		"  j: jitter_____%s\n" % _bool(self.jitter)
+		s = s +		"  d: drft_______%s\n" % _bool(self.drift)
+		s = s +		"t/T: drft amp___%dpix\n" % self.drift_amp
+		s = s +		"y/Y: drft frq___%.1fHz\n" % self.drift_freq
+		s = s +		"  b: blink______%s\n" % _bool(self.blink)
+		s = s +		"  B: c-blink____%s\n" % _bool(self.cblink)
+		s = s +		"p/P: blnk per___%dms\n" % self.blinkper
+		s = s +		"i/I: inten______%d\n" % self.inten
+
+		if 0:
+			ecc1 = math.sqrt(rx * rx + ry * ry)
+			ecc2 = math.sqrt(rx * rx + ry * ry) / self.app.udpy.gridinterval
+			a = (180.0 * math.atan2(ry, rx) / math.pi)
+			if a < 0:
+				a = a + 360.0
+			s = s +		" RELPOS=(%4d,%4d)px\n" % (rx, ry)
+			s = s +		"    ECC=%3dpx / %.1fd\n" %  (round(ecc1), ecc2)
+			s = s +		"  THETA=%.0fdeg\n" % round(a)
+			
+		return s[:-1]
 	
 	def clear(self):
 		if self.l:
@@ -373,11 +389,26 @@ class _Probe:
 				polargrat(self.s, abs(self.p1), abs(self.p2), phase, pol,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
+			elif self.barmode == 4:
+				# rds
+				l = self.length
+				self.s = Sprite(width=l/15, height=l/5, fb=self.app.fb, depth=99)
+				self.s.scale(l, l)
+				self.s.alpha_aperture(l/2)
+				if color is None:
+					c = (255,255,255)
+				else:
+					c = color
+				simple_rdp(self.s, fraction=0.10,
+						   fgcolor=c, bgcolor=(self.bg,self.bg,self.bg))
+				
 			if self.barmode > 0:
 				self.showprobe()
 			self.lastx = None
 			self.lasty = None
-				
+
+		if self.barmode == 4:
+			simple_rdp(self.s, self.a, self.drift_freq)
 
 		x = self.x
 		y = self.y
@@ -389,7 +420,7 @@ class _Probe:
 			# This was WRONG. Not sure why it ever worked!!!
 			#y = y + d * math.sin(-math.pi * (90. + self.a) / 180.)
 			#x = x + d * math.cos(-math.pi * (90. + self.a) / 180.)
-			
+
 			# This should now be correct:
 			y = y + d * math.sin(math.pi * self.a / 180.)
 			x = x + d * math.cos(math.pi * self.a / 180.)
@@ -453,7 +484,12 @@ class _Probe:
 			self.app.udpy._canvas.itemconfigure(self.l2, fill='pink')
 		else:
 			self.app.udpy._canvas.itemconfigure(self.l2, fill=fill)
-		self.app.udpy_note(self.pp())
+			
+		if self.showinfo:
+			self.app.udpy_note(self.pp())
+		else:
+			self.app.udpy_note("  H: hide/show")
+
 
 def _incr(x, by=1, min=1):
 	x = x + by
@@ -467,8 +503,10 @@ def _key_handler(app, c, ev):
 
 	if c == 'z':
 		p.lock = not p.lock
+	elif c == 'H':
+		p.showinfo = not p.showinfo
 	elif c == 'M':
-		p.barmode = (p.barmode + 1) % len(p.barmodes)
+		p.barmode = (p.barmode + 1) % len(BARMODES.keys())
 		app.udpy._canvas.delete(p.l)
 		p.l = None
 		app.udpy._canvas.delete(p.l2)

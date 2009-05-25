@@ -111,7 +111,7 @@ class _Socket:
 				#  it doesn't look like a tuple, so I've removed it.. we'll
 				#  see..
 				# (errnum, err) = evalue
-				if evalue == errno.EINTER:
+				if evalue == errno.EINTR:
 					# unexpected SIGNAL came in before data, just retry..
 					# this is likely to be something like a fixwin break
 					# during data collection..

@@ -60,6 +60,10 @@ Mon Jan  5 14:49:56 2009 mazer
 - moved gen{axes,d,rad,theta} axes generator from sprite.py to this
   file (spritetools.py) - gend() function is now officially obsolete..
 
+Fri May 22 15:27:42 2009 mazer
+
+- added simple_rdp() function for Random Dot Patterns
+
 """
 
 __author__   = '$Author$'
@@ -72,6 +76,7 @@ from Numeric import *
 import pygame.surfarray
 from pygame.constants import *
 import sprite
+from RandomArray import uniform
 
 from guitools import Logger
 
@@ -463,6 +468,23 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
+
+def simple_rdp(s, dir=None, vel=None, fraction=0.25,
+			   fgcolor=(255,255,255), bgcolor=(128,128,128)):
+	if dir is None:
+		for n in range(3):
+			if n == 0:
+				m = uniform(0.0, 1.0, shape=(s.w, s.h))
+			mc = where(greater(m, fraction), bgcolor[n], fgcolor[n])
+			s.array[:,:,n] = mc[:].astype(UnsignedInt8)
+	else:
+		dx = -int(round(vel * math.cos(math.pi * dir / 180.0)))
+		dy = int(round(vel * math.sin(math.pi * dir / 180.0)))
+		a = s.array[:,:,:]
+		a = concatenate((a[dx:,:,:],a[:dx,:,:]), axis=0)
+		a = concatenate((a[:,dy:,:],a[:,:dy,:]), axis=1)
+		s.array[:,:,:] = a[:]
+
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	"""Generate a bar into existing sprite using the alpha channel.
 
@@ -551,7 +573,15 @@ def image_circmask(im, x, y, r, apply):
 		raise PygameIncompleteError, 'image_circmask: !apply not implemented'
 
 if __name__ == '__main__':
-	pass
+	#pass
+	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
+	s = Sprite(x=0, y=0, width=100, height=100, fb=fb, on=1)
+	simple_rdp(s, fraction=0.05, color=(255,255,1))
+	for n in range(100):
+		fb.clear()
+		s.blit(flip=1)
+		simple_rdp(s, dir=-45, vel=2)
+	
 else:
 	try:
 		from pype import loadwarn

@@ -1477,10 +1477,13 @@ class PypeApp:
 			if os.path.isdir(d) and not (m[0] == '_'):
 				self.add_tasks(menubar, "~"+m, d)
 		self.add_tasks(menubar, 'CWD', '.')
-		if os.environ.has_key('PYPEPATH'):
-			dirs = os.environ['PYPEPATH'].split(':')
+		if os.environ.has_key('PYPETASKPATH'):
+			dirs = os.environ['PYPETASKPATH'].split(':')
 			for d in dirs:
-				self.add_tasks(menubar, posixpath.basename(d), d)
+				try:
+					self.add_tasks(menubar, posixpath.basename(d), d)
+				except ValueError:
+					Logger("pype: %s in PYPETASKPATH is duplicate.\n" % d)
 
 	def add_tasks(self, menubar, dropname, dir):
 		if dir[-1] == '/':
@@ -1488,36 +1491,37 @@ class PypeApp:
 		else:
 			g = glob.glob(dir+'/*.py')
 
-		# only add menu if there are really files in the directory..
-		if len(g) > 0:
-			menubar.addmenu(dropname, '', '')
-			tasks = []
-			comments = {}
-			for i in range(0, len(g)):
-				# query the type for each "task" and only add to the
-				# task menu if it's really a task, with the !TASK! flag
-				# in the header
-				type, comment = self.__pypefile_type(g[i])
-				# print g[i], 'is', type
-				if type is 'task' or type is None:
-					x = posixpath.basename(g[i])
-					tasks.append(x[:-3])
-					if len(comment) > 0:
-						comments[tasks[-1]] = '  <%s>' % comment
-					else:
-						comments[tasks[-1]] = ''
-			tasks.sort()
+		tasks = []
+		taskdescrs = {}
+		for i in range(len(g)):
+			# check each "task" to see if it's task or support file
+			# based on !TASK! tag in header
+			tasktype, taskdescr = self.__pypefile_type(g[i])
+			if tasktype is 'task' or tasktype is None:
+				x = posixpath.basename(g[i])
+				tasks.append(x[:-3])
+				if len(taskdescr) > 0:
+					taskdescrs[tasks[-1]] = '  <%s>' % taskdescr
+				else:
+					taskdescrs[tasks[-1]] = ''
 
+		if len(tasks) == 0:
+			# dir is empty of real tasks... skip it
+			return
+		
+		tasks.sort()
+		menubar.addmenu(dropname, '', '')
+		menubar.addmenuitem(dropname, 'command', label=dir, foreground='blue')
+		menubar.addmenuitem(dropname, 'separator')
+		for i in range(0, len(tasks)):
 			menubar.addmenuitem(dropname, 'command',
-								label='Reload current',
-								command=self.newloadtask)
-			menubar.addmenuitem(dropname, 'separator')
-
-			for i in range(0, len(tasks)):
-				menubar.addmenuitem(dropname, 'command',
-									label=tasks[i] + comments[tasks[i]],
-									command=lambda s=self,t=tasks[i],d=dir: \
-									s.newloadtask(t, d))
+								label=tasks[i] + taskdescrs[tasks[i]],
+								command=lambda s=self,t=tasks[i],d=dir: \
+								s.newloadtask(t, d))
+		menubar.addmenuitem(dropname, 'separator')
+		menubar.addmenuitem(dropname, 'command', label='Reload current',
+							command=self.newloadtask)
+		
 
 	def unloadtask(self):
 		if self.taskmod:
