@@ -286,13 +286,14 @@ class UserDisplay:
 				self.msg_label = None
 		else:
 			if self.msg_win is None:
-				font = "-*-lucidatypewriter-medium-r-normal-*-12-*-*-*-*-*-*-*"
-				f = Frame(self._canvas, borderwidth=1)
-				self.msg_win = self._canvas.create_window(5, 25,
-													  window=f, anchor=NW)
+				font = "-*-lucidatypewriter-medium-r-normal-*-10-*-*-*-*-*-*-*"
+				f = Frame(self._canvas)
+				self.msg_win = self._canvas.create_window(5, 25, window=f,
+														  anchor=NW)
 				self.msg_label = Label(f, text=msg, font=font, justify=LEFT,
-									   bg=None, fg='black')
-				self.msg_label.pack()
+									   borderwidth=3, relief=RIDGE,
+									   bg='white', fg='black')
+				self.msg_label.pack(ipadx=3, ipady=3)
 				self._placenote()
 			else:
 				self.msg_label.configure(text=msg)
