@@ -112,14 +112,14 @@ class _Probe:
 		self.inten = 100
 		self.colorstr = None
 		self.barmode = BAR
-		self.p1 = 1.0
-		self.p2 = 0.0
-		self.l = None
-		self.l2 = None
-		self.l3 = None
+		self.sfreq = 1.0
+		self.rfreq = 0.0
+		self.major = None
+		self.minor = None
 		#self.txt = None
 		self.bg = 128.0
 		self.showinfo = 1
+		self.probeid = None
 		
 		try:
 			self.load()
@@ -155,8 +155,8 @@ class _Probe:
 		x.inten = self.inten
 		x.cblink = self.cblink
 		x.barmode = self.barmode
-		x.p1 = self.p1
-		x.p2 = self.p2
+		x.sfreq = self.sfreq
+		x.rfreq = self.rfreq
 
 		file = open(pyperc('hmapstim'), 'w')
 		cPickle.dump(x, file)
@@ -191,8 +191,8 @@ class _Probe:
 			self.inten = x.inten
 			self.cblink = x.cblink
 			self.barmode = x.barmode
-			self.p1 = x.p1
-			self.p2 = x.p2
+			self.sfreq = x.sfreq
+			self.rfreq = x.rfreq
 		except AttributeError:
 			sys.stderr.write('** loaded modified probe **\n');
 			
@@ -220,8 +220,8 @@ class _Probe:
 		s = s +		"  u: on/off_____%s\n" % _bool(self.on)
 		s = s +		"  M: bar mode___%s\n" % BARMODES[self.barmode]
 		if self.barmode in (CART, HYPER, POLAR):
-			s = s + "  {:  radfrq=%.1f\n" % self.p1
-			s = s + "  }:  polrty=%.1f\n" % self.p2
+			s = s + "  {:  s.freq____%.1f\n" % self.sfreq
+			s = s + "  }:  r.freq____%.1f\n" % self.rfreq
 		s = s +		"8,9: a__________%d/%d\n" % (a1, a2)
 		try:
 			c = '#'+string.join(map(lambda x:"%02x"%x, self.colorshow),'')
@@ -253,15 +253,12 @@ class _Probe:
 		return s[:-1]
 	
 	def clear(self):
-		if self.l:
-			self.app.udpy._canvas.delete(self.l)
-			self.l = None
-		if self.l2:
-			self.app.udpy._canvas.delete(self.l2)
-			self.l2 = None
-		if self.l3:
-			self.app.udpy._canvas.delete(self.l3)
-			self.l3 = None
+		if self.major:
+			self.app.udpy._canvas.delete(self.major)
+			self.major = None
+		if self.minor:
+			self.app.udpy._canvas.delete(self.minor)
+			self.minor = None
 		self.app.udpy_note('')
 		
 	def reset(self):
@@ -315,10 +312,15 @@ class _Probe:
 	def nextcolor(self, incr=1):
 		self.colorn = (self.colorn + incr) % 9
 
-	def showprobe(self):
-		photoim = self.s.asPhotoImage()
-		i= self.app.udpy._canvas.create_image(0, 0, anchor=NW,
-											  image=photoim)
+	def showprobe(self, x=0, y=0, redraw=1):
+		if self.probeid is None or redraw:
+			self.photoim = self.s.asPhotoImage()
+			self.probeid = self.app.udpy._canvas.create_image(x, y, anchor=NW,
+															  image=self.photoim)
+		else:
+			self.app.udpy._canvas.coords(self.probeid, x, y)
+		self.app.udpy._canvas.lower(self.probeid)
+
 		
 	def draw(self):
 		t = self.app.ts()
@@ -341,6 +343,7 @@ class _Probe:
 			bc = 1.0
 		self.colorshow = color
 		self.colorname = name
+		olds = self.s
 		if (self.s is None) or (self.drift and (self.drift_amp < 1)):
 			if self.drift_amp < 1:
 				phase = 10.0 * \
@@ -363,7 +366,7 @@ class _Probe:
 				if sum(color) < 3:
 					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
-				singrat(self.s, abs(self.p1), phase, self.a,
+				singrat(self.s, abs(self.sfreq), phase, self.a,
 						1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
 			elif self.barmode == HYPER:
@@ -373,21 +376,21 @@ class _Probe:
 				if sum(color) < 3:
 					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
-				hypergrat(self.s, abs(self.p1), phase, self.a,
+				hypergrat(self.s, abs(self.sfreq), phase, self.a,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
 			elif self.barmode == POLAR:
 				l = self.length
 				self.s = Sprite(width=l, height=l,
 								fb=self.app.fb, depth=99)
-				if self.p2 < 0:
+				if self.rfreq < 0:
 					pol = -1
 				else:
 					pol = 1
 				if sum(color) < 3:
 					# 'black' is just 90deg phase shift of 'white'
 					rc,gc,bc = -1.0,-1.0,-1.0
-				polargrat(self.s, abs(self.p1), abs(self.p2), phase, pol,
+				polargrat(self.s, abs(self.sfreq), abs(self.rfreq), phase, pol,
 						  1.0*rc, 1.0*gc, 1.0*bc)
 				self.s.circmask(0, 0, self.length/2)
 			elif self.barmode == RDP:
@@ -403,13 +406,11 @@ class _Probe:
 				self.s.scale(l, l)
 				self.s.alpha_aperture(l/2)
 				
-			if not self.barmode == BAR:
-				self.showprobe()
-				
 			self.lastx = None
 			self.lasty = None
 
 		if self.barmode == RDP:
+			# advance the RDP one tick..
 			simple_rdp(self.s, self.a, self.drift_freq)
 
 		x = self.x
@@ -440,51 +441,41 @@ class _Probe:
 		(x, y) = self.app.udpy.fb2can(x, y)
 
 		# compute line for long axis (orientation indicator)
-		l2 = self.length / 2.0
-		_tsin = l2 * math.sin(math.pi * (270.0 - self.a) / 180.0)
-		_tcos = l2 * math.cos(math.pi * (270.0 - self.a) / 180.0)
+		h2 = self.length / 2.0
+		_tsin = h2 * math.sin(math.pi * (270.0 - self.a) / 180.0)
+		_tcos = h2 * math.cos(math.pi * (270.0 - self.a) / 180.0)
 		(x1, y1) = (x + _tcos, y + _tsin)
 		(x2, y2) = (x - _tcos, y - _tsin)
-		(xx1, yy1) = (x - l2, y - l2)
-		(xx2, yy2) = (x + l2, y + l2)
 
 		# compute line for short axis (direction indicator)
 		dx = (self.width/2.0)*math.cos(math.pi * -self.a / 180.0)
 		dy = (self.width/2.0)*math.sin(math.pi * -self.a / 180.0)
-			
-		if self.l:
-			if self.barmode == BAR:
-				self.app.udpy._canvas.coords(self.l, x1, y1, x2, y2)
-			else:
-				self.app.udpy._canvas.coords(self.l, xx1, yy1, xx2, yy2)
-			self.app.udpy._canvas.coords(self.l2, x1, y1, x2, y2)
-			self.app.udpy._canvas.coords(self.l3, x, y, x+dx, y+dy)
-		else:
-			if self.barmode == BAR:
-				self.l = self.app.udpy._canvas.create_line(x1, y1, x2, y2)
-			else:
-				self.l = self.app.udpy._canvas.create_oval(xx1, yy1, xx2, yy2)
-			self.l2 = self.app.udpy._canvas.create_line(x1, y1, x2, y2,
-														fill='pink', width=2)
-			self.l3 = self.app.udpy._canvas.create_line(x, y, x+dx, y+dy,
-														fill='blue', width=2)
 
-		if color:
-			fill = "#%02x%02x%02x" % color
+		# compute photoimage position in canvas coords
+		cx = x - (self.s.w / 2.0)
+		cy = y - (self.s.h / 2.0)
+
+		if not self.s is olds:
+			# new sprite, redraw the probe
+			self.showprobe(x=cx, y=cy, redraw=1)
 		else:
-			fill = 'orange'
+			self.showprobe(x=cx, y=cy, redraw=0)
 			
-		if self.barmode == BAR:
-			self.app.udpy._canvas.itemconfigure(self.l, fill=fill,
-												width=self.width)
+		if self.major:
+			self.app.udpy._canvas.coords(self.major, x1, y1, x2, y2)
+			self.app.udpy._canvas.coords(self.minor, x, y, x+dx, y+dy)
 		else:
-			self.app.udpy._canvas.itemconfigure(self.l, fill=None,
-												width=2)
+			self.major = self.app.udpy._canvas.create_line(x1, y1, x2, y2,
+														fill='violet', width=2)
+			self.minor = self.app.udpy._canvas.create_line(x, y, x+dx, y+dy,
+														fill='blue', width=2)
+			for l in (self.minor, self.major):
+				self.app.udpy._canvas.lower(l)
 
 		if self.on and self.live:
-			self.app.udpy._canvas.itemconfigure(self.l2, fill='pink')
+			self.app.udpy._canvas.itemconfigure(self.major, dash=None)
 		else:
-			self.app.udpy._canvas.itemconfigure(self.l2, fill=fill)
+			self.app.udpy._canvas.itemconfigure(self.major, dash=(2,2))
 			
 		if self.showinfo:
 			self.app.udpy_note(self.pp())
@@ -508,22 +499,20 @@ def _key_handler(app, c, ev):
 		p.showinfo = not p.showinfo
 	elif c == 'M':
 		p.barmode = (p.barmode + 1) % len(BARMODES.keys())
-		app.udpy._canvas.delete(p.l)
-		p.l = None
-		app.udpy._canvas.delete(p.l2)
-		p.l2 = None
+		app.udpy._canvas.delete(p.major); p.major = None
+		app.udpy._canvas.delete(p.minor); p.minor = None
 		p.reset()
 	elif c == 'bracketleft':
-		p.p1 = p.p1 - 0.2
+		p.sfreq = p.sfreq - 0.2
 		p.reset()
 	elif c == 'bracketright':
-		p.p1 = p.p1 + 0.2
+		p.sfreq = p.sfreq + 0.2
 		p.reset()
 	elif c == 'braceleft':
-		p.p2 = round(p.p2 - 1.0)
+		p.rfreq = round(p.rfreq - 1.0)
 		p.reset()
 	elif c == 'braceright':
-		p.p2 = round(p.p2 + 1.0)
+		p.rfreq = round(p.rfreq + 1.0)
 		p.reset()
 	elif c == 'B':
 		p.cblink = not p.cblink
