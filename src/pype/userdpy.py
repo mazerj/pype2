@@ -286,7 +286,7 @@ class UserDisplay:
 				self.msg_label = None
 		else:
 			if self.msg_win is None:
-				font = "-*-lucidatypewriter-medium-r-normal-*-10-*-*-*-*-*-*-*"
+				font = "-*-lucidatypewriter-medium-r-normal-*-12-*-*-*-*-*-*-*"
 				f = Frame(self._canvas)
 				self.msg_win = self._canvas.create_window(5, 25, window=f,
 														  anchor=NW)
@@ -331,9 +331,8 @@ class UserDisplay:
 			 "-----------------------------------------\n"+
 			 "/  Mark box corner (twice to set box)\n"+
 			 "x  postion message window at cursor\n"+
-			 "L-mouse access fixspot menu\n"+
-			 "M-mouse access task-specific dropdown\n"+
-			 "R-mouse simulate bar up/down",
+			 "R-mouse access fixation menu\n"+
+			 "M-mouse access task-specific dropdown\n",
 			 fixed=1, astext=1)
 
 	def deltags(self, taglist):
@@ -505,8 +504,6 @@ class UserDisplay:
 			self._placenote(ev.x, ev.y)
 		elif c == 'v':
 			self._showfidmarks()
-		elif c == 'h':
-			self.help()
 		elif c == 'period':
 			self.addpoint(ev.x, ev.y)
 		elif c == 'comma':

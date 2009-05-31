@@ -1501,11 +1501,11 @@ class PypeApp:
 						   "      Terminal directory names must be unique;\n" +
 						   "      skipped duplicates\n")
 
-	def add_tasks(self, menubar, dropname, dir):
-		if dir[-1] == '/':
-			g = glob.glob(dir+'*.py')
+	def add_tasks(self, menubar, dropname, dirname):
+		if dirname[-1] == '/':
+			g = glob.glob(dirname+'*.py')
 		else:
-			g = glob.glob(dir+'/*.py')
+			g = glob.glob(dirname+'/*.py')
 
 		tasks = []
 		taskdescrs = {}
@@ -1522,17 +1522,22 @@ class PypeApp:
 					taskdescrs[tasks[-1]] = ''
 
 		if len(tasks) == 0:
-			# dir is empty of real tasks... skip it
 			return
+		else:
+			_addpath(dirname, atend=1)
+			
+
+		dname = dirname
+		if dname is '.': dname = 'current dir'
 		
 		tasks.sort()
 		menubar.addmenu(dropname, '', '')
-		menubar.addmenuitem(dropname, 'command', label=dir, foreground='blue')
+		menubar.addmenuitem(dropname, 'command', label=dname, foreground='blue')
 		menubar.addmenuitem(dropname, 'separator')
 		for i in range(0, len(tasks)):
 			menubar.addmenuitem(dropname, 'command',
 								label=tasks[i] + taskdescrs[tasks[i]],
-								command=lambda s=self,t=tasks[i],d=dir: \
+								command=lambda s=self,t=tasks[i],d=dirname: \
 								s.newloadtask(t, d))
 		menubar.addmenuitem(dropname, 'separator')
 		menubar.addmenuitem(dropname, 'command', label='Reload current',
@@ -1584,11 +1589,12 @@ class PypeApp:
 						taskname = taskname[:-3]
 					(file, pathname, descr) = imp.find_module(taskname, [dir])
 		except ImportError:
-			warn('Error', "Task doesn't exist.")
+			warn('Error',
+				 "Can't find task '%s' on search path.\n" % taskname +
+				 "Try specifying a full path!")
 			return None
 
 		self.unloadtask()				# unload current, if it exists..
-
 
 		try:
 			try:
@@ -1602,6 +1608,9 @@ class PypeApp:
 			# in case loading throws an exception:
 			if file:
 				file.close()
+
+		if dir is None:
+			dir = string.join(string.split(pathname, '/')[:-1], '/')
 
 		if task:
 			try:

@@ -32,6 +32,12 @@ Wed Mar 11 11:08:19 2009 mazer
 - when parameter tables are evaluated, added storage of the raw
   unevaluated string version of the var for future reference..
 
+Sun May 31 15:13:23 2009 mazer
+
+- changed load/save of param tables to use standard pythong ConfigParser
+  object -- this makes it easier to have external programs generate
+  params files..
+
 """
 
 __author__   = '$Author$'
@@ -729,7 +735,7 @@ class ParamTable:
 			cPickle.dump(x, f)
 			cPickle.dump(self._locks, f)
 
-		if 1:
+		if 0:
 			# new human-readable text version
 			for k in x.keys():
 				if self._locks.has_key(k):
@@ -738,6 +744,19 @@ class ParamTable:
 					lock = ''
 				f.write('%s!!%s!!%s!!%s\n' % (posixpath.basename(file)[:-4],
 											  k, lock, x[k]))
+		if 1:
+			# new standard config-file version
+			import ConfigParser
+			c = ConfigParser.ConfigParser()
+			c.add_section('params')
+			c.add_section('locks')
+			for k in x.keys():
+				c.set('params', k, x[k])
+				if self._locks.has_key(k):
+					if self._locks[k] == DISABLED:
+						c.set('locks', k, 1)
+						lock = 1
+			c.write(f)
 
 		f.close()
 
@@ -778,12 +797,12 @@ class ParamTable:
 				return
 
 	def _load(self, file=None):
-		try:
-			# try to load as pickle file (old-style)
-			return self._loadp(file=file)
-		except:
-			# then try as string version (new-style)
-			return self._loadt(file=file)
+		# try all the load methods in order until one works..
+		# or if none work, return 0..
+		for method in (self._loadc, self._loadt, self._loadp):
+			if method(file=file):
+				return 1
+		return 0
 
 	def _loadp(self, file=None):
 		"""
@@ -868,6 +887,51 @@ class ParamTable:
 		except IOError:
 			return 0
 
+	def _loadc(self, file=None):
+		"""Load config-file base param file.
+		New load as text function (replaces !! version). Uses standard
+		python ConfigParser tools.
+		"""
+		import ConfigParser
+		
+		c = ConfigParser.ConfigParser()
+		f = open(file, 'r')
+		try:
+			c.readfp(f)
+		except:
+			c = None
+		f.close()
+		if c is None:
+			return 0
+		
+		for slot in self._table:
+			(name, default, validate, descr, runlock) = _unpack_slot(slot)
+			if default is None:
+				continue
+			if type(validate) is types.TupleType:
+				try:
+					self._entries[name].selectitem(c.get('params', name))
+				except IndexError:
+					# invalid string..
+					pass
+			else:
+				try:
+					self._entries[name].setentry(c.get('params', name))
+				except KeyError:
+					pass
+				except ConfigParser.NoSectionError:
+					pass
+
+		try:
+			for (name, lockstate) in c.items('locks'):
+				if int(lockstate):
+					self.lockfield(name)
+		except ConfigParser.NoSectionError:
+			pass
+
+		return 1
+			
+
 	def view(self):
 		(ok, x) = self.get(evaluate=0)
 		s = ''
@@ -884,11 +948,15 @@ class ParamTable:
 	def check(self, mergewith=None):
 		while 1:
 			(ok, P) = self.get(mergewith=mergewith)
+			if self.tablename:
+				w = "Check parameter table '%s'.\n" % self.tablename
+			else:
+				w = "Check parameter tables.\n"
 			if not ok:
-				warn('Warning',
-				'Check parameter tables:\n'
-				'  Field "%s" contains invalid data.\n\n'
-				'Please fix before contining.' % P, wait=1, grab=None)
+				warn('Warning', w +
+					 "Field '%s' contains invalid data.\n\n" % P +
+					 "Please fix and then click Continue.",
+					 wait=1, grab=None)
 			else:
 				break
 		return P
