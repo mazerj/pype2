@@ -113,7 +113,7 @@ class UserDisplay:
 		self.callback = callback
 
 		f = Frame(self.frame)
-		f.pack(expand=1, fill=X)
+		f.pack(expand=1, fill=X, side=TOP)
 
 		mb = Pmw.MenuBar(f)
 		mb.pack(side=LEFT, expand=0, fill=X)
@@ -172,23 +172,20 @@ class UserDisplay:
 		self._info = Label(f, text='', fg='red')
 		self._info.pack(side=RIGHT, padx=20)
 	
+		f = Frame(self.frame)
+		f.pack(expand=1, fill=X, side=TOP)
+
 		self._stopbutton = Button(f, bg='red', fg='white', text='STOP')
-		self._stopbutton.pack(side=RIGHT, padx=20)
+		self._stopbutton.pack(expand=0, side=LEFT)
 		self._stopbutton.forget()
+		
+		self.xypos = Label(f, text="")
+		self.xypos.pack(expand=0, side=RIGHT)
+		self._mouse_motion(ev=None)
 
 		self._canvas = Canvas(self.frame)
 		self._canvas.pack()
 		self._canvas.configure(width=cwidth, height=cheight)
-
-		f = Frame(self.frame)
-		f.pack(expand=1, side=BOTTOM, fill=X)
-
-		if 0:
-			self.xypos = Label(f, text="")
-			self.xypos.pack(side=LEFT)
-		else:
-			self.xypos = None
-		self._mouse_motion(ev=None)
 
 		self.mousex = 0
 		self.mousey = 0
@@ -665,7 +662,10 @@ class UserDisplay:
 			(self.mousex, self.mousey) = self.can2fb(ev.x, ev.y)
 			(x, y, fx, fy) = (self.mousex, self.mousey, self.fix_x, self.fix_y)
 		if self.xypos:
-			s = "[%4d,%4d][rel %4d,%4d]" % (x, y, x-fx, y-fy)
+			if fx or fy:
+				s = "abs=[%4d,%4d]  rel=[%4d,%4d]" % (x, y, x-fx, y-fy)
+			else:
+				s = "[%4d,%4d]" % (x, y)
 			self.xypos.configure(text=s)
 
 	def _mouse_enter(self, ev):
