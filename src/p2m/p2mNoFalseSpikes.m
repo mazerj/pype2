@@ -29,6 +29,7 @@ for n=1:length(pf.rec)
       pf.rec(n).photo_times = pf.rec(n).photo_times(2:end);
       kp = kp + 1;
     end
+  end
 end
 if ks > 0
   fprintf('warning: removed %d false initial spikes\n', ks);
