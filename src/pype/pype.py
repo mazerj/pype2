@@ -904,17 +904,21 @@ class PypeApp:
 		self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
 		# TALLY WINDOW ######################################
-		b = Button(tally, text="clear task tally",
-				   command=lambda s=self: s.tally(cleartask=1))
-		b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
-		self.balloon.bind(b, "clear tally statistics for this task")
-
-		b = Button(tally, text="clear tally",
+		tf = Frame(tally)
+		tf.pack(side=BOTTOM, fill=X)
+		
+		b = Button(tf, text="clear all",
 				   command=lambda s=self: s.tally(clear=1))
-		b.pack(expand=0, fill=BOTH, side=BOTTOM, pady=0)
-		self.balloon.bind(b, "clear tally statistics")
+		b.pack(side=LEFT, pady=0)
+		self.balloon.bind(b, "clear tally statistics for all tasks")
 
-		self.tallyw = Info(tally, bg='gray90')
+		b = Button(tf, text="clear task",
+				   command=lambda s=self: s.tally(cleartask=1))
+		b.pack(side=LEFT, pady=0)
+		self.balloon.bind(b, "clear tally statistics just for current task")
+
+
+		self.tallyw = Info(tally, bg='gray90', height=30)
 
 		self.__runstats_update(clear=1)
 		self.tally(type=None)

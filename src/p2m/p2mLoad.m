@@ -38,6 +38,8 @@ function r = p2mLoad(fname, plexchan, verbose)
 %Fri Aug  8 12:42:05 2008 mazer 
 %  added verbose option
 %
+%Tue Jun  2 10:17:23 2009 mazer 
+%  added automatic call to p2mNoFalseSpikes
 
 if ~ischar(fname)
   % if it's not a char, then assume it's an already loaded
@@ -106,7 +108,10 @@ if fname(end-3:end) == '.p2m'
   if verbose
     fprintf('%d trials\n', length(PF.rec));
   end
-  r = PF;
+  % strip false spikes from PF right away! these are spikes
+  % generated at the onset of ADC by the crappy TTL detection
+  % algorithm pype uses... see p2mNoFalseSpikes() doc
+  r = p2mNoFalseSpikes(PF);
 elseif fname(end-4:end) == '.ical'
   if gz
     gzload([fname '.gz']);
