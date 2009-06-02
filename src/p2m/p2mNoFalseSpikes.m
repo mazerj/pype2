@@ -13,17 +13,27 @@ function pf=p2mNoFalseSpikes(pf)
 %
 % Tue Jun  2 10:14:10 2009 mazer 
 
-k=0;
+ks=0;
+kp=0;
 for n=1:length(pf.rec)
   [ix, ts] = p2mFindEvents(pf,n,'eye_start');
-  if length(ts) & abs(pf.rec(n).spike_times(1) - ts(1)) < 5
-    % false spike detection
-    pf.rec(n).spike_times = pf.rec(n).spike_times(2:end);
-    pf.rec(n).ttl_times = pf.rec(n).ttl_times(2:end);
-    k = k + 1;
-  end
+  if length(ts)
+    if length(pf.rec(n).spike_times) & abs(pf.rec(n).spike_times(1) - ts(1)) < 5
+      % false spike detection
+      pf.rec(n).spike_times = pf.rec(n).spike_times(2:end);
+      pf.rec(n).ttl_times = pf.rec(n).ttl_times(2:end);
+      ks = ks + 1;
+    end
+    if length(pf.rec(n).photo_times) & abs(pf.rec(n).photo_times(1) - ts(1)) < 5
+      % false photo event detection
+      pf.rec(n).photo_times = pf.rec(n).photo_times(2:end);
+      kp = kp + 1;
+    end
 end
-if k > 0
-  fprintf('warning: removed %d false initial spikes\n', k);
+if ks > 0
+  fprintf('warning: removed %d false initial spikes\n', ks);
+end
+if kp > 0
+  fprintf('warning: removed %d false initial photodiode events\n', kp);
 end
 
