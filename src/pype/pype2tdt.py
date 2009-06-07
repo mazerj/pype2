@@ -11,7 +11,7 @@ from guitools import *
 
 import cPickle
 import glob
-import tdt
+import tdt2 as tdt
 
 #from pype import *
 import pypedebug
@@ -32,7 +32,7 @@ class Controller:
                 f = int(f.split('-')[1].split('.')[0])
                 nmax = max(nmax, f)
             f = 'tmp-%03d.hoop' % (nmax + 1)
-            sortp = self.tdtconnx.tdev_sortparams()
+            sortp = self.tdtconnx.sortparams()
             fp = open(f, 'w')
             fp.write(cPickle.dumps(sortp))
             fp.close()
@@ -56,7 +56,7 @@ class Controller:
                 f = 'tmp-%03d.hoop' % nmax
                 fp = open(f, 'r')
                 sortp = cPickle.loads(fp.read())
-                self.tdtconnx.tdev_sortparams(sortp)
+                self.tdtconnx.sortparams(sortp)
                 fp.close()
                 self.app.console.writenl('%s -> hoops' % f)
         except:
@@ -69,8 +69,8 @@ class Controller:
     def settank(self, dirname, name):
         # this will only work in IDLE or STANDBY mode, so do it 1st!
 
-        td = self.tdtconnx.tdev_invoke
-        tt = self.tdtconnx.ttank_invoke
+        td = self.tdtconnx.tdev
+        tt = self.tdtconnx.ttank
 
         if not tt('CheckTank', '%s%s' % (dirname, name)):
             tt('AddTank', name, dirname)
@@ -90,11 +90,11 @@ class Controller:
 
     def newblock(self, record=1):
         (self._server, self._tank, self._block) = \
-                       self.tdtconnx.tdev_newblock(record=record)
+                       self.tdtconnx.newblock(record=record)
         return (self._server, self._tank, self._block)
         
 	def getblock(self):
-        tnum = self.tdtconnx.tdev_tnum()
+        tnum = self.tdtconnx.tnum()
         return (self._server, self._tank, self._block, tnum)
     
 if __name__ == '__main__':

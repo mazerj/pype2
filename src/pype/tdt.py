@@ -83,15 +83,24 @@ RECORD = 3								# running and saving all data
 PORT=10000
 DEBUG=1
 
-def log(msg=None):
-	if msg is None:
-		sys.stderr.write('\n')
-	else:
-		for ln in msg.split('\n'):
-			sys.stderr.write('%02d:%02d:%02d ' % \
-							 time.localtime(time.time())[3:6])
-			sys.stderr.write('%s: %s\n' % (os.path.basename(sys.argv[0]), ln))
-
+class LOG:
+	fp = None
+	
+	def __init__(self, msg=None, openfile=None):
+		if openfile:
+			if log.fp: log.fp.close()
+			log.fp.open(openfile, 'a')
+		elif msg is None:
+			sys.stderr.write('\n')
+			if log.fp: log.write('\n')
+		else:
+			for ln in msg.split('\n'):
+				s = '%02d:%02d:%02d %s: %s\n' % \
+					(time.localtime(time.time())[3:6],
+					 os.path.basename(sys.argv[0]), ln)
+				sys.stderr.write(s)
+				if log.fp: log.write(s)
+		
 class _Socket:
 	def Send(self, data):
 		self.conn.send(struct.pack('!I', len(data)))
@@ -207,21 +216,21 @@ class TDTServer:
 		"""
 		global TDevAcc, TTank
 
-		log('Connecting to TDT servers...')
+		LOG('Connecting to TDT servers...')
 
 		connections = 0
 
 		if TDevAcc.ConnectServer(self.Server):
-			log('..connect to %s:TDevAcc' % self.Server)
+			LOG('..connect to %s:TDevAcc' % self.Server)
 			connections = connections + 1
 		else:
-			log('..no connection to %s:TDevAcc' % self.Server)
+			LOG('..no connection to %s:TDevAcc' % self.Server)
 
 		if TTank.ConnectServer(self.Server, 'Me'):
-			log('..connect to %s:TTank.X' % self.Server)
+			LOG('..connect to %s:TTank.X' % self.Server)
 			connections = connections + 2
 		else:
-			log('..no connection %s:TTank.X' % self.Server)
+			LOG('..no connection %s:TTank.X' % self.Server)
 
 		return connections
 
@@ -230,13 +239,13 @@ class TDTServer:
 
 		while 1:
 			server = _SocketServer()
-			log('Waiting for client..')
+			LOG('Waiting for client..')
 			server.Listen()
-			log('Received connection from %s' % server.remoteHost)
+			LOG('Received connection from %s' % server.remoteHost)
 
 			connections = self.connect()
 			server.Send(cPickle.dumps(connections))
-			log('Recieving commands')
+			LOG('Recieving commands')
 			while 1:
 				try:
 					x = cPickle.loads(server.Receive())
@@ -261,25 +270,25 @@ class TDTServer:
 				et = time.time() - et
 				server.Send(cPickle.dumps((ok, result)))
 				if DEBUG:
-					log('(%s,"%s") <- %s' % (ok, result, x))
-					log('[%.3fs elapsed]' % (et, ))
+					LOG('(%s,"%s") <- %s' % (ok, result, x))
+					LOG('[%.3fs elapsed]' % (et, ))
 
 				if ok is None:
-					log('%s' % sys.exc_value)
+					LOG('%s' % sys.exc_value)
 
-			log("client closed connection.")
+			LOG("client closed connection.")
 			if TTank:
-				log('TTank.X closing tank')
+				LOG('TTank.X closing tank')
 				TTank.CloseTank()
-				log('TTank.X releasing server')
+				LOG('TTank.X releasing server')
 				TTank.ReleaseServer()
 			if TDevAcc:
 				if TDevAcc.CheckServerConnection():
-					log('TDevAcc closing connection')
+					LOG('TDevAcc closing connection')
 					TDevAcc.CloseConnection()
 
 			server.Close()
-			log()
+			LOG()
 
 class TDTClient:
 	def __init__(self, server):
@@ -529,10 +538,10 @@ def loopforever():
 		try:
 			s.listen()
 		except:
-			log('-----------------------------')
-			log('Server-side near fatal error in loopforever:')
-			log(sys.exc_value)
-			log('-----------------------------')
+			LOG('-----------------------------')
+			LOG('Server-side near fatal error in loopforever:')
+			LOG(sys.exc_value)
+			LOG('-----------------------------')
 			del s
 
 if __name__ == '__main__':
