@@ -66,6 +66,7 @@ import sys
 import math
 import cPickle
 
+SEED=(100,1001)
 from pype import *
 from Tkinter import *
 from events import *
@@ -73,8 +74,11 @@ import pypedebug
 
 from pype_aux import uniform
 
-B = {0:'OFF', 1:'ON'}					# repr's for booleans
-
+def B(x):
+	"""convert boolean value to human-readable string"""
+	if x: return 'ON'
+	else: return 'OFF'
+	
 BAR=0
 CART=1
 HYPER=2
@@ -208,9 +212,9 @@ class _Probe:
 
 		s = ""
 		s = s +		"  h: hide/show info\n"
-		s = s +		"  z: lock_______%s\n" % B[self.lock]
-		s = s +		"  o: offset_____%s\n" % B[self.xoff]
-		s = s +		"  u: on/off_____%s\n" % B[self.on]
+		s = s +		"  z: lock_______%s\n" % B(self.lock)
+		s = s +		"  o: offset_____%s\n" % B(self.xoff)
+		s = s +		"  u: on/off_____%s\n" % B(self.on)
 		s = s +		"  M: bar mode___%s\n" % BARMODES[self.barmode]
 		s = s +     " []:  s-freq____%.1f\n" % self.sfreq
 		s = s +     " {}:  r-freq____%.1f\n" % self.rfreq
@@ -219,11 +223,11 @@ class _Probe:
 		s = s +		"1-6: color______%s\n" % self.colorname
 		s = s +		"q/w: len________%d\n" % self.length
 		s = s +		"e/r: wid________%d\n" % self.width
-		s = s +		"  j: jitter_____%s\n" % B[self.jitter]
-		s = s +		"  d: drft_______%s\n" % B[self.drift]
+		s = s +		"  j: jitter_____%s\n" % B(self.jitter)
+		s = s +		"  d: drft_______%s\n" % B(self.drift)
 		s = s +		"t/T: drft amp___%dpix\n" % self.drift_amp
 		s = s +		"y/Y: drft frq___%.1fHz\n" % self.drift_freq
-		s = s +		"  b: blink______%s\n" % B[self.blink]
+		s = s +		"  b: blink______%s\n" % B(self.blink)
 		s = s +		"p/P: blnk frq___%.1fHz\n" % self.blink_freq
 		s = s +		"i/I: inten______%d\n" % self.inten
 
@@ -290,13 +294,16 @@ class _Probe:
 		self.colorn = (self.colorn + incr) % 9
 
 	def showprobe(self, x=0, y=0, redraw=1):
-		if self.probeid is None or redraw:
+		if self.probeid and not self.s.on:
+			self.app.udpy._canvas.delete(self.probeid)
+			self.probeid = None
+		elif self.probeid is None or redraw:
 			self.photoim = self.s.asPhotoImage()
 			self.probeid = self.app.udpy._canvas.create_image(x, y, anchor=NW,
 															  image=self.photoim)
+			self.app.udpy._canvas.lower(self.probeid)
 		else:
 			self.app.udpy._canvas.coords(self.probeid, x, y)
-		self.app.udpy._canvas.lower(self.probeid)
 
 		
 	def draw(self):
@@ -377,7 +384,8 @@ class _Probe:
 				else:
 					c = color
 				simple_rdp(self.s, fraction=0.10,
-						   fgcolor=c, bgcolor=(self.bg,self.bg,self.bg))
+						   fgcolor=c, bgcolor=(self.bg,self.bg,self.bg),
+						   rseed=SEED)
 				self.s.scale(l, l)
 				self.s.alpha_aperture(l/2)
 				
@@ -386,7 +394,7 @@ class _Probe:
 
 		if self.barmode == RDP:
 			# advance the RDP one tick..
-			simple_rdp(self.s, self.a, self.drift_freq)
+			simple_rdp(self.s, self.a, self.drift_freq, rseed=SEED)
 
 		x = self.x
 		y = self.y

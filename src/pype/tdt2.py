@@ -54,6 +54,8 @@ IDLE    = 0								# dsp completely idle
 STANDBY = 1								# running, no display, no tank..
 PREVIEW = 2								# running, not saving to tank
 RECORD  = 3								# running and saving all data
+MODES = { IDLE:'IDLE', STANDBY:'STANDBY',
+		  PREVIEW:'PREVIEW', RECORD:'RECORD'}
 
 class TDTError(Exception): pass
 
@@ -65,7 +67,8 @@ class Log:
 				s = '%02d:%02d:%02d ' % time.localtime(time.time())[3:6]
 				#s = s + '%s: %s\n' % (os.path.basename(sys.argv[0]), ln)
 				s = s + '%s\n' % (ln,)
-				sys.stderr.write(s)
+				if DEBUG:
+					sys.stderr.write(s)
 				if Log.fp:
 					Log.fp.write(s)
 					Log.fp.flush()
@@ -113,6 +116,7 @@ if WINDOWS:
 	from threading import Thread
 
 	class ServersideClientHandler(Thread):
+		COUNT = 0
 		# ...windows side only..
 		def __init__(self, clientsocket, src):
 			Thread.__init__(self)
@@ -126,6 +130,8 @@ if WINDOWS:
 			# not in run..
 			self.TDevAcc = win32com.client.Dispatch('TDevAcc.X')
 			self.TTank = win32com.client.Dispatch('TTank.X')
+
+			ServersideClientHandler.COUNT = ServersideClientHandler.COUNT + 1
 
 		def run(self):
 			# result coding:
@@ -180,7 +186,8 @@ if WINDOWS:
 								result = (1, apply(fn, args))
 							except:
 								errinfo = sys.exc_info()
-								traceback.print_tb(errinfo[2])
+								LOG('Eval/Apply Exception:\n')
+								LOG(traceback.format_exc(errinfo[2]))
 								result = (0, result[errinfo:1])
 						except AttributeError:
 							result = (-1, 'invalid method: %s.%s' % \
@@ -199,7 +206,11 @@ if WINDOWS:
 						self.TDevAcc.CloseConnection()		
 			if descr:
 				Log('Error: %s\n' % (descr,))
-			Log('Connection from %s closed\n' % (self.src,))
+			ServersideClientHandler.COUNT = ServersideClientHandler.COUNT - 1
+			
+			Log('Connection from %s closed (%d left)\n' % \
+				(self.src, ServersideClientHandler.COUNT,))
+
 
 	def RunServer(port=PORT):
 		serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -217,18 +228,26 @@ if WINDOWS:
 
 	if __name__ == '__main__':
 		Log().file('C:\\tdt2.log')
+		Log('-----------------------------------------\n')
 		RunServer()
-		sys.stderr.write('<HIT RETURN TO QUIT>'); sys.stdin.readline()
+		LOG('RunSever() returned -- should never happen!\n')
+		#sys.stderr.write('<HIT RETURN TO QUIT>'); sys.stdin.readline()
 		sys.exit(1)
 else:
 	class TDTClient:
 		def __init__(self, server, port=PORT):
 			self.server = server
-			self.s = MySocket(host=server, port=port)
+			try:
+				self.s = MySocket(host=server, port=port)
+			except socket.error:
+				# tdt's not available -- reraise the exception for now..
+				raise
 
 			self.gotTDevAcc = cPickle.loads(self.s.recv())
 			self.gotTTank = cPickle.loads(self.s.recv())
-			print "tdtstatus:", self.gotTDevAcc, self.gotTTank
+			if DEBUG:
+				sys.stderr.write('tdtstatus: circuit=%d tank=%d\n' % \
+								 (self.gotTDevAcc, self.gotTTank, ))
 
 		def __repr__(self):
 			return '<TDTClient server=%s TDevAcc=%d TTank=%d>' % \
@@ -259,33 +278,32 @@ else:
 				pass
 			return (ok, result)
 
-		def tdev(self, method, *args):
-			if not self.gotTDevAcc:
+		def _invoke(self, which, method, args):
+			if which == TDEVACC and not self.gotTDevAcc:
 				raise TDTError, \
-					  'No TDevAcc.X available; cmd=<%s>' % (method,)
-
-			print 'exec:', TDEVACC, method, args, 
-			(ok, result) = self._sendtuple((TDEVACC, method, args,))
-			print "-->", (ok, result)
+					  'No %s.X available; cmd=<%s>' % (which, method,)
+			if which == TTANK and not self.gotTTank:
+				raise TDTError, \
+					  'No %s.X available; cmd=<%s>' % (which, method,)
+			
+			if DEBUG:
+				sys.stderr.write(repr(('exec:', which, method, args,)))
+			(ok, result) = self._sendtuple((which, method, args,))
+			if DEBUG:
+				sys.stderr.write('--> %s\n' % ((ok, result),))
+				
 			if ok:
 				return result
 			else:
 				raise TDTError, \
-					  'TDev Error; cmd=<%s>; err=<%s>' % (method, result)
+					  '%s.X Error; cmd=<%s>; err=<%s>' % (which, method, result)
+		
+
+		def tdev(self, method, *args):
+			return self._invoke(TDEVACC, method, args)
 
 		def ttank(self, method, *args):
-			if not self.gotTTank:
-				raise TDTError, \
-					  'No TTank.X available; cmd=<%s>' % (method,)
-				  
-			print 'exec:', TTANK, method, args,
-			(ok, result) = self._sendtuple((TTANK, method, args,))
-			print "-->", (ok, result)
-			if ok:
-				return result
-			else:
-				raise TDTError, \
-					  'TTank Error; cmd=<%s>; err=<%s>' % (method, result)
+			return self._invoke(TTANK, method, args)
 
 		def mode(self, mode=None, name=None, wait=None):
 			"""
@@ -300,18 +318,16 @@ else:
 			  RECORD = 3	# running and saving all data
 
 			"""
-			if not mode is None:
-				self.tdev('SetSysMode', mode)
-				while wait:
-					if self.tdev('GetSysMode') == mode:
-						break
-			else:
+			if mode is None:
 				r = self.tdev('GetSysMode')
-				if name:
-					modes = { IDLE:'IDLE', STANDBY:'STANDBY',
-							  PREVIEW:'PREVIEW', RECORD:'RECORD'}
-					r = modes[r]
-			r = self.tdev('GetSysMode')
+			else:
+				self.tdev('SetSysMode', mode)
+				while 1:
+					r = self.tdev('GetSysMode')
+					if (not wait) or (r == mode):
+						break
+			if name:
+				r = MODES[r]
 			return r
 
 		def tnum(self, reset=None):

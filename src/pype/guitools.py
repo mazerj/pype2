@@ -240,7 +240,7 @@ class SimpleDialog(Toplevel):
 		
 		if astext:
 			# use text box so message is copyable with mouse...
-			m = Text(f, relief=RIDGE, borderwidth=3, justify=LEFT)
+			m = Text(f, relief=RIDGE, borderwidth=3)
 			m.insert(END, msg)
 		else:
 			m = Label(f, text=msg, justify=LEFT)

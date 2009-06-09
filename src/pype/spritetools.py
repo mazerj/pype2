@@ -76,7 +76,7 @@ from Numeric import *
 import pygame.surfarray
 from pygame.constants import *
 import sprite
-from RandomArray import uniform
+from RandomArray import uniform, seed, get_seed
 
 from guitools import Logger
 
@@ -470,7 +470,11 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 
 
 def simple_rdp(s, dir=None, vel=None, fraction=0.25,
-			   fgcolor=(255,255,255), bgcolor=(128,128,128)):
+			   fgcolor=(255,255,255), bgcolor=(128,128,128),
+			   rseed=None):
+	if rseed:
+		old_seed = get_seed()
+		seed(rseed[0], rseed[1])
 	if dir is None:
 		for n in range(3):
 			if n == 0:
@@ -484,6 +488,10 @@ def simple_rdp(s, dir=None, vel=None, fraction=0.25,
 		a = concatenate((a[dx:,:,:],a[:dx,:,:]), axis=0)
 		a = concatenate((a[:,dy:,:],a[:,:dy,:]), axis=1)
 		s.array[:,:,:] = a[:]
+		
+	if rseed:
+		seed(old_seed[0], old_seed[1])
+		
 
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	"""Generate a bar into existing sprite using the alpha channel.

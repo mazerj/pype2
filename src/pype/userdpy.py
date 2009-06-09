@@ -519,10 +519,11 @@ class UserDisplay:
 	def addpoint(self, x, y):
 		"""(x, y) specifies point in CANVAS coords (0,0) is upper left"""
 		(px, py) = (int(round(x - (self.w/2.0))), int(round((self.h/2.0) - y)))
-		d = 2;
+		d = 2; o = 6;
+		tb = self._canvas.create_oval(x-o, y-o, x+o, y+o, fill='red', width=0)
 		t = self._canvas.create_text(x, y, anchor=CENTER, justify=CENTER, \
-									 text='e', fill='blue')
-		self.points.append((px, py, t))
+									 text='i', fill='white')
+		self.points.append((px, py, t, tb))
 
 	def deletepoint(self, x, y):
 		"""
@@ -533,14 +534,15 @@ class UserDisplay:
 		py = int(round((self.h/2.0)) - y)
 		nearest = None
 		for n in range(len(self.points)):
-			(x, y, t) = self.points[n]
+			(x, y, t, tb) = self.points[n]
 			d = (px - x) ** 2 + (py - y) ** 2
 			if n == 0 or d < dmin:
 				dmin = d
 				nearest = n
 		if not nearest is None:
-			(x, y, t) = self.points[nearest]
+			(x, y, t, tb) = self.points[nearest]
 			self._canvas.delete(t)
+			self._canvas.delete(tb)
 			self.points.remove(self.points[nearest])
 		else:
 			beep.beep(4000, 10)
@@ -554,7 +556,7 @@ class UserDisplay:
 		py = int(round((self.h/2.0) - y))
 		nearest = None
 		for n in range(len(self.points)):
-			(x, y, t) = self.points[n]
+			(x, y, t, tb) = self.points[n]
 			d = (px - x) ** 2 + (py - y) ** 2
 			if n == 0 or d < dmin:
 				dmin = d
@@ -567,8 +569,9 @@ class UserDisplay:
 	def clearpoints(self):
 		"""Clear all points"""
 		for n in range(len(self.points)):
-			(x, y, t) = self.points[n]
+			(x, y, t, tb) = self.points[n]
 			self._canvas.delete(t)
+			self._canvas.delete(tb)
 		self.points = []
 
 	def savepoints(self, filename=None):
@@ -601,7 +604,10 @@ class UserDisplay:
 			self.clearpoints()
 
 		for n in range(len(newpoints)):
-			(px, py, t) = newpoints[n]
+			if len(newpoints) == 3:
+				(px, py, t) = newpoints[n]
+			else:
+				(px, py, t, tb) = newpoints[n]
 			x = int(round(px + (self.w/2.0)))
 			y = int(round((self.h/2.0) - py))
 			self.addpoint(x, y)
@@ -647,7 +653,7 @@ class UserDisplay:
 		"""
 		points = []
 		for n in range(len(self.points)):
-			(x, y, t) = self.points[n]
+			(x, y, t, tb) = self.points[n]
 			points.append((x, y))
 		return points
 
@@ -767,7 +773,7 @@ class UserDisplay:
 		n = 0
 		for mark in self._fid_list:
 			if mark:
-				(tag, x, y) = mark
+				(tag, tagb, x, y) = mark
 				s = s + ( '%3d%6d%6d\n' % (n, x, y) )
 				n = n + 1
 		if len(s) > 0:
@@ -799,7 +805,7 @@ class UserDisplay:
 		r = 0.
 		for f in self._fid_list:
 			if not f is None:
-				(tag, x, y) = f
+				(tag, tagb, x, y) = f
 				xs = xs + x;
 				ys = ys + y;
 				n = n + 1
@@ -809,7 +815,7 @@ class UserDisplay:
 			r = 0.
 			for f in self._fid_list:
 				if not f is None:
-					(tag, x, y) = f
+					(tag, tagb, x, y) = f
 					r = r + math.sqrt((xs - x) * (xs - x) + (ys - y) * (ys - y))
 			r = int(r / n)
 
@@ -840,7 +846,7 @@ class UserDisplay:
 			n = 0;
 			for f in self._fid_list:
 				if not f is None:
-					(tag, x, y) = f
+					(tag, tagb, x, y) = f
 					fp.write('p\t%d\t%d\t%d\n' % (n, x, y))
 					n = n + 1
 			fp.write('%\n')
@@ -910,7 +916,7 @@ class UserDisplay:
 		self._clearfidmarks()
 		for mark in l:
 			if mark:
-				(tag, x, y) = mark
+				(tag, tagb, x, y) = mark
 				self._putfidmark(mx=x, my=y, update=0)
 		self.fidinfo()
 
@@ -924,11 +930,14 @@ class UserDisplay:
 		ax = mx + self.fix_x
 		ay = my + self.fix_y
 		(cx, cy) = self.fb2can(ax, ay)
+
+		o = 6
+		tagb = self._canvas.create_oval(cx-o, cy-o, cx+o, cy+o, fill='green', width=0)
 		tag = self._canvas.create_text(cx, cy, anchor=CENTER, justify=CENTER,
-									   fill='black', text='f')
+									   fill='black', text='x')
 
 		# save mark in retinal coords
-		self._fid_list.append((tag, mx, my))
+		self._fid_list.append((tag, tagb, mx, my))
 		if update:
 			self.fidinfo()
 		return tag
@@ -949,7 +958,7 @@ class UserDisplay:
 					# so convert mx,my to re:fix
 					mx = mx - self.fix_x
 					my = my - self.fix_y
-					(tag, x, y) = i
+					(tag, tagb, x, y) = i
 					if d1 is None:
 						ix = n
 						d1 = (mx - x) * (mx - x) + (my - y) * (my - y)
@@ -961,14 +970,17 @@ class UserDisplay:
 				n = n + 1
 
 			if not d1 is None:
-				(tag, x, y) = self._fid_list[ix]
+				(tag, tagb, x, y) = self._fid_list[ix]
 				self._canvas.delete(tag)
+				self._canvas.delete(tagb)
 				self._fid_list[ix] = None
 		else:
 			for i in self._fid_list:
 				if not i is None:
 					tag = i[0]
+					tagb = i[1]
 					self._canvas.delete(tag)
+					self._canvas.delete(tagb)
 			self._fid_list = []
 		self.fidinfo()
 
@@ -977,7 +989,7 @@ class UserDisplay:
 		self._clearfidmarks()
 		for mark in x:
 			if mark:
-				(tag, x, y) = mark
+				(tag, tagb, x, y) = mark
 				self._putfidmark(x + xoff, y + yoff, update=0)
 		self.fidinfo()
 
@@ -987,7 +999,7 @@ class UserDisplay:
 		self._clearfidmarks()
 		for mark in x:
 			if mark:
-				(tag, x, y) = mark
+				(tag, tagb, x, y) = mark
 				r = math.sqrt((x - xc)**2 + (y - yc)**2)
 				t = math.atan2((y - yc), (x - xc))
 				r = r + delta
