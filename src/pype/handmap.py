@@ -304,6 +304,7 @@ class _Probe:
 			self.app.udpy._canvas.lower(self.probeid)
 		else:
 			self.app.udpy._canvas.coords(self.probeid, x, y)
+			self.app.udpy._canvas.lower(self.probeid)
 
 		
 	def draw(self):
@@ -326,10 +327,9 @@ class _Probe:
 		self.colorshow = color
 		self.colorname = name
 		olds = self.s
-		if (self.s is None) or (self.drift and (self.drift_amp < 1)):
-			if self.drift_amp < 1:
-				phase = 10.0 * \
-						self.drift_freq * 180.0 * (t - self.drift) / 1000.0
+		if (self.s is None) or self.drift:
+			if self.drift and not (self.barmode == BAR):
+				phase = (t/1000.0) * self.drift_freq * 360.0
 			else:
 				phase = 0.0;
 
@@ -392,13 +392,13 @@ class _Probe:
 			self.lastx = None
 			self.lasty = None
 
-		if self.barmode == RDP:
+		if self.drift and self.barmode == RDP:
 			# advance the RDP one tick..
 			simple_rdp(self.s, self.a, self.drift_freq, rseed=SEED)
 
 		x = self.x
 		y = self.y
-		if self.drift:
+		if self.drift and (self.barmode == BAR):
 			dt = t - self.drift;
 			d = self.drift_amp * \
 				math.sin(self.drift_freq * 2.0 * math.pi * dt / 1000.)
@@ -424,15 +424,18 @@ class _Probe:
 		(x, y) = self.app.udpy.fb2can(x, y)
 
 		# compute line for long axis (orientation indicator)
-		h2 = self.length / 2.0
-		_tsin = h2 * math.sin(math.pi * (270.0 - self.a) / 180.0)
-		_tcos = h2 * math.cos(math.pi * (270.0 - self.a) / 180.0)
+		hh = max(10, self.length / 2.0)
+		hh = 15
+		_tsin = hh * math.sin(math.pi * (270.0 - self.a) / 180.0)
+		_tcos = hh * math.cos(math.pi * (270.0 - self.a) / 180.0)
 		(x1, y1) = (x + _tcos, y + _tsin)
 		(x2, y2) = (x - _tcos, y - _tsin)
 
 		# compute line for short axis (direction indicator)
-		dx = (self.width/2.0)*math.cos(math.pi * -self.a / 180.0)
-		dy = (self.width/2.0)*math.sin(math.pi * -self.a / 180.0)
+		hw = max(10, self.width / 2.0)
+		hw = 15
+		dx = hw * math.cos(math.pi * -self.a / 180.0)
+		dy = hw * math.sin(math.pi * -self.a / 180.0)
 
 		# compute photoimage position in canvas coords
 		cx = x - (self.s.w / 2.0)
@@ -449,16 +452,18 @@ class _Probe:
 			self.app.udpy._canvas.coords(self.minor_ax, x, y, x+dx, y+dy)
 		else:
 			self.major_ax = self.app.udpy._canvas.create_line(x1, y1, x2, y2,
-														fill='violet', width=2)
+															  width=3)
 			self.minor_ax = self.app.udpy._canvas.create_line(x, y, x+dx, y+dy,
-														fill='blue', width=2)
+															  fill='blue',
+															  arrow=LAST,
+															  width=3)
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy._canvas.lower(l)
 
-		if self.on and self.live:
-			self.app.udpy._canvas.itemconfigure(self.major_ax, dash=None)
+		if self.on:
+			self.app.udpy._canvas.itemconfigure(self.major_ax, fill='green')
 		else:
-			self.app.udpy._canvas.itemconfigure(self.major_ax, dash=(2,2))
+			self.app.udpy._canvas.itemconfigure(self.major_ax, fill='red')
 			
 		if self.showinfo:
 			self.app.udpy_note(self.pp())

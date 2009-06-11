@@ -119,8 +119,6 @@ class UserDisplay:
 		mb.pack(side=LEFT, expand=0, fill=X)
 		mb.addmenu('Fidmarks', '', '')
 		mb.addmenuitem('Fidmarks', 'command',
-					   label='Help', command=self.help)
-		mb.addmenuitem('Fidmarks', 'command',
 					   label='Clear all marks (C)', command=self._clearfidmarks)
 		mb.addmenuitem('Fidmarks', 'command',
 					   label='Save (s)', command=self.savefidmarks)
@@ -128,6 +126,11 @@ class UserDisplay:
 					   label='Load (l)', command=self.loadfidmarks)
 		mb.addmenuitem('Fidmarks', 'command',
 					   label='View (v)', command=self._showfidmarks)
+		mb.addmenuitem('Fidmarks', 'separator')
+		mb.addmenuitem('Fidmarks', 'command', state=DISABLED,
+					   label='set (f)')
+		mb.addmenuitem('Fidmarks', 'command', state=DISABLED,
+					   label='clear closest (c)')
 
 		mb.addmenu('Eyecal', '', '')
 		mb.addmenuitem('Eyecal', 'command',
@@ -148,6 +151,11 @@ class UserDisplay:
 		mb.addmenuitem('Eyecal', 'command',
 					   label='Merge ascii file',
 					   command=lambda s=self: s.loadpoints_ascii(merge=1))
+		mb.addmenuitem('Eyecal', 'separator')
+		mb.addmenuitem('Eyecal', 'command', state=DISABLED,
+					   label='set (.)')
+		mb.addmenuitem('Eyecal', 'command', state=DISABLED,
+					   label='clear closest (,)')		
 
 		mb.addmenu('Display', '', '')
 		self._photomode_tvar = IntVar()
@@ -172,17 +180,14 @@ class UserDisplay:
 		self._info = Label(f, text='', fg='red')
 		self._info.pack(side=RIGHT, padx=20)
 	
-		f = Frame(self.frame)
-		f.pack(expand=1, fill=X, side=TOP)
+		self.xypos = Label(f, text="")
+		self.xypos.pack(expand=0, side=RIGHT)
+		self._mouse_motion(ev=None)
 
 		self._stopbutton = Button(f, bg='red', fg='white', text='STOP')
 		self._stopbutton.pack(expand=0, side=LEFT)
 		self._stopbutton.forget()
 		
-		self.xypos = Label(f, text="")
-		self.xypos.pack(expand=0, side=RIGHT)
-		self._mouse_motion(ev=None)
-
 		self._canvas = Canvas(self.frame)
 		self._canvas.pack()
 		self._canvas.configure(width=cwidth, height=cheight)
