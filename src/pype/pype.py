@@ -161,11 +161,11 @@ Mon May 22 10:24:25 2006 mazer
 
 Thu Sep 28 10:16:02 2006 mazer
 
-- 'final' modificaiton to the runstats() code... the current system
+- 'final' modification to the runstats() code... the current system
   should be simple for most people. There are now three termination
   parameters:
 
-  - max_ntrials -- maximum number of trials to run before stopping.
+  - max_trials -- maximum number of trials to run before stopping.
     only correct and error trials count.
 
   - max_correct -- maximum number of CORRECT trials to run before stopping.
@@ -179,7 +179,7 @@ Thu Sep 28 10:16:02 2006 mazer
     conditions are met.
 
   In all cases, setting these values to zero means they won't be used.
-  Either max_ntrials should be set OR max_correct, but not both!
+  Either max_trials should be set OR max_correct, but not both!
 
 Mon Dec  4 09:26:10 2006 mazer
 
@@ -356,6 +356,11 @@ import iplot
 import userdpy
 import pypeversion
 import configvars
+
+import prand
+if not prand.validate():
+	sys.stderr.write('Invalid Mersenne Twister implmentation!!!!\n')
+	sys.exit(1)
 
 def pypeapp():
 	"""
@@ -662,12 +667,10 @@ class PypeApp:
 		b = Checkbutton(c1pane, text='subj parm', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=4)
 
+
 		sub_common = DockWindow(checkbutton=b, title='subj/cell')
 		self.sub_common = ParamTable(sub_common,
 		(
-			("Eye Candy Params", None, None),
-			("show_noise", 1, is_boolean),
-
 			("Session Data", None, None),
 			("training",	0, is_boolean, "training mode (#0000 files)"),
 			("subject",		"", is_any, "subject id (prefix/partial)"),
@@ -676,28 +679,31 @@ class PypeApp:
 			("cell",		"", is_any, "unique (per subj) cell id #"),
 			("acute",		"0", is_bool, "acute experiment"),
 			("save_tmp",	"1", is_bool, "0 to write to /dev/null"),
-			("fast_tmp",	"1", is_bool, "super fast tmp mode -- "),
+			("fast_tmp",	"1", is_bool, "super fast tmp mode"),
 
+			("Fixation Window Params", None, None),
+			("win_size",	"50", is_int, "fixation window radius (pix; 0=>disable)"),
+			("win_scale",	"0.0", is_float, "additive eccentricity adj. for win_size (pixels-rad/pixels-ecc)"),
+			("vbias",	    "1.0", is_float, "fixwin vertical elongation factor (1.0=none)"),
+			
+			("Recording Info", None, None),
 			("site.well",	"", is_any, "well number [recording only]"),
 			("site.probe",	"", is_any, "probe time [recording only]"),
 			("site.depth",	"", is_any, "electrode depth in um [recording only]"),
-			("site.note1",	"", is_any, "notes about conditions etc"),
-			("site.note2",	"", is_any, "notes about conditions etc"),
-			("site.note3",	"", is_any, "notes about conditions etc"),
-
+			
 			("Reward Params", None, None),
 			("dropsize",	"100", is_int, "mean drop size in ms (for continuous flow systems)"),
 			("dropvar",		"10", is_int, "reward variance (std)"),
 			("maxreward",	"500", is_gteq_zero, "maximum reward duration (hard limits of variance dist)"),
 			("minreward",	"0", is_gteq_zero, "minimum reward duration (hard limits of variance dist)"),
 
-			("Blocking Params", None, None),
+			("Pype Blocking Params", None, None),
 			# these are handled automatically by pype!
-			("max_ntrials",	"0",   is_int, "# correct+error trials to stop at (0 for no limit)"),
-			("max_correct",	"0",   is_int, "# correct trials to stop at (0 for no limit)"),
-			("max_ui",		"0",   is_int, "# UI trials to stop at (0 for no limit)"),
+			("max_trials",	"0",   is_int, "trials before stopping (0 for no limit)"),
+			("max_correct",	"0",   is_int, "correct trials before stopping (0 for no limit)"),
+			("max_ui",		"0",   is_int, "sequential UI's before stopping (0 for no limit)"),
 
-			("Old Blocking Params", None, None),
+			("Task Blocking Params", None, None),
 			# these need to be handled by the task!
 			("uimax",		"3",   is_int, "maximum # conseq. UI trial's before halting"),
 			("nreps",		"100", is_int, "number of blocks per rep"),
@@ -718,6 +724,9 @@ class PypeApp:
 			("iti",			"4000+-20%", is_iparam, "inter-trial interval (ms)"),
 			("timeout",		"10000+-20%", is_iparam, "penalty timeout for errors (ms)"),
 			("uitimeout",	"20000+-20%", is_iparam, "uninitiated trial timeout (ms)"),
+			
+			("Eye Candy Params", None, None),
+			("show_noise", 1, is_boolean, 'noise background during slides'),
 			), file='subject.par', altfile='common-%s.par' % hostname)
 
 		if self.use_elog:
@@ -1388,7 +1397,6 @@ class PypeApp:
 		with no arguments.
 
 		"""
-
 		# combination of self.tally() and self.history()
 		if type is None:
 			self._results = []
@@ -1396,7 +1404,7 @@ class PypeApp:
 			self._results.append(type)
 			self.history(type[0])
 			self.tally(type=type)
-			self.__runstats_update(type[0])
+			self.__runstats_update(resultcode=type)
 
 	def get_result(self, nback=1):
 		"""Get the nth to last saved trial result code.
@@ -1854,60 +1862,54 @@ class PypeApp:
 			self.__runstats = {}
 			self.__runstats['ncorrect'] = 0
 			self.__runstats['nerror'] = 0
-			self.__runstats['nother'] = 0
 			# this is really sequential ui's
 			self.__runstats['nui'] = 0
 		elif resultcode is not None:
 			r = resultcode[0]
 
-			if r is 'C':
+			if r in 'C':
 				self.__runstats['ncorrect'] = self.__runstats['ncorrect'] + 1
 				self.__runstats['nui'] = 0
-			elif r is 'E':
+			elif r in 'EM':
 				self.__runstats['nerror'] = self.__runstats['nerror'] + 1
 				self.__runstats['nui'] = 0
-			elif r is 'U':
+			elif r in 'U':
 				self.__runstats['nui'] = self.__runstats['nui'] + 1
-			else:
-				self.__runstats['nother'] = self.__runstats['nother'] + 1
 
 			nmax = self.sub_common.queryv('max_trials')
 			n = self.__runstats['ncorrect'] + self.__runstats['nerror']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
 				warn('Warning',
-					 '%d total trials trials. Stopping.' % n, wait=0)
+					 '%d total trials reached -- stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_correct')
 			n = self.__runstats['ncorrect']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
 				warn('Warning',
-					 '%d correct trials trials. Stopping.' % n, wait=0)
+					 '%d correct trials reached -- stopping.' % n, wait=0)
 
 			nmax = self.sub_common.queryv('max_ui')
-			n = self.__runstats['max_ui']
+			n = self.__runstats['nui']
 			if (nmax > 0) and n > nmax:
 				self.set_state(running=0)
 				warn('Warning',
-					 '%d sequential UI trials. Stopping.' % n, wait=0)
+					 '%d sequential UI trials -- stopping.' % n, wait=0)
 
+		ne = self.__runstats['nerror']
+		nc = self.__runstats['ncorrect']
+		nu = self.__runstats['nui']
+		nt = nc + ne
 		s = string.join((
-			'ncorrect    = %d' % self.__runstats['ncorrect'],
-			'nerror      = %d' % self.__runstats['nerror'],
-			'nui         = %d' % self.__runstats['nui'],
-			'ntrials     = %d' % (self.__runstats['ncorrect'] +
-									self.__runstats['nerror']),
-			'---------------------',
-			'max_ntrials = %d' % self.sub_common.queryv('max_ntrials'),
-			'max_correct = %d' % self.sub_common.queryv('max_correct'),
-			'max_ui      = %d' % self.sub_common.queryv('max_ui'),
-			'---------------------',
-			'running     = %d' % self.isrunning()), '\n')
-
+			' running = %d'    % (self.isrunning(),),
+			'----------------------------------',
+			'  nerror = %d'      % (ne,),
+			'ncorrect = %d [%d]' % (nc, self.sub_common.queryv('max_correct'),),
+			'     nui = %d [%d]' % (nu, self.sub_common.queryv('max_ui'),),
+			' ntrials = %d [%d]' % (nt, self.sub_common.queryv('max_trials'),),
+			'----------------------------------'), '\n')
 		self.statsw.configure(text=s)
-
-
 
 	def trial_ui(self, uimax=None):
 		"""This trial was un-initiated.."""

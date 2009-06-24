@@ -917,9 +917,11 @@ class ParamTable:
 			else:
 				try:
 					self._entries[name].setentry(c.get('params', name))
-				except KeyError:
-					pass
+				except ConfigParser.NoOptionError:
+					self._entries[name].setentry(default)
 				except ConfigParser.NoSectionError:
+					self._entries[name].setentry(default)
+				except KeyError:
 					pass
 
 		try:
