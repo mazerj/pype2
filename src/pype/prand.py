@@ -31,6 +31,11 @@ would. At least to about +- 1.0e-11 as far as I can tell..
 
 """
 
+__author__   = '$Author: mazer $'
+__date__     = '$Date: 2009-03-30 13:52:04 -0400 (Mon, 30 Mar 2009) $'
+__revision__ = '$Revision$'
+__id__       = '$Id: pype_aux.py 306 2009-03-30 17:52:04Z mazer $'
+
 class MTRandom:
     def __init__(self, seed=None, state=None):
         """Uniform random number generator object

@@ -4,7 +4,7 @@
 """
 **Basic interface to Plexon network API**
 
-The plexon  network API is massively broken, but this will get
+The plexon network API is massively broken, but this will get
 you some of the data in a pure-python application.
 
 Author -- James A. Mazer (james.mazer@yale.edu)
@@ -22,10 +22,7 @@ import sys
 import struct
 import socket
 import threading
-import time, random
-
 from guitools import Logger
-
 from PlexHeaders import Plex
 
 class PlexNet:
@@ -199,6 +196,8 @@ class PlexNet:
 		return s
 
 if __name__ == '__main__':
+	# try training plexon buffers for testing...
+	import time
 	p = PlexNet("192.168.1.111", 6000)
 	for i in range(3):
 		time.sleep(1)
