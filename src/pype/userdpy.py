@@ -464,30 +464,34 @@ class UserDisplay:
 														 dash=(5,5))
 
 	def _key(self, ev):
+		# ev.state values:
+		# NOMOD = 0; SHIFT = 1; CONTROL = 4; ALT = 8; WIN = 64
+		
 		c = ev.keysym
-		# NOTE:
-		#  state == 0 --> no modifier
-		#  state == 4 --> control key
-		if ev.state == 0 and c == 'Left':
-			self._movefidmarks(xoff=-1, yoff=0)
-		elif ev.state == 0 and c == 'Right':
-			self._movefidmarks(xoff=1, yoff=0)
-		elif ev.state == 0 and c == 'Up':
-			self._movefidmarks(xoff=0, yoff=1)
-		elif ev.state == 0 and c == 'Down':
-			self._movefidmarks(xoff=0, yoff=-1)
-		elif ev.state == 4 and c == 'Left':
-			# control-left
-			self.app.eyeshift(x=1,y=0)
-		elif ev.state == 4 and c == 'Right':
-			# control-right
-			self.app.eyeshift(x=-1,y=0)
-		elif ev.state == 4 and c == 'Up':
-			# control-up
-			self.app.eyeshift(x=0,y=-1)
-		elif ev.state == 4 and c == 'Down':
-			# control-down
-			self.app.eyeshift(x=0,y=1)
+		if c == 'Left':
+			if ev.state:
+				# any modifier...
+				self.app.eyeshift(x=1,y=0)
+			else:
+				self._movefidmarks(xoff=-1, yoff=0)
+		elif c == 'Right':
+			if ev.state:
+				# any modifier...
+				self.app.eyeshift(x=-1,y=0)
+			else:
+				self._movefidmarks(xoff=1, yoff=0)
+		elif c == 'Up':
+			if ev.state:
+				# any modifier...
+				self.app.eyeshift(x=0,y=-1)
+			else:
+				self._movefidmarks(xoff=0, yoff=1)
+		elif c == 'Down':
+			if ev.state:
+				# any modifier...
+				self.app.eyeshift(x=0,y=1)
+			else:
+				self._movefidmarks(xoff=0, yoff=-1)
 		elif c == 'less':
 			self._scalefidmarks(-1)
 		elif c == 'greater':
@@ -517,7 +521,6 @@ class UserDisplay:
 		elif not self.userhook is None:
 			return self.userhook(self.userhook_data, c, ev)
 		else:
-			# print ev,ev.keysym,ev.state
 			pass
 		return 1
 

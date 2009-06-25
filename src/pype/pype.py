@@ -296,6 +296,12 @@ Mon May 25 17:02:17 2009 mazer
   You can specified as both a config var in ~/.pyperrc AND/OR using the
   enviornment var..
 
+Thu Jun 25 16:01:42 2009 mazer
+
+- changed 'dropvar' to really specify VARIANCE instead of STD!!
+
+- got rid of trial_XXX functions and trialstats{}
+
 """
 
 __author__   = '$Author$'
@@ -408,7 +414,7 @@ class PypeApp:
 		# need Pmw (python megawidgets Tkinter addon) for gui
 		if Pmw is None:
 			sys.stderr.write('%s: missing `Pmw` package\n' % __name__)
-			raise PypeFatalError
+			raise FatalPypeError
 
 		# no console window to start with..
 		self.conwin = None
@@ -469,15 +475,15 @@ class PypeApp:
 		monw = self.config.fget('MONW', -1)
 		if monw < 0:
 			Logger('pype: set MONW in Config file\n')
-			raise PypeFatalError
+			raise FatalPypeError
 		monh = self.config.fget('MONH', -1)
 		if monh < 0:
 			Logger('pype: set MONH in Config file\n')
-			raise PypeFatalError
+			raise FatalPypeError
 		viewdist = self.config.fget('VIEWDIST', -1)
 		if viewdist < 0:
 			Logger('pype: set VIEWDIST in Config file\n')
-			raise PypeFatalError
+			raise FatalPypeError
 
 		mon_id = self.config.get('MON_ID', '')
 		if len(mon_id) == 0:
@@ -487,7 +493,7 @@ class PypeApp:
 		if self.config.iget('GFX_TESTMODE', default=-666) != -666:
 			Logger("pype: CONFIG ERROR: GFX_TESTMODE is obsolete" +
 				   "      Try FULLSCREEN instead.\n")
-			raise PypeFatalError
+			raise FatalPypeError
 
 		state = self.__readstate()
 		if state is None:
@@ -513,8 +519,9 @@ class PypeApp:
 		self._eyetrace = 0
 		self.taskidle = None
 
-		self.trialstats = {}
-		self.trial_clear()
+		#Thu Jun 25 16:07:42 2009 mazer OBSOLETE:
+		#self.trialstats = {}
+		#self.trial_clear()
 
 		self.tk = Tk()
 		self.tk.resizable(0, 0)
@@ -531,9 +538,11 @@ class PypeApp:
 
 		font = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
 		#font = '-*-helvetica-bold-r-*-*-12-*-*-*-*-*-iso8859-*'
-		fixed = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
-
 		self.tk.option_add('*Font', font)
+		
+		fixed = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
+		self.tk.option_add('*Font', fixed)
+
 
 		if sys.platform == 'darwin':
 			self.tk.geometry("+0+20")
@@ -542,7 +551,6 @@ class PypeApp:
 							 )
 		self.tk.title('Pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self.shutdown)
-
 
 		Pmw.initialise(self.tk, useTkOptionDb=1)
 
@@ -597,7 +605,6 @@ class PypeApp:
 		mb.addmenuitem('Set', 'command',
 					   label='Toggle TRAINING mode',
 					   command=self.tog_training)
-
 
 		# make top-level menubar for task loaders that can be
 		# disabled when it's not safe to load new tasks...
@@ -667,47 +674,47 @@ class PypeApp:
 		b = Checkbutton(c1pane, text='subj parm', relief=RAISED, anchor=W)
 		b.pack(expand=0, fill=X, side=TOP, pady=4)
 
-
 		sub_common = DockWindow(checkbutton=b, title='subj/cell')
 		self.sub_common = ParamTable(sub_common,
 		(
 			("Session Data", None, None),
-			("training",	0, is_boolean, "training mode (#0000 files)"),
-			("subject",		"", is_any, "subject id (prefix/partial)"),
-			("full_subject", "", is_any, "full (unique) subject name"),
-			("owner",		"", is_any, "datafile owner"),
-			("cell",		"", is_any, "unique (per subj) cell id #"),
-			("acute",		"0", is_bool, "acute experiment"),
-			("save_tmp",	"1", is_bool, "0 to write to /dev/null"),
-			("fast_tmp",	"1", is_bool, "super fast tmp mode"),
+			("training",	0,	 is_boolean,	"training mode (#0000 files)"),
+			("subject",		"",  is_any,		"subject id (prefix/partial)"),
+			("full_subject", "", is_any,		"full (unique) subject name"),
+			("owner",		"",  is_any,		"datafile owner"),
+			("cell",		"",  is_any,		"unique (per subj) cell id #"),
+			("acute",		"0", is_bool,		"acute experiment"),
+			("save_tmp",	"1", is_bool,		"0 to write to /dev/null"),
+			("fast_tmp",	"1", is_bool,		"super fast tmp mode"),
 
 			("Fixation Window Params", None, None),
-			("win_size",	"50", is_int, "fixation window radius (pix; 0=>disable)"),
-			("win_scale",	"0.0", is_float, "additive eccentricity adj. for win_size (pixels-rad/pixels-ecc)"),
-			("vbias",	    "1.0", is_float, "fixwin vertical elongation factor (1.0=none)"),
+			# these are global params, but should be handled by tasks:
+			("win_size",	"50",  is_int,		"default fixwin radius (pix)"),
+			("win_scale",	"0.0", is_float,	"additive eccentricity adjustment for win_size (rad-pixels/ecc-pixels)"),
+			("vbias",	    "1.0", is_float,	"fixwin vertical elongation factor (1.0=none)"),
 			
 			("Recording Info", None, None),
-			("site.well",	"", is_any, "well number [recording only]"),
-			("site.probe",	"", is_any, "probe time [recording only]"),
-			("site.depth",	"", is_any, "electrode depth in um [recording only]"),
+			("site.well",	"", is_any,			"well number"),
+			("site.probe",	"", is_any,			"probe location"),
+			("site.depth",	"", is_any,			"electrode depth (um)"),
 			
 			("Reward Params", None, None),
-			("dropsize",	"100", is_int, "mean drop size in ms (for continuous flow systems)"),
-			("dropvar",		"10", is_int, "reward variance (std)"),
-			("maxreward",	"500", is_gteq_zero, "maximum reward duration (hard limits of variance dist)"),
-			("minreward",	"0", is_gteq_zero, "minimum reward duration (hard limits of variance dist)"),
+			("dropsize",	"100", is_int,		"mean drop size in ms (for continuous flow systems)"),
+			("dropvar",		"10", is_int,		"reward variance (sigma^2)"),
+			("maxreward",	"500", is_gteq_zero,"maximum reward duration (hard limit)"),
+			("minreward",	"0", is_gteq_zero,	"minimum reward duration (hard limit)"),
 
 			("Pype Blocking Params", None, None),
 			# these are handled automatically by pype!
-			("max_trials",	"0",   is_int, "trials before stopping (0 for no limit)"),
-			("max_correct",	"0",   is_int, "correct trials before stopping (0 for no limit)"),
-			("max_ui",		"0",   is_int, "sequential UI's before stopping (0 for no limit)"),
+			("max_trials",	"0",   is_int,		"trials before stopping (0 for no limit)"),
+			("max_correct",	"0",   is_int,		"correct trials before stopping (0 for no limit)"),
+			("max_ui",		"0",   is_int,		"sequential UI's before stopping (0 for no limit)"),
 
-			("Task Blocking Params", None, None),
-			# these need to be handled by the task!
-			("uimax",		"3",   is_int, "maximum # conseq. UI trial's before halting"),
-			("nreps",		"100", is_int, "number of blocks per rep"),
-			("blocksize",	"100", is_int, "number of trials per block"),
+			#("Task Blocking Params", None, None),
+			# global, but handled by task -- soon to go away
+			#("uimax",		"3",   is_int, "maximum # conseq. UI trial's before halting"),
+			#("nreps",		"100", is_int, "number of blocks per rep"),
+			#("blocksize",	"100", is_int, "number of trials per block"),
 
 			("Fixation and Appearence", None, None),
 			("fix_size",	"2", is_int, "size of fixspot (radius in pixels)"),
@@ -844,7 +851,7 @@ class PypeApp:
 			self.rig_common.set('eyelag', '0')
 		else:
 			Logger("pype: %s is not a valid EYETRACKER.\n" % et)
-			raise PypeFatalError
+			raise FatalPypeError
 
 		c2pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c2pane.pack(expand=0, fill=X, side=TOP)
@@ -899,9 +906,9 @@ class PypeApp:
 		book.grid(row=0, column=1, sticky=N+S+E)
 		console = book.add('Console')
 		info = book.add('Info')
+		stats = book.add('Performance')
 		tally = book.add('Tally')
-		stats = book.add('PerfStats')
-		setables = book.add('Tracker')
+		setables = book.add('I-Tracker')
 
 		# INFO CONSOLES ######################################
 		self.console = Info(console, bg='white')
@@ -1024,8 +1031,8 @@ class PypeApp:
 		self._eye_yoff.pack(expand=0, side=TOP, pady=2, anchor=W)
 
 		Label(setables,
-			  text="Use Ctrl-Arrows in UserDisplay to adjust and\n"+
-			       "the 'Update' button to lock values in").pack(\
+			  text="Use Shift/Ctrl/Meta-Arrows in UserDisplay\n"+
+			       "window to adjust offsets in real-time").pack(\
 			expand=0, fill=X, side=TOP, pady=10)
 
 		Pmw.alignlabels([self._eye_tweak,
@@ -1185,7 +1192,7 @@ class PypeApp:
 			Logger('pype: error actually FPS does not match requested rate\n' +
 				   '      requested=%dhz actual=%dhz\n' % \
 				   (self.config.iget('FPS'), fps))
-			raise PypeFatalError
+			raise FatalPypeError
 		self.rig_common.set('mon_fps', '%g' % fps)
 		self.idlefb()
 		Logger('pype: estimated fps = %g\n' % fps)
@@ -1348,12 +1355,9 @@ class PypeApp:
 		letting user's set app.running etc by hand
 
 		"""
-		if not (running is -1):
-			self.running = running
-		if not (paused is -1):
-			self.paused = paused
-		if not (led is -1):
-			self.led(led)
+		if not (running is -1):	self.running = running
+		if not (paused is -1):	self.paused = paused
+		if not (led is -1):		self.led(led)
 
 	def drawledbar(self):
 		x = ("[ ]", "[*]")
@@ -1911,7 +1915,17 @@ class PypeApp:
 			'----------------------------------'), '\n')
 		self.statsw.configure(text=s)
 
-	def trial_ui(self, uimax=None):
+	def query_ncorrect(self):
+		return self.__runstats['ncorrect']
+	
+	def query_nerror(self):
+		return self.__runstats['nerror']
+	
+	def query_ntrials(self):
+		# note: UI's and ABORTs don't count as trials
+		return self.__runstats['ncorrect'] + self.__runstats['nerror']
+
+	def OBSOLETE_trial_ui(self, uimax=None):
 		"""This trial was un-initiated.."""
 		if uimax is None:
 			uimax = self.sub_common.queryv('uimax')
@@ -1922,18 +1936,18 @@ class PypeApp:
 				 Timestamp(), wait=1)
 			self.trialstats['uicount'] = 0
 
-	def trial_clear(self):
+	def OBSOLETE_trial_clear(self):
 		# runset stats
 		self.trialstats['trialnum'] = 0	# number of total trial
 		self.trialstats['ntrials'] = 0	# number of real/iniated trial
 		self.trialstats['ncorrect'] = 0	# number correct (out of ntrials)
 		self.trialstats['uicount'] = 0	# number UI trials
 
-	def trial_new(self):
+	def OBSOLETE_trial_new(self):
 		"""Starting a new trial..."""
 		self.trialstats['trialnum'] = self.trialstats['trialnum'] + 1
 
-	def trial_correct(self, correct):
+	def OBSOLETE_trial_correct(self, correct):
 		"""This trial was correct..."""
 		if correct:
 			self.trialstats['ncorrect'] = self.trialstats['ncorrect'] + 1
@@ -2413,14 +2427,14 @@ class PypeApp:
 			else:
 				self.userinfo.configure(bg='white')
 
-	def nreps(self):
+	def OBSOLETE_nreps(self):
 		"""Query the number of repetitions (slider value)"""
 		if self.tk:
 			return self.sub_common.queryv('nreps')
 		else:
 			raise GuiOnlyFunction, "nreps"
 
-	def notdone(self, repnum):
+	def OBSOLETE_notdone(self, repnum):
 		"""Continue running or abort/done?"""
 		nreps = self.nreps()
 		if self.running and (nreps == 0 or repnum < nreps):
@@ -2449,7 +2463,7 @@ class PypeApp:
 			raise GuiOnlyFunction, "dropsize"
 
 	def dropvar(self):
-		"""Query the dropsize variance (in ms; from slider)"""
+		"""Query the dropsize variance (in ms)"""
 		if self.tk:
 			return self.sub_common.queryv('dropvar')
 		else:
@@ -2474,10 +2488,10 @@ class PypeApp:
 
 		if ms is None:
 			ms = int(round(multiplier * float(self.dropsize())))
-			var = self.dropvar()
+			sigma = sqrt(self.dropvar())
 		else:
 			# user specified ms, no variance
-			var = 0
+			sigma = 0
 
 		if ms == 0:
 			return
@@ -2490,9 +2504,9 @@ class PypeApp:
 		maxreward = self.sub_common.queryv('maxreward')
 		minreward = self.sub_common.queryv('minreward')
 
-		if var > 0:
+		if sigma > 0:
 			while 1:
-				t = normal(ms, var)
+				t = normal(mean=ms, sigma=sigma)
 				if (t > minreward) and (t < maxreward):
 					break
 			if dobeep:

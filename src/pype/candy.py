@@ -34,7 +34,6 @@ def bounce(app):
 
 	# cancel candy if it's running..
 	if app._candy:
-		app.led(0)
 		app._sbut1.config(state=NORMAL)
 		app._sbut2.config(state=NORMAL)
 		app.udpy.stop(command=None)
@@ -43,7 +42,6 @@ def bounce(app):
 		app.udpy_note('')
 		return
 	else:
-		app.led(1)
 		app._sbut1.config(state=DISABLED)
 		app._sbut2.config(state=DISABLED)
 		app.udpy.stop(command=lambda app=app: bounce(app))
@@ -99,7 +97,6 @@ def slideshow(app):
 
 	# cancel candy if it's running..
 	if app._candy:
-		app.led(0)
 		app._sbut1.config(state=NORMAL)
 		app._sbut2.config(state=NORMAL)
 		app.udpy.stop(command=None)
@@ -108,7 +105,6 @@ def slideshow(app):
 		app.udpy_note('')
 		return
 	else:
-		app.led(1)
 		app._sbut1.config(state=DISABLED)
 		app._sbut2.config(state=DISABLED)
 		app.udpy.stop(command=lambda app=app: slideshow(app))

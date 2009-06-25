@@ -674,7 +674,12 @@ class ParamTable:
 		return (1, d)
 
 	def lockfield(self, name, toggle=None, state=DISABLED):
-		w = self._entries[name].component('entry')
+		try:
+			w = self._entries[name].component('entry')
+		except KeyError:
+			# obsolete field...
+			return
+		
 		if toggle:
 			if w.cget('state') == DISABLED:
 				state = NORMAL
@@ -895,7 +900,11 @@ class ParamTable:
 		import ConfigParser
 		
 		c = ConfigParser.ConfigParser()
-		f = open(file, 'r')
+		try:
+			f = open(file, 'r')
+		except IOError:
+			return 0
+		
 		try:
 			c.readfp(f)
 		except:
