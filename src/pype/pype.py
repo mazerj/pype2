@@ -721,8 +721,8 @@ class PypeApp:
 			("fix_ring",	"10", is_int, "size of annular ring around fixspot for ++visibility"),
 			("fix_x",		"0", is_int, "default X position of fixspot (pix)"),
 			("fix_y",		"0", is_int, "default Y position of fixspot (pix)"),
-			("win_size",	"20", is_int, "default fixation window size (radius in pixels)"),
-			("win_scale",	"0.0053", is_float, "multiplier to scale win_size w/eccentricity (gain/pix"),
+			#("win_size",	"20", is_int, "default fixation window size (radius in pixels)"),
+			#("win_scale",	"0.0053", is_float, "multiplier to scale win_size w/eccentricity (gain/pix"),
 			("bg",			"80", is_gray, "default background color of screen"),
 
 			("Timing Params", None, None),

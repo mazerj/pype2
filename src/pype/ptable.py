@@ -806,6 +806,8 @@ class ParamTable:
 		# or if none work, return 0..
 		for method in (self._loadc, self._loadt, self._loadp):
 			if method(file=file):
+				if not method  == self._loadc:
+					sys.stderr.write("Warning: updating '%s'\n" % file)
 				return 1
 		return 0
 
@@ -890,6 +892,8 @@ class ParamTable:
 					self.lockfield(k, state=locks[k])
 			return 1
 		except IOError:
+			return 0
+		except ValueError:
 			return 0
 
 	def _loadc(self, file=None):
