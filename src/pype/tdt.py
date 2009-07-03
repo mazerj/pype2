@@ -46,6 +46,8 @@ Socket Classes derrived from::
 
 """
 
+raise Exception('tdt', 'tdt module is obsolete -- use tdt2')
+
 __author__   = '$Author$'
 __date__     = '$Date$'
 __revision__ = '$Revision$'
