@@ -87,6 +87,11 @@ Fri Apr 17 10:45:46 2009 mazer
 
 - improved noise() function (added color flag) (from numsprite.py)
 
+- Tue Jul  7 10:25:19 2009 mazer
+
+  - FrameBuffer.syncinfo is stashed to allow UserDisplay to automatically
+    mark the sync spot location on the screen..
+
 """
 
 __author__   = '$Author$'
@@ -176,7 +181,7 @@ def checkrshift():
 
 class FrameBuffer:
 	def __init__(self, dpy, width, height, bpp, fullscreen, bg=1,
-				 sync=1, syncsize=50, syncx=-10000, syncy=-10000,
+				 sync=1, syncsize=50, syncx=None, syncy=None,
 				 synclevel=255, opengl=0, mouse=0):
 		"""FrameBuffer class (SDL<-pygame<-pype).
 
@@ -209,7 +214,8 @@ class FrameBuffer:
 		positive to left and up. Note that this indicates the position
 		for the **center** of the sync spot, so if you're on the
 		corner, you should probably double the size to get the
-		expected value.  Default position is lower right hand corner.
+		expected value.  Default position (when syncx and syncy are
+		not specified or are None) is lower right hand corner.
 
 		**syncsize** - size of sync pulse in pixels (sync pulse will be
 		syncsize x syncsize pixels and located in the lower right
@@ -344,13 +350,15 @@ class FrameBuffer:
 		else:
 			self.sync_mode = 1
 
-		# if location of sync pulse is not specified (-10000), then
-		# put it in the lower right corner by default
-		if syncx < self.w:
+		# if location of sync pulse is not specified (None), then
+		# put it in the lower right corner by default -- remember,
+		# coords are standard pype/geometry coords, so (+,-) is
+		# lower right quadrant.
+		if syncx is None:
 			syncx = int(round(self.w/2))
-		if syncy < self.h:
+		if syncy is None:
 			syncy = int(round(-self.h/2))
-		
+
 		if self.sync_mode:
 			# pre-build sync/photodiode driving sprites:
 			self._sync_low = Sprite(syncsize, syncsize, syncx, syncy,
@@ -362,9 +370,12 @@ class FrameBuffer:
 									 name='sync_high', on=1, fb=self)
 			self._sync_high.fill((synclevel, synclevel, synclevel))
 			self._sync_high.render()
+			
+			self.syncinfo = (syncx, syncy, syncsize)
 		else:
 			self._sync_low = None
 			self._sync_high = None
+			self.syncinfo = None
 
 		# initial sync state is OFF
 		self.sync(0)

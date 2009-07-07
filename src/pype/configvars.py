@@ -81,16 +81,13 @@ def defaults(srcfile):
     c.set('OPENGL',	 '0')               # enable OpenGL graphics
     
     c.set('SYNCSIZE', '50')             # size of sync pulse square (pix)
-    c.set('SYNCX', '-10000')            # X location of sync square CENTER (pix)
-    c.set('SYNCY', '-10000')            # Y location of sync square CENTER (pix)
+    c.set('SYNCX', None)                # X location of sync square CENTER (pix)
+    c.set('SYNCY', None)                # Y location of sync square CENTER (pix)
+                                        #  (None means autoconfig to lower right)
     c.set('SYNCLEVEL', '255')           # gray scale value of sync-on
-
     c.set('TESTPAT', None)              # filename for test pattern
     
 
-    # BLOCKED should probably just go away or be figured out automatically
-    # based on SYNC{X,Y,SIZE}
-    c.set('BLOCKED', '')                # region of screen blocked by photodiode
 
     if os.environ.has_key('DISPLAY'):   # display device for graphics
         c.set('SDLDPY', os.environ['DISPLAY'])

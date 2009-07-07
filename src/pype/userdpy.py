@@ -36,6 +36,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
   - changed button-1 function to button-3 to avoid problems with WM..
 
+- Tue Jul  7 10:25:19 2009 mazer
+
+  - BLOCKED is gone -- computed automatically from syncinfo..
+  
 """
 
 __author__   = '$Author$'
@@ -62,7 +66,7 @@ import filebox
 
 class UserDisplay:
 	def __init__(self, master, cwidth=1024, cheight=768,
-				 pix_per_dva=1.0, blocked=None, app=None, callback=None):
+				 pix_per_dva=1.0, app=None, callback=None):
 		"""UserDisplay Class.
 
 		The UserDisplay is a pype local window on the user's computer
@@ -75,10 +79,6 @@ class UserDisplay:
 		shadowing.
 
 		**pix_per_dva** - pixels per degree visual angle
-
-		**blocked** - x,y coords of the upper left corner of the *blocked*
-		region of the display (blocked by photodiode). This is just marked
-		out so the user doesn't forget...
 
 		**app** - PypeApp handle
 
@@ -232,9 +232,8 @@ class UserDisplay:
 		self.w2 = int(round(self.w / 2.0))
 		self.h2 = int(round(self.h / 2.0))
 
-		self._blocked = blocked
 		self._axis = []
-		self._drawaxis(self.w, self.h)
+		#self._drawaxis()
 
 		self._eye_trace = []
 		self._eye_trace_maxlen = 50
@@ -382,31 +381,37 @@ class UserDisplay:
 			(x, y) = x
 		return(x - (self.w2), (self.h - y) - self.h2)
 
-	def _drawaxis(self, cw, ch):
+	def drawaxis(self):
 		cursor = 'tcross'
 		background = 'gray80'
 		cardinal = 'black'
 		
 		self._canvas.configure(cursor=cursor, bg=background)
-		
-		if self._blocked:
+
+		if 0 and self._blocked:
 			# mark region blocked by photodiode..
 			(x1, y1) = self.fb2can(self._blocked[0], self._blocked[1])
-			self._canvas.create_line(x1, ch, x1, y1, width=3, fill='black')
-			self._canvas.create_line(x1, y1, cw, y1, width=3, fill='black')
+			
+			self._canvas.create_line(x1, self.h, x1, y1, width=3, fill='black')
+			self._canvas.create_line(x1, y1, self.w, y1, width=3, fill='black')
+		if self.app.fb.syncinfo:
+			(sx, sy, ss) = self.app.fb.syncinfo
+			(a, b) = self.fb2can(sx - ss/2, sy - ss/2)
+			(c, d) = self.fb2can(sx + ss/2, sy + ss/2)
+			self._canvas.create_rectangle(a, b, c, d, fill='black')
 
 		# draw cardinal axis (0,0)
 		(x, y) = self.fb2can(0, 0)
-		self._canvas.create_line(x, 0, x, ch, width=1,
+		self._canvas.create_line(x, 0, x, self.h, width=1,
 								 fill='black', dash=(7,2))
-		self._canvas.create_line(0, y, cw, y, width=1,
+		self._canvas.create_line(0, y, self.w, y, width=1,
 								 fill='black', dash=(7,2))
 
 		# gridinterval is pix/deg
 		d = int(round(self.gridinterval))
 		(xo, yo) = self.fb2can(0,0)
-		for x in range(0, int(round(cw/2)), d):
-			for y in range(0, int(round(ch/2)), d):
+		for x in range(0, int(round(self.w/2)), d):
+			for y in range(0, int(round(self.h/2)), d):
 				for (sx, sy) in ((1,1),(-1,1),(-1,-1),(1,-1)):
 					if x == 0 or y == 0:
 						continue

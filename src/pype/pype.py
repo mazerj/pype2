@@ -302,6 +302,10 @@ Thu Jun 25 16:01:42 2009 mazer
 
 - got rid of trial_XXX functions and trialstats{}
 
+Tue Jul  7 10:25:03 2009 mazer
+
+- got rid of BLOCKED -- automatically computed from sync info..
+
 """
 
 __author__   = '$Author$'
@@ -1049,25 +1053,12 @@ class PypeApp:
 		self.keyque = EventQueue(self.tk, '<Key>')
 
 		# userdisplay: shadow of framebuffer window
-		blk = self.config.get('BLOCKED')
-		if len(blk) > 0:
-			blk = string.split(blk, ',')
-			try:
-				blk = (int(blk[0]),int(blk[1]))
-			except ValueError:
-				Logger("pype: warning -- config 'BLOCKED' must be (x,y)\n")
-				blk = None
-		else:
-			blk = None
-
 		self.udpy_visible = 1
 		self.udpy = userdpy.UserDisplay(None,
 										cwidth=self.config.iget('DPYW'),
 										cheight=self.config.iget('DPYH'),
 										pix_per_dva=self.pix_per_dva,
-										blocked=blk, app=self,
-										callback=self.marktime)
-
+										app=self, callback=self.marktime)
 
 		if posixpath.exists(subjectrc('last.fid')):
 			self.udpy.loadfidmarks(file=subjectrc('last.fid'))
@@ -1185,6 +1176,9 @@ class PypeApp:
 		root_take()
 
 		self.init_framebuffer()
+
+		# this must be defered until sync spot info is computed..
+		self.udpy.drawaxis()
 
 		# added automatic detection of framerate (13-jan-2004 JAM):
 		fps = self.fb.calcfps(duration=250)
@@ -1743,14 +1737,20 @@ class PypeApp:
 		dacq_eye_params(xg, yg, self.eye_xoff, self.eye_yoff)
 
 	def init_framebuffer(self):
+		sx = self.config.get('SYNCX', None)
+		if not sx is None:
+			sx = int(sx)
+		sy = self.config.get('SYNCY', None)
+		if not sy is None:
+			sy = int(sy)
+
 		self.fb = FrameBuffer(self.config.get('SDLDPY'),
 							  self.config.iget('DPYW'),
 							  self.config.iget('DPYH'),
 							  self.config.iget('DPYBITS'),
 							  self.config.iget('FULLSCREEN'),
 							  syncsize=self.config.iget('SYNCSIZE'),
-							  syncx=self.config.iget('SYNCX'),
-							  syncy=self.config.iget('SYNCY'),
+							  syncx=sx, syncy=sy,
 							  synclevel=self.config.iget('SYNCLEVEL'),
 							  opengl=self.config.iget('OPENGL'))
 

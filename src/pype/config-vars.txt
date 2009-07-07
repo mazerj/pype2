@@ -2,7 +2,6 @@ Config file options as of 07-Dec-2005
 -------------------------------------
 
 AUDIODRIVER	(str)	name of pygame SDL_AUDIODRIVER
-BLOCKED		(#,#)	width and heigh in pixels of photodiode blockage zone
 DACQ_SERVER	(str)	name of data acquisition server
 DACQ_TESTMODE	(0|1)	if true, then dacq runs in test mode (w/o connecting to hardware)
 DEBUG		(0|1)	enables debug mode
