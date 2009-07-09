@@ -362,7 +362,6 @@ from candy import bounce, slideshow
 import PlexHeaders, PlexNet, pype2tdt
 from info import print_version_info
 import filebox
-import iplot
 import userdpy
 import pypeversion
 import configvars
@@ -575,6 +574,8 @@ class PypeApp:
 		self.show_eyetrace_stop = None
 		self.show_eyetraces = IntVar()
 		self.show_eyetraces.set(0)
+		self.testpat = IntVar()
+		self.testpat.set(1)
 		self._eyetrace_window = None
 
 		mb = Pmw.MenuBar(f1)
@@ -606,6 +607,9 @@ class PypeApp:
 		mb.addmenuitem('Set', 'checkbutton',
 					   label='Show traces',
 					   variable=self.show_eyetraces)
+		mb.addmenuitem('Set', 'checkbutton',
+					   label='show test pattern',
+					   variable=self.testpat)
 		mb.addmenuitem('Set', 'command',
 					   label='Toggle TRAINING mode',
 					   command=self.tog_training)
@@ -3393,7 +3397,7 @@ class PypeApp:
 				self._testpat = s
 					
 			self.fb.clear((1,1,1))
-			if self._testpat:
+			if self.testpat.get() and self._testpat:
 				self._testpat.blit(force=1)
 				s = Sprite(x=50, y=50, width=150, height=150,
 						   fb=self.fb, on=1)
@@ -3414,6 +3418,8 @@ class PypeApp:
 		self.show_eyetrace_stop = stop
 
 	def plotEyetraces(self, t=None, x=None, y=None, others=None, raster=None):
+		from iplot import *
+		
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
 			oldgraph = attach(self._eyetrace_window)
