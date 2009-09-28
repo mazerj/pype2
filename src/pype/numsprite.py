@@ -20,18 +20,32 @@ __revision__ = '$Revision$'
 __id__       = '$Id$'
 
 import math
-import copy
 
-NUMPY = 1
-if NUMPY:
+_NUMPY = 1				 # this should only be set to zero for testing!!
+
+if _NUMPY:
 	from numpy import *
 	from numpy.random import uniform
+
+	# These are hacks to transition from numeric to numpy
+	UnsignedInt8 = uint8
+	NewAxis = newaxis
 else:
 	from Numeric import *
 	from RandomArray import uniform
+	sys.stderr.write('Warning: numsprite using Numeric, not numpy\n')
 	
+try:
+	from OpenGL.GL import *
+	from OpenGL.GLU import *
+	from OpenGL.GLUT import *
+except ImportError:
+	sys.stderr.write('Warning: numsprite required OpenGL module\n')
+	sys.exit(1)
+	
+
 from PIL import Image
-from sprite import _C
+from sprite import _C, genaxes
 
 from pypedebug import keyboard
 import time
@@ -91,6 +105,7 @@ class NumSprite:
 			   (self.name, self.x, self.y, self.w, self.h, self.depth)
 
 	def clone(self):
+		import copy
 		new = NumSprite(x=self.x, y=self.y,
 						width=self.w,height=self.h,
 						dx=self.dx, dy=self.dy, depth=self.depth,
@@ -123,7 +138,7 @@ class NumSprite:
 	def noise(self, thresh=0.5, color=None):
 		for n in range(3):
 			if color or n == 0:
-				if NUMPY:
+				if _NUMPY:
 					m = uniform(1, 255, size=self.array.shape[0:2])
 				else:
 					m = uniform(1, 255, shape=self.array.shape[0:2])
@@ -158,13 +173,13 @@ class NumSprite:
 	def toPIL(self):
 		m = concatenate((self.array, self.alpha[:,:,NewAxis]), axis=2)
 		m = transpose(m, axes=[1,0,2])
-		if NUMPY:
+		if _NUMPY:
 			return Image.fromarray(m, 'RGBA')
 		else:
 			return PIL.Image.fromstring('RGBA', (self.w, self.h), m.tostring())
 
 	def fromPIL(self, i):
-		if NUMPY:
+		if _NUMPY:
 			a = transpose(asarray(i), axes=[1,0,2])
 			if a.shape[2] == 3:
 				# RGB
@@ -339,8 +354,9 @@ class NumSprite:
 
 def testset():
 	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
+	fb.clear((128,128,128))
 
-	if 0:
+	if 1:
 		N = 200
 		for num in [1, 0]:
 			start = time.time()
@@ -356,7 +372,7 @@ def testset():
 			stop = time.time()
 			print 'num=%d' % num, N/(stop-start), 'fps'
 
-	if 1:
+	if 0:
 		s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)
 		s.alpha_gradient(100,200)
 		#s.save('foo.jpg')
@@ -386,15 +402,17 @@ def testset():
 		keyboard()
 
 	if 0:
-		s = NumSprite(x=0, y=-200, width=200, height=200, fb=fb)
-		cosgrat(s, 5, 0, 45)
-		alphaGaussian(s, 50)
+		s = NumSprite(x=-100, y=-100, width=200, height=200, fb=fb, on=1)
+		cosgrat(s, 5, 0, -45)
+		alphaGaussian(s, 20)
 		s.blit()
 
-		o = Sprite(x=0, y=200, width=200, height=200, fb=fb)
-		cosgrat(o, 5, 0, 45)
-		alphaGaussian(o, 50)
+		o = Sprite(x=100, y=100, width=200, height=200, fb=fb, on=1)
+		cosgrat(o, 5, 90, -45)
+		alphaGaussian(o, 20)
 		o.blit()
+		fb.flip()
+		keyboard()
 
 	if 0:
 		print 'starting'
@@ -422,15 +440,19 @@ def testset():
 						phi = (phi + 10) % 360
 					stop = time.time()
 					print ' ', nf/(stop-start), 'fps'
-	
+		keyboard()
+
 
 if __name__ == '__main__':
-	import cProfile,pstats
+	if 0:
+		import cProfile,pstats
+		f = '/tmp/testset.prof'
+		cProfile.run('testset()', f)
+		#p = pstats.Stats(f)
+		#p.strip_dirs().sort_stats('time').print_stats()
 
-	f = '/tmp/testset.prof'
-	cProfile.run('testset()', f)
-	#p = pstats.Stats(f)
-	#p.strip_dirs().sort_stats('time').print_stats()
+	if 1:
+		testset()
 	
 else:
 	try:

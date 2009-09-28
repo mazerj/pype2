@@ -3418,11 +3418,11 @@ class PypeApp:
 		self.show_eyetrace_stop = stop
 
 	def plotEyetraces(self, t=None, x=None, y=None, others=None, raster=None):
-		from iplot import *
+		import iplot
 		
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
-			oldgraph = attach(self._eyetrace_window)
+			oldgraph = iplot.attach(self._eyetrace_window)
 
 			skip = int(self.rig_common.queryv('plotskip'))
 			if skip < 1:
@@ -3452,37 +3452,37 @@ class PypeApp:
 				nplots = 1 + len(others) + 0
 
 			pnum = 1
-			subplot(nplots, 1, pnum)
-			plot(t[::skip] - t0, x[::skip], 'r-')
-			hold_on()
-			plot(t[::skip] - t0, y[::skip], 'g-')
-			hold_off()
-			xrange(start - t0, stop - t0)
-			ylabel('red=x grn=y')
+			iplot.subplot(nplots, 1, pnum)
+			iplot.plot(t[::skip] - t0, x[::skip], 'r-')
+			iplot.hold_on()
+			iplot.plot(t[::skip] - t0, y[::skip], 'g-')
+			iplot.hold_off()
+			iplot.xrange(start - t0, stop - t0)
+			iplot.ylabel('red=x grn=y')
 
 			pnum = pnum + 1
 			# plot the others
 			for (data, name) in others:
-				subplot(nplots, 1, pnum)
-				plot(t[::skip] - t0, data[::skip], 'k-')
-				ylabel(name)
-				xrange(start - t0, stop - t0)
+				iplot.subplot(nplots, 1, pnum)
+				iplot.plot(t[::skip] - t0, data[::skip], 'k-')
+				iplot.ylabel(name)
+				iplot.xrange(start - t0, stop - t0)
 				pnum = pnum + 1
 
 			if raster:
 				# stop xmgrace error message for empty rasters..
 				if len(raster) > 1:
 					raster = array(raster) - t0
-					subplot(nplots, 1, pnum)
-					plot(raster, 0.0 * raster, 'o')
-					yrange(-1,1)
-					ylabel('raster')
-					xrange(start - t0, stop - t0)
+					iplot.subplot(nplots, 1, pnum)
+					iplot.plot(raster, 0.0 * raster, 'o')
+					iplot.yrange(-1,1)
+					iplot.ylabel('raster')
+					iplot.xrange(start - t0, stop - t0)
 
 			# restore previous graph window (even if it's None)
 			# attach() returns the current handle, so save it
 			# (might be different if new or reopened window..)
-			self._eyetrace_window  = attach(oldgraph)
+			self._eyetrace_window  = iplot.attach(oldgraph)
 
 	def showsprites(self):
 		for n in range(0, len(Sprite.__list__)):
