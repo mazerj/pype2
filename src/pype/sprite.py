@@ -1841,7 +1841,7 @@ class Sprite(_ImageBase):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[:] = where(less(pixs, t), 1, 255).astype(UnsignedInt8)
+		pixs[:] = where(less(pixs, threshval), 1, 255).astype(UnsignedInt8)
 
 	def on(self):
 		"""Turn sprite on
