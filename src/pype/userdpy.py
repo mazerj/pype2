@@ -132,6 +132,10 @@ class UserDisplay:
 		mb.addmenuitem('Fidmarks', 'command', state=DISABLED,
 					   label='clear closest (c)')
 
+		mb.addmenu('Box', '', '')
+		mb.addmenuitem('Box', 'command',
+					   label='Enter box position', command=self.manualbox)
+		
 		mb.addmenu('Eyecal', '', '')
 		mb.addmenuitem('Eyecal', 'command',
 					   label='Clear all points', command=self.clearpoints)
@@ -426,6 +430,37 @@ class UserDisplay:
 													  outline=dots, fill=dots)
 					self._axis.append(b)
 
+
+	def manualbox(self):
+		x1 = float(min(self.markstack[0][0], self.markstack[1][0]))
+		x2 = float(max(self.markstack[0][0], self.markstack[1][0]))
+		y1 = float(min(self.markstack[0][1], self.markstack[1][1]))
+		y2 = float(max(self.markstack[0][1], self.markstack[1][1]))
+		cx = (x1 + x2)/2
+		cy = (y1 + y2)/2
+		w = (x2 - x1)
+		h = (y2 - y1)
+		s = tkSimpleDialog.askstring('position box exactly',
+									 'Enter centerx, centery, width, height:',
+									 initialvalue='%d,%d,%d,%d' % \
+									 (cx, cy, w, h))
+		try:
+			s = map(int, string.split(s,','))
+		except ValueError:
+			return
+		if len(s) == 3:
+			[cx, cy, r] = s
+			w = 2*r
+			h = 2*r
+		elif len(s) == 4:
+			[cx, cy, w, h] = s
+		else:
+			return
+		self.clearbox()
+		self.markstack.append(((cx-w), (cy-h)))
+		self.markstack.append(((cx+w), (cy+h)))
+		self.drawbox()
+		
 	def clearbox(self):
 		self.setbox(clear=1)
 
