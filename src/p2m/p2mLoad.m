@@ -111,7 +111,7 @@ if fname(end-3:end) == '.p2m'
   % strip false spikes from PF right away! these are spikes
   % generated at the onset of ADC by the crappy TTL detection
   % algorithm pype uses... see p2mNoFalseSpikes() doc
-  r = p2mNoFalseSpikes(PF);
+  r = p2mNoFalseSpikes(PF, verbose);
 elseif fname(end-4:end) == '.ical'
   if gz
     gzload([fname '.gz']);

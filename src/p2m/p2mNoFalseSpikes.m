@@ -1,5 +1,5 @@
-function pf=p2mNoFalseSpikes(pf)
-%function pf=p2mNoFalseSpikes(pf)
+function pf=p2mNoFalseSpikes(pf, verbose)
+%function pf=p2mNoFalseSpikes(pf, verbose)
 %
 %  - Look for TTL spikes in a newly loaded datafile that occur right
 %    after ADC starts and strip them out
@@ -12,6 +12,10 @@ function pf=p2mNoFalseSpikes(pf)
 %    should never have to deal with this function directly
 %
 % Tue Jun  2 10:14:10 2009 mazer 
+
+if nargin < 2
+  verbose = 1;
+end
 
 ks=0;
 kp=0;
@@ -31,10 +35,11 @@ for n=1:length(pf.rec)
     end
   end
 end
-if ks > 0
-  fprintf('warning: removed %d false initial spikes\n', ks);
+if verbose
+  if ks > 0
+    fprintf('warning: removed %d false initial spikes\n', ks);
+  end
+  if kp > 0
+    fprintf('warning: removed %d false initial photodiode events\n', kp);
+  end
 end
-if kp > 0
-  fprintf('warning: removed %d false initial photodiode events\n', kp);
-end
-
