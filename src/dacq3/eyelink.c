@@ -18,7 +18,9 @@
 #include "eyetypes.h"
 
 /* this has set_eyelink_address() etc.. */
-#include "exptsppt.h"
+//32bit: #include "exptsppt.h"
+//64bit: #include "core_expt.h"
+#include "my_core_expt.h"
 
 static int eyelink_camera = -1;
 

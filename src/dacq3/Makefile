@@ -8,11 +8,12 @@ include ../../make.defs
 #   INCEYELINK = 
 
 # for new version (summer 2003):
-LIBEYELINK = ./eyelinksoftware/lib/libeyelink_core.a -lpthread
-INCEYELINK = ./eyelinksoftware/include
+LIBEYELINK =  -lpthread -lm -lrt \
+	./eyelinksoftware/`uname -m`/lib/libeyelink_core.a
+INCEYELINK = ./eyelinksoftware/`uname -m`/include
 
 CFLAGS = -O6 -g -Wall -I$(INCEYELINK) -I./include \
-		$(GLOBAL_CFLAGS) $(PYTHONINC) $(DEBUG)
+		$(GLOBAL_CFLAGS) $(PYTHONINC) $(DEBUG) -fPIC
 CC = gcc
 
 all: build install
@@ -20,16 +21,16 @@ all: build install
 build: das16_server das08_server _dacqmodule.so comedi 
 
 sigs.o: sigs.c sigs.h
-	$(CC) -c sigs.c
+	$(CC) $(CFLAGS) -c sigs.c
 
 psems.o: psems.c psems.h
-	$(CC) -c psems.c
+	$(CC) $(CFLAGS) -c psems.c
 
 usbjs.o: usbjs.c usbjs.h
-	$(CC) -c usbjs.c
+	$(CC) $(CFLAGS) -c usbjs.c
 
 procname.o: procname.c procname.h
-	$(CC) -c procname.c
+	$(CC) $(CFLAGS) -c procname.c
 
 comedi:
 	if [ -f /usr/include/comedi.h -o -f /usr/local/include/comedi.h ]; then \

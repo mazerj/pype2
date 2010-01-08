@@ -80,7 +80,7 @@ def diff(v):
 	"""Compute first derivate of vector."""
 	if not type(v) == Numeric.ArrayType:
 		v = Numeric.array(v, 'f')
-	return v[1:]-v[0:-1]
+	return v[1::]-v[0:-1:]
 
 def diff2(v):
 	"""Compute first derivate of vector, but IN PLACE"""

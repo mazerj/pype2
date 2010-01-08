@@ -23,6 +23,11 @@ Wed Jul  5 16:16:19 2006 mazer
 
 - added =start:stop:step for inclusive ranges
 
+Thu Jan  7 17:22:10 2010 mazer
+
+- hacked labeled_load to override the Numeric array constructor
+  function to allow loading 32bit data files on 64bit machines.
+  
 """
 
 __author__   = '$Author$'
@@ -38,6 +43,7 @@ import os
 import re
 import string
 import cPickle
+import Numeric
 
 _tic = None
 
@@ -438,17 +444,52 @@ def labeled_dump(label, obj, f, bin=0):
 	f.write('<<<%s>>>\n' % label)
 	cPickle.dump(obj, f, bin)
 
+
 def labeled_load(f):
 	"""Wrapper for cPickle.load.
 
 	Inverse of labeled_dump().
 	"""
-	while 1:
-		l = f.readline()
-		if not l:
-			return None, None
-		elif l[:3] == '<<<' and l[-4:] == '>>>\n':
-			return l[3:-4], cPickle.load(f)
+
+	def local_array_constructor(shape, typecode, thestr,
+								Endian=Numeric.LittleEndian):
+
+		# try to guess the word size on the machine that
+		# pickled the data -- 'l' and 'f' are NATIVE types
+		# and native word length is not available, so we have
+		# to infer the native word length based on the actually
+		# data block size and the indicated data block size.
+		#
+		# this is FRAGILE -- could break and only handles tje
+		# two cases I'm aware of -- in general, the better
+		# solution is to never create Numeric arrays without
+		# a complete type specification -- ie, use Float32
+		# instead of Float -- and always pass in a typecode.
+
+		if typecode == 'l':
+			if Numeric.cumproduct(shape) * 4 == len(thestr):
+				typecode = Numeric.Int32
+			else:
+				typecode = Numeric.Int64
+		elif typecode == 'f':
+			if Numeric.cumproduct(shape) * 4 == len(thestr):
+				typecode = Numeric.Float32
+			else:
+				typecode = Numeric.Float64
+		return ac(shape, typecode, thestr, Endian=Endian)
+
+	try:
+		ac = Numeric.array_constructor
+		Numeric.array_constructor = local_array_constructor
+		while 1:
+			l = f.readline()
+			if not l:
+				return None, None
+			elif l[:3] == '<<<' and l[-4:] == '>>>\n':
+				return l[3:-4], cPickle.load(f)
+	finally:
+		Numeric.array_constructor = ac
+		
 
 def pp_encode(e):
 	"""Pretty-print an event list.

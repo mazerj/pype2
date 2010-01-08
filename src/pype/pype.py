@@ -306,6 +306,16 @@ Tue Jul  7 10:25:03 2009 mazer
 
 - got rid of BLOCKED -- automatically computed from sync info..
 
+
+Thu Jan  7 17:31:33 2010 mazer
+
+- added explicit typeing for c0,c1..cN numeric arrays so they
+  get properly saved/pickled by labeled_load.
+
+- At the same time changed s0 (ttl spike channel) and p0 (photo diode
+  channel) to be a list (should have been all along) to avoid problems
+  in the future.
+  
 """
 
 __author__   = '$Author$'
@@ -3104,23 +3114,23 @@ class PypeApp:
 		# signals, you'd better not set fast_tmp=1...
 		if not fast_tmp or self.show_eyetraces.get():
 			if self.rig_common.queryv('save_chn_0'):
-				c0 = zeros(n)
+				c0 = zeros(n, Numeric.Int32)
 			else:
 				c0 = None
 			if self.rig_common.queryv('save_chn_1'):
-				c1 = zeros(n)
+				c1 = zeros(n, Numeric.Int32)
 			else:
 				c1 = None
 			if self.rig_common.queryv('save_chn_2'):
-				c2 = zeros(n)
+				c2 = zeros(n, Numeric.Int32)
 			else:
 				c2 = None
 			if self.rig_common.queryv('save_chn_3'):
-				c3 = zeros(n)
+				c3 = zeros(n, Numeric.Int32)
 			else:
 				c3 = None
 			if self.rig_common.queryv('save_chn_4'):
-				c4 = zeros(n)
+				c4 = zeros(n, Numeric.Int32)
 			else:
 				c4 = None
 
@@ -3229,7 +3239,7 @@ class PypeApp:
 				   list(self.eyebuf_t),
 				   list(self.eyebuf_x), list(self.eyebuf_y),
 				   self.photo_times, self.spike_times,
-				   self.record_id, p0, s0,
+				   self.record_id, list(p0), list(s0),
 				   (c0, c1, c2, c3, c4, None, None),
 				   list(self.eyebuf_pa),
 				   self.xdacq_data_store]
