@@ -18,18 +18,34 @@ function defaults = getopts(defaults, varargin)
 %    opts = getops(opts, varargin{:});
 %    ....
 %
+%  You can also use '+foo'/'-foo' to set foo to 1/0, respectively
+%  in a single argument for ease-of-use
+%
 %
 %Tue Mar  4 15:19:19 2003 mazer 
+%
+%Tue Jan 12 10:15:15 2010 mazer 
+%  added +var/-var syntax for boolean 1/0
 
-if length(varargin) > 0 && strcmp(varargin{1}, 'help')
+if length(varargin) > 0 && strcmp(varargin{1}, '?help')
   f = fieldnames(defaults);
   for n = 1:length(f)
     disp({f{n} getfield(defaults, f{n})});
   end
   error('getopt: stopped after help');
 else
-  for n = 1:2:length(varargin)
-    defaults = setfield(defaults, varargin{n}, varargin{n+1});
+  n = 1;
+  while n <= length(varargin)
+    if varargin{n}(1) == '+'
+      defaults = setfield(defaults, varargin{n}(2:end), 1);
+      n = n + 1;
+    elseif varargin{n}(1) == '-'
+      defaults = setfield(defaults, varargin{n}(2:end), 0);
+      n = n + 1;
+    else
+      defaults = setfield(defaults, varargin{n}, varargin{n+1});
+      n = n + 2;
+    end
   end
 end
   
