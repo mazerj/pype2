@@ -17,7 +17,7 @@ install-subdirs:
 	@mkdir -p $(PYPEDIR)/pype
 	@mkdir -p $(PYPEDIR)/lib
 	@mkdir -p $(PYPEDIR)/Tasks
-	@mkdir -p $(PYPEDIR)/../p2m
+	@mkdir -p $(PYPEDIR)/p2m
 	@for i in $(SUBDIRS); \
 		do (cd $$i ; $(MAKE) install);\
 		done

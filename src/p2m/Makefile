@@ -3,7 +3,7 @@ include ../../make.defs
 P2MDIR = $(PYPEDIR)/p2m
 
 install:
-	@mkdir -p $(P2MDIR)
+	mkdir -p $(P2MDIR)
 	chmod +x pype_expander.py p2m p2mupdate pypeinfo.py \
 		p2m-ical p2m-fixes p2m-spotmap affinecal \
 		plx2mat plx2asc.py tdtgetspikes.py
