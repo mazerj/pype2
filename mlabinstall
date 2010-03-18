@@ -1,0 +1,2 @@
+#!/bin/sh
+env PYPEDIR=/auto/share/pype2/$(uname -m) ./build $*
