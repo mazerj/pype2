@@ -42,14 +42,16 @@ _debug = 0
 _show_pypedir = 0
 _showimports = 0
 
+
+
 import sys
+from platform import python_version
 import posixpath
 import os
 import glob
 import string
 import traceback
 import code
-import platform
 import imp
 
 def _addpath(d, atend=None):
@@ -134,8 +136,7 @@ if os.environ.has_key('LD_LIBRARY_PATH'):
 # now that $PYPEDIR is partially setup, pype and pype modules
 # should be importable...
 
-
-if len(sys.argv) > 1 and (sys.argv[1] == '-v' or sys.argv[1] == '--version'):
+if len(sys.argv) > 2 and (sys.argv[2] == '-v' or sys.argv[2] == '--version'):
     from pypeversion import *
     print "pype version:", PypeVersion
     print "         svn:", __revision__
@@ -184,10 +185,12 @@ if _debug:
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
     # Invoked with -s argument -- typially as pypenv
-    #   - could be eithre as script or for interactive session
+    #   - could be either as script or for interactive session
     if len(sys.argv) == 2:
         # no command line args (beyond -s) -- startup an interactive session
-        code.interact(banner='[pype interactive shell]')
+        print dir(platform)
+        sys.stdout.write('[pype ishell (python %s)]\n' % python_version())
+        code.interact(banner='')
     else:
         # with command line args -- run as script:
         #  - trim pyperun (this script) from sys.argv[] and then
