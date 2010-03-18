@@ -18,6 +18,10 @@ cross calls giving the user/programmer a matlab-like feel.
 
 **Revision History**
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -28,8 +32,8 @@ __id__       = '$Id$'
 import sys
 from gracePlot import *
 from grace_np import Disconnected
-from Numeric import *
 
+import numpy as _N
 
 _plothandle = None
 
@@ -203,18 +207,18 @@ def polar(r, theta, style='k-', err=None, degrees=1):
 
     h = graceplot().hold(1)
 
-    r = array(r)
-    theta = array(theta)
+    r = _N.array(r)
+    theta = _N.array(theta)
 
     if degrees:
-        theta = pi * (array(theta) / 180.0)
+        theta = pi * (_N.array(theta) / 180.0)
     r = resize(r, (shape(r)[0]+1,))
     theta = resize(theta, (shape(theta)[0]+1,))
     if err:
         err = resize(err, (shape(err)[0]+1,))
         
-    x = r * cos(theta)
-    y = r * sin(theta)
+    x = r * _N.cos(theta)
+    y = r * _N.sin(theta)
 
     linestyle, color, symbol = _parsestyle(style)
 
@@ -222,12 +226,12 @@ def polar(r, theta, style='k-', err=None, degrees=1):
         symbol = 1
     graceplot().plot(x, y, symbols=symbol, color=color)
     if err:
-        err = array(err)
+        err = _N.array(err)
         a = r - err
         b = r + err
         for n in range(len(r)-1):
-            x = [a[n] * cos(theta[n]), b[n] * cos(theta[n])]
-            y = [a[n] * sin(theta[n]), b[n] * sin(theta[n])]
+            x = [a[n] * _N.cos(theta[n]), b[n] * _N.cos(theta[n])]
+            y = [a[n] * _N.sin(theta[n]), b[n] * _N.sin(theta[n])]
             graceplot().plot(x, y, color=color)
     if err:
         m = max(r+err)
@@ -431,7 +435,7 @@ def _parsestyle(s):
 
 
 if __name__ == '__main__':
-    from Numeric import *
+    from numpy import *
 
     x = arange(10);
     

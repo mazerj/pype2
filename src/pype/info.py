@@ -6,6 +6,10 @@
 Wed Feb  1 09:41:40 2006 mazer
 - Print useful info about installed versions of dependent libraries
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -34,6 +38,12 @@ def libinfo():
         v['numeric'] = Numeric.__version__
     except ImportError:
         v['numeric'] = None
+
+    try:
+        import numpy
+        v['numpy'] = numpy.__version__
+    except ImportError:
+        v['numpy'] = None
 
     try:
         import pygame

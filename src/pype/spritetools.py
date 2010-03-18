@@ -64,6 +64,13 @@ Fri May 22 15:27:42 2009 mazer
 
 - added simple_rdp() function for Random Dot Patterns
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
+  - NOTE: simple_rdp seed argument changed from 2-tuple to a MT state
+    vecotr
+
 """
 
 __author__   = '$Author$'
@@ -71,13 +78,17 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-import math, sys
-from Numeric import *
-import pygame.surfarray
-from pygame.constants import *
-import sprite
-from RandomArray import uniform, seed, get_seed
+import sys
+import math
+import numpy as _N
+pi = _N.pi
 
+# force pygame.surfarray to use numpy instead of Numeric
+from pygame.constants import *
+import pygame.surfarray
+pygame.surfarray.use_arraytype('numpy')
+
+import sprite
 from guitools import Logger
 
 ##########################################################################
@@ -90,7 +101,7 @@ def _unpack_rgb(R, G, B):
 	# and convert to grating RGB (0-1) values. This one's for Jon T.
 
 	try:
-		R, G, B = array(R)/255.0
+		R, G, B = _N.array(R)/255.0
 	except TypeError:
 		pass
 	except ValueError:
@@ -104,7 +115,7 @@ def g2rgb(a):
 	This converts a shape=(W,H) array into an RGB shape=(W, H, 3) array.
 
 	"""
-	return transpose(array([a, a, a]), axes=[1,2,0])
+	return _N.transpose(_N.array([a, a, a]), axes=[1,2,0])
 
 def pixelize(a, rgb=None, norm=1):
 	"""Convert a floating point array into an UnsignedInt8 array.
@@ -122,15 +133,15 @@ def pixelize(a, rgb=None, norm=1):
 	if norm:
 		amin = min(ravel(a))
 		amax = max(ravel(a))
-		a = (1.0 + 254.0 * ((a - amin) / (amax - amin))).astype(UnsignedInt8)
+		a = (1.0 + 254.0 * ((a - amin) / (amax - amin))).astype(_N.uint8)
 	else:
-		a = a.astype(UnsignedInt8)
+		a = a.astype(_N.uint8)
 	if rgb is None:
 		return a
 	else:
 		return g2rgb(a)
 
-def genaxes(w, h=None, typecode=Float64, inverty=0):
+def genaxes(w, h=None, typecode=_N.float64, inverty=0):
 	"""Generate two Numeric vectors for sprite axes.
 
 	**w, h** - scalar values indicating the width and height of the
@@ -154,15 +165,15 @@ def genaxes(w, h=None, typecode=Float64, inverty=0):
 	"""
 	if h is None:
 		(w, h) = w						# size supplied as pair/tuple
-	x = arange(0, w) - ((w - 1) / 2.0)
+	x = _N.arange(0, w) - ((w - 1) / 2.0)
 	if inverty:
-		y = arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
+		y = _N.arange(h-1, 0-1, -1) - ((h - 1) / 2.0)
 	else:
-		y = arange(0, h) - ((h - 1) / 2.0)
-	return x.astype(typecode)[:,NewAxis],y.astype(typecode)[NewAxis,:]
+		y = _N.arange(0, h) - ((h - 1) / 2.0)
+	return x.astype(typecode)[:,_N.newaxis],y.astype(typecode)[_N.newaxis,:]
 
 
-def genrad(w, h=None, typecode=Float64):
+def genrad(w, h=None, typecode=_N.float64):
 	"""Replaces old gend() function.
 
 	**w, h** - width and height of sprite (height defaults to width)
@@ -176,11 +187,11 @@ def genrad(w, h=None, typecode=Float64):
 	x, y = genaxes(w, h)
 	return (((x**2)+(y**2))**0.5).astype(typecode)
 
-def gend(w, h=None, typecode=Float64):
+def gend(w, h=None, typecode=_N.float64):
 	"""OBSOLETE"""
 	raise SpriteObsolete, 'gend function obsolete - use genrad'
 
-def gentheta(w, h=None, typecode=Float64, degrees=None):
+def gentheta(w, h=None, typecode=_N.float64, degrees=None):
 	"""Generate 2D theta map for sprite
 
 	**w, h** - width and height of sprite (height defaults to width)
@@ -200,7 +211,7 @@ def gentheta(w, h=None, typecode=Float64, degrees=None):
 
 	"""
 	x, y = genaxes(w, h)
-	t = arctan2(y, x)
+	t = _N.arctan2(y, x)
 	if degrees:
 		t = 180.0 * t / pi
 	return t.astype(typecode)
@@ -251,11 +262,11 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	else:
 		R, G, B = _unpack_rgb(R, G, B)
 	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
-	x, y = (r * cos(t), r * sin(t))
+	t = _N.arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.
+	x, y = (r * _N.cos(t), r * _N.sin(t))
 
-	i = moddepth * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	i = moddepth * _N.sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
+	s.array[:] = _N.transpose((_N.array((R*i,G*i,B*i))+meanlum).astype(_N.uint8),
 						   axes=[1,2,0])
 
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
@@ -302,11 +313,11 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	else:
 		R, G, B = _unpack_rgb(R, G, B)
 	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
-	x, y = (r * cos(t), r * sin(t))
+	t = _N.arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	x, y = (r * _N.cos(t), r * _N.sin(t))
 
-	i = moddepth * cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	i = moddepth * _N.cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
+	s.array[:] = _N.transpose((_N.array((R*i,G*i,B*i))+meanlum).astype(_N.uint8),
 						   axes=[1,2,0])
 
 def polargrat(s, cfreq, rfreq, phase_deg, polarity, 
@@ -363,11 +374,11 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 	x, y = (polarity * s.xx/s.w, s.yy/s.h)
 
 	if logpolar:
-		z = (log(hypot(x,y)) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
+		z = (log(_N.hypot(x,y)) * cfreq) + (_N.arctan2(y,x) * rfreq / (2.0 * pi))
 	else:
-		z = (hypot(x,y) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
-	i = moddepth * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+		z = (_N.hypot(x,y) * cfreq) + (_N.arctan2(y,x) * rfreq / (2.0 * pi))
+	i = moddepth * _N.cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
+	s.array[:] = _N.transpose((_N.array((R*i,G*i,B*i))+meanlum).astype(_N.uint8),
 						   axes=[1,2,0])
 
 def logpolargrat(s, cfreq, rfreq, phase_deg, polarity,
@@ -460,12 +471,12 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 	else:
 		R, G, B = _unpack_rgb(R, G, B)
 	r = (((s.xx / s.w)**2) + ((s.yy / s.h)**2))**0.5
-	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
-	x, y = (r * cos(t), r * sin(t))
+	t = _N.arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	x, y = (r * _N.cos(t), r * _N.sin(t))
 
-	z = sqrt(fabs((x * freq) ** 2 - (y * freq) ** 2))
-	i = moddepth * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	z = _N.sqrt(_N.fabs((x * freq) ** 2 - (y * freq) ** 2))
+	i = moddepth * _N.cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
+	s.array[:] = _N.transpose((_N.array((R*i,G*i,B*i))+meanlum).astype(_N.uint8),
 						   axes=[1,2,0])
 
 
@@ -473,24 +484,24 @@ def simple_rdp(s, dir=None, vel=None, fraction=0.25,
 			   fgcolor=(255,255,255), bgcolor=(128,128,128),
 			   rseed=None):
 	if rseed:
-		old_seed = get_seed()
-		seed(rseed[0], rseed[1])
+		old_seed = _N.random.get_state()
+		_N.random.set_state(rseed)
 	if dir is None:
 		for n in range(3):
 			if n == 0:
-				m = uniform(0.0, 1.0, shape=(s.w, s.h))
-			mc = where(greater(m, fraction), bgcolor[n], fgcolor[n])
-			s.array[:,:,n] = mc[:].astype(UnsignedInt8)
+				m = _N.random.uniform(0.0, 1.0, (s.w, s.h))
+			mc = _N.where(_N.greater(m, fraction), bgcolor[n], fgcolor[n])
+			s.array[:,:,n] = mc.astype(_N.uint8)[:]
 	else:
 		dx = -int(round(vel * math.cos(math.pi * dir / 180.0)))
 		dy = int(round(vel * math.sin(math.pi * dir / 180.0)))
 		a = s.array[:,:,:]
-		a = concatenate((a[dx:,:,:],a[:dx,:,:]), axis=0)
-		a = concatenate((a[:,dy:,:],a[:,:dy,:]), axis=1)
+		a = _N.concatenate((a[dx:,:,:],a[:dx,:,:]), axis=0)
+		a = _N.concatenate((a[:,dy:,:],a[:,:dy,:]), axis=1)
 		s.array[:,:,:] = a[:]
 		
 	if rseed:
-		seed(old_seed[0], old_seed[1])
+		_N.random.set_state(old_seed)
 		
 
 def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
@@ -512,14 +523,14 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	**B** - optional B channel value
 
 	"""
-	R, G, B = (array(_unpack_rgb(R, G, B)) * 255.0).astype(Int)
+	R, G, B = (_N.array(_unpack_rgb(R, G, B)) * 255.0).astype(_N.int)
 	r = sprite.genrad(s.w, s.h)
 	t = sprite.gentheta(s.w, s.h) + (pi * ori_deg / 180.0)
-	x = r * cos(t)
-	y = r * sin(t)
+	x = r * _N.cos(t)
+	y = r * _N.sin(t)
 	s.fill((R,G,B))
-	mask = where(less(abs(x), (bw/2.0)) * less(abs(y), (bh/2.0)), 255, 0)
-	s.alpha[:] = mask[:].astype(UnsignedInt8)
+	mask = _N.where(_N.less(abs(x), (bw/2.0)) * _N.less(abs(y), (bh/2.0)), 255, 0)
+	s.alpha[:] = mask[:].astype(_N.uint8)
 
 def alphaGaussian(s, sigma):
 	"""Put symmetric Gaussian envelope into sprite's alpha channel.
@@ -534,8 +545,8 @@ def alphaGaussian(s, sigma):
 
 	"""
 	r = ((s.xx**2) + (s.yy**2))**0.5
-	i = 255.0 * exp(-((r) ** 2) / (2 * sigma**2))
-	s.alpha[:] = i[:].astype(UnsignedInt8)
+	i = 255.0 * _N.exp(-((r) ** 2) / (2 * sigma**2))
+	s.alpha[:] = i[:].astype(_N.uint8)
 
 def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 	"""Put non-symmetric Gaussian envelope into sprite's alpha channel.
@@ -553,27 +564,27 @@ def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 
 	"""
 	r = ((s.xx**2) + (s.yy**2))**0.5
-	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
-	x, y = (r * cos(t), r * sin(t))
-	i = 255.0 * exp(-(x**2) / (2*xsigma**2)) * exp(-(y**2) / (2*ysigma**2))
-	s.alpha[:] = i[:].astype(UnsignedInt8)
+	t = _N.arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
+	x, y = (r * _N.cos(t), r * _N.sin(t))
+	i = 255.0 * _N.exp(-(x**2) / (2*xsigma**2)) * _N.exp(-(y**2) / (2*ysigma**2))
+	s.alpha[:] = i[:].astype(_N.uint8)
 
 def gaussianEnvelope(s, sigma):
 	w, h = s.im.get_size()
-	x, y = sprite.genaxes(w, h, Float)
+	x, y = sprite.genaxes(w, h, _N.float)
 	r = ((x**2)+(y**2))**0.5
-	g = exp(-((r) ** 2) / (2 * sigma**2)) / sqrt(2 * pi * sigma**2);
+	g = _N.exp(-((r) ** 2) / (2 * sigma**2)) / _N.sqrt(2 * pi * sigma**2);
 
 	# note: sum(z(:)) = 1.0
-	#g = exp(-((x**2)) / (2 * sigma**2)) * \
-	#exp(-((y**2)) / (2 * sigma**2)) / (2*math.pi*sigma**2)
+	#g = _N.exp(-((x**2)) / (2 * sigma**2)) * \
+	#_N.exp(-((y**2)) / (2 * sigma**2)) / (2*math.pi*sigma**2)
 	gmax = max(reshape(g, [multiply.reduce(g.shape), 1]))
-	g = array(255.0 * g / gmax).astype('b')
+	g = _N.array(255.0 * g / gmax).astype(_N.uint8)
 	pygame.surfarray.pixels_alpha(s.im)[:] = g
 
 def image_circmask(im, x, y, r, apply):
 	(ax, ay) = sprite.genaxes(im.get_width(), im.get_height())
-	mask = where(less(((((ax-x)**2)+((ay-y)**2)))**0.5, r), 1, 0)
+	mask = _N.where(_N.less(((((ax-x)**2)+((ay-y)**2)))**0.5, r), 1, 0)
 	if apply:
 		a = pygame.surfarray.pixels2d(im)
 		a[:] = mask * a
@@ -584,7 +595,7 @@ if __name__ == '__main__':
 	#pass
 	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
 	s = Sprite(x=0, y=0, width=100, height=100, fb=fb, on=1)
-	simple_rdp(s, fraction=0.05, color=(255,255,1))
+	simple_rdp(s, fraction=0.05, fgcolor=(255,255,1))
 	for n in range(100):
 		fb.clear()
 		s.blit(flip=1)

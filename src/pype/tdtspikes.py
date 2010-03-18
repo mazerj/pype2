@@ -6,6 +6,10 @@
 Module lets you Retrieve spike timestamps from tdt datatank using
 the ttank.py network API.
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -14,7 +18,7 @@ __revision__ = '$Revision$'
 __id__       = '$Id$'
 
 import sys
-import Numeric
+import numpy as _N
 import pypedata, ttank
 import time, os, string
 
@@ -107,19 +111,17 @@ class Spikes(TDTBaseClass):
                       chan, unit, start, stop, 'ALL')
 
         # get timestamps, channel (electrode), sortnum (unit) for spikes
-        tall = Numeric.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.TIME))
-        call = Numeric.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.CHANNUM))
-        sall = Numeric.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.SORTNUM))
+        tall = _N.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.TIME))
+        call = _N.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.CHANNUM))
+        sall = _N.array(tt.invoke('ParseEvInfoV', 0, n,  ttank.SORTNUM))
         
         self.sdata = []
         for k in range(len(self.trl1)):
-            mask = Numeric.logical_and(Numeric.greater_equal(tall,
-                                                             self.trl1[k]),
-                                       Numeric.less_equal(tall,
-                                                          self.trl2[k]))
-            t = (Numeric.compress(mask, tall) - self.trl1[k]) * 1000.0
-            c = Numeric.compress(mask, call)
-            s = Numeric.compress(mask, sall)
+            mask = _N.logical_and(_N.greater_equal(tall, self.trl1[k]),
+                                 _N.less_equal(tall, self.trl2[k]))
+            t = (_N.compress(mask, tall) - self.trl1[k]) * 1000.0
+            c = _N.compress(mask, call)
+            s = _N.compress(mask, sall)
             sigs = []
             for j in range(len(s)):
                 sigs.append('%03d%c' % (c[j], chr(int(s[j])+ord('a')-1),))
@@ -162,9 +164,9 @@ class Raw(TDTBaseClass):
         tt.invoke('SetGlobalB', 'T2', stop)
         keyboard()
         print start, stop, stop-stop, 's'
-        w = Numeric.array(tt.invoke('ReadWavesV', 'RAW0'))
+        w = _N.array(tt.invoke('ReadWavesV', 'RAW0'))
         dt = float(stop-start)/float(w.shape[0])
-        t = Numeric.arange(start, stop, step=dt)
+        t = _N.arange(start, stop, step=dt)
         return t, w
 
     def dump(self, out, dump=0):

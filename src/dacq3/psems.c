@@ -60,6 +60,7 @@
 */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/sem.h>
@@ -99,7 +100,7 @@ int psem_get(int semid)
   return(semctl(semid, 0, GETVAL, 0));
 }
 
-int psem_info(int semid)
+void psem_info(int semid)
 {
   printf("%d waiting\n", semctl(semid, 0, GETNCNT, 0));
   printf("last pid = %d\n", semctl(semid, 0, GETPID, 0));

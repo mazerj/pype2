@@ -83,8 +83,8 @@ docs:
 		grep -v __init__.py | \
 		xargs epydoc --docformat "restructuredtext en" --html \
 		      --simple-term --parse-only -v --no-private \
-		      -o $(PYPEDIR)/docs -n pype
-	date > $(PYPEDIR)/docs/GENERATED
+		      -o $(PYPEDIR)/../docs -n pype
+	date > $(PYPEDIR)/../docs/GENERATED
 
 
 

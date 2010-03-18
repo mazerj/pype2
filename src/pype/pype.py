@@ -315,6 +315,11 @@ Thu Jan  7 17:31:33 2010 mazer
 - At the same time changed s0 (ttl spike channel) and p0 (photo diode
   channel) to be a list (should have been all along) to avoid problems
   in the future.
+
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+  
   
 """
 
@@ -342,43 +347,45 @@ import time
 import math
 import cPickle
 import thread
-from types import *
+import types
 from Tkinter import *
-try:
-	import Pmw
-except ImportError:
-	Pmw = None
+import Pmw
 
 try:
-	from Numeric import *
+	# SOMETHING'S OVERWRITING N WITH A STRING!!
+	# always use _N to access numpy/Numeric functions!!
+	import numpy as _N					# this one's for pype
+	from numpy import *					# this one's for tasks..
 except ImportError:
-	sys.stderr.write('missing `Numeric` package.\n' % __name__)
+	sys.stderr.write('missing `numpy` package.\n' % __name__)
 	sys.exit(1)
 
 #####################################################################
 #  import frequently accessed pype modules
 #####################################################################
 from pypedebug import *
-from rootperm import *
 from pype_aux import *
 from ptable import *
-from beep import *
 from sprite import *
 from events import *
 from guitools import *
 from dacq import *
 from pypeerrors import *
-from candy import bounce, slideshow
-import PlexHeaders, PlexNet, pype2tdt
-from info import print_version_info
+
+from beep import beep
+import PlexHeaders
+import PlexNet
+import pype2tdt
+import rootperm
+import info
 import filebox
 import userdpy
 import pypeversion
 import configvars
-
+import candy
 import prand
 if not prand.validate():
-	sys.stderr.write('Invalid Mersenne Twister implmentation!!!!\n')
+	sys.stderr.write('Invalid Mersenne Twister implmentation.')
 	sys.exit(1)
 
 def pypeapp():
@@ -423,12 +430,6 @@ class PypeApp:
 		really require some sort of underlying locking method to prevent
 		collision.
 		"""
-
-		# need Pmw (python megawidgets Tkinter addon) for gui
-		if Pmw is None:
-			sys.stderr.write('%s: missing `Pmw` package\n' % __name__)
-			raise FatalPypeError
-
 		# no console window to start with..
 		self.conwin = None
 
@@ -549,13 +550,8 @@ class PypeApp:
 		if self.config.iget('SPLASH'):
 			splash()
 
-		font = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
-		#font = '-*-helvetica-bold-r-*-*-12-*-*-*-*-*-iso8859-*'
-		self.tk.option_add('*Font', font)
-		
 		fixed = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
 		self.tk.option_add('*Font', fixed)
-
 
 		if sys.platform == 'darwin':
 			self.tk.geometry("+0+20")
@@ -903,14 +899,14 @@ class PypeApp:
 
 		self._candy = 0
 		b = Button(c3pane, text="bounce",
-				   command=lambda s=self: bounce(s),
+				   command=lambda s=self: candy.bounce(s),
 				   bg='white')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "following the bouncing ball")
 		self._button_bounce = b
 
 		b = Button(c3pane, text="slides",
-				   command=lambda s=self: slideshow(s),
+				   command=lambda s=self: candy.slideshow(s),
 				   bg='white')
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "slide show from $(PYPERC)/candy.lst")
@@ -1097,7 +1093,7 @@ class PypeApp:
 		self.led(0)
 
 		# make sure we're root, if possible
-		root_take()
+		rootperm.root_take()
 
 		check = self.config.get('ISCAN_DEV')
 		if check and len(check) == 0:
@@ -1172,7 +1168,7 @@ class PypeApp:
 		# automatically.. so make sure you start the dacq process
 		# first (see above).
 
-		root_drop()
+		rootperm.root_drop()
 		if self.config.iget('NO_AUDIO'):
 			from beep import _Beeper
 			_Beeper(disable=1)
@@ -1186,8 +1182,8 @@ class PypeApp:
 			else:
 				# default for linux...
 				audiodriver = 'alsa'
-			beep(driver=audiodriver)
-		root_take()
+			beep(init=1, driver=audiodriver)
+		rootperm.root_take()
 
 		self.init_framebuffer()
 
@@ -1210,7 +1206,7 @@ class PypeApp:
 		#  dropping root access causes the ALSA libs to bitch. I'm
 		#  not sure what the problem is, but we're generally having
 		#  also of sound problems recently..
-		root_drop()
+		rootperm.root_drop()
 		Logger('pype: dropped root access\n')
 
 
@@ -1314,7 +1310,7 @@ class PypeApp:
 			   'pype: CWD=%s\n' % os.getcwd())
 		
 		if debug():
-			print_version_info()
+			info.print_version_info()
 
 		if dacq_jsbut(-1):
 			self.console.writenl("warning: joystick replaces bar input",
@@ -1368,7 +1364,7 @@ class PypeApp:
 		if not (led is -1):		self.led(led)
 
 	def drawledbar(self):
-		x = ("[ ]", "[*]")
+		x = ("[^]", "[v]")
 		t = x[dacq_bar()] + x[dacq_sw1()] + x[dacq_sw2()]
 		if dacq_jsbut(-1):
 			t = t + " ("
@@ -1467,11 +1463,11 @@ class PypeApp:
 		s = s + '\ntotal: %d trials\n\n' % ntot
 
 		try:
-			N = len(self.tally_recent)
-			for n in range(N):
+			nrecent = len(self.tally_recent)
+			for n in range(nrecent):
 				if n == 0:
 					s = s + 'History\n'
-				s = s + '%d: %s\n' % (-(N-n), self.tally_recent[n])
+				s = s + '%d: %s\n' % (-(nrecent-n), self.tally_recent[n])
 		except AttributeError:
 			pass
 
@@ -2124,7 +2120,7 @@ class PypeApp:
 		This is the veridical time in ms...
 
 		"""
-		return dacq_ts()
+		return dacq_ts_f()
 
 	def status(self, s):
 		"""Set the GUI status message (eg, 'running', 'busy', 'idle' etc)."""
@@ -2140,7 +2136,7 @@ class PypeApp:
 
 		"""
 
-		ts = dacq_ts()
+		ts = dacq_ts_f()
 		if (self._last_eyepos) is None or (ts > self._last_eyepos):
 			self._eye_x = dacq_eye_read(0)
 			self._eye_y = dacq_eye_read(1)
@@ -2942,17 +2938,17 @@ class PypeApp:
 			try:
 				l = self._last_recstate
 			except:
-				self._last_recstate = dacq_ts()
+				self._last_recstate = dacq_ts_f()
 
 			if self.xdacq is 'plexon':
 				warn = 1
-				while (dacq_ts() - self._last_recstate) < 250:
+				while (dacq_ts_f() - self._last_recstate) < 250:
 					if warn:
 						sys.stderr.write('warning: short ITI, stalling\n')
 						warn = 0
 			# this is causing a wedge!!!
 			dacq_dig_out(2, state)
-			self._last_recstate = dacq_ts()
+			self._last_recstate = dacq_ts_f()
 		if state:
 			self.record_led.configure(fg='blue')
 		else:
@@ -2995,8 +2991,8 @@ class PypeApp:
 
 		"""
 
-		t = dacq_ts()
-		if type(code) is TupleType:
+		t = dacq_ts_f()
+		if type(code) is types.TupleType:
 			for c in code:
 				self.record_buffer.append((t, c))
 		else:
@@ -3021,11 +3017,11 @@ class PypeApp:
 
 		"""
 		n = dacq_adbuf_size()
-		t = zeros(n)
-		s0 = zeros(n)
+		t = _N.zeros(n)
+		s0 = _N.zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i)
+			t[i] = dacq_adbuf_t_f(i)
 			s0[i] = dacq_adbuf_c3(i)
 
 		spike_thresh = int(self.rig_common.queryv('spike_thresh'))
@@ -3049,12 +3045,12 @@ class PypeApp:
 
 		"""
 		n = dacq_adbuf_size()
-		t = zeros(n)
-		x = zeros(n)
-		y = zeros(n)
+		t = _N.zeros(n)
+		x = _N.zeros(n)
+		y = _N.zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i)
+			t[i] = dacq_adbuf_t_f(i)
 			x[i] = dacq_adbuf_x(i)
 			y[i] = dacq_adbuf_y(i)
 
@@ -3066,11 +3062,11 @@ class PypeApp:
 
 		"""
 		n = dacq_adbuf_size()
-		t = zeros(n)
-		p = zeros(n)
+		t = _N.zeros(n)
+		p = _N.zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i)
+			t[i] = dacq_adbuf_t_f(i)
 			p[i] = dacq_adbuf_c2(i)
 
 		return (t, p)
@@ -3096,46 +3092,46 @@ class PypeApp:
 			fast_tmp = 0
 
 		# force taskinfo to be a tuple..
-		if type(taskinfo) != TupleType:
+		if type(taskinfo) != types.TupleType:
 			taskinfo = (taskinfo,)
 
 		# stop eye recording, just in case user forgot.
 		self.eyetrace(0)
 
 		n = dacq_adbuf_size()
-		self.eyebuf_t = zeros(n)
-		self.eyebuf_x = zeros(n)
-		self.eyebuf_y = zeros(n)
-		self.eyebuf_pa = zeros(n)
-		p0 = zeros(n)
-		s0 = zeros(n)
+		self.eyebuf_t = _N.zeros(n)
+		self.eyebuf_x = _N.zeros(n)
+		self.eyebuf_y = _N.zeros(n)
+		self.eyebuf_pa = _N.zeros(n)
+		p0 = _N.zeros(n)
+		s0 = _N.zeros(n)
 
 		# be careful here -- if you're trying to look at the photodiode
 		# signals, you'd better not set fast_tmp=1...
 		if not fast_tmp or self.show_eyetraces.get():
 			if self.rig_common.queryv('save_chn_0'):
-				c0 = zeros(n, Numeric.Int32)
+				c0 = _N.zeros(n, _N.int32)
 			else:
 				c0 = None
 			if self.rig_common.queryv('save_chn_1'):
-				c1 = zeros(n, Numeric.Int32)
+				c1 = _N.zeros(n, _N.int32)
 			else:
 				c1 = None
 			if self.rig_common.queryv('save_chn_2'):
-				c2 = zeros(n, Numeric.Int32)
+				c2 = _N.zeros(n, _N.int32)
 			else:
 				c2 = None
 			if self.rig_common.queryv('save_chn_3'):
-				c3 = zeros(n, Numeric.Int32)
+				c3 = _N.zeros(n, _N.int32)
 			else:
 				c3 = None
 			if self.rig_common.queryv('save_chn_4'):
-				c4 = zeros(n, Numeric.Int32)
+				c4 = _N.zeros(n, _N.int32)
 			else:
 				c4 = None
 
 			for i in range(0,n):
-				self.eyebuf_t[i] = dacq_adbuf_t(i)
+				self.eyebuf_t[i] = dacq_adbuf_t_f(i)
 				self.eyebuf_x[i] = dacq_adbuf_x(i)
 				self.eyebuf_y[i] = dacq_adbuf_y(i)
 				self.eyebuf_pa[i] = dacq_adbuf_pa(i)
@@ -3151,6 +3147,20 @@ class PypeApp:
 					c3[i] = dacq_adbuf_c3(i)
 				if not c4 is None:
 					c4[i] = dacq_adbuf_c4(i)
+
+		if 0:
+			# look for glitches!!!
+			t = _N.array(self.eyebuf_t);
+			bins = range(20)
+			counts, bins = histogram(diff(t), bins=bins)
+			print "[dts] ",
+			for nb in range(len(counts)):
+				print "%2d:%3d" % (bins[nb], counts[nb]),
+			print
+			f = open('/tmp/foo.asc', 'w')
+			for n in range(len(t)):
+				f.write('%f %f\n' % (n, t[n]))
+			f.close
 
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
@@ -3196,9 +3206,9 @@ class PypeApp:
 			#						taskinfo can be ANYTHING user wants to
 			#						save in the datafile
 			#  rec[2]		event LIST: [(time, event), (time, event) ...]
-			#  rec[3]		time VECTOR (numeric array)
-			#  rec[4]		eye x-pos VECTOR (numeric array)
-			#  rec[5]		eye y-pos VECTOR (numeric array)
+			#  rec[3]		time VECTOR (numeric array->list)
+			#  rec[4]		eye x-pos VECTOR (numeric array->list)
+			#  rec[5]		eye y-pos VECTOR (numeric array->list)
 			#  rec[6]		LIST of photodiode time stamps
 			#  rec[7]		LIST of spike time stamps
 			#  rec[8]		record_id (SCALAR; auto incr'd after each write)
@@ -3235,18 +3245,32 @@ class PypeApp:
 				info[2]['tdt_block'] = str(block.encode('ascii'))
 				info[2]['tdt_tnum'] = tnum
 
-			rec = [ENCODE, info, self.record_buffer,
-				   list(self.eyebuf_t),
-				   list(self.eyebuf_x), list(self.eyebuf_y),
-				   self.photo_times, self.spike_times,
-				   self.record_id, list(p0), list(s0),
-				   (c0, c1, c2, c3, c4, None, None),
-				   list(self.eyebuf_pa),
-				   self.xdacq_data_store]
-
-				   # note the None's in the line above are logical
-				   # place holders for c2,c3, which are hardcoded
-				   # as p0 and s0
+			# make sure these are native python types before pickling.
+			if not p0 is None: p0 = list(p0)
+			if not s0 is None: s0 = list(s0)
+			
+			if not c0 is None: c0 = list(c0)
+			if not c1 is None: c1 = list(c1)
+			if not c2 is None: c2 = list(c2)
+			if not c3 is None: c3 = list(c3)
+			if not c4 is None: c4 = list(c4)
+				
+			rec = [
+				ENCODE,					# named tag (for labeled_load)
+				info,					# useful info about data srcs
+				self.record_buffer,		# encode stream
+				list(self.eyebuf_t),	# time vector (ms)
+				list(self.eyebuf_x),	# x eye pos (pixels)
+				list(self.eyebuf_y),	# y eye pos (pixels)
+				self.photo_times,		# photodiode time stamps
+				self.spike_times,		# spike/ttl type stamps
+				self.record_id,			# record number (incremented after each trial)
+				p0,								  # photo diode trace
+				s0,								  # spike/ttl trace
+				(c0, c1, c2, c3, c4, None, None), # None's are place holders for c2,c3 (aka p0, s0)
+				list(self.eyebuf_pa),			  # pupil area
+				self.xdacq_data_store			  # optional stuff from xdacq module
+				]
 
 			f = open(self.record_file, 'a')
 			labeled_dump('encode', rec, f, 1)
@@ -3482,7 +3506,7 @@ class PypeApp:
 			if raster:
 				# stop xmgrace error message for empty rasters..
 				if len(raster) > 1:
-					raster = array(raster) - t0
+					raster = _N.array(raster) - t0
 					iplot.subplot(nplots, 1, pnum)
 					iplot.plot(raster, 0.0 * raster, 'o')
 					iplot.yrange(-1,1)
@@ -3886,14 +3910,14 @@ class Timer:
 		self.reset()
 
 	def reset(self):
-		self._start_at = dacq_ts()
+		self._start_at = dacq_ts_f()
 
 	def ms(self):
-		return dacq_ts() - self._start_at
+		return dacq_ts_f() - self._start_at
 
 	def us(self):
 		Logger("pype: warning -- timer.us method obsolete, faking it\n")
-		return 1000 * (dacq_ts() - self._start_at)
+		return 1000 * (dacq_ts_f() - self._start_at)
 
 class Holder:
 	"""Dummy class

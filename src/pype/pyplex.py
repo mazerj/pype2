@@ -45,6 +45,10 @@ Sun Sep 22 17:58:00 2002 mazer ::
 
 - Extensive revision (almost rewrote from scratch).
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -55,7 +59,6 @@ __id__       = '$Id$'
 import sys
 import struct
 import cPickle
-import Numeric
 
 from pype import *
 
@@ -116,6 +119,8 @@ class Header:
 
 class PlexonRecord:
 	def __init__(self, fp, waveforms=None):
+		import numpy as _N
+		
 		self.typecode = readbytes(fp, 1, 'int16')
 		self.upperbyte = readbytes(fp, 1, 'int16')
 		self.timestamp = readbytes(fp, 1, 'int32')
@@ -129,7 +134,7 @@ class PlexonRecord:
 		if nwords > 0:					# read waveform, if any
 			w = readbytes(fp, nwords, 'int16')
 			if waveforms:
-				self.waveform = Numeric.array(w)
+				self.waveform = _N.array(w)
 
 class Plexondata:
 	STARTCHANNEL = 258

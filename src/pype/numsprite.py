@@ -357,10 +357,10 @@ def testset():
 	fb.clear((128,128,128))
 
 	if 1:
-		N = 200
+		NN = 200
 		for num in [1, 0]:
 			start = time.time()
-			for n in range(N):
+			for n in range(NN):
 				if num:
 					s = NumSprite(x=0, y=0, width=25, height=25, fb=fb)
 				else:
@@ -370,7 +370,7 @@ def testset():
 				s.blit()
 				fb.flip()
 			stop = time.time()
-			print 'num=%d' % num, N/(stop-start), 'fps'
+			print 'num=%d' % num, NN/(stop-start), 'fps'
 
 	if 0:
 		s = NumSprite(x=0, y=0, fname='testpat.png', fb=fb)

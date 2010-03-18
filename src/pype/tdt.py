@@ -44,6 +44,13 @@ Socket Classes derrived from::
    Socket utilities class by Amey R Pathak
    src: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/200946
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
+  - actually, just removed references to Numeric/numpy -- I think it's
+    not longer used..
+
 """
 
 raise Exception('tdt', 'tdt module is obsolete -- use tdt2')
@@ -68,11 +75,6 @@ try:
 	import win32com.client
 except ImportError:
 	pass								# only works on windows machines..
-
-try:
-	from Numeric import *
-except ImportError:
-	pass
 
 class TDTError(Exception): pass
 
@@ -143,9 +145,9 @@ class _Socket:
 		if not len(buf):
 			raise EOFError, '_Socket.Receive()'
 		else:
-			N = struct.unpack('!I', buf)[0]
+			ssize = struct.unpack('!I', buf)[0]
 			data = ''
-			while len(data) < N:
+			while len(data) < ssize:
 				packet = self._recv(size)
 				data = data + packet
 			return data

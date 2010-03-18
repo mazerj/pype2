@@ -19,6 +19,10 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
  - added sparseness()
  
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -26,13 +30,7 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-from griddata import griddata
-
-try:
-	import Numeric
-except ImportError:
-	raise ImportError, "%s requires Python Numeric installation" % __file__
-
+import numpy as _N
 
 def find(boolvec):
 	"""Find indices of all TRUE elements in boolvec.
@@ -44,21 +42,21 @@ def find(boolvec):
 	to select all elements of x greater than zero..
 	
 	"""
-	return Numeric.compress(boolvec, Numeric.arange(len(boolvec)))
+	return _N.compress(boolvec, _N.arange(len(boolvec)))
 
 def mean(v):
 	"""Compute mean of vector."""
-	if not type(v) == Numeric.ArrayType:
-		v = Numeric.array(v, 'f')
-	return Numeric.sum(v) / float(len(v))
+	if not type(v) == _N.ndarray:
+		v = _N.array(v, 'f')
+	return _N.sum(v) / float(len(v))
 
 def std(v):
 	"""Compute standard deviation of vector."""
 	if len(v) > 0:
-		if not type(v) == Numeric.ArrayType:
-			v = Numeric.array(v, 'f')
-		m = Numeric.sum(v) / float(len(v))
-		return Numeric.sum(((v-m)**2)/(float(len(v))-1))**0.5
+		if not type(v) == _N.ndarray:
+			v = _N.array(v, 'f')
+		m = _N.sum(v) / float(len(v))
+		return _N.sum(((v-m)**2)/(float(len(v))-1))**0.5
 	return 0.0
 
 def sem(v, sig=None):
@@ -72,14 +70,14 @@ def sem(v, sig=None):
 
 def zeros(v):
 	"""Count number of zero entries in vector"""
-	if not type(v) == Numeric.ArrayType:
-		v = Numeric.array(v, 'f')
-	return len(v)-len(Numeric.nonzero(v))
+	if not type(v) == _N.ndarray:
+		v = _N.array(v, 'f')
+	return len(v)-len(_N.nonzero(v))
 
 def diff(v):
 	"""Compute first derivate of vector."""
-	if not type(v) == Numeric.ArrayType:
-		v = Numeric.array(v, 'f')
+	if not type(v) == _N.ndarray:
+		v = _N.array(v, 'f')
 	return v[1::]-v[0:-1:]
 
 def diff2(v):
@@ -93,18 +91,18 @@ def smooth1(yi, ksize=3):
 	Simple smoothing function (eg, for PSTHs).
 	NOTE: Kernel length is actually (2*ksize)+1
 	"""
-	yo = Numeric.array(yi)
+	yo = _N.array(yi)
 	for i in range(0, len(yi)):
 		a, b = max(0, i - ksize), min(len(yi), i + ksize)
-		yo[i] = Numeric.sum(yo[a:b])/(b - a)
+		yo[i] = _N.sum(yo[a:b])/(b - a)
 	return yo
 
 def smooth(v, kn=1):
 	"""Smooth vector kn=1 --> 3pt average."""
-	if not type(v) == Numeric.ArrayType:
-		v = Numeric.array(v, 'f')
+	if not type(v) == _N.ndarray:
+		v = _N.array(v, 'f')
 	n = len(v)
-	vout = Numeric.zeros(v.shape)
+	vout = _N.zeros(v.shape)
 	for ix in range(0, n):
 		a = ix - kn
 		if a < 0:
@@ -117,19 +115,19 @@ def smooth(v, kn=1):
 
 def decimate(v, n):
 	"""Decimate/downsample vector by n"""
-	if not type(v) == Numeric.ArrayType:
-		v = Numeric.array(v, 'f')
-	return Numeric.take(v, range(0,len(v),n))
+	if not type(v) == _N.ndarray:
+		v = _N.array(v, 'f')
+	return _N.take(v, range(0,len(v),n))
 
 def sparseness(v):
 	"""Compute sparseness of vector."""
-	if not type(v) == Numeric.ArrayType:
-		v = Numeric.array(v, 'f')
+	if not type(v) == _N.ndarray:
+		v = _N.array(v, 'f')
 	n = float(len(v));
-	if Numeric.sum(v) == 0:
+	if _N.sum(v) == 0:
 		return 0
 	else:
-		a = ((Numeric.sum(v) / n) ** 2.0) / (Numeric.sum((v**2.0) / n))
+		a = ((_N.sum(v) / n) ** 2.0) / (_N.sum((v**2.0) / n))
 		return ((1.0 - a) / (1.0 - (1.0 / n)))
 
 def nanround(n, digits=0):

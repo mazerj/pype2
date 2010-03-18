@@ -65,8 +65,7 @@ libezV24-0.0.3/libezV24-0.a:
 dacq.c: dacq.h
 
 dacq.i: dacq.h
-	@echo %module dacq >dacq.i
-	@cat dacq.h >>dacq.i
+	@cat _dacq.i dacq.h >>dacq.i
 	@echo "Made dacq.i"
 
 dacq_wrap.c: dacq.i
@@ -96,8 +95,9 @@ comedi_test:
 
 
 clean:
-	@rm -f *.o _dacqmodule.so *.i *.pyc _dacqmodule \
+	@rm -f *.o _dacqmodule.so *.pyc _dacqmodule \
 		*_server *_wrap.* .*~ dacq.py
+	@rm -f dacq.i
 	(cd libezV24-0.0.3 ; $(MAKE) clean)
 	@rm -f libezV24-0.0.3/libezV24-0.a
 	@rm -f das16_server comedi_server das08_server _dacqmodule.so 

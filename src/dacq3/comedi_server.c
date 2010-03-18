@@ -82,7 +82,7 @@ static int analog_range;
 	
 static int comedi_init()
 {
-  char *devname;
+  const char *devname;
   comedi_range *r;
   int n;
 
@@ -211,7 +211,8 @@ static int ad_in(int chan)
 
 static void dig_in()
 {
-  int i, success, bits, last;
+  int i, success, last;
+  unsigned int bits;
 
   if (dummymode) {
     // just lock these down -- polarities are
@@ -248,7 +249,7 @@ static void dig_in()
 
 static void dig_out()
 {
-  int bits = 0;
+  unsigned int bits = 0;
   int i, success;
 
   if (dummymode) {

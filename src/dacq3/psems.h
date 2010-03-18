@@ -13,7 +13,7 @@ extern int psem_init(int key);
 extern int psem_free(int semid);
 extern int psem_set(int semid, int value);
 extern int psem_get(int semid);
-extern int psem_info(int semid);
+extern void psem_info(int semid);
 extern int psem_incr(int semid);
 extern int psem_incr_mine(int semid);
 extern int psem_decr(int semid);

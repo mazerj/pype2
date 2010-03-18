@@ -28,6 +28,16 @@ Thu Jan  7 17:22:10 2010 mazer
 - hacked labeled_load to override the Numeric array constructor
   function to allow loading 32bit data files on 64bit machines.
   
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
+  - actually there's no real numpy/Numeric code here -- Numeric
+    is only here to handle loading pickle'd datafiles containing
+    Numeric arrays. Numeric needs to be hot-patched during the
+	load process to make cross-arch (32-64bit) support work. See
+	comment above.
+
 """
 
 __author__   = '$Author$'
@@ -43,6 +53,9 @@ import os
 import re
 import string
 import cPickle
+
+# Numeric is imported here (as opposed to numpy) only to load
+# pre-numpy datafiles...
 import Numeric
 
 _tic = None

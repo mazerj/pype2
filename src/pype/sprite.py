@@ -92,6 +92,10 @@ Fri Apr 17 10:45:46 2009 mazer
   - FrameBuffer.syncinfo is stashed to allow UserDisplay to automatically
     mark the sync spot location on the screen..
 
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -107,9 +111,10 @@ import types
 import math
 import copy
 import exceptions
+import string
 
-from Numeric import *
-from RandomArray import uniform
+import numpy as _N
+
 try:
 	import pygame
 except ImportError:
@@ -122,12 +127,14 @@ import pygame.mouse
 import pygame.image
 import pygame.font
 import pygame.draw
-import pygame.surfarray
 import pygame.transform
 import pygame.movie
 from pygame.constants import *
 import PIL.Image, PIL.ImageTk
 
+# force pygame.surfarray to use numpy instead of Numeric
+import pygame.surfarray
+pygame.surfarray.use_arraytype('numpy')
 
 import pype
 from rootperm import root_take, root_drop
@@ -1076,8 +1083,8 @@ class _SurfArrayAccess:
 
 	def __setitem__(self, idx, value):
 		array = self.setfn(self.im)
-		if type(value) is arraytype:
-			array[idx] = value.astype(array.typecode())
+		if type(value) is _N.ndarray:
+			array[idx] = value.astype(type(array))
 		else:
 			array[idx] = value
 
@@ -1426,10 +1433,10 @@ class Sprite(_ImageBase):
 		"""
 		for n in range(3):
 			if color or n == 0:
-				m = uniform(1, 255, shape=(self.w, self.h))
+				m = _N.random.uniform(1, 255, (self.w, self.h))
 				if not thresh is None:
-					m = where(greater(m, thresh*255), 255, 1)
-			self.array[:,:,n] = m[:].astype(UnsignedInt8)
+					m = _N.where(_N.greater(m, thresh*255), 255, 1)
+			self.array[:,:,n] = m[:].astype(_N.uint8)
 		
 
 	def circlefill(self, color, r=None, x=None, y=None, width=0):
@@ -1504,9 +1511,9 @@ class Sprite(_ImageBase):
 			surf.set_palette(((0, 0, 0), color))
 		except TypeError:
 			surf.set_palette(((0, 0, 0), color[0:3]))
-		axis = (arange(r*2,typecode=Int)-(r-0.5))**2
-		mask = sqrt(axis[NewAxis,:] + axis[:,NewAxis])
-		mask = less(mask, r)
+		axis = (arange(r*2, _N.int) - (r-0.5))**2
+		mask = _N.sqrt(axis[_N.newaxis,:] + axis[:,_N.newaxis])
+		mask = _N.less(mask, r)
 
 		pygame.surfarray.blit_array(surf, mask)			#apply circle data
 		surf.set_colorkey(0, RLEACCEL)					#make transparent
@@ -1732,7 +1739,7 @@ class Sprite(_ImageBase):
 
 	def circmask(self, x, y, r):
 		"""hard vignette in place - was image_circmask"""
-		mask = where(less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
+		mask = _N.where(_N.less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
 		a[:] = mask * a
 
@@ -1751,8 +1758,8 @@ class Sprite(_ImageBase):
 
 		**returns** - None
 		"""
-		d = where(less((((self.ax-x)**2)+((self.ay+y)**2))**0.5, r),
-				  255, 0).astype(UnsignedInt8)
+		d = _N.where(_N.less((((self.ax-x)**2)+((self.ay+y)**2))**0.5, r),
+				  255, 0).astype(_N.uint8)
 		self.alpha[:] = d
 
 	def alpha_gradient(self, r1, r2, x=0, y=0):
@@ -1772,8 +1779,8 @@ class Sprite(_ImageBase):
 		"""
 		d = 255 - (255 * (((((self.ax-x)**2)+\
 							((self.ay+y)**2))**0.5)-r1) / (r2-r1))
-		d = where(less(d, 0), 0,
-				  where(greater(d, 255), 255, d)).astype(UnsignedInt8)
+		d = _N.where(_N.less(d, 0), 0,
+				  _N.where(_N.greater(d, 255), 255, d)).astype(_N.uint8)
 		self.alpha[:] = d
 
 	def alpha_gradient2(self, r1, r2, bg, x=0, y=0):
@@ -1792,19 +1799,19 @@ class Sprite(_ImageBase):
 		**returns** - None
 
 		"""
-		d = 1.0 - ((hypot(self.ax-x, self.ay+y) - r1) / (r2 - r1))
+		d = 1.0 - ((_N.hypot(self.ax-x, self.ay+y) - r1) / (r2 - r1))
 		alpha = clip(d, 0.0, 1.0)
 		i = pygame.surfarray.pixels3d(self.im)
-		alpha = transpose(array((alpha,alpha,alpha)), axes=[1,2,0])
+		alpha = _N.transpose(_N.array((alpha,alpha,alpha)), axes=[1,2,0])
 		if _is_seq(bg):
-			bgi = zeros(i.shape)
+			bgi = _N.zeros(i.shape)
 			bgi[:,:,0] = bg[0]
 			bgi[:,:,1] = bg[1]
 			bgi[:,:,2] = bg[2]
 		else:
 			bgi = bg
-		i[:] = ((alpha * i.astype(Float)) +
-				((1.0-alpha) * bgi)).astype(UnsignedInt8)
+		i[:] = ((alpha * i.astype(_N.float)) +
+				((1.0-alpha) * bgi)).astype(_N.uint8)
 		self.alpha[:] = 255;
 
 	def dim(self, mult, meanval=128.0):
@@ -1827,7 +1834,7 @@ class Sprite(_ImageBase):
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
 		pixs[:] = (float(meanval) + ((1.0-mult) * \
-			   (pixs.astype(Float)-float(meanval)))).astype(UnsignedInt8)
+			   (pixs.astype(_N.float)-float(meanval)))).astype(_N.uint8)
 
 	def thresh(self, threshval):
 		"""Threshold sprite image data
@@ -1841,7 +1848,7 @@ class Sprite(_ImageBase):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[:] = where(less(pixs, threshval), 1, 255).astype(UnsignedInt8)
+		pixs[:] = _N.where(_N.less(pixs, threshval), 1, 255).astype(_N.uint8)
 
 	def on(self):
 		"""Turn sprite on

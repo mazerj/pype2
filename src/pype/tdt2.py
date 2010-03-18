@@ -92,9 +92,9 @@ class MySocket:
         buf = self.sockfd.recv(struct.calcsize('!I'))
         if len(buf) == 0:
             return None
-        N = struct.unpack('!I', buf)[0]
+        ssize = struct.unpack('!I', buf)[0]
         data = ''
-        while len(data) < N:
+        while len(data) < ssize:
             packet = self.sockfd.recv(packetsize)
             data = data + packet
         return data

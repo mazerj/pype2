@@ -543,6 +543,24 @@ unsigned long dacq_ts(void)
   return(i);
 }
 
+double dacq_ts_f(void)
+{
+  unsigned long i;
+  /* If a dacq driver is loaded and running, get current das_server
+     timestamp, otherwise, use the system clock and get it yourself..
+     NOTE: it's in msec
+  */
+  LOCK(semid);
+
+  if (dacq_data && dacq_data->das_ready) {
+    i = dacq_data->timestamp;
+  } else {
+    i = timestamp(0);
+  }
+  UNLOCK(semid);
+  return((double)i);
+}
+
 int dacq_bar(void)
 {
   /* note: digital 1 (high) is pressed */
@@ -770,6 +788,16 @@ unsigned long dacq_adbuf_t(int ix)
   i = dacq_data->adbuf_t[ix];
   UNLOCK(semid);
   return(i);
+}
+
+double dacq_adbuf_t_f(int ix)
+{
+  unsigned long i;
+
+  LOCK(semid);
+  i = dacq_data->adbuf_t[ix];
+  UNLOCK(semid);
+  return((double)i);
 }
 
 int dacq_adbuf_x(int ix)

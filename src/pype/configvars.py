@@ -54,7 +54,7 @@ def defaults(srcfile):
     c.set('FLIP_BAR', '0')              # flip response  bar input polarity
     c.set('FLIP_SW1', '0')              # flip user switch 1 input polarity
     c.set('FLIP_SW2', '0')              # flip user switch 1 input polarity
-    c.set('ENABLE_SW1', '1')            # enable/disable SW1
+    c.set('ENABLE_SW1', '0')            # enable/disable SW1
     c.set('JUICEBUTTON', '1')           # if 1, SW1 triggers a *reward*
     c.set('JUICESWITCH', '1')           # if 1, SW1 opens/closes solenoid
     c.set('REWARD_BEEP', '1')           # beep when giving rewards?

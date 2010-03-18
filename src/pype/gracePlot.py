@@ -57,6 +57,11 @@ graphs) then gracePlot will have NO KNOWLEDGE of the changes.  This should not
 often be an issue, since the only state that gracePlot saves is the number and
 layout of graphs, the number of Sets that each graph has, and the hold state
 for each graph.
+
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -69,9 +74,8 @@ __xx_author__ = "Nathaniel Gray <n8gray@caltech.edu>"
 __xx_date__ = "September 16, 2001"
 
 import grace_np
-import Numeric, string
-_N = Numeric
-del Numeric
+import string
+import numpy as _N
 
 try:
     from Scientific.Statistics.Histogram import Histogram
@@ -363,12 +367,12 @@ class graceGraph:
         if edges:
             # x_min and x_max are the outside edges of the first/last bins
             binwidth = (x_max-x_min)/float(len(y))
-            edge_x = _N.arange(len(y)+1 , typecode='d')*binwidth + x_min
+            edge_x = _N.arange(len(y)+1)*binwidth + x_min
             cent_x = (edge_x + 0.5*binwidth)[0:-1]
         else:
             # x_min and x_max are the centers of the first/last bins
             binwidth = (x_max-x_min)/float(len(y)-1)
-            cent_x = _N.arange(len(y), typecode='d')*binwidth + x_min
+            cent_x = _N.arange(len(y))*binwidth + x_min
             edge_x = cent_x - 0.5*binwidth
             edge_x = _N.resize(edge_x, (len(cent_x)+1,))
             edge_x[-1] = edge_x[-2] + binwidth

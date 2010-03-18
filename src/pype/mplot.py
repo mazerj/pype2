@@ -31,6 +31,10 @@ Tue Apr  3 12:44:04 2001 mazer::
 
 **NOTE: PLOTS ARE NOT DRAWN UNTIL YOU CALL DRAWNOW()**
   
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
+
 """
 
 __author__   = '$Author$'
@@ -39,7 +43,7 @@ __revision__ = '$Revision$'
 __id__       = '$Id$'
 
 
-import Numeric
+import numpy as _N
 from biggles import *
 
 configure('default', 'fontface', 'Helvetica')
@@ -239,17 +243,17 @@ def imagesc(z, x=None, y=None, show=None, p=None, scale=1):
     p.mplotnum = nth
 
     if x is None:
-        x = Numeric.arange(0, z.shape[0])
+        x = _N.arange(0, z.shape[0])
     if y is None:
-        y = Numeric.arange(0, z.shape[1])
+        y = _N.arange(0, z.shape[1])
 
     if scale:
         z = (0.5 + 255.0 * \
-             (z - min(Numeric.ravel(z))) \
-             / (max(Numeric.ravel(z)) - \
-                min(Numeric.ravel(z)))).astype(Numeric.Int32)
+             (z - min(_N.ravel(z))) \
+             / (max(_N.ravel(z)) - \
+                min(_N.ravel(z)))).astype(_N.int32)
     else:
-        z = z.astype(Numeric.Int32)
+        z = z.astype(_N.int32)
 
     # convert RGB/Greyscale to 24bit integer array
     if len(z.shape) == 2:
@@ -364,16 +368,16 @@ def hist(v, nbins=10, vmin=None, vmax=None, show=None, p=None):
     if vmax is None:
         vmax = float(max(v))
     binwidth = (vmax - vmin) / float(nbins-1)
-    x = Numeric.arrayrange(vmin, vmax+binwidth, binwidth)
-    y = Numeric.zeros(x.shape, 'i')
+    x = _N.arrayrange(vmin, vmax+binwidth, binwidth)
+    y = _N.zeros(x.shape, 'i')
     for i in range(len(v)):
         n = int(round((float(v[i]) - vmin) / binwidth, 0))
         try:
             y[n] = y[n] + 1
         except IndexError:
             pass
-    xx = Numeric.zeros(len(x) * 2 + 3, 'f')
-    yy = Numeric.zeros(len(y) * 2 + 3)
+    xx = _N.zeros(len(x) * 2 + 3, 'f')
+    yy = _N.zeros(len(y) * 2 + 3)
     xx[0] = x[0]
     yy[0] = 0
     for i in range(0, len(x)):
@@ -397,33 +401,34 @@ def psprint(dest="-"):
         TABLE.write_eps(dest)
 
 if __name__=='__main__' :
-    import sys, Numeric, RandomArray
-    x = Numeric.arrayrange(-10,10);
+    import sys
+    
+    x = _N.arange(-10,10);
     y = x**2;
     e = y/4
 
-    a = RandomArray.random([20,20,3])
+    a = _N.random.random_sample([20,20,3])
     imagesc(a, x=range(-10,10), y=range(-10,10))
     drawnow()
     sys.stdin.readline()
     
 
-    a = Numeric.array([[[1, 0, 0],
-                [0, 1, 0],
-                [0, 0, 1],
-                [0, 0, 0]],
-               [[0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]],
-               [[0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]],
-               [[0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0],
-                [0, 0, 0]]])
+    a = _N.array([[[1, 0, 0],
+                  [0, 1, 0],
+                  [0, 0, 1],
+                  [0, 0, 0]],
+                 [[0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0]],
+                 [[0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0]],
+                 [[0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0],
+                  [0, 0, 0]]])
     imagesc(a)
     drawnow()
     sys.stdin.readline()

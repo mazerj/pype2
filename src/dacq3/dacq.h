@@ -43,6 +43,7 @@ extern int dacq_eye_read(int which);
 
 extern int dacq_ad_n(int n);
 extern unsigned long dacq_ts(void);
+extern double dacq_ts_f(void);
 
 extern int dacq_bar(void);
 extern int dacq_bar_transitions(int reset);
@@ -66,6 +67,7 @@ extern void dacq_adbuf_clear();
 
 extern int dacq_adbuf_size();
 extern unsigned long dacq_adbuf_t(int ix);
+extern double dacq_adbuf_t_f(int ix);
 extern int dacq_adbuf_x(int ix);
 extern int dacq_adbuf_y(int ix);
 extern int dacq_adbuf_pa(int ix);

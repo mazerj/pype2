@@ -12,7 +12,9 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
 **Revision History**
 
-Tue Mar 17 14:41:32 2009 mazer
+Fri Jan 15 09:53:24 2010 mazer
+
+- migrated from Numeric to numpy
 
 """
 
@@ -22,9 +24,9 @@ __revision__ = '$Revision$'
 __id__       = '$Id$'
 
 try:
-	from Numeric import *
+	import numpy as _N
 except ImportError:
-	raise ImportError, "%s requires Numeric module" % __name__
+	raise ImportError, "%s requires numpy module" % __name__
 
 def _crossproduct(a, b):
 	"""Compute cross product of two 3-d vectors (x,y,z)"""
@@ -33,7 +35,7 @@ def _crossproduct(a, b):
 	v = [a[1]*b[2] - a[2]*b[1],
 		 a[2]*b[0] - a[0]*b[2],
 		 a[0]*b[1] - a[1]*b[0]]
-	return array(v)
+	return _N.array(v)
 
 def _project(a, b, c, x, y):
 	"""
@@ -79,16 +81,16 @@ def griddata(xd, yd, zd, nx, ny):
 	if len(xd) != len(yd) or len(xd) != len(zd):
 		raise TypeError, "xd,yd,zd must all be same length"
 	
-	nz = zeros((len(nx), len(ny)), 'f')
+	nz = _N.zeros((len(nx), len(ny)), 'f')
 	for i in range(len(nx)):
 		for j in range(len(ny)):
 			x, y = nx[i], ny[j]
 			d = (((xd - x) ** 2) + ((yd - y) ** 2)) ** 0.5
-			ix = argsort(d)
-			a = array((xd[ix[0]], yd[ix[0]], zd[ix[0]]), 'f')
-			b = array((xd[ix[1]], yd[ix[1]], zd[ix[1]]), 'f')
+			ix = _N.argsort(d)
+			a = _N.array((xd[ix[0]], yd[ix[0]], zd[ix[0]]), 'f')
+			b = _N.array((xd[ix[1]], yd[ix[1]], zd[ix[1]]), 'f')
 			for n in range(2, len(ix)):
-				c = array((xd[ix[n]], yd[ix[n]], zd[ix[n]]), 'f')
+				c = _N.array((xd[ix[n]], yd[ix[n]], zd[ix[n]]), 'f')
 				z = _project(a, b, c, x, y)
 				if not (z is None):
 					break
@@ -121,15 +123,15 @@ def surfinterp(xd, yd, zd, new_xd, new_yd):
 	if len(new_xd) != len(new_yd):
 		raise TypeError, "new_xd and new_yd must be same length"
 
-	new_z = zeros((len(new_xd),), 'f')
+	new_z = _N.zeros((len(new_xd),), 'f')
 	for i in range(len(new_z)):
 		x, y = nx[i], ny[j]
 		d = (((xd - x) ** 2) + ((yd - y) ** 2)) ** 0.5
-		ix = argsort(d)
-		a = array((xd[ix[0]], yd[ix[0]], zd[ix[0]]), 'f')
-		b = array((xd[ix[1]], yd[ix[1]], zd[ix[1]]), 'f')
+		ix = _N.argsort(d)
+		a = _N.array((xd[ix[0]], yd[ix[0]], zd[ix[0]]), 'f')
+		b = _N.array((xd[ix[1]], yd[ix[1]], zd[ix[1]]), 'f')
 		for n in range(2, len(ix)):
-			c = array((xd[ix[n]], yd[ix[n]], zd[ix[n]]), 'f')
+			c = _N.array((xd[ix[n]], yd[ix[n]], zd[ix[n]]), 'f')
 			z = _project(a, b, c, x, y)
 			if not (z is None):
 				break
@@ -141,38 +143,38 @@ def surfinterp(xd, yd, zd, new_xd, new_yd):
 	return new_z
 
 if __name__ == '__main__':
-	import mplot
+	import pylab
 
 	xd, yd, zd = [], [], []
-	xa = arange(-3.0, 3.0, 0.5)
-	ya = arange(-3.0, 3.0, 0.5)
-	m  = zeros((len(xa), len(ya)), 'f')
+	xa = _N.arange(-3.0, 3.0, 0.5)
+	ya = _N.arange(-3.0, 3.0, 0.5)
+	m  = _N.zeros((len(xa), len(ya)), 'f')
 
 	for i in range(len(xa)):
 		for j in range(len(ya)):
-			z = sin(2*xa[i])
+			z = _N.sin(2*xa[i])
 			xd.append(xa[i])
 			yd.append(ya[j])
 			zd.append(z)
 			m[i,j]= z
 
-	mplot.subplot(2,1,1)
-	mplot.imagesc(m, x=xa, y=ya)
-	mplot.xrange(-5.0, 5.0)
-	mplot.title('original')
+	pylab.subplot(2,1,1)
+	pylab.imshow(m)
+	#pylab.xrange(-5.0, 5.0)
+	pylab.title('original')
 
-	nx = arange(-4.5, 4.5, 0.1)
-	ny = arange(-4.5, 4.5, 0.1)
-	nz = griddata(array(xd), array(yd), array(zd), nx, ny)
+	nx = _N.arange(-4.5, 4.5, 0.1)
+	ny = _N.arange(-4.5, 4.5, 0.1)
+	nz = griddata(_N.array(xd), _N.array(yd), _N.array(zd), nx, ny)
 
-	mplot.subplot(2,1,2)
-	mplot.imagesc(nz, x=nx, y=ny)
-	mplot.xrange(-5.0, 5.0)
-	mplot.title('interpolated')
+	pylab.subplot(2,1,2)
+	pylab.imshow(nz)
+	#pylab.xrange(-5.0, 5.0)
+	pylab.title('interpolated')
 
 	print 'done.'
 
-	mplot.drawnow()
+	pylab.show()
 else:
 	try:
 		from pype import loadwarn

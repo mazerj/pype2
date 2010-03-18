@@ -72,6 +72,15 @@
 ** Tue May  5 14:40:33 2009 mazer 
 **   - removed EYELINK_TEST mode completely..
 **   - changed private XXxxx env vars to XX_xxxx
+**
+** Thu Mar 18 12:56:09 2010 mazer 
+**   - added processor affinity support of 4 or more cores are detected..
+**     (locks to core #3, currently hardcoded)
+**
+** Thu Mar 18 15:37:15 2010 mazer 
+**   - timestamp via RDTSC is apparently NOT the same under 32bit and
+**     64bit kernels. See http://www.mcs.anl.gov/~kazutomo/rdtsc.html
+**
 */
 
 #include <unistd.h>
@@ -80,6 +89,7 @@
 #include <sys/resource.h>
 #include <sys/types.h>
 #include <signal.h>
+#define __USE_GNU		/* needed to get processor affinity stuff */
 #include <sched.h>
 #include <math.h>
 
@@ -89,7 +99,7 @@
 #endif
 #include "usbjs.h"
 
-//#define SPIN_SAMPLE 1
+// #define SPIN_SAMPLE 1
 
 static char *_tmodes[] = {
   "ANALOG", "ISCAN", "EYELINK", "EYEJOY", "NONE"
@@ -114,11 +124,15 @@ static double arange = 10.0;
 #include "iscan.c"
 #include "eyelink.c"
 
-static double find_clockfreq()	/* get clock frequency in Hz */
+static double find_clockfreq(int *ncores) /* get clock frequency in Hz */
 {
   FILE *fp;
   char buf[100];
   double mhz;
+
+  if (ncores) {
+    *ncores = 0;
+  }
 
   if ((fp = fopen("/proc/cpuinfo", "r")) == NULL) {
     fprintf(stderr, "%s: can't open /proc/cpuinfo\n", progname);
@@ -127,13 +141,19 @@ static double find_clockfreq()	/* get clock frequency in Hz */
   mhz = -1.0;
   while (fgets(buf, sizeof(buf), fp) != NULL) {
     if (sscanf(buf, "cpu MHz         : %lf", &mhz) == 1) {
-      break;
+      if (ncores) {
+	(*ncores)++;
+      }
     }
   }
   return(mhz * 1.0e6);
 }
 
-#define RDTSC(x) __asm__ __volatile__ ( ".byte 0x0f,0x31" \
+#if defined(__i386__)
+
+// this macro doesn't quite work
+
+#define RDTSC(x) __asm__ __volatile__ ( ".byte 0x0f,0x31"		\
 					:"=a" (((unsigned long*)&x)[0]), \
 					 "=d" (((unsigned long*)&x)[1]))
 
@@ -142,7 +162,7 @@ static unsigned long timestamp(int init)
   static unsigned long long timezero;
   unsigned long long now;
 
-  RDTSC(now);			/* get cycle counter from hardwareTSC */
+  RDTSC(now);			/* get cycle counter from hardware TSC */
   if (init) {
     timezero = now;
     return(0);
@@ -151,6 +171,36 @@ static unsigned long timestamp(int init)
     return((unsigned long)((now - timezero) / ticks_per_ms));
   }
 }
+
+#elif defined(__x86_64__)
+
+/* need to use different method to access real time clock
+** under 64bit kernel!
+*/
+
+static unsigned long timestamp(int init)
+{
+  static unsigned long long timezero;
+  unsigned long long now;
+  unsigned a, d;
+
+  asm("cpuid");
+  asm volatile("rdtsc" : "=a" (a), "=d" (d));
+  now = ((unsigned long long)a) | (((unsigned long long)d) << 32);
+
+  if (init) {
+    timezero = now;
+    return(0);
+  } else {
+    /* use precalibrated ticks_per_ms to convert to real time.. */
+    return((unsigned long)((now - timezero) / ticks_per_ms));
+  }
+}
+#else
+#error "real time clock not defined this arch"
+#endif
+
+
 
 static void perror2(char *s, char *file, int line)
 {
@@ -178,6 +228,23 @@ static void resched(int rt)
     }
   }
 #endif
+}
+
+static int locktocore(int corenum)
+{
+  /* 0 for first core etc.. -1 for no lock */
+  cpu_set_t mask;
+  int result = 1;
+
+  if (corenum >= 0) {
+    CPU_ZERO(&mask);
+    CPU_SET(corenum, &mask);
+    result = sched_setaffinity(0, sizeof(mask), &mask);
+    if (result >= 0) {
+      fprintf(stderr, "%s: locked dacq to core %d\n", progname, corenum);
+    }
+  }
+  return(result);
 }
 
 static void mainloop(void)
@@ -567,7 +634,8 @@ static void mainloop(void)
 int main(int ac, char **av, char **envp)
 {
   char *p;
-  float mhz;
+  float hz;
+  int ncores;
 
 #ifdef CHANGE_NAME
   init_set_proc_title(ac, av, envp);
@@ -576,8 +644,14 @@ int main(int ac, char **av, char **envp)
   p = rindex(av[0], '/');
   progname = p ? (p + 1) : av[0];
 
-  ticks_per_ms = (unsigned long long)(0.5 +
-				      ((mhz = find_clockfreq()) / 1000.0));
+  hz = find_clockfreq(&ncores);
+  ticks_per_ms = (unsigned long long)(0.5 + (hz / 1000.0));
+  fprintf(stderr, "%s: %.0f mHz cpu detected; %.1f megaticks/ms\n", \
+	  progname, hz/1e6, ticks_per_ms/1.0e6);
+
+  if (ncores >= 4) {
+    locktocore(3);
+  }
 
   if ((semid = psem_init(SEMKEY)) < 0) {
     perror("psem_init");
