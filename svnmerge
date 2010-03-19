@@ -1,0 +1,3 @@
+#!/bin/sh
+# just merge in all changes AFTER numpy-branch was created:
+svn merge -r 367:HEAD ^/pype2/trunk
