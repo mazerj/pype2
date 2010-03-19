@@ -122,7 +122,6 @@ class _Probe:
 		self.bg = 128.0
 		self.showinfo = 1
 		self.probeid = None
-		self.lastts = 0
 		
 		try:
 			self.load()
@@ -312,8 +311,6 @@ class _Probe:
 		
 	def draw(self):
 		t = self.app.ts()
-		if t < self.lastts: print "[neg time]"
-		self.lastts = t
 			
 		ms_bperiod = 1000.0 / self.blink_freq
 		if (self.blink > 0) and (t - self.blinktime) > (ms_bperiod/2):
