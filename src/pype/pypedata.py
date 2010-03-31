@@ -360,10 +360,10 @@ class PypeRecord:
 			if len(t) > 0:
 				if len(self.spike_times) and \
 					   abs(self.spike_times[0] - t[0]) < 5:
-					self.spike_times = self.spike_times[1:]
+					self.spike_times = self.spike_times[1::]
 				if len(self.photo_times) and \
 					   abs(self.photo_times[0] - t[0]) < 5:
-					self.photo_times = self.photo_times[1:]
+					self.photo_times = self.photo_times[1::]
 
 			try_ttank_pull = 0
 			if self.params.has_key('tdt_tank'):
@@ -422,6 +422,8 @@ class PypeRecord:
 			self.realt = self.realt - self.t0
 			self.photo_times = self.photo_times - self.t0
 			self.spike_times = self.spike_times - self.t0
+
+			
 
 			# Sun Dec  4 10:08:01 2005 mazer -- NOTE:
 			# not necessary to align -- it's already been
@@ -829,9 +831,9 @@ def find_saccades(d, thresh=2, mindur=25, maxthresh=None):
 		x = d.eyex[start:stop]
 		y = d.eyey[start:stop]
 
-	dx = x[1:] - x[0:-1]
-	dy = y[1:] - y[0:-1]
-	dt = t[1:] - t[0:-1]
+	dx = x[1::] - x[0:-1:]
+	dy = y[1::] - y[0:-1:]
+	dt = t[1::] - t[0:-1:]
 
 	dxy = ((dx**2 + dy ** 2) ** .5) / dt
 	dxy = smooth(dxy, 2)

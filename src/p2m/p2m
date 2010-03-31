@@ -15,7 +15,7 @@ foreach i ($*)
   if ("$root:e" == "gz") then
     set dst="$root:r".p2m
   else
-    set dst="$root.p2m"
+    set dst="$i.p2m"
   endif
 
   #echo "CONVERTING $i ===> $dst"

@@ -71,7 +71,7 @@ if ( $rh_or_fc == "true" || "$ubuntu" == "Ubuntu" ) then
 	set major=2 minor=4
     else if ("$distno" == "9.04") then
 	# jaunty
-	set major=2 minor=6
+	set major=2 minor=5
     else if ("$distno" == "9.10") then
 	# karmic
 	set major=2 minor=6
