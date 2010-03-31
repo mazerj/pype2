@@ -13,7 +13,7 @@ end
 
 if nargin == 0
   for n = 1:length(ptab.vars)
-    fprintf('%s=%s\n', ptab.vars{n},  ptab.vals{n});
+    disp({ptab.vars{n} ptab.vals{n}});
   end
   val = [];
   return
