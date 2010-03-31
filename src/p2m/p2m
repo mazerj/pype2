@@ -18,7 +18,8 @@ foreach i ($*)
     set dst="$root.p2m"
   endif
 
-  echo "CONVERTING $i ===> $dst"
+  #echo "CONVERTING $i ===> $dst"
+  echo "[$i->$dst]"
   if !(-e $i) then
     echo "`basename $0`: $i does not exist."
     exit 1
