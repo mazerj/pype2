@@ -41,6 +41,7 @@
 #include <sys/errno.h>
 #include <sys/resource.h>
 #include <math.h>
+#include <ezV24/ezV24.h>	/* ezV24 serial io lib for iscan */
 
 #define __USE_GNU		/* needed to get processor affinity stuff */
 #include <sched.h>
@@ -50,16 +51,17 @@
 #include "psems.h"
 #include "usbjs.h"
 
-/* ez-serial library for iscan interface */
-#include "libezV24-0.0.3/ezV24.h"
 
 /* these are eyelink API header files */
 #include "eyelink.h"
 #include "eyetypes.h"
 
-/* this has set_eyelink_address() etc.. */
-//32bit: #include "exptsppt.h"
-//64bit: #include "core_expt.h"
+/* get header-def for set_eyelink_address() etc..
+**   32bit: #include "exptsppt.h"
+**   64bit: #include "core_expt.h"
+** I added:
+**   my_core_expt.h which works for both 32 and 64bit systems
+*/
 #include "my_core_expt.h"
 
 static char *progname = NULL;
