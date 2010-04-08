@@ -36,9 +36,6 @@ static void eyelink_init(char *ip_address)
 
   saved = malloc(strlen(__progname) + 1);
   strcpy(saved, __progname);
-#ifdef CHANGE_NAME
-  set_proc_title("eyelink_thread");
-#endif
 
   //begin_realtime_mode();
   set_eyelink_address(ip_address);
@@ -114,9 +111,6 @@ static void eyelink_init(char *ip_address)
 
   fprintf(stderr, "%s/eyelink_init: connected ok\n", progname);
   tracker_mode = EYELINK;
-#ifdef CHANGE_NAME
-  set_proc_title(saved);
-#endif
 }
 
 

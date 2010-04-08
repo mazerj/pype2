@@ -1,6 +1,7 @@
 include ../make.defs
 
-DACQDIR = dacq3
+#DACQDIR = dacq3
+DACQDIR = comedi
 DUMMYDIR= dummy-dacq
 PYDIR   = pype
 SUBDIRS = sh systasks Plexon p2m tools
