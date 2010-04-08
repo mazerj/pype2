@@ -22,10 +22,10 @@ really simplify coding...
  >> x.foobar(2, 3, 4, foo=1)
 """
 
-__author__   = '$Author: mazer $'
-__date__     = '$Date: 2009-05-25 16:00:02 -0400 (Mon, 25 May 2009) $'
-__revision__ = '$Revision: 339 $'
-__id__       = '$Id: tdt2.py 339 2009-05-25 20:00:02Z mazer $'
+__author__   = '$Author$'
+__date__     = '$Date$'
+__revision__ = '$Revision$'
+__id__       = '$Id$'
 
 import sys
 import os
