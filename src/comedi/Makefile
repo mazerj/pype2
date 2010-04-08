@@ -9,7 +9,7 @@ EYELINK_INC = ./eyelinksoftware/`uname -m`/include
 CFLAGS = -O6 -g -Wall -I$(EYELINK_INC) -I./include \
 		$(GLOBAL_CFLAGS) $(PYTHONINC) -fPIC
 
-SERVER_OBJS = sigs.o psems.o usbjs.o libezV24-0.0.3/libezV24-0.a
+SERVER_OBJS = sigs.o psems.o usbjs.o
 
 
 all: build install
@@ -27,10 +27,7 @@ usbjs.o: usbjs.c usbjs.h
 
 
 comedi_server: comedi_server.o $(SERVER_OBJS)
-	$(CC) -o $@ $< $(SERVER_OBJS) $(EYELINK_LIB) -lcomedi -lm
-
-libezV24-0.0.3/libezV24-0.a:
-	(cd libezV24-0.0.3 ; $(MAKE) static)
+	$(CC) -o $@ $< $(SERVER_OBJS) $(EYELINK_LIB) -lcomedi -lm -lezV24
 
 _dacqmodule.so: dacq.c dacq.h dacq.o psems.o
 	cat _dacq.i dacq.h >>dacq.i
@@ -50,7 +47,5 @@ clean:
 	@rm -f *.o _dacqmodule.so *.pyc _dacqmodule \
 		*_server *_wrap.* .*~ dacq.py
 	@rm -f dacq.i
-	(cd libezV24-0.0.3 ; $(MAKE) clean)
-	@rm -f libezV24-0.0.3/libezV24-0.a
 	@rm -f comedi_server _dacqmodule.so 
 
