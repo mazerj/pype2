@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- Mode: Python; tab-width: 4; py-indent-offset: 4; -*-
-# $Id: pyplex.py 33 2005-07-13 00:30:26Z mazer $
+# $Id$
 
 """
 Tools for extracting data from Plexon .plx files
