@@ -1359,7 +1359,7 @@ class Sprite(_ImageBase):
 		**returns** - None
 
 		"""
-		self.alpha[:] = a
+		self.alpha[::] = a
 
 	def line(self, x1, y1, x2, y2, color, width=1):
 		"""Draw line of specified color in sprite
@@ -1753,7 +1753,7 @@ class Sprite(_ImageBase):
 		"""
 		d = where(less((((self.ax-x)**2)+((self.ay+y)**2))**0.5, r),
 				  255, 0).astype(UnsignedInt8)
-		self.alpha[:] = d
+		self.alpha[::] = d
 
 	def alpha_gradient(self, r1, r2, x=0, y=0):
 		"""Linear gradient vignette
@@ -2095,7 +2095,7 @@ class Sprite(_ImageBase):
 			pass
 
 		# copy the alpha mask too..
-		s.alpha[:] = self.alpha[:]
+		s.alpha[::] = self.alpha[::]
 
 		s.userdict = copy.copy(self.userdict)
 
