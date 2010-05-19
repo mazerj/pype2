@@ -169,6 +169,10 @@
 **   arbitary analog data at 1khz... into the datafile. Just make sure
 **   you set the channels to be saved in pype (see the rig parameter
 **   sheet down near the bottom).
+**
+** Wed Apr 14 11:13:47 2010 mazer 
+**   Removed boot option for dacq_start()
+**
 */
 
 #include <sys/types.h>
@@ -248,10 +252,10 @@ static void dacq_sigchld_handler(int signum)
   signal(SIGCHLD, dacq_sigchld_handler);
 }
 
-int dacq_start(int boot, int testmode, char *tracker_type,
-	       char *dacq_server, char *trakdev)
+int dacq_start(int testmode, char *tracker_type, char *tracker_dev)
 {
-  int shmid, ii;
+  int shmid, i, ii;
+  char *dacq_server = "comedi_server"; /* no longer settable! */
 
   /* init the internal timestamper, in case it's needed later */
   timestamp(1);
@@ -291,118 +295,107 @@ int dacq_start(int boot, int testmode, char *tracker_type,
    * running ... so don't bother here..
    */
 
-  if (boot) {
-    int i;
+  for (i = 0; i < NDIGIN; i++) {
+    dacq_data->din[i] = 0;
+    dacq_data->din_changes[i] = 0;
+    dacq_data->din_intmask[i] = 0;
+  }
 
-    for (i = 0; i < NDIGIN; i++) {
-      dacq_data->din[i] = 0;
-      dacq_data->din_changes[i] = 0;
-      dacq_data->din_intmask[i] = 0;
+  for (i = 0; i < NDIGOUT; i++) {
+    dacq_data->dout[i] = 0;
+  }
+
+  dacq_data->dout_strobe = 0;
+
+  for (i = 0; i < NADC; i++) {
+    dacq_data->adc[i] = 0;
+  }
+
+  dacq_data->eye_xgain = 1.0;
+  dacq_data->eye_ygain = 1.0;
+  dacq_data->eye_xoff = 0;
+  dacq_data->eye_yoff = 0;
+  
+  for (i = 0; i < NFIXWIN; i++) {
+    dacq_data->fixwin[i].active = 0;
+    dacq_data->fixwin[i].genint = 0;
+  }
+
+  for (i = 0; i < NJOYBUT; i++) {
+    dacq_data->js[i] = 0;
+  }
+  dacq_data->js_x = 0;
+  dacq_data->js_y = 0;
+  dacq_data->js_enabled = 0;
+  
+  dacq_data->adbuf_on = 0;
+  dacq_data->adbuf_ptr = 0;
+  dacq_data->adbuf_overflow = 0;
+  for (i = 0; i < ADBUFLEN; i++) {
+    dacq_data->adbuf_t[i] = 0;
+    dacq_data->adbuf_x[i] = 0;
+    dacq_data->adbuf_y[i] = 0;
+    for (ii=0; ii < NADC; ii++) {
+      dacq_data->adbufs[ii][i] = 0;
     }
-
-    for (i = 0; i < NDIGOUT; i++) {
-      dacq_data->dout[i] = 0;
-    }
-
-    dacq_data->dout_strobe = 0;
-
-    for (i = 0; i < NADC; i++) {
-      dacq_data->adc[i] = 0;
-    }
-
-    dacq_data->eye_xgain = 1.0;
-    dacq_data->eye_ygain = 1.0;
-    dacq_data->eye_xoff = 0;
-    dacq_data->eye_yoff = 0;
-
-    for (i = 0; i < NFIXWIN; i++) {
-      dacq_data->fixwin[i].active = 0;
-      dacq_data->fixwin[i].genint = 0;
-    }
-
-    for (i = 0; i < NJOYBUT; i++) {
-      dacq_data->js[i] = 0;
-    }
-    dacq_data->js_x = 0;
-    dacq_data->js_y = 0;
-    dacq_data->js_enabled = 0;
-
-    dacq_data->adbuf_on = 0;
-    dacq_data->adbuf_ptr = 0;
-    dacq_data->adbuf_overflow = 0;
-    for (i = 0; i < ADBUFLEN; i++) {
-      dacq_data->adbuf_t[i] = 0;
-      dacq_data->adbuf_x[i] = 0;
-      dacq_data->adbuf_y[i] = 0;
-      for (ii=0; ii < NADC; ii++) {
-	dacq_data->adbufs[ii][i] = 0;
+  }
+  
+  for (i = 0; i < NDAC; i++) {
+    dacq_data->dac[i] = 0;
+  }
+  
+  dacq_data->dac_strobe = 0;
+  
+  dacq_data->timestamp = 0;
+  dacq_data->terminate = 0;
+  dacq_data->das_ready = 0;
+  
+  dacq_data->eye_smooth = 0;
+  dacq_data->eye_x = 0;
+  dacq_data->eye_y = 0;
+  
+  dacq_data->dacq_pri = 0;
+  
+  dacq_data->fixbreak_tau = 5;
+  
+  /* alarm timer (same units as timestamp); 0 for no alarm */
+  dacq_data->alarm_time = 0;
+  
+  if (testmode) {
+    dacq_data->din[2] = 1;
+    dacq_data->din[3] = 1;
+    fprintf(stderr, "dacq: testmode = 1 (no sub process!)\n");
+  } else {
+    signal(SIGCHLD, dacq_sigchld_handler);
+    
+    fprintf(stderr, "dacq: testmode = 0\n");
+    fprintf(stderr, "dacq: tracker_type = %s\n", tracker_type);
+    fprintf(stderr, "dacq: dacq_server = %s\n", dacq_server);
+    
+    if ((dacq_server_pid = fork()) == 0) {
+      if (strcmp(tracker_type, "ISCAN") == 0) {
+	execlp(dacq_server, dacq_server, "-iscan", tracker_dev, NULL);
+      } else if (strcmp(tracker_type, "EYELINK") == 0) {
+	execlp(dacq_server, dacq_server, "-eyelink", tracker_dev, NULL);
+      } else if (strcmp(tracker_type, "ANALOG") == 0) {
+	execlp(dacq_server, dacq_server, NULL);
+      } else if (strcmp(tracker_type, "EYEJOY") == 0) {
+	execlp(dacq_server, dacq_server, "-eyejoy", NULL);
+      } else if (strcmp(tracker_type, "NONE") == 0) {
+	execlp(dacq_server, dacq_server, "-notracker", NULL);
       }
-    }
-
-    for (i = 0; i < NDAC; i++) {
-      dacq_data->dac[i] = 0;
-    }
-
-    dacq_data->dac_strobe = 0;
-
-    dacq_data->timestamp = 0;
-    dacq_data->terminate = 0;
-    dacq_data->das_ready = 0;
-
-    dacq_data->eye_smooth = 0;
-    dacq_data->eye_x = 0;
-    dacq_data->eye_y = 0;
-
-    dacq_data->dacq_pri = 0;
-
-    dacq_data->fixbreak_tau = 5;
-
-    /* alarm timer (same units as timestamp); 0 for no alarm */
-    dacq_data->alarm_time = 0;
-
-    if (testmode) {
-      dacq_data->din[2] = 1;
-      dacq_data->din[3] = 1;
-      fprintf(stderr, "dacq: testmode = 1 (no sub process!)\n");
+      
+      perror(dacq_server);
+      exit(1);
     } else {
-      signal(SIGCHLD, dacq_sigchld_handler);
-
-      fprintf(stderr, "dacq: testmode = 0\n");
-      fprintf(stderr, "dacq: tracker_type = %s\n", tracker_type);
-      fprintf(stderr, "dacq: dacq_server = %s\n", dacq_server);
-
-      if ((dacq_server_pid = fork()) == 0) {
-	/* child process execs the dacq_server */
-
-	if (strcmp(tracker_type, "ISCAN") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting iscan\n");
-	  execlp(dacq_server, dacq_server, "-iscan", trakdev, NULL);
-	} else if (strcmp(tracker_type, "EYELINK") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
-	  execlp(dacq_server, dacq_server, "-eyelink", trakdev, NULL);
-	} else if (strcmp(tracker_type, "ANALOG") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting analog\n");
-	  execlp(dacq_server, dacq_server, NULL);
-	} else if (strcmp(tracker_type, "EYEJOY") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
-	  execlp(dacq_server, dacq_server, "-eyejoy", NULL);
-	} else if (strcmp(tracker_type, "NONE") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting w/o tracker\n");
-	  execlp(dacq_server, dacq_server, "-notracker", NULL);
-	}
-
-	perror(dacq_server);
-	exit(1);
-      } else {
-
-	/* parent waits for server to become ready */
-	do {
-	  LOCK(semid);
-	  i = dacq_data->das_ready;
-	  UNLOCK(semid);
-	  usleep(100);
-	  } while (i == 0);
-      }
+      
+      /* parent waits for server to become ready */
+      do {
+	LOCK(semid);
+	i = dacq_data->das_ready;
+	UNLOCK(semid);
+	usleep(100);
+      } while (i == 0);
     }
   }
   return(1);

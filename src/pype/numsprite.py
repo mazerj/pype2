@@ -21,26 +21,19 @@ __id__       = '$Id$'
 
 import math
 
-_NUMPY = 1				 # this should only be set to zero for testing!!
+from numpy import *
+from numpy.random import uniform
 
-if _NUMPY:
-	from numpy import *
-	from numpy.random import uniform
-
-	# These are hacks to transition from numeric to numpy
-	UnsignedInt8 = uint8
-	NewAxis = newaxis
-else:
-	from Numeric import *
-	from RandomArray import uniform
-	sys.stderr.write('Warning: numsprite using Numeric, not numpy\n')
+# These are hacks to transition from numeric to numpy
+UnsignedInt8 = uint8
+NewAxis = newaxis
 	
 try:
 	from OpenGL.GL import *
 	from OpenGL.GLU import *
 	from OpenGL.GLUT import *
 except ImportError:
-	sys.stderr.write('Warning: numsprite required OpenGL module\n')
+	sys.stderr.write('Warning: numsprite requires OpenGL module\n')
 	sys.exit(1)
 	
 
@@ -138,10 +131,7 @@ class NumSprite:
 	def noise(self, thresh=0.5, color=None):
 		for n in range(3):
 			if color or n == 0:
-				if _NUMPY:
-					m = uniform(1, 255, size=self.array.shape[0:2])
-				else:
-					m = uniform(1, 255, shape=self.array.shape[0:2])
+				m = uniform(1, 255, size=self.array.shape[0:2])
 				if not thresh is None:
 					m = where(greater(m, thresh*255), 255, 1)
 			self.array[:,:,n] = m[:].astype(UnsignedInt8)
@@ -173,42 +163,21 @@ class NumSprite:
 	def toPIL(self):
 		m = concatenate((self.array, self.alpha[:,:,NewAxis]), axis=2)
 		m = transpose(m, axes=[1,0,2])
-		if _NUMPY:
-			return Image.fromarray(m, 'RGBA')
-		else:
-			return PIL.Image.fromstring('RGBA', (self.w, self.h), m.tostring())
+		return Image.fromarray(m, 'RGBA')
 
 	def fromPIL(self, i):
-		if _NUMPY:
-			a = transpose(asarray(i), axes=[1,0,2])
-			if a.shape[2] == 3:
-				# RGB
-				self.array = a[:,:,0:3].astype(UnsignedInt8)
-				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
-				self.alpha[:] = 255
-			elif a.shape[2] == 4:
-				# RGBA
-				self.array = a[:,:,0:3].astype(UnsignedInt8)
-				self.alpha = a[:,:,3].astype(UnsignedInt8)
-			else:
-				raise Error
+		a = transpose(asarray(i), axes=[1,0,2])
+		if a.shape[2] == 3:
+			# RGB
+			self.array = a[:,:,0:3].astype(UnsignedInt8)
+			self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
+			self.alpha[:] = 255
+		elif a.shape[2] == 4:
+			# RGBA
+			self.array = a[:,:,0:3].astype(UnsignedInt8)
+			self.alpha = a[:,:,3].astype(UnsignedInt8)
 		else:
-			a = array(i.tostring()).astype(UnsignedInt8)
-			bpp = a.shape[0] / i.size[1] / i.size[0]
-			if bpp == 4:
-				# RGBA
-				a = reshape(a, (i.size[1], i.size[0], 4))
-				a = transpose(a, axes=[1,0,2])
-				self.array = a[:,:,0:3]
-				self.alpha = a[:,:,3]
-			elif bpp == 3:
-				# RGB
-				a = reshape(a, (i.size[1], i.size[0], 3))
-				self.array = transpose(a, axes=[1,0,2])
-				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
-				self.alpha[:] = 255
-			else:
-				raise Error
+			raise Error
 
 	def rotate(self, angle, preserve_size=1, trim=0):
 		self.fromPIL(self.toPIL().rotate(-angle, expand=(not preserve_size)))
@@ -353,7 +322,7 @@ class NumSprite:
 
 
 def testset():
-	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
+	fb = quickinit(dpy=":0.0", bpp=32, fullscreen=1)
 	fb.clear((128,128,128))
 
 	if 1:

@@ -37,12 +37,6 @@ install-pypebin:
 	@cp pypedebug $(PYPEDIR)/bin
 	@chmod +x $(PYPEDIR)/bin/pypedebug
 
-	@chmod +x pypespike
-	@cp pypespike $(PYPEDIR)/bin
-
-#	@chmod +x pypeplex.py
-#	@cp pypeplex.py $(PYPEDIR)/bin
-
 pypeversion:
 	@sed 's/%%INSTALLDATE%%/$(shell date)/' \
 		<pypeversion.py.template >pypeversion.py

@@ -2,8 +2,8 @@ Config file options as of 07-Dec-2005
 -------------------------------------
 
 AUDIODRIVER	(str)	name of pygame SDL_AUDIODRIVER
-DACQ_SERVER	(str)	name of data acquisition server
-DACQ_TESTMODE	(0|1)	if true, then dacq runs in test mode (w/o connecting to hardware)
+AUDIO		(0|1)	if 0, audio is disabled
+DACQ_TESTMODE	(0|1)	if 1, dacq runs in test mode (doesn't open hardware)
 DEBUG		(0|1)	enables debug mode
 DPYBITS		(#)	number of display bits (typically 24 or 32)
 DPYH		(#)	display height in pixels
@@ -12,23 +12,16 @@ EYELINK_CAMERA	(0,1)	left or right eyelink (EL2) camera to read
 EYELINK_OPTS	(str)	extra options for the eyelink API
 EYETRACKER	(str)	eyetracker device: ANALOG, ISCAN or EYELINK
 EYETRACKER_DEV	(str)	device file (IP # for eyelink)
-FLIP_BAR	(0|1)	flip sign of monkey bar
-FLIP_SW1	(0|1)	flip sign of user switch 1
-FLIP_SW2	(0|1)	flip sign of user switch 2
-FULLSCREEN	(0|1)	enable full screen (dga)	mode
+FLIP_BAR	(0|1)	flip sign of monkey bar    <- (DIN 0)
+FULLSCREEN	(0|1)	enable full screen mode
 GAMMA		(float)	scalar gamma correction for monitor (luminance)
-GFX_TESTMODE	(XXX)	**DO NOT USE** (use FULLSCREEN: 0 instead)
-ISCAN_DEV	(str)	serial port name (/dev/ttyS0) for iscan
-ISCAN_SERVER	(str)	program name for iscan program
-JUICEBUTTON	(0|1)	if 1, then sw1 will deliver rewards while running
-JUICESWITCH	(0|1)	if 1, then sw1 acts as switch to drain juice tank (when not running)
 MONH		(#)	monitor height in cm
 MONW		(#)	monitor width in cm
 MON_ID		(str)	identifier string for monitor (brand etc)
-NO_AUDIO	(0|1)	if 1, audio is disabled
 PLEXHOST	(str)	IP # or name of machine running PlexNet
 PLEXPORT	(#)	port # for PlexNet
-PPORT		(hex#)	port # for parallel port controller (cage trainer); should start with 0x
+PPORT		(hex#)	port # for parallel port (cage trainer);
+			should start with 0x
 PUPILXTALK	(#,#)	lumiance-position cross talk correction for eyelink
 REWARD_BEEP	(0|1)	beep on each reward
 SDLDPY		(str)	display to use for graphics -- typically ":0.0"

@@ -143,8 +143,6 @@ static int comedi_init()
   analog_in  = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_AI,0);
   if (analog_in == -1) {
     comedi_perror("analog_in");
-  } else {
-    fprintf(stderr, "%s: analog input OK\n", progname);
   }
 
   n = comedi_get_n_channels(comedi_dev, analog_in);
@@ -173,7 +171,7 @@ static int comedi_init()
     if (dig_io == -1) {
       comedi_perror("dig_io");
     } else {
-      fprintf(stderr, "%s: digitial IO OK\n", progname);
+      fprintf(stderr, "%s: digitial IO available\n", progname);
       dig_i = -1;
       dig_o = -1;
     }
@@ -325,6 +323,8 @@ static int init()
     dummymode = 1;
   }
   fprintf(stderr, "%s: comedi initialized.\n", progname);
+
+#ifdef LIST_COMEDI_SUBDEVS
   if (dig_io >= 0) {
     fprintf(stderr, "%s: dig_io=subdev #%d\n", progname, dig_io);
   }
@@ -337,6 +337,7 @@ static int init()
   if (analog_in >= 0) {
     fprintf(stderr, "%s: analog_in=subdev #%d\n", progname, analog_in);
   }
+#endif
 
   if ((shmid = shmget((key_t)SHMKEY,
 		      sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
@@ -741,9 +742,6 @@ static int locktocore(int corenum)
     CPU_ZERO(&mask);
     CPU_SET(corenum, &mask);
     result = sched_setaffinity(0, sizeof(mask), &mask);
-    if (result >= 0) {
-      fprintf(stderr, "%s: locked dacq to core %d\n", progname, corenum);
-    }
   }
   return(result);
 }
@@ -1147,12 +1145,16 @@ int main(int ac, char **av, char **envp)
 
   hz = find_clockfreq(&ncores);
   ticks_per_ms = (unsigned long long)(0.5 + (hz / 1000.0));
-  fprintf(stderr, "%s: %.0f mHz cpu detected; %.1f megaticks/ms\n", \
+  fprintf(stderr, "%s: %.0f mHz cpu detected; %.1f megaticks/ms\n",
 	  progname, hz/1e6, ticks_per_ms/1.0e6);
 
   if (ncores >= 4) {
-    fprintf(stderr, "%s: detected %d cores.\n", progname, ncores);
-    locktocore(3);
+    if (locktocore(ncores-1) >= 0) {
+      fprintf(stderr, "%s: %d cores -- locked to #%d\n", 
+	      progname, ncores, ncores-1);
+    } else {
+      fprintf(stderr, "%s: %d cores -- can't lock\n", progname, ncores);
+    }
   }
 
   if ((semid = psem_init(SEMKEY)) < 0) {
@@ -1160,8 +1162,6 @@ int main(int ac, char **av, char **envp)
     fprintf(stderr, "%s: can't init semaphore\n", progname);
     exit(1);
   }
-
-  fprintf(stderr, "bar\n");
 
   // get requested analog input range for comedi device (+- ARANGE volts)
   if ((p = getenv("XX_ARANGE")) != NULL) {
@@ -1172,7 +1172,6 @@ int main(int ac, char **av, char **envp)
   }
 
   init();
-  fprintf(stderr, "%s: initted\n", progname);
 
   if (av[1] && (strcmp(av[1], "-iscan") == 0)) {
     iscan_init(av[2]);

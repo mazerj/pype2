@@ -321,6 +321,17 @@ Fri Jan 15 09:53:24 2010 mazer
 - migrated from Numeric to numpy
   
   
+Wed Apr 14 09:31:07 2010 mazer
+
+- cleanup:
+
+  * config NO_AUDIO -> AUDIO
+  * config GFX_TESTMODE purged
+  * config OPENGL purged
+  * config DACQ_SERVER purged (comedi_server only now)
+  * config ISCAN_SERVER & ISCAN_DEV purged
+  * all the sw1/sw2/juicewswicth/juicebutton stuff removed
+  
 """
 
 __author__   = '$Author$'
@@ -383,7 +394,9 @@ import userdpy
 import pypeversion
 import configvars
 import candy
-import prand
+
+
+import prand							# local Mersenne Twister implementation
 if not prand.validate():
 	sys.stderr.write('Invalid Mersenne Twister implmentation.')
 	sys.exit(1)
@@ -502,12 +515,6 @@ class PypeApp:
 		mon_id = self.config.get('MON_ID', '')
 		if len(mon_id) == 0:
 			Logger('pype: warning -- MON_ID field in Config file unset.\n')
-
-		# GFX_TESTMODE is now obsolete, replaced by FULLSCREEN
-		if self.config.iget('GFX_TESTMODE', default=-666) != -666:
-			Logger("pype: CONFIG ERROR: GFX_TESTMODE is obsolete" +
-				   "      Try FULLSCREEN instead.\n")
-			raise FatalPypeError
 
 		state = self.__readstate()
 		if state is None:
@@ -848,19 +855,19 @@ class PypeApp:
 		self.rig_common.set('mon_ppd', '%g' % ppd)
 
 		et = self.config.get('EYETRACKER', 'ANALOG')
-		if et == 'ISCAN':
+		if et.upper() == 'ISCAN':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '16')
-		elif et == 'EYELINK':
+		elif et.upper() == 'EYELINK':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '0')
-		elif et == 'ANALOG':
+		elif et.upper() == 'ANALOG':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '0')
-		elif et == 'EYEJOY':
+		elif et.upper() == 'EYEJOY':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '0')
-		elif et == 'NONE':
+		elif et.upper() == 'NONE':
 			self.rig_common.set('eyetracker', et)
 			self.rig_common.set('eyelag', '0')
 		else:
@@ -1095,11 +1102,6 @@ class PypeApp:
 		# make sure we're root, if possible
 		rootperm.root_take()
 
-		check = self.config.get('ISCAN_DEV')
-		if check and len(check) == 0:
-			warn('Error', \
-				 'ISCAN_DEV in config is obsolete, change to EYETRACKER_DEV')
-
 		# EYELINK_OPTS can be defined in the pyperc config file and should
 		# contained a colon-delimited list of commands to be sent to the
 		# eyelink. Most users should NEVER use this feature, it's really
@@ -1134,10 +1136,8 @@ class PypeApp:
 
 		os.environ['XX_ARANGE'] = self.config.get('ARANGE')
 
-		dacq_start(1,
-				   self.config.iget('DACQ_TESTMODE'),
+		dacq_start(self.config.iget('DACQ_TESTMODE'),
 				   self.config.get('EYETRACKER'),
-				   self.config.get('DACQ_SERVER'),
 				   self.config.get('EYETRACKER_DEV'))
 		
 		self.drawledbar()
@@ -1160,8 +1160,6 @@ class PypeApp:
 		# this is a hack -- some buttons are down/true others are
 		# up/true .. lets user sort it all out..
 		self.flip_bar = self.config.iget('FLIP_BAR')
-		self.flip_sw1 = self.config.iget('FLIP_SW1')
-		self.flip_sw2 = self.config.iget('FLIP_SW2')
 
 		# NOTE:
 		# Framebuffer initialization will give up root access
@@ -1169,20 +1167,19 @@ class PypeApp:
 		# first (see above).
 
 		rootperm.root_drop()
-		if self.config.iget('NO_AUDIO'):
-			from beep import _Beeper
-			_Beeper(disable=1)
+		if not self.config.iget('AUDIO'):
 			# disable the beep subsystem:
+			import beep as b
+			b.SoundDevice(disable=1)
 			Logger('pype: audio disabled by user config\n')
 		else:
 			if self.config.get('AUDIODRIVER'):
-				audiodriver = self.config.get('AUDIODRIVER')
+				driver = self.config.get('AUDIODRIVER')
 			elif sys.platform == 'darwin':
-				audiodriver = 'sndmgr'
+				driver = 'sndmgr'
 			else:
-				# default for linux...
-				audiodriver = 'alsa'
-			beep(init=1, driver=audiodriver)
+				driver = None			# let pygame sort it out (was alsa)
+			beep(init=1, driver=driver)
 		rootperm.root_take()
 
 		self.init_framebuffer()
@@ -1365,7 +1362,7 @@ class PypeApp:
 
 	def drawledbar(self):
 		x = ("[^]", "[v]")
-		t = x[dacq_bar()] + x[dacq_sw1()] + x[dacq_sw2()]
+		t = x[dacq_bar()]
 		if dacq_jsbut(-1):
 			t = t + " ("
 			for n in range(10):
@@ -1761,8 +1758,7 @@ class PypeApp:
 							  self.config.iget('FULLSCREEN'),
 							  syncsize=self.config.iget('SYNCSIZE'),
 							  syncx=sx, syncy=sy,
-							  synclevel=self.config.iget('SYNCLEVEL'),
-							  opengl=self.config.iget('OPENGL'))
+							  synclevel=self.config.iget('SYNCLEVEL'));
 
 		self.fb.app = self
 		g = self.config.fget('GAMMA')
@@ -1934,35 +1930,6 @@ class PypeApp:
 	def query_ntrials(self):
 		# note: UI's and ABORTs don't count as trials
 		return self.__runstats['ncorrect'] + self.__runstats['nerror']
-
-	def OBSOLETE_trial_ui(self, uimax=None):
-		"""This trial was un-initiated.."""
-		if uimax is None:
-			uimax = self.sub_common.queryv('uimax')
-			trialstats['uicount'] = self.trialstats['uicount'] + 1
-		if uimax and (self.trialstats['uicount']  > uimax):
-			warn('Warning',
-				 'UI Count exceeded.\nTime: %s\nPlease intervene.\n' %
-				 Timestamp(), wait=1)
-			self.trialstats['uicount'] = 0
-
-	def OBSOLETE_trial_clear(self):
-		# runset stats
-		self.trialstats['trialnum'] = 0	# number of total trial
-		self.trialstats['ntrials'] = 0	# number of real/iniated trial
-		self.trialstats['ncorrect'] = 0	# number correct (out of ntrials)
-		self.trialstats['uicount'] = 0	# number UI trials
-
-	def OBSOLETE_trial_new(self):
-		"""Starting a new trial..."""
-		self.trialstats['trialnum'] = self.trialstats['trialnum'] + 1
-
-	def OBSOLETE_trial_correct(self, correct):
-		"""This trial was correct..."""
-		if correct:
-			self.trialstats['ncorrect'] = self.trialstats['ncorrect'] + 1
-		self.trialstats['ntrials'] = self.trialstats['ntrials'] + 1
-		self.trialstats['uicount'] = 0
 
 	def new_cell(self):
 		try:
@@ -2310,32 +2277,6 @@ class PypeApp:
 				Logger('pype: user requested exit.\n')
 				sys.exit(0)
 
-			if self.config.iget('ENABLE_SW1'):
-				if self.running:
-					# added JUICEBUTTON for Ben Willmore 20-sep-2003:
-					if self.sw1() and self.config.iget('JUICEBUTTON'):
-						self.console.writenl("sw1 running", color='red')
-						self.reward()
-				elif self.sw1():
-					# added JUICESWITCH 27-feb-2005 JAM
-					if not self.config.iget('JUICESWITCH'):
-						# give squirt (vs. constant on) and wait for switch
-						# to get released before continuing
-						self.console.writenl("sw1 not running", color='red')
-						self.reward()
-						while self.sw1():
-							self.idlefn()
-					else:
-						self.juice_on()
-						self.status('juice on')
-						while self.sw1():
-							self.tk.update()
-							if self.terminate:
-								Logger("pype: warning -- juice switch open\n")
-								break
-						self.juice_off()
-						self.status('')
-
 			x, y = self.eyepos()
 			try:
 				self.udpy.eye_at(x, y)
@@ -2436,21 +2377,6 @@ class PypeApp:
 				self.userinfo.configure(bg='#c0cbff')
 			else:
 				self.userinfo.configure(bg='white')
-
-	def OBSOLETE_nreps(self):
-		"""Query the number of repetitions (slider value)"""
-		if self.tk:
-			return self.sub_common.queryv('nreps')
-		else:
-			raise GuiOnlyFunction, "nreps"
-
-	def OBSOLETE_notdone(self, repnum):
-		"""Continue running or abort/done?"""
-		nreps = self.nreps()
-		if self.running and (nreps == 0 or repnum < nreps):
-			return 1
-		else:
-			return 0
 
 	def runstate(self, state=1):
 		if state:
@@ -2672,19 +2598,21 @@ class PypeApp:
 			pass
 
 	def debug_handler(self, signal, frame):
-		"""This is for catching SIGUSR2's for debugging.."""
-		sys.stderr.write('\n------------------------------Recieved SIGUSR2:\n')
+		"""Catching SIGUSR2's for debugging and drop into keyboard shell"""
+		sys.stderr.write('\n\n[Recieved SIGUSR2]\n')
 		traceback.print_stack(frame)
 		keyboard()
 
 	def bardown(self):
 		if self.pport:
-			return pp_bar()
+			state = pp_bar()
 		else:
-			if self.flip_bar:
-				return not dacq_bar()
-			else:
-				return dacq_bar()
+			state = dacq_bar()
+			
+		if self.flip_bar:
+			return not state
+		else:
+			return state
 
 	def barup(self):
 		return not self.bardown()
@@ -2706,35 +2634,6 @@ class PypeApp:
 
 		"""
 		return (dacq_js_x(), dacq_js_y())
-
-	def sw1(self):
-		# if FLIP_SW1 < 0, disable switch 1 (for das08 problems)
-		if self.flip_sw1 < 0:
-			return 0
-	
-		if self.config.iget('DACQ_TESTMODE'):
-			return 0
-		elif self.pport:
-			return pp_sw1()
-		else:
-			if self.flip_sw1:
-				return not dacq_sw1()
-			else:
-				return dacq_sw1()
-
-	def sw2(self):
-		# if FLIP_SW2 < 0, disable switch 2 (for das08 problems)
-		if self.flip_sw1 < 0:
-			return 0
-		if self.config.iget('DACQ_TESTMODE'):
-			return 0
-		elif self.pport:
-			return pp_sw2()
-		else:
-			if self.flip_sw2:
-				return not dacq_sw2()
-			else:
-				return dacq_sw2()
 
 	def close(self):
 		"""
@@ -3425,8 +3324,9 @@ class PypeApp:
 				else:
 					fname = libdir('testpat.png');
 				# load new test pattern and scale to fit frame buffer
-				s = Sprite(x=0, y=0,
-						   fname=fname, fb=self.fb, depth=99, on=1)
+				s = Sprite(x=0, y=0, fname=fname,
+						   name='testpat',
+						   fb=self.fb, depth=99, on=1)
 				s.scale(self.fb.w, self.fb.h)
 				self._testpat = s
 					
@@ -3434,11 +3334,13 @@ class PypeApp:
 			if self.testpat.get() and self._testpat:
 				self._testpat.blit(force=1)
 				s = Sprite(x=50, y=50, width=150, height=150,
+						   name='alphatest1',
 						   fb=self.fb, on=1)
 				s.fill((255,1,1))
 				s.alpha[:]=128
 				s.blit()
 				s = Sprite(x=-50, y=-50,  width=150, height=150,
+						   name='alphatest2',
 						   fb=self.fb, on=1)
 				s.fill((1,255,1))
 				s.alpha[:]=128
@@ -3914,10 +3816,6 @@ class Timer:
 
 	def ms(self):
 		return dacq_ts_f() - self._start_at
-
-	def us(self):
-		Logger("pype: warning -- timer.us method obsolete, faking it\n")
-		return 1000 * (dacq_ts_f() - self._start_at)
 
 class Holder:
 	"""Dummy class

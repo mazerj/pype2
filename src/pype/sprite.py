@@ -96,6 +96,14 @@ Fri Jan 15 09:53:24 2010 mazer
 
 - migrated from Numeric to numpy
 
+Tue Apr 13 14:24:14 2010 mazer
+
+- got rid of DGA driver stuff once and for all. fullscreen mode under
+  linux is basically X11+OpenGL... just make sure you're using an
+  accelerated GL-capable card!
+
+- got rid of opengl option and references -- it's all opengl now..
+
 """
 
 __author__   = '$Author$'
@@ -143,13 +151,12 @@ from stats import mean, stdev
 from spritetools import *
 
 try:
-	# Shinji added 17-Jan-2006:
 	from OpenGL.GL import *
 	from OpenGL.GLU import *
 	from OpenGL.GLUT import *
-	OPENGL_AVAIL = 1
 except ImportError:
-	OPENGL_AVAIL = 0
+	sys.stderr.write('require `OpenGL` package.\n' % __name__)
+	sys.exit(1)
 
 # some useful colors..
 WHITE = (255, 255, 255)
@@ -171,9 +178,9 @@ def _got_root():
 	return (posix.geteuid() == 0)
 
 def _pygl_setxy(x, y):
+	# 24-jan-2006 shinji
 	# A trick for the OpenGL position setting to let us blit
 	# image even if the part of sprite is outside the screen.
-	# 24-jan-2006 shinji
 	glRasterPos2i(0,0)
 	glBitmap(0, 0, 0, 0, x, y, '\0')
 
@@ -189,12 +196,12 @@ def checkrshift():
 class FrameBuffer:
 	def __init__(self, dpy, width, height, bpp, fullscreen, bg=1,
 				 sync=1, syncsize=50, syncx=None, syncy=None,
-				 synclevel=255, opengl=0, mouse=0):
+				 synclevel=255, mouse=0):
 		"""FrameBuffer class (SDL<-pygame<-pype).
 
 		This class provides a simple wrapper for the pygame interface
 		to the framebuffer device. In theory this could be an X11
-		window, X11-DGA fullscreen buffer or even a raw framebuffer
+		window, X11/OpenGL fullscreen buffer or even a raw framebuffer
 		using /dev/fb0.
 
 		**dpy** - string containing name of X11 display to contact (None
@@ -229,9 +236,6 @@ class FrameBuffer:
 		corner of the screen (if syncsize <= 0, then sync pulses are
 		disabled - same as sync=0)
 
-		**opengl** - boolean flag indicating whether or not to run
-		in OpenGL mode  (added 17-jan-2006 shinji)
-
 		**pype** - optional pype app handle
 
 		**mouse** - show mouse cursor? default is no
@@ -255,42 +259,24 @@ class FrameBuffer:
 			Logger('sprite: fullscreen only for root, ignored.\n')
 			self.flags = self.flags & ~FULLSCREEN
 
-		self.opengl = opengl
-		if self.opengl and not OPENGL_AVAIL:
-			sys.stderr.write('Requested GL, but PyOpenGL not installed!\n');
-			sys.exit(1)
-			
-		if self.opengl:
-			# set driver for OPENGL mode
-			if sys.platform=='darwin':
-				self.driver = 'Quartz'
-			else:
-				self.driver = 'x11'
-			os.environ['__GL_SYNC_TO_VBLANK'] = '1'
-			self.flags = self.flags | OPENGL
+		# set driver for OPENGL mode
+		if sys.platform=='darwin':
+			self.driver = 'Quartz'
 		else:
-			# set driver for non-GL mode
-			if sys.platform=='darwin':
-				# mac still uses quartz..
-				self.driver = 'Quartz'
-			elif (self.flags & FULLSCREEN):
-				# linux uses dga for full screen only..
-				self.driver = 'dga'
-			else:
-				# otherwise x11
-				self.driver = 'x11'
-		
+			self.driver = 'x11'
+		os.environ['__GL_SYNC_TO_VBLANK'] = '1'
+		self.flags = self.flags | OPENGL
 		os.environ['SDL_VIDEODRIVER'] = self.driver
 
-		if dpy:
-			self.gui_dpy = os.environ['DISPLAY']
-			self.fb_dpy = dpy
-
-		try:
-			os.environ['DISPLAY'] = self.fb_dpy
+		if dpy and fullscreen:
+			gui_dpy = os.environ['DISPLAY']
+			os.environ['DISPLAY'] = dpy
+			try:
+				pygame.init()
+			finally:
+				os.environ['DISPLAY'] = gui_dpy
+		else:
 			pygame.init()
-		finally:
-			os.environ['DISPLAY'] = self.gui_dpy
 		
 		if width is None or height is None:
 			modes = pygame.display.list_modes(bpp, self.flags)
@@ -334,14 +320,12 @@ class FrameBuffer:
 		self.opendisplay()
 
 		if (self.flags & OPENGL):
-			mode = '/OPENGL'
-		else:
-			mode = '/pygame'
+			mode = '+OPENGL'
 			
 		if (self.flags & FULLSCREEN):
-			mode = mode+'/fullscreen'
+			mode = mode+'+fullscreen'
 		else:
-			mode = mode+'/windowed'
+			mode = mode+'+windowed'
 			
 		
 		Logger('framebuffer: dev=%s%s %dx%d %dbbp\n' % \
@@ -408,16 +392,12 @@ class FrameBuffer:
 		self.close()
 
 	def opendisplay(self):
-		if self.opengl:
-			# for unknown reason(s), we can not set_mode using
-			# maxbpp in OpenGL mode. (shinji)
-			self.screen = pygame.display.set_mode((self.w, self.h),
-											  self.flags)
-			# doesn't seem like you can set this with gl_set_attribute either.
-			self.maxbpp = pygame.display.gl_get_attribute(GL_DEPTH_SIZE)
-		else:
-			self.screen = pygame.display.set_mode((self.w, self.h),
-											  self.flags, self.maxbpp)
+		# for unknown reason(s), we can not set_mode using
+		# maxbpp in OpenGL mode. (shinji)
+		self.screen = pygame.display.set_mode((self.w, self.h),
+										  self.flags)
+		# doesn't seem like you can set this with gl_set_attribute either.
+		self.maxbpp = pygame.display.gl_get_attribute(GL_DEPTH_SIZE)
 
 		pygame.display.set_caption('Pype Display (%dx%d; %d bbp)' % \
 								   (self.w, self.h, self.maxbpp))
@@ -425,13 +405,9 @@ class FrameBuffer:
 		# turn OFF the cursor!!
 		self.cursor(0)
 
-		if self.opengl:
-			glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
-			glEnable(GL_BLEND)
-			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-		else:
-			# set (0,0,0) to be transparent/colorkey
-			self.screen.set_colorkey((0,0,0,0))
+		glOrtho(0.0, self.w, 0.0, self.h, 0.0, 1.0)
+		glEnable(GL_BLEND)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
 	def printinfo(self):
 		vi = pygame.display.Info()
@@ -670,17 +646,13 @@ class FrameBuffer:
 			color = self.bg
 		color = _C(color)
 
-		if self.opengl:
-			cl = [0.0]*4
-			cl[0] = float(color[0])/255
-			cl[1] = float(color[1])/255
-			cl[2] = float(color[2])/255
-			cl[3] = float(color[3])/255
-			glClearColor(cl[0], cl[1], cl[2], cl[3])
-			glClear(GL_COLOR_BUFFER_BIT)
-		else:
-			self.screen.fill(color)
-		# added OpenGL fill 12-jan-2006 shinji
+		cl = [0.0]*4
+		cl[0] = float(color[0])/255
+		cl[1] = float(color[1])/255
+		cl[2] = float(color[2])/255
+		cl[3] = float(color[3])/255
+		glClearColor(cl[0], cl[1], cl[2], cl[3])
+		glClear(GL_COLOR_BUFFER_BIT)
 
 		if flip:
 			self.flip()
@@ -712,9 +684,8 @@ class FrameBuffer:
 			# directly to the frame buffer and does it's own flip..)
 			return
 
-		if self.opengl:
-			glFinish()
-			# to make sure all stimuli are written to the surface.
+		# to make sure all stimuli are written to the surface.
+		glFinish()
 
 		pygame.display.flip()
 		if self.fliptimer is None:
@@ -724,13 +695,6 @@ class FrameBuffer:
 			self.fliptimer.reset()
 			if (self.maxfliptime > 0) and (elapsed > self.maxfliptime):
 				Logger('warning: %dms flip\n' % elapsed)
-
-		# JAM 12/10/2002 - something on the sdl newsgroup suggested that
-		#   flip doesn't actually block until you try to read or write
-		#   the screen surface.. just in case that's true
-
-		if not self.opengl:
-			self.screen.set_at((0,0), self.screen.get_at((0,0)))
 
 	def string(self, x, y, s, color, flip=None, prefill=None, size=30):
 		"""Draw string on framebuffer
@@ -781,27 +745,17 @@ class FrameBuffer:
 		(x, y) = self._xy(x, -y)
 
 		if prefill:
-			if self.opengl:
-				strw = s.get_width()
-				strh = s.get_height()
-				self.rectangle(rawx, rawy, strw*1.1, strh*1.1,
-							   prefill, width=0)
+			strw = s.get_width()
+			strh = s.get_height()
+			self.rectangle(rawx, rawy, strw*1.1, strh*1.1,
+						   prefill, width=0)
 
-			else:
-				rect = (x - (1.1*s.get_width())/2, y-(1.1*s.get_height())/2,
-						1.1*s.get_width(), 1.1*s.get_height())
-				self.screen.fill(prefill, rect)
-
-		if self.opengl:
-			# added OpenGL mode 12-jan-2006 shinji
-			blitstr = pygame.image.tostring(s, 'RGBA', 1)
-			_pygl_setxy(x - (s.get_width()/2),
-					   self.h - y - (s.get_height()/2))
-			glDrawPixels(s.get_width(), s.get_height(), GL_RGBA,
-						 GL_UNSIGNED_BYTE, blitstr)
-		else:
-			self.screen.blit(s, (x - (s.get_width()/2),
-								 (y - (s.get_height()/2))))
+		# added OpenGL mode 12-jan-2006 shinji
+		blitstr = pygame.image.tostring(s, 'RGBA', 1)
+		_pygl_setxy(x - (s.get_width()/2),
+				   self.h - y - (s.get_height()/2))
+		glDrawPixels(s.get_width(), s.get_height(), GL_RGBA,
+					 GL_UNSIGNED_BYTE, blitstr)
 
 		if flip:
 			self.flip()
@@ -925,16 +879,13 @@ class FrameBuffer:
 					  ((cx - w), (cy - h)))
 
 
-		if self.opengl:
-			# added OpenGL drawing 12-jan-2006 shinji
-			s = pygame.Surface((w*2, h*2), flags=0, depth=32)
-			s.set_colorkey((0,0,0,0))
-			pygame.draw.rect(s, color, (0,0,w*2,h*2), width)
-			blitstr = pygame.image.tostring(s, 'RGBA')
-			_pygl_setxy(cx-w, self.h - cy - h)
-			glDrawPixels(w*2, h*2, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
-		else:
-			pygame.draw.polygon(self.screen, color, pointslist, width)
+		# added OpenGL drawing 12-jan-2006 shinji
+		s = pygame.Surface((w*2, h*2), flags=0, depth=32)
+		s.set_colorkey((0,0,0,0))
+		pygame.draw.rect(s, color, (0,0,w*2,h*2), width)
+		blitstr = pygame.image.tostring(s, 'RGBA')
+		_pygl_setxy(cx-w, self.h - cy - h)
+		glDrawPixels(w*2, h*2, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
 
 	def line(self, start, stop, color, width=1, flip=None):
 		"""Draw line directly on framebuffer
@@ -954,22 +905,16 @@ class FrameBuffer:
 		"""
 		color = _C(color)
 
-		if self.opengl:
-			# added OpenGL drawing 12-jan-2006
-			glLineWidth(width)
-			glColor3d(float(color[0])/255, float(color[1])/255,
-					  float(color[2])/255)
-			startpos = self._xy(start, sflip=1)
-			stoppos = self._xy(stop, sflip=1)
-			glBegin(GL_LINE_LOOP)
-			glVertex2f(startpos[0], self.h-startpos[1])
-			glVertex2f(stoppos[0], self.h-stoppos[1])
-			glEnd()
-		else:
-			pygame.draw.line(self.screen, color,
-							 self._xy(start, sflip=1), self._xy(stop, sflip=1),
-							 width)
-
+		# added OpenGL drawing 12-jan-2006
+		glLineWidth(width)
+		glColor3d(float(color[0])/255, float(color[1])/255,
+				  float(color[2])/255)
+		startpos = self._xy(start, sflip=1)
+		stoppos = self._xy(stop, sflip=1)
+		glBegin(GL_LINE_LOOP)
+		glVertex2f(startpos[0], self.h-startpos[1])
+		glVertex2f(stoppos[0], self.h-stoppos[1])
+		glEnd()
 
 		if flip:
 			self.flip()
@@ -992,20 +937,15 @@ class FrameBuffer:
 
 		"""
 
-		if self.opengl:
-			# added OpenGL drawing 12-jan-2006 shinji
-			(cx, cy) = self._xy((cx, -cy), sflip=1)
-			surfsize = r*2+width
-			s = pygame.Surface((surfsize, surfsize), flags=0, depth=32)
-			s.set_colorkey((0,0,0,0))
-			pygame.draw.circle(s, color, (surfsize/2, surfsize/2), r, width)
-			blitstr = pygame.image.tostring(s, 'RGBA')
-			_pygl_setxy(cx-surfsize/2, cy-surfsize/2)
-			glDrawPixels(surfsize, surfsize, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
-		else:
-			(cx, cy) = self._xy((cx, cy), sflip=1)
-			pygame.draw.circle(self.screen, color, (cx, cy), r, width)
-
+		# added OpenGL drawing 12-jan-2006 shinji
+		(cx, cy) = self._xy((cx, -cy), sflip=1)
+		surfsize = r*2+width
+		s = pygame.Surface((surfsize, surfsize), flags=0, depth=32)
+		s.set_colorkey((0,0,0,0))
+		pygame.draw.circle(s, color, (surfsize/2, surfsize/2), r, width)
+		blitstr = pygame.image.tostring(s, 'RGBA')
+		_pygl_setxy(cx-surfsize/2, cy-surfsize/2)
+		glDrawPixels(surfsize, surfsize, GL_RGBA, GL_UNSIGNED_BYTE, blitstr)
 
 def zoomdown(fb, cx, cy, width=100, height=100,
 			 color=(255,255,255), nsteps=None):
@@ -1954,22 +1894,17 @@ class Sprite(_ImageBase):
 		scy = fb.hh - y - (self.h / 2)
 
 		# blit and optional page flip..
-		if fb.opengl:
-			scy = fb.hh + y - (self.h / 2)
-			_pygl_setxy(scx, scy)
-			try:
-				# fastim precomputed by render()?
-				glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
-							 self._fastim)
-			except AttributeError:
-				# nope, go ahead and render then blit..
-				blitstr = pygame.image.tostring(self.im, 'RGBA', 1)
-				glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
-							 blitstr)
-		else:
-			fb.screen.blit(self.im, (scx, scy))
-
-		#added OpenGL blit 12-jan-2006 shinji
+		scy = fb.hh + y - (self.h / 2)
+		_pygl_setxy(scx, scy)
+		try:
+			# fastim precomputed by render()?
+			glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
+						 self._fastim)
+		except AttributeError:
+			# nope, go ahead and render then blit..
+			blitstr = pygame.image.tostring(self.im, 'RGBA', 1)
+			glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
+						 blitstr)
 
 		if flip:
 			fb.flip()
@@ -1996,18 +1931,13 @@ class Sprite(_ImageBase):
 		if not self._on:
 			return
 
-		if self.fb.opengl:
-			# added OpenGL fastblit(blit pre-calculated string)
-			# 12-jan-2006 shinji
-			x = self.fb.hw + self.x - (self.w / 2)
-			y = self.fb.hh + self.y - (self.h / 2)
-			_pygl_setxy(x, y)
-			glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
-						 self._fastim)
-		else:
-			x = self.fb.hw + self.x - (self.w / 2)
-			y = self.fb.hh - self.y - (self.h / 2)
-			self.fb.screen.blit(self._fastim, (x, y))
+		# added OpenGL fastblit(blit pre-calculated string)
+		# 12-jan-2006 shinji
+		x = self.fb.hw + self.x - (self.w / 2)
+		y = self.fb.hh + self.y - (self.h / 2)
+		_pygl_setxy(x, y)
+		glDrawPixels(self.w, self.h, GL_RGBA, GL_UNSIGNED_BYTE,
+					 self._fastim)
 		return 1
 
 	def render(self, clear=None):
@@ -2028,12 +1958,7 @@ class Sprite(_ImageBase):
 				pass
 			return
 
-		if self.fb.opengl:
-			self._fastim = pygame.image.tostring(self.im,'RGBA', 1)
-		else:
-			self._fastim = self.im.convert()
-
-		#added opengl convert 12-jan-2006 shinji
+		self._fastim = pygame.image.tostring(self.im,'RGBA', 1)
 
 	def subimage(self, x, y, w, h, center=None):
 		"""Extract sub-region of sprite into new sprite
@@ -2330,7 +2255,7 @@ class PolySprite:
 		if not self._on:
 			return
 
-		if self.fb and self.fb.opengl:
+		if self.fb:
 			if self.line:
 				glLineWidth(self.width)
 			glColor3d(float(self.color[0])/255,
@@ -2347,13 +2272,6 @@ class PolySprite:
 				xy = self.fb._xy(xy, sflip=1)
 				glVertex2f(xy[0], self.fb.h-xy[1])
 			glEnd()
-		else:
-			if self.line:
-				pygame.draw.lines(self.fb.screen, self.color, self.closed,
-								  self.points, self.width);
-			else:
-				pygame.draw.polygon(self.fb.screen, self.color,
-								  self.points, self.width);
 		if flip:
 			self.fb.flip()
 
@@ -2629,7 +2547,7 @@ def _C(color):
 					 color&ALPHAMASKS[3])
 	return color
 
-def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0, mouse=1):
+def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, mouse=1):
 	"""Quickly setup and initialize framebuffer
 
 	**dpy** (string) - display string
@@ -2641,15 +2559,13 @@ def quickinit(dpy=":0.0", w=100, h=100, bpp=32, fullscreen=0, opengl=0, mouse=1)
 
 	**fullscreen** (bool) - full screen mode (default is no)
 	
-	**opengl** (bool) - use OpenGL backend? (default is no)
-
 	**mouse** (bool) - now mouse cursor? (default is no)
 
 	**returns** - live frame buffer
 
 	"""
 	return FrameBuffer(dpy, w, h, bpp, fullscreen,
-					   sync=None, opengl=opengl, mouse=mouse)
+					   sync=None, mouse=mouse)
 
 
 # these are just here to generate useful error messages

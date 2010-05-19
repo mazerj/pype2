@@ -593,7 +593,7 @@ def image_circmask(im, x, y, r, apply):
 
 if __name__ == '__main__':
 	#pass
-	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0, opengl=1)
+	fb = quickinit(dpy=":0.0", w=512, h=512, bpp=32, fullscreen=0)
 	s = Sprite(x=0, y=0, width=100, height=100, fb=fb, on=1)
 	simple_rdp(s, fraction=0.05, fgcolor=(255,255,1))
 	for n in range(100):

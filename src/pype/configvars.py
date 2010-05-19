@@ -16,6 +16,10 @@ Tue Mar 31 13:59:22 2009 mazer
 
 - added TESTPAT
 
+Wed Apr 14 09:26:52 2010 mazer
+
+- NO_AUDIO=0 --> AUDIO=1
+
 """
 __author__   = '$Author$'
 __date__     = '$Date$'
@@ -45,21 +49,14 @@ def defaults(srcfile):
     #####################################################
     # physical hardware (i/o) settings
     
-    c.set('DACQ_SERVER',
-          'comedi_server')              # name of DACQ executable
     c.set('ARANGE',	'10.0')             # set analog input volt. range (+-V)
     c.set('PPORT', '-1')                # enable parallel port access
                                         # specific 1 for default or
                                         # 0xNNN for non-default
     c.set('FLIP_BAR', '0')              # flip response  bar input polarity
-    c.set('FLIP_SW1', '0')              # flip user switch 1 input polarity
-    c.set('FLIP_SW2', '0')              # flip user switch 1 input polarity
-    c.set('ENABLE_SW1', '0')            # enable/disable SW1
-    c.set('JUICEBUTTON', '1')           # if 1, SW1 triggers a *reward*
-    c.set('JUICESWITCH', '1')           # if 1, SW1 opens/closes solenoid
     c.set('REWARD_BEEP', '1')           # beep when giving rewards?
     c.set('DACQ_TESTMODE', '0')         # testing mode for DAQ cards
-    c.set('NO_AUDIO', '0')              # disable audio?
+    c.set('AUDIO', '1')                 # enable audio?
     
     c.set('USB_JS_DEV',	'')             # enable USB joystick -- device file
 

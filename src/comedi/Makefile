@@ -30,7 +30,7 @@ comedi_server: comedi_server.o $(SERVER_OBJS)
 	$(CC) -o $@ $< $(SERVER_OBJS) $(EYELINK_LIB) -lcomedi -lm -lezV24
 
 _dacqmodule.so: dacq.c dacq.h dacq.o psems.o
-	cat _dacq.i dacq.h >>dacq.i
+	cat _dacq.i dacq.h >dacq.i
 	swig -python dacq.i
 	$(CC) $(CFLAGS) $(PYTHONINC) -c dacq_wrap.c
 	$(CC) -shared dacq_wrap.o dacq.o psems.o -o $@
