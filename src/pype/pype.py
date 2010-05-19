@@ -3081,7 +3081,7 @@ class PypeApp:
 		warnings as the other get_XXXXX_now() methods above..
 
 		"""
-		return self.record_buffer[:]
+		return self.record_buffer[::]
 
 	def record_write(self, result=None, rt=None, pdict=None, taskinfo=None):
 		"""
@@ -3412,12 +3412,12 @@ class PypeApp:
 				s = Sprite(x=50, y=50, width=150, height=150,
 						   fb=self.fb, on=1)
 				s.fill((255,1,1))
-				s.alpha[:]=128
+				s.alpha[::]=128
 				s.blit()
 				s = Sprite(x=-50, y=-50,  width=150, height=150,
 						   fb=self.fb, on=1)
 				s.fill((1,255,1))
-				s.alpha[:]=128
+				s.alpha[::]=128
 				s.blit()
 
 			self.fb.sync(0)

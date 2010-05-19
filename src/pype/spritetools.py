@@ -255,7 +255,7 @@ def singrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	x, y = (r * cos(t), r * sin(t))
 
 	i = moddepth * sin((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	s.array[::] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
 def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,

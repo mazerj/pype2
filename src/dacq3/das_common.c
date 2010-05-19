@@ -133,7 +133,11 @@ static double find_clockfreq()	/* get clock frequency in Hz */
   return(mhz * 1.0e6);
 }
 
-#define RDTSC(x) __asm__ __volatile__ ( ".byte 0x0f,0x31" \
+#if defined(__i386__)
+
+// this macro doesn't quite work
+
+#define RDTSC(x) __asm__ __volatile__ ( ".byte 0x0f,0x31"		\
 					:"=a" (((unsigned long*)&x)[0]), \
 					 "=d" (((unsigned long*)&x)[1]))
 
@@ -142,7 +146,7 @@ static unsigned long timestamp(int init)
   static unsigned long long timezero;
   unsigned long long now;
 
-  RDTSC(now);			/* get cycle counter from hardwareTSC */
+  RDTSC(now);			/* get cycle counter from hardware TSC */
   if (init) {
     timezero = now;
     return(0);
@@ -151,6 +155,34 @@ static unsigned long timestamp(int init)
     return((unsigned long)((now - timezero) / ticks_per_ms));
   }
 }
+
+#elif defined(__x86_64__)
+
+/* need to use different method to access real time clock
+** under 64bit kernel!
+*/
+
+static unsigned long timestamp(int init)
+{
+  static unsigned long long timezero;
+  unsigned long long now;
+  unsigned a, d;
+
+  asm("cpuid");
+  asm volatile("rdtsc" : "=a" (a), "=d" (d));
+  now = ((unsigned long long)a) | (((unsigned long long)d) << 32);
+
+  if (init) {
+    timezero = now;
+    return(0);
+  } else {
+    /* use precalibrated ticks_per_ms to convert to real time.. */
+    return((unsigned long)((now - timezero) / ticks_per_ms));
+  }
+}
+#else
+#error "real time clock not defined this arch"
+#endif
 
 static void perror2(char *s, char *file, int line)
 {

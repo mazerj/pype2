@@ -1774,7 +1774,7 @@ class Sprite(_ImageBase):
 							((self.ay+y)**2))**0.5)-r1) / (r2-r1))
 		d = where(less(d, 0), 0,
 				  where(greater(d, 255), 255, d)).astype(UnsignedInt8)
-		self.alpha[:] = d
+		self.alpha[::] = d
 
 	def alpha_gradient2(self, r1, r2, bg, x=0, y=0):
 		"""Linear gradient vignette
