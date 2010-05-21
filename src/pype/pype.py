@@ -2189,8 +2189,7 @@ class PypeApp:
 		anywhere this is called you **MUST** catch the *UserAbort* exception!!!
 
 		"""
-
-
+		
 		if self._post_fixbreak:
 			self._post_fixbreak = 0
 			raise FixBreak

@@ -104,3 +104,16 @@ extern int dacq_js_y();
 
 /* new alarm function -- set to zero to clear alarm */
 extern void dacq_set_alarm(int ms_from_now);
+
+/* wiimote access functions */
+extern int dacq_wiiA(void);
+extern int dacq_wiiB(void);
+extern int dacq_wiiOne(void);
+extern int dacq_wiiTwo(void);
+extern int dacq_wiiLeft(void);
+extern int dacq_wiiRight(void);
+extern int dacq_wiiUp(void);
+extern int dacq_wiiDown(void);
+extern int dacq_wiiPlus(void);
+extern int dacq_wiiMinus(void);
+extern int dacq_wiiHome(void);

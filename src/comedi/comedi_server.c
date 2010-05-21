@@ -22,6 +22,9 @@
 **
 ** Tue May  5 15:58:44 2009 mazer 
 **   joystick junk moved into separate JS device in das_common.c
+**
+** Fri May 21 18:36:27 2010 mazer 
+**   added support for wiimote
 */
 
 #include <sys/types.h>
@@ -50,6 +53,7 @@
 #include "sigs.h"
 #include "psems.h"
 #include "usbjs.h"
+#include "wiimote.h"
 
 
 /* these are eyelink API header files */
@@ -76,6 +80,7 @@ static void mainloop(void);
 static int semid;
 static double arange;
 static int usbjs_dev;
+static cwiid_wiimote_t *wii;
 /* end das_common.h */
 
 static int pci_das08 = 0;	/* board is pci-das08? */
@@ -400,6 +405,7 @@ static int semid = -1;
 static unsigned long long ticks_per_ms = 0;
 static int swap_xy = 0;
 static int usbjs_dev = -1;
+static cwiid_wiimote_t *wii = NULL;
 static int iscan_x, iscan_y, iscan_p;
 static double arange = 10.0;
 static v24_port_t *iscan_port = NULL;
@@ -874,6 +880,23 @@ static void mainloop(void)
       }
     }
 
+    if (wii != NULL) {
+      int bs = wiimote_query(wii);
+      LOCK(semid);
+      dacq_data->two = bs & (1<<0);
+      dacq_data->one = bs & (1<<1);
+      dacq_data->B = bs & (1<<2);
+      dacq_data->A = bs & (1<<3);
+      dacq_data->minus = bs & (1<<4);
+      dacq_data->home = bs & (1<<6);
+      dacq_data->left = bs & (1<<7);
+      dacq_data->right = bs & (1<<8);
+      dacq_data->down = bs & (1<<9);
+      dacq_data->up = bs & (1<<10);
+      dacq_data->plus = bs & (1<<11);
+      UNLOCK(semid);
+    }
+
     switch (tracker_mode)
       {
       case NONE:
@@ -1123,6 +1146,11 @@ static void mainloop(void)
   eyelink_halt();
   if (usbjs_dev >= 0) {
     usbjs_close(usbjs_dev);
+    usbjs_dev = -1;
+  }
+  if (wii != NULL) {
+    wiimote_close(wii);
+    wii = NULL;
   }
 
   /* no longer ready */
@@ -1200,6 +1228,23 @@ int main(int ac, char **av, char **envp)
       fprintf(stderr, "%s: joystick at %s configured\n", progname, p);
       LOCK(semid);
       dacq_data->js_enabled = 1;
+      UNLOCK(semid);
+    }
+  }
+
+  if ((p = getenv("XX_WIIMOTE")) != NULL) {
+    int bat;
+    wii = wiimote_init(p, &bat);
+    if (wii == NULL) {
+      fprintf(stderr, "%s: can't open wiimote %s\n", progname, p);
+    } else {
+      fprintf(stderr, "%s: wiimote at %s configured\n", progname, p);
+      if (bat < 10) {
+	fprintf(stderr, "%s: warning %d%% battery left on remote\n", 
+		progname, bat);
+      }
+      LOCK(semid);
+      dacq_data->wii_enabled = 1;
       UNLOCK(semid);
     }
   }

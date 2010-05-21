@@ -114,6 +114,10 @@ typedef struct {
   int		js_x;
   int		js_y;
 
+  /* wiimote stuff */
+  int		wii_enabled;
+  int		one, two, A, B, minus, plus, left, right, up, down, home;
+
   /* interupt generating elapsed time counter/alarm
    * tracks in ms -- same as timestamp(). 0 for no alarm
    */

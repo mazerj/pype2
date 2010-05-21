@@ -173,6 +173,8 @@
 ** Wed Apr 14 11:13:47 2010 mazer 
 **   Removed boot option for dacq_start()
 **
+** Fri May 21 18:35:08 2010 mazer 
+**   added wii functions
 */
 
 #include <sys/types.h>
@@ -1050,4 +1052,103 @@ void dacq_set_alarm(int ms_from_now)
     dacq_data->alarm_time = 0;
   }
   UNLOCK(semid);
+}
+
+int dacq_wiiA()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->A;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiB()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->B;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiOne()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->one;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiTwo()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->two;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiLeft()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->left;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiRight()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->right;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiUp()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->up;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiDown()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->down;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiPlus()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->plus;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiMinus()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->minus;
+  UNLOCK(semid);
+  return(i);
+}
+
+int dacq_wiiHome()
+{
+  int i;
+  LOCK(semid);
+  i = dacq_data->home;
+  UNLOCK(semid);
+  return(i);
 }
