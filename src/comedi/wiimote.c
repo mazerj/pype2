@@ -17,7 +17,6 @@
 
 #include "wiimote.h"
 
-
 cwiid_wiimote_t *wiimote_init(char *devname, int *bat)
 {
   bdaddr_t ba;
@@ -30,10 +29,11 @@ cwiid_wiimote_t *wiimote_init(char *devname, int *bat)
   if ((wii = cwiid_connect(&ba, 0)) == NULL) {
     return(NULL);
   }
-  cwiid_command(wii, CWIID_CMD_RPT_MODE, 
-		CWIID_RPT_CLASSIC | CWIID_RPT_BTN | CWIID_RPT_ACC);
-  cwiid_get_state(wii, &s);
+  //  add "| CWIID_RPT_ACC" to BTN for accelerometer info...
+  cwiid_command(wii, CWIID_CMD_RPT_MODE, CWIID_RPT_BTN);
+
   if (bat) {
+    cwiid_get_state(wii, &s);
     *bat = (int)(100.0 * s.battery / CWIID_BATTERY_MAX);
   }
   return(wii);
@@ -46,25 +46,26 @@ void wiimote_close(cwiid_wiimote_t *wii)
   }
 }
 
-/* button bits:
-  bit	key
-  1	2
-  2	1
-  3	B (trigger)
-  4	A
-  5	-
-  6	?
-  7	home
-  8	left
-  9	right
-  10	down
-  11	up
-  12	+
+/* button bits from cwiid_get_state():
+**  BIT	KEY
+**  1	2
+**  2	1
+**  3	B (trigger)
+**  4	A
+**  5	-
+**  6	?
+**  7	home
+**  8	left
+**  9	right
+**  10	down
+**  11	up
+**  12	+
 */
 
 int wiimote_query(cwiid_wiimote_t *wii)
 {
   static struct cwiid_state s;
+
   cwiid_get_state(wii, &s);
   return((int)s.buttons);
 }

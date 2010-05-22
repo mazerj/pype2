@@ -1,6 +1,3 @@
-Config file options as of 07-Dec-2005
--------------------------------------
-
 AUDIODRIVER	(str)	name of pygame SDL_AUDIODRIVER
 AUDIO		(0|1)	if 0, audio is disabled
 DACQ_TESTMODE	(0|1)	if 1, dacq runs in test mode (doesn't open hardware)
@@ -34,7 +31,8 @@ SYNCY		(#)	y-location (pixels) of sync pulse sprite
 VIDEODRIVER	(str)	name of SDL_VIDEODRIVER
 VIEWDIST	(#)	viewing distance (eye to monitor) in cm
 TDTHOST		(str)	name or IP number of machine running tdt.py
-
+USB_JS_DEV	(str)	name of dev file for usb joystick
+WIIMOTE		(str)	bluetooth address (hex, eg. "E0:E7:51:9E:07:B0")
 
 Magic Environment Vars
 ----------------------------------

@@ -20,6 +20,10 @@ Wed Apr 14 09:26:52 2010 mazer
 
 - NO_AUDIO=0 --> AUDIO=1
 
+Sat May 22 09:50:57 2010 mazer
+
+- added WIIMOTE configvar
+
 """
 __author__   = '$Author$'
 __date__     = '$Date$'
@@ -59,6 +63,7 @@ def defaults(srcfile):
     c.set('AUDIO', '1')                 # enable audio?
     
     c.set('USB_JS_DEV',	'')             # enable USB joystick -- device file
+    c.set('WIIMOTE',	'')             # enable WIIMOTE -- bluetooth addr
 
     #####################################################
     # graphics display screen parameters

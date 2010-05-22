@@ -1134,6 +1134,11 @@ class PypeApp:
 		if len(self.config.get('USB_JS_DEV')) > 0:
 			os.environ['XX_USBJS'] = self.config.get('USB_JS_DEV')
 
+		# tell comedi_server to try to connect to a wii remote control
+		# with the specified bluetooth address:
+		if len(self.config.get('WIIMOTE')) > 0:
+			os.environ['XX_WIIMOTE'] = self.config.get('WIIMOTE')
+
 		os.environ['XX_ARANGE'] = self.config.get('ARANGE')
 
 		dacq_start(self.config.iget('DACQ_TESTMODE'),
