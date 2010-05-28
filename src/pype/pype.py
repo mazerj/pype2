@@ -2315,30 +2315,15 @@ class PypeApp:
 				sys.exit(0)
 
 			if self.config.iget('ENABLE_SW1'):
-				if self.running:
-					# added JUICEBUTTON for Ben Willmore 20-sep-2003:
-					if self.sw1() and self.config.iget('JUICEBUTTON'):
-						self.console.writenl("sw1 running", color='red')
-						self.reward()
-				elif self.sw1():
-					# added JUICESWITCH 27-feb-2005 JAM
-					if not self.config.iget('JUICESWITCH'):
-						# give squirt (vs. constant on) and wait for switch
-						# to get released before continuing
-						self.console.writenl("sw1 not running", color='red')
-						self.reward()
-						while self.sw1():
-							self.idlefn()
-					else:
-						self.juice_on()
-						self.status('juice on')
-						while self.sw1():
-							self.tk.update()
-							if self.terminate:
-								Logger("pype: warning -- juice switch open\n")
-								break
-						self.juice_off()
-						self.status('')
+				if self.sw1():
+					try:
+						tt = self.sw1_timer.ms()
+					except:
+						tt = 1e9
+						self.sw1_timer = Timer()
+					# enforce 250ms between reward shots..
+					if tt > 250: self.reward()
+					self.sw1_timer.reset()
 
 			x, y = self.eyepos()
 			try:
