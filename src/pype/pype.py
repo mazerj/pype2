@@ -2322,8 +2322,9 @@ class PypeApp:
 						tt = 1e9
 						self.sw1_timer = Timer()
 					# enforce 250ms between reward shots..
-					if tt > 250: self.reward()
-					self.sw1_timer.reset()
+					if tt > 250:
+						self.reward()
+						self.sw1_timer.reset()
 
 			x, y = self.eyepos()
 			try:
