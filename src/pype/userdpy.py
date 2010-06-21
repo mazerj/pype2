@@ -624,8 +624,10 @@ class UserDisplay:
 
 	def savepoints(self, filename=None):
 		"""Save points to file"""
+		import pype
+		
 		if filename is None:
-			(filename, mode) = filebox.SaveAs(initialdir=subjectrc(),
+			(filename, mode) = filebox.SaveAs(initialdir=pype.subjectrc(),
 											  pattern="*.pts", append=None)
 		if filename:
 			file = open(filename, 'w')
@@ -635,7 +637,9 @@ class UserDisplay:
 	def loadpoints(self, filename=None, merge=None):
 		"""Load points from file (pickle file make by savepoints)"""
 		if filename is None:
-			(filename, mode) = filebox.Open(initialdir=subjectrc(),
+			import pype
+			
+			(filename, mode) = filebox.Open(initialdir=pype.subjectrc(),
 											pattern="*.pts")
 			if filename is None:
 				return
@@ -667,7 +671,9 @@ class UserDisplay:
 		pixels separated by commas or spaces
 		"""
 		if filename is None:
-			(filename, mode) = filebox.Open(initialdir=subjectrc(),
+			import pype
+			
+			(filename, mode) = filebox.Open(initialdir=pype.subjectrc(),
 											pattern="*.asc")
 			if filename is None:
 				return

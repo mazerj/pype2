@@ -75,12 +75,14 @@ if ( $rh_or_fc == "true" || "$ubuntu" == "Ubuntu" ) then
     else if ("$distno" == "9.10") then
 	# karmic
 	set major=2 minor=6
+    else if ("$distno" == "10.04") then
+	# lucid
+	set major=2 minor=6
     else
 	# anything else...
-	set major=2 minor=5
+        echo "Can't identify distribution."
+        exit 1
     endif
-
-
   else
     echo "Can't identify distribution."
     exit 1
