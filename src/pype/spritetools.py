@@ -306,7 +306,7 @@ def cosgrat(s, frequency, phase_deg, ori_deg, R=1.0, G=1.0, B=1.0,
 	x, y = (r * cos(t), r * sin(t))
 
 	i = moddepth * cos((2.0 * pi * frequency * x) - (pi * phase_deg / 180.0))
-	s.array[::] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
 def polargrat(s, cfreq, rfreq, phase_deg, polarity, 
@@ -367,7 +367,7 @@ def polargrat(s, cfreq, rfreq, phase_deg, polarity,
 	else:
 		z = (hypot(x,y) * cfreq) + (arctan2(y,x) * rfreq / (2.0 * pi))
 	i = moddepth * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-	s.array[::] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
 def logpolargrat(s, cfreq, rfreq, phase_deg, polarity,
@@ -465,7 +465,7 @@ def hypergrat(s, freq, phase_deg, ori_deg,
 
 	z = sqrt(fabs((x * freq) ** 2 - (y * freq) ** 2))
 	i = moddepth * cos((2.0 * pi * z) - (pi * phase_deg / 180.0))
-	s.array[::] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
+	s.array[:] = transpose((array((R*i,G*i,B*i))+meanlum).astype(UnsignedInt8),
 						   axes=[1,2,0])
 
 
@@ -480,14 +480,14 @@ def simple_rdp(s, dir=None, vel=None, fraction=0.25,
 			if n == 0:
 				m = uniform(0.0, 1.0, shape=(s.w, s.h))
 			mc = where(greater(m, fraction), bgcolor[n], fgcolor[n])
-			s.array[:,:,n] = mc[::].astype(UnsignedInt8)
+			s.array[:,:,n] = mc[:].astype(UnsignedInt8)
 	else:
 		dx = -int(round(vel * math.cos(math.pi * dir / 180.0)))
 		dy = int(round(vel * math.sin(math.pi * dir / 180.0)))
 		a = s.array[:,:,:]
 		a = concatenate((a[dx:,:,:],a[:dx,:,:]), axis=0)
 		a = concatenate((a[:,dy:,:],a[:,:dy,:]), axis=1)
-		s.array[:,:,:] = a[::]
+		s.array[:,:,:] = a[:]
 		
 	if rseed:
 		seed(old_seed[0], old_seed[1])
@@ -519,7 +519,7 @@ def alphabar(s, bw, bh, ori_deg, R=1.0, G=1.0, B=1.0):
 	y = r * sin(t)
 	s.fill((R,G,B))
 	mask = where(less(abs(x), (bw/2.0)) * less(abs(y), (bh/2.0)), 255, 0)
-	s.alpha[::] = mask[::].astype(UnsignedInt8)
+	s.alpha[:] = mask[:].astype(UnsignedInt8)
 
 def alphaGaussian(s, sigma):
 	"""Put symmetric Gaussian envelope into sprite's alpha channel.
@@ -535,7 +535,7 @@ def alphaGaussian(s, sigma):
 	"""
 	r = ((s.xx**2) + (s.yy**2))**0.5
 	i = 255.0 * exp(-((r) ** 2) / (2 * sigma**2))
-	s.alpha[::] = i[::].astype(UnsignedInt8)
+	s.alpha[:] = i[:].astype(UnsignedInt8)
 
 def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 	"""Put non-symmetric Gaussian envelope into sprite's alpha channel.
@@ -556,7 +556,7 @@ def alphaGaussian2(s, xsigma, ysigma, ori_deg):
 	t = arctan2(s.yy, s.xx) - (pi * ori_deg) / 180.0
 	x, y = (r * cos(t), r * sin(t))
 	i = 255.0 * exp(-(x**2) / (2*xsigma**2)) * exp(-(y**2) / (2*ysigma**2))
-	s.alpha[::] = i[::].astype(UnsignedInt8)
+	s.alpha[:] = i[:].astype(UnsignedInt8)
 
 def gaussianEnvelope(s, sigma):
 	w, h = s.im.get_size()
@@ -569,14 +569,14 @@ def gaussianEnvelope(s, sigma):
 	#exp(-((y**2)) / (2 * sigma**2)) / (2*math.pi*sigma**2)
 	gmax = max(reshape(g, [multiply.reduce(g.shape), 1]))
 	g = array(255.0 * g / gmax).astype('b')
-	pygame.surfarray.pixels_alpha(s.im)[::] = g
+	pygame.surfarray.pixels_alpha(s.im)[:] = g
 
 def image_circmask(im, x, y, r, apply):
 	(ax, ay) = sprite.genaxes(im.get_width(), im.get_height())
 	mask = where(less(((((ax-x)**2)+((ay-y)**2)))**0.5, r), 1, 0)
 	if apply:
 		a = pygame.surfarray.pixels2d(im)
-		a[::] = mask * a
+		a[:] = mask * a
 	else:
 		raise PygameIncompleteError, 'image_circmask: !apply not implemented'
 

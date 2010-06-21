@@ -92,14 +92,6 @@ Fri Apr 17 10:45:46 2009 mazer
   - FrameBuffer.syncinfo is stashed to allow UserDisplay to automatically
     mark the sync spot location on the screen..
 
-- Mon Jun 21 16:25:28 2010 mazer
-
-  - trying to fix ALPHA problems under Lucid:
-  
-    - removed set_colorkey() calls
-	
-    - added SRCALPHA flag to surface creation calls
-
 """
 
 __author__   = '$Author$'
@@ -135,9 +127,6 @@ import pygame.transform
 import pygame.movie
 from pygame.constants import *
 import PIL.Image, PIL.ImageTk
-
-# force use of numeric, even when numpy is installed:
-pygame.surfarray.use_arraytype('numeric')
 
 
 import pype
@@ -435,8 +424,7 @@ class FrameBuffer:
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 		else:
 			# set (0,0,0) to be transparent/colorkey
-			#self.screen.set_colorkey((0,0,0,0))
-			pass
+			self.screen.set_colorkey((0,0,0,0))
 
 	def printinfo(self):
 		vi = pygame.display.Info()
@@ -933,7 +921,7 @@ class FrameBuffer:
 		if self.opengl:
 			# added OpenGL drawing 12-jan-2006 shinji
 			s = pygame.Surface((w*2, h*2), flags=0, depth=32)
-			#s.set_colorkey((0,0,0,0))
+			s.set_colorkey((0,0,0,0))
 			pygame.draw.rect(s, color, (0,0,w*2,h*2), width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
 			_pygl_setxy(cx-w, self.h - cy - h)
@@ -1002,7 +990,7 @@ class FrameBuffer:
 			(cx, cy) = self._xy((cx, -cy), sflip=1)
 			surfsize = r*2+width
 			s = pygame.Surface((surfsize, surfsize), flags=0, depth=32)
-			#s.set_colorkey((0,0,0,0))
+			s.set_colorkey((0,0,0,0))
 			pygame.draw.circle(s, color, (surfsize/2, surfsize/2), r, width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
 			_pygl_setxy(cx-surfsize/2, cy-surfsize/2)
@@ -1229,12 +1217,11 @@ class Sprite(_ImageBase):
 		else:
 			# new image from scratch
 			# image/sprites should have 32 bits (RGBA)
-			#self.im = pygame.Surface((width, height), flags=0, depth=32)
-			self.im = pygame.Surface((width, height), flags=SRCALPHA, depth=32)
+			self.im = pygame.Surface((width, height), flags=0, depth=32)
 			self.userdict = {}
 
-		#self.im = self.im.convert(ALPHAMASKS)
-		#self.im.set_colorkey((0,0,0,0))
+		self.im = self.im.convert(ALPHAMASKS)
+		self.im.set_colorkey((0,0,0,0))
 
 		# Tue Jan 31 11:34:47 2006 mazer
 		# starting with pygame-1.6.2 pixels_alpha() pixel3d() cause
@@ -1442,7 +1429,7 @@ class Sprite(_ImageBase):
 				m = uniform(1, 255, shape=(self.w, self.h))
 				if not thresh is None:
 					m = where(greater(m, thresh*255), 255, 1)
-			self.array[:,:,n] = m[:,:].astype(UnsignedInt8)
+			self.array[:,:,n] = m[:].astype(UnsignedInt8)
 		
 
 	def circlefill(self, color, r=None, x=None, y=None, width=0):
@@ -1620,12 +1607,11 @@ class Sprite(_ImageBase):
 
 		"""
 		new = pygame.transform.flip(self.im, xaxis, yaxis)
-		#self.im = new.convert(ALPHAMASKS)
-		self.im = new
+		self.im = new.convert(ALPHAMASKS)
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
-		#self.im.set_colorkey((0,0,0,0))
+		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
@@ -1669,12 +1655,11 @@ class Sprite(_ImageBase):
 			x = (w/2) - (self.w/2)
 			y = (h/2) - (self.h/2)
 			new = new.subsurface(x, y, self.w, self.h)
-		#self.im = new.convert(ALPHAMASKS)
-		self.im = new
+		self.im = new.convert(ALPHAMASKS)
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
-		#self.im.set_colorkey((0,0,0,0))
+		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
@@ -1701,12 +1686,11 @@ class Sprite(_ImageBase):
 
 		"""
 		new = pygame.transform.scale(self.im, (new_width, new_height))
-		#self.im = new.convert(ALPHAMASKS)
-		self.im = new
+		self.im = new.convert(ALPHAMASKS)
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
-		#self.im.set_colorkey((0,0,0,0))
+		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
@@ -1733,12 +1717,11 @@ class Sprite(_ImageBase):
 
 		"""
 		new = pygame.transform.rotozoom(self.im, scale, angle)
-		#self.im = new.convert(ALPHAMASKS)
-		self.im = new
+		self.im = new.convert(ALPHAMASKS)
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
-		#self.im.set_colorkey((0,0,0,0))
+		self.im.set_colorkey((0,0,0,0))
 		self.w = self.im.get_width()
 		self.h = self.im.get_height()
 		self.iw = self.w
@@ -1751,7 +1734,7 @@ class Sprite(_ImageBase):
 		"""hard vignette in place - was image_circmask"""
 		mask = where(less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
-		a[::] = mask * a
+		a[:] = mask * a
 
 	def alpha_aperture(self, r, x=0, y=0):
 		"""Hard vignette
@@ -1820,9 +1803,9 @@ class Sprite(_ImageBase):
 			bgi[:,:,2] = bg[2]
 		else:
 			bgi = bg
-		i[::] = ((alpha * i.astype(Float)) +
+		i[:] = ((alpha * i.astype(Float)) +
 				((1.0-alpha) * bgi)).astype(UnsignedInt8)
-		self.alpha[::] = 255;
+		self.alpha[:] = 255;
 
 	def dim(self, mult, meanval=128.0):
 		"""Reduce sprite contrast
@@ -1843,7 +1826,7 @@ class Sprite(_ImageBase):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[::] = (float(meanval) + ((1.0-mult) * \
+		pixs[:] = (float(meanval) + ((1.0-mult) * \
 			   (pixs.astype(Float)-float(meanval)))).astype(UnsignedInt8)
 
 	def thresh(self, threshval):
@@ -1858,7 +1841,7 @@ class Sprite(_ImageBase):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[::] = where(less(pixs, threshval), 1, 255).astype(UnsignedInt8)
+		pixs[:] = where(less(pixs, threshval), 1, 255).astype(UnsignedInt8)
 
 	def on(self):
 		"""Turn sprite on
@@ -2147,7 +2130,7 @@ class Sprite(_ImageBase):
 		try:
 			file = open(fname, mode)
 			file.write('P5\n# pype save_ppm\n%d %d\n255\n' % (self.w, self.h))
-			a = self.alpha[::]
+			a = self.alpha[:]
 			file.write(a.tostring())
 			file.close()
 		except IOError:
