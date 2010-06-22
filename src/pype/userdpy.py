@@ -655,7 +655,7 @@ class UserDisplay:
 			self.clearpoints()
 
 		for n in range(len(newpoints)):
-			if len(newpoints) == 3:
+			if len(newpoints[n]) == 3:
 				(px, py, t) = newpoints[n]
 			else:
 				(px, py, t, tb) = newpoints[n]
