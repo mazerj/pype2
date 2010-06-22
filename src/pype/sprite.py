@@ -1045,15 +1045,15 @@ class _SurfArrayAccess:
 
 	For example::
 
-	  array = self.array[:]
+	  array = self.array[::]
 	  array = self.array[3:,4]
-	  self.array[:] = newarray
+	  self.array[::] = newarray
 	  self.array[4,3] = 12
 
 	However, self.array is not really a Numeric array itself, so don't do::
 
-	  BAD self.array = newarray (use self.array[:] = newarray)
-	  BAD sz = size(self.array) (use size(self.array[:])).
+	  BAD self.array = newarray (use self.array[::] = newarray)
+	  BAD sz = size(self.array) (use size(self.array[::])).
 
 	Similar for self.alpha.
 
@@ -1429,7 +1429,7 @@ class Sprite(_ImageBase):
 				m = uniform(1, 255, shape=(self.w, self.h))
 				if not thresh is None:
 					m = where(greater(m, thresh*255), 255, 1)
-			self.array[:,:,n] = m[:].astype(UnsignedInt8)
+			self.array[:,:,n] = m[::].astype(UnsignedInt8)
 		
 
 	def circlefill(self, color, r=None, x=None, y=None, width=0):
@@ -1734,7 +1734,7 @@ class Sprite(_ImageBase):
 		"""hard vignette in place - was image_circmask"""
 		mask = where(less(((((self.ax-x)**2)+((self.ay+y)**2)))**0.5, r), 1, 0)
 		a = pygame.surfarray.pixels2d(self.im)
-		a[:] = mask * a
+		a[::] = mask * a
 
 	def alpha_aperture(self, r, x=0, y=0):
 		"""Hard vignette
@@ -1803,9 +1803,9 @@ class Sprite(_ImageBase):
 			bgi[:,:,2] = bg[2]
 		else:
 			bgi = bg
-		i[:] = ((alpha * i.astype(Float)) +
+		i[::] = ((alpha * i.astype(Float)) +
 				((1.0-alpha) * bgi)).astype(UnsignedInt8)
-		self.alpha[:] = 255;
+		self.alpha[::] = 255;
 
 	def dim(self, mult, meanval=128.0):
 		"""Reduce sprite contrast
@@ -1826,7 +1826,7 @@ class Sprite(_ImageBase):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[:] = (float(meanval) + ((1.0-mult) * \
+		pixs[::] = (float(meanval) + ((1.0-mult) * \
 			   (pixs.astype(Float)-float(meanval)))).astype(UnsignedInt8)
 
 	def thresh(self, threshval):
@@ -1841,7 +1841,7 @@ class Sprite(_ImageBase):
 
 		"""
 		pixs = pygame.surfarray.pixels3d(self.im)
-		pixs[:] = where(less(pixs, threshval), 1, 255).astype(UnsignedInt8)
+		pixs[::] = where(less(pixs, threshval), 1, 255).astype(UnsignedInt8)
 
 	def on(self):
 		"""Turn sprite on
@@ -2130,7 +2130,7 @@ class Sprite(_ImageBase):
 		try:
 			file = open(fname, mode)
 			file.write('P5\n# pype save_ppm\n%d %d\n255\n' % (self.w, self.h))
-			a = self.alpha[:]
+			a = self.alpha[::]
 			file.write(a.tostring())
 			file.close()
 		except IOError:

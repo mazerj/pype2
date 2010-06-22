@@ -400,7 +400,7 @@ class PypeRecord:
 				self.plex_times = Numeric.array(times, 'i')
 				self.plex_channels = Numeric.array(channels, 'i')
 				self.plex_units = Numeric.array(units, 'i')
-				self.plex_ids = ids[:]
+				self.plex_ids = ids[::]
 			elif try_ttank_pull and self.params.has_key('tdt_tank'):
 				(times, channels, units, ids) = self.file.tdtpull(self)
 				self.plex_times = times
@@ -496,7 +496,7 @@ class PypeRecord:
 				pattern = None
 
 		if pattern is None or self.plex_times is None:
-			ts = self.spike_times[:]
+			ts = self.spike_times[::]
 			pattern = 'TTL'
 		else:
 			p = re.compile(pattern)
@@ -530,7 +530,7 @@ class PypeFile:
 			if not quiet:
 				sys.stderr.write('decompressing: %s\n' % fname)
 			self.fname = fname[:-3]
-			self.zfname = fname[:]
+			self.zfname = fname[::]
 		elif not posixpath.exists(fname) and \
 				 posixpath.exists(fname+'.gz'):
 			# if .gz file exists and the named file does not,
@@ -676,7 +676,7 @@ class PypeFile:
 			times = around(t).astype(Numeric.Int)
 			channels = around(c).astype(Numeric.Int)
 			units = around(s).astype(Numeric.Int)
-			ids = sigs[:]
+			ids = sigs[::]
 			return (times, channels, units, ids)
 		else:
 			sys.stderr.write('Warning: tdt tank appears short!')

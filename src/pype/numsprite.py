@@ -79,7 +79,7 @@ class NumSprite:
 			# new RGBA image from scratch
 			self.array = zeros((width, height, 3), UnsignedInt8)
 			self.alpha = zeros((width, height), UnsignedInt8)
-			self.alpha[:] = 255
+			self.alpha[::] = 255
 
 		# set dimensions automatically based on shape of instantiated
 		# Numeric arrays
@@ -124,13 +124,13 @@ class NumSprite:
 		return self.pim
 
 	def set_alpha(self, alpha):
-		self.alpha[:] = alpha
+		self.alpha[::] = alpha
 
 	def clear(self, color=(1,1,1)):
 		rgba = _C(color)
 		for n in range(3):
 			self.array[:,:,n] = rgba[n]
-		self.alpha[:] = rgba[3]
+		self.alpha[::] = rgba[3]
 
 	def fill(self, color):
 		self.clear(color=color)
@@ -144,7 +144,7 @@ class NumSprite:
 					m = uniform(1, 255, shape=self.array.shape[0:2])
 				if not thresh is None:
 					m = where(greater(m, thresh*255), 255, 1)
-			self.array[:,:,n] = m[:].astype(UnsignedInt8)
+			self.array[:,:,n] = m[::].astype(UnsignedInt8)
 
 	def circlefill(self, color, r, x=0, y=0, width=0):
 		ar = (((self.ax-x)**2)+((self.ay+y)**2))**0.5
@@ -152,7 +152,7 @@ class NumSprite:
 		rgba = _C(color)
 		for n in range(3):
 			self.array[:,:,n] = where(mask, rgba[n], self.array[:,:,n])
-		self.alpha[:] = rgba[3]
+		self.alpha[::] = rgba[3]
 
 	def circle(self, color, r, x=0, y=0, width=1):
 		ar = abs((((self.ax-x)**2)+((self.ay+y)**2))**0.5 - r)
@@ -160,7 +160,7 @@ class NumSprite:
 		rgba = _C(color)
 		for n in range(3):
 			self.array[:,:,n] = where(mask, rgba[n], self.array[:,:,n])		
-		self.alpha[:] = rgba[3]
+		self.alpha[::] = rgba[3]
 
 	def axisflip(self, xaxis, yaxis):
 		if xaxis:
@@ -185,7 +185,7 @@ class NumSprite:
 				# RGB
 				self.array = a[:,:,0:3].astype(UnsignedInt8)
 				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
-				self.alpha[:] = 255
+				self.alpha[::] = 255
 			elif a.shape[2] == 4:
 				# RGBA
 				self.array = a[:,:,0:3].astype(UnsignedInt8)
@@ -206,7 +206,7 @@ class NumSprite:
 				a = reshape(a, (i.size[1], i.size[0], 3))
 				self.array = transpose(a, axes=[1,0,2])
 				self.alpha = zeros(self.array.shape[0:2], UnsignedInt8)
-				self.alpha[:] = 255
+				self.alpha[::] = 255
 			else:
 				raise Error
 
@@ -250,11 +250,11 @@ class NumSprite:
 			for n in range(len(bg)):
 				bgi[:,:,n] = bg[n]
 		except TypeError:
-			bgi[:] = bg
+			bgi[::] = bg
 		for n in range(3):
 			self.array[:,:,n] = ((alpha * self.array[:,:,n]).astype(Float) + \
 								((1.0-alpha) * bgi[:,:,n])).astype(UnsignedInt8)
-		self.alpha[:] = 255;
+		self.alpha[::] = 255;
 
 	def dim(self, mult, meanval=128.0):
 		self.array = meanval + \

@@ -1037,7 +1037,7 @@ class UserDisplay:
 		self.fidinfo()
 
 	def _movefidmarks(self, xoff, yoff):
-		x = self._fid_list[:]
+		x = self._fid_list[::]
 		self._clearfidmarks()
 		for mark in x:
 			if mark:
@@ -1047,7 +1047,7 @@ class UserDisplay:
 
 	def _scalefidmarks(self, delta):
 		(xc, yc, r) = self.fidinfo()
-		x = self._fid_list[:]
+		x = self._fid_list[::]
 		self._clearfidmarks()
 		for mark in x:
 			if mark:
