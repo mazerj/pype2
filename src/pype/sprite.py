@@ -115,6 +115,16 @@ try:
 except ImportError:
 	sys.stderr.write('missing `pygame` package.\n' % __name__)
 	sys.exit(1)
+
+pygameVersion = map(int, pygame.version.ver[:-len('release')].split('.'))
+
+if pygameVersion[0] == 1 and pygameVersion[1] < 9:
+	SURFFLAG = 0
+	ALPHAMASKS = (16711680, 65280, 255, -16777216)
+else:
+	pygame.surfarray.use_arraytype('numeric')
+	SURFFLAG = pygame.SRCALPHA
+	ALPHAMASKS = None
 	
 import pygame.display
 import pygame.event
@@ -154,7 +164,6 @@ YELLOW = (255, 255, 1)
 CYAN = (1, 255, 255)
 MAGENTA = (255, 1, 255)
 
-ALPHAMASKS = (16711680, 65280, 255, -16777216)
 
 class SpriteObsolete(Exception): pass
 class SpriteError(Exception): pass
@@ -920,7 +929,7 @@ class FrameBuffer:
 
 		if self.opengl:
 			# added OpenGL drawing 12-jan-2006 shinji
-			s = pygame.Surface((w*2, h*2), flags=0, depth=32)
+			s = pygame.Surface((w*2, h*2), flags=SURFFLAG, depth=32)
 			s.set_colorkey((0,0,0,0))
 			pygame.draw.rect(s, color, (0,0,w*2,h*2), width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
@@ -989,7 +998,8 @@ class FrameBuffer:
 			# added OpenGL drawing 12-jan-2006 shinji
 			(cx, cy) = self._xy((cx, -cy), sflip=1)
 			surfsize = r*2+width
-			s = pygame.Surface((surfsize, surfsize), flags=0, depth=32)
+			s = pygame.Surface((surfsize, surfsize),
+							   flags=SURFFLAG, depth=32)
 			s.set_colorkey((0,0,0,0))
 			pygame.draw.circle(s, color, (surfsize/2, surfsize/2), r, width)
 			blitstr = pygame.image.tostring(s, 'RGBA')
@@ -1158,39 +1168,7 @@ class Sprite(_ImageBase):
 	def __init__(self, width=100, height=100, x=0, y=0, depth=0, \
 				 fb=None, on=1, image=None, dx=0, dy=0, fname=None, \
 				 name=None, icolor='black', centerorigin=0):
-		"""Sprite instantiation function
 
-		**width, height** - width and height of sprite in pixels
-
-		**x, y** - initial sprite position (pixels in world coordinates)
-
-		**depth** - depth of sprite (for DisplayList below). The DisplayList
-		class draws sprites in depth order, with large depths being
-		draw first (ie, 0 is the top-most layer of sprites)
-
-		**on** (boolean) - sprite on or off. If the sprite is off, then
-		the blit method won't actually perform the blit (see
-		blit method for exceptions).
-
-		**dx, dy** - linear motion for sprite; if these are set, then
-		each time the sprite is blitted, the position is changed
-		by the specified amount.
-
-		**fname** - name of file to load pixel data from
-
-		**name** - debugging name (string) of the sprite; if not set, then
-		either the filename or a unique random name is used instead.
-
-		**icolor** - color to draw icon on the UserDisplay
-
-		**centerorigin** - this determines whether the sprite's internal
-		coordinate system has (0,0) at center or in the upper left
-		corner. Default is origin in upper left corner!
-
-		**NOTE:**
-		DEFAULT IS CENTERORIGIN=0, WHICH MEANS UPPER LEFT CORNER!
-
-		"""
 		self.x = x
 		self.y = y
 		self.dx = dx
@@ -1200,27 +1178,33 @@ class Sprite(_ImageBase):
 		self._on = on
 		self.icolor = icolor
 
+		# almost right: new sprites are good, but sprites
+		# sourced from files or images (other sprites) don't
+		# have alpha channels setup correctly
+
 		if fname:
 			# load image data from file
-			self.im = pygame.image.load(fname)
+			self.im = pygame.image.load(fname).convert(32, SURFFLAG)
 			self.userdict = {}
 		elif image:
 			# make a copy of the source sprite/image
 			try:
 				# pype Image object
-				self.im = image.im.convert()
+				self.im = image.im.convert(32, SURFFLAG)
 				self.userdict = copy.copy(image.userdict)
 			except:
 				# pygame image/surface
-				self.im = image.convert()
+				self.im = image.convert(32, SURFFLAG)
 				self.userdict = {}
 		else:
 			# new image from scratch
 			# image/sprites should have 32 bits (RGBA)
-			self.im = pygame.Surface((width, height), flags=0, depth=32)
+			self.im = pygame.Surface((width, height), flags=SURFFLAG, depth=32)
 			self.userdict = {}
 
-		self.im = self.im.convert(ALPHAMASKS)
+		if ALPHAMASKS:
+			self.im = self.im.convert(ALPHAMASKS)
+
 		self.im.set_colorkey((0,0,0,0))
 
 		# Tue Jan 31 11:34:47 2006 mazer
@@ -1499,7 +1483,7 @@ class Sprite(_ImageBase):
 
 		# make a circle with center color, rest transparent
 		#  is this right? depth=8, not 32??
-		surf = pygame.Surface((r*2, r*2), flags=0, depth=8)
+		surf = pygame.Surface((r*2, r*2), flags=SURFFLAG, depth=8)
 		try:
 			surf.set_palette(((0, 0, 0), color))
 		except TypeError:
@@ -1607,7 +1591,10 @@ class Sprite(_ImageBase):
 
 		"""
 		new = pygame.transform.flip(self.im, xaxis, yaxis)
-		self.im = new.convert(ALPHAMASKS)
+		if ALPHAMASKS:
+			self.im = new.convert(ALPHAMASKS)
+		else:
+			self.im = new
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
@@ -1655,7 +1642,10 @@ class Sprite(_ImageBase):
 			x = (w/2) - (self.w/2)
 			y = (h/2) - (self.h/2)
 			new = new.subsurface(x, y, self.w, self.h)
-		self.im = new.convert(ALPHAMASKS)
+		if ALPHAMASKS:
+			self.im = new.convert(ALPHAMASKS)
+		else:
+			self.im = new
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
@@ -1686,7 +1676,10 @@ class Sprite(_ImageBase):
 
 		"""
 		new = pygame.transform.scale(self.im, (new_width, new_height))
-		self.im = new.convert(ALPHAMASKS)
+		if ALPHAMASKS:
+			self.im = new.convert(ALPHAMASKS)
+		else:
+			self.im = new
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 
@@ -1717,7 +1710,10 @@ class Sprite(_ImageBase):
 
 		"""
 		new = pygame.transform.rotozoom(self.im, scale, angle)
-		self.im = new.convert(ALPHAMASKS)
+		if ALPHAMASKS:
+			self.im = new.convert(ALPHAMASKS)
+		else:
+			self.im = new
 		self.array.refresh(self.im)
 		self.alpha.refresh(self.im)
 

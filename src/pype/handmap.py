@@ -211,13 +211,12 @@ class _Probe:
 			color = 'noise'
 
 		s = ""
-		s = s +		"  h: hide/show info\n"
 		s = s +		"  z: lock_______%s\n" % B(self.lock)
 		s = s +		"  o: offset_____%s\n" % B(self.xoff)
 		s = s +		"  u: on/off_____%s\n" % B(self.on)
 		s = s +		"  M: bar mode___%s\n" % BARMODES[self.barmode]
-		s = s +     " []:  s-freq____%.1f\n" % self.sfreq
-		s = s +     " {}:  r-freq____%.1f\n" % self.rfreq
+		s = s +     " []:    s-freq__%.1f\n" % self.sfreq
+		s = s +     " {}:    r-freq__%.1f\n" % self.rfreq
 		s = s +		" 89: a__________%d/%d\n" % angle
 		s = s +     "n/m: rgb________%s\n" % color
 		s = s +		"1-6: color______%s\n" % self.colorname
@@ -230,6 +229,8 @@ class _Probe:
 		s = s +		"  b: blink______%s\n" % B(self.blink)
 		s = s +		"p/P: blnk frq___%.1fHz\n" % self.blink_freq
 		s = s +		"i/I: inten______%d\n" % self.inten
+		s = s +		"\n"
+		s = s +		"  h: hide/show info\n"
 
 		return s[:-1]
 	
@@ -240,6 +241,8 @@ class _Probe:
 		if self.minor_ax:
 			self.app.udpy._canvas.delete(self.minor_ax)
 			self.minor_ax = None
+		if self.app.udpy.msg_label:
+			self.app.udpy.msg_label.config(fg='black')
 		self.app.udpy_note('')
 		
 	def force_redraw(self):
@@ -469,6 +472,11 @@ class _Probe:
 			self.app.udpy_note(self.pp())
 		else:
 			self.app.udpy_note("  h: hide/show info")
+		if self.app.udpy.msg_label:
+			if self.app.hmapstate.probe.live:
+				self.app.udpy.msg_label.config(fg='red')
+			else:
+				self.app.udpy.msg_label.config(fg='black')
 
 
 def step(val, by=1, minval=None, maxval=None):

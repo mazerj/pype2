@@ -29,21 +29,14 @@ foreach i ($*)
   if ($?DISPLAY) then
     unsetenv DISPLAY
   endif
-  if (-e $dst) then
-    echo $dst already exists, skipping
-  else if (-e $dst.gz) then
-    echo $dst.gz already exists, skipping
+  echo "p2mBatch('$i', 1, 1); quit;" | matlab-nh -nodisplay -nojvm
+  if (-e $ec) then
+    set s = `cat $ec`
+    /bin/rm -f $ec
   else
-#    echo "p2mBatch('$i', 1, 1); quit;" | matlab -nodisplay -nojvm
-    echo "p2mBatch('$i', 1, 1); quit;" | matlab-nh -nodisplay -nojvm
-    if (-e $ec) then
-      set s = `cat $ec`
-      /bin/rm -f $ec
-    else
-      set s = 0
-    endif
-    if ("$s") then
-      exit $s
-    endif
+    set s = 0
+  endif
+  if ("$s") then
+    exit $s
   endif
 end
