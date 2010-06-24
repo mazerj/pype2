@@ -40,17 +40,8 @@ install-pypebin:
 	@chmod +x pypespike
 	@cp pypespike $(PYPEDIR)/bin
 
-#	@chmod +x pypeplex.py
-#	@cp pypeplex.py $(PYPEDIR)/bin
-
 pypeversion:
-	@sed 's/%%INSTALLDATE%%/$(shell date)/' \
-		<pypeversion.py.template >pypeversion.py
-	@echo 'PypeBuildDir = "$(shell pwd)"' >>pypeversion.py
-	@echo 'PypeBuildBy = "$(shell logname)"' >>pypeversion.py
-	@echo 'PypeBuildDate = "$(shell date)"' >>pypeversion.py
-	@echo 'PypeBuildHost = "$(shell hostname)"' >>pypeversion.py
-
+	@sh mkpypeversion.sh
 
 build:
 	@echo "nothing to do for build"
