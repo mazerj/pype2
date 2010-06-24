@@ -41,7 +41,7 @@ install-pypebin:
 	@cp pypespike $(PYPEDIR)/bin
 
 pypeversion:
-	@sh mkpypeversion.sh
+	@sh mkpypeversion.sh >pypeversion.py
 
 build:
 	@echo "nothing to do for build"

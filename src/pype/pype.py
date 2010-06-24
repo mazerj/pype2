@@ -3157,6 +3157,12 @@ class PypeApp:
 		# in case you wawnt them for something..
 		dacq_adbuf_clear()
 
+		# insert these into the param dictionary for later retrieval
+		pdict['PypeBuildDate']  = pypeversion.PypeBuildDate
+		pdict['PypeBuildHost'] = pypeversion.PypeBuildHost
+		pdict['PypeSvnInfo'] = pypeversion.PypeSvnInfo
+		pdict['PypeSvnRev']  = pypeversion.PypeSvnRev
+
 		if not fast_tmp and self.record_file:
 			# dump the event stream
 			info = (result, rt, pdict) + taskinfo
