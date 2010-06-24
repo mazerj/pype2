@@ -241,8 +241,6 @@ class _Probe:
 		if self.minor_ax:
 			self.app.udpy._canvas.delete(self.minor_ax)
 			self.minor_ax = None
-		if self.app.udpy.msg_label:
-			self.app.udpy.msg_label.config(fg='black')
 		self.app.udpy_note('')
 		
 	def force_redraw(self):
@@ -455,15 +453,15 @@ class _Probe:
 			self.app.udpy._canvas.coords(self.minor_ax, x, y, x+dx, y+dy)
 		else:
 			self.major_ax = self.app.udpy._canvas.create_line(x1, y1, x2, y2,
-															  width=3)
+															  width=4)
 			self.minor_ax = self.app.udpy._canvas.create_line(x, y, x+dx, y+dy,
 															  fill='blue',
 															  arrow=LAST,
-															  width=3)
+															  width=4)
 			for l in (self.minor_ax, self.major_ax):
 				self.app.udpy._canvas.lower(l)
 
-		if self.on:
+		if self.on and self.app.hmapstate.probe.live:
 			self.app.udpy._canvas.itemconfigure(self.major_ax, fill='green')
 		else:
 			self.app.udpy._canvas.itemconfigure(self.major_ax, fill='red')
@@ -472,11 +470,6 @@ class _Probe:
 			self.app.udpy_note(self.pp())
 		else:
 			self.app.udpy_note("  h: hide/show info")
-		if self.app.udpy.msg_label:
-			if self.app.hmapstate.probe.live:
-				self.app.udpy.msg_label.config(fg='red')
-			else:
-				self.app.udpy.msg_label.config(fg='black')
 
 
 def step(val, by=1, minval=None, maxval=None):

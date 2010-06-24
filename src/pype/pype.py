@@ -549,19 +549,10 @@ class PypeApp:
 		if self.config.iget('SPLASH'):
 			splash()
 
-		font = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
-		#font = '-*-helvetica-bold-r-*-*-12-*-*-*-*-*-iso8859-*'
-		self.tk.option_add('*Font', font)
-		
-		fixed = '-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-iso8859-*'
-		self.tk.option_add('*Font', fixed)
-
-
 		if sys.platform == 'darwin':
 			self.tk.geometry("+0+20")
 		else:
-			self.tk.geometry("+0+0"
-							 )
+			self.tk.geometry("+0+0")
 		self.tk.title('Pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self.shutdown)
 
@@ -934,7 +925,7 @@ class PypeApp:
 
 		# STATS WINDOW ######################################
 		self.statsw = Label(stats, text='', anchor=W, justify=LEFT,
-							font=fixed)
+							font="Courier 10")
 		self.statsw.pack(expand=0, fill=BOTH, side=TOP)
 
 		# TALLY WINDOW ######################################
@@ -1082,8 +1073,7 @@ class PypeApp:
 		self.dpy_h = self.config.iget('DPYH')
 
 		# history info
-		self._hist = Label(f2, text="", anchor=W, font=fixed,
-						   borderwidth=1, relief=RIDGE)
+		self._hist = Label(f2, text="", anchor=W, borderwidth=1, relief=RIDGE)
 		self._hist.grid(row=3, column=0, columnspan=3, sticky=W+E)
 		self.balloon.bind(self._hist, "recent trial result codes")
 		self.history(init=1)

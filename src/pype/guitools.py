@@ -176,8 +176,7 @@ class Logger:
 
 class ConsoleWindow(Toplevel):
 	def __init__(self, title='ConsoleWindow', iconname='Console',
-				 font="-*-lucidatypewriter-medium-r-*-*-12-*-*-*-*-*-*-*",
-				 bg='gray75', **kw):
+				 font='courier 10', bg='gray75', **kw):
 		
 		apply(Toplevel.__init__, (self,), kw)
 		if title:
@@ -287,7 +286,7 @@ class SimpleDialog(Toplevel):
 		
 class Info:
 	def __init__(self, parent, height=10, width=50, bg='white',
-				 font="-*-lucidatypewriter-medium-r-*-*-10-*-*-*-*-*-*-*"):
+				 font='courier 10'):
 
 		t = Pmw.ScrolledText(parent)
 		t.pack(expand=1, side=TOP, fill=BOTH)
@@ -295,14 +294,6 @@ class Info:
 		self.text.config(bg=bg, font=font,
 						 height=height,
 						 width=width)
-		
-		#from ScrolledText import ScrolledText
-		#self.text = ScrolledText(parent)
-		#self.text.config(height=height,
-		#					 width=width,
-		#					 bg=bg, font=font)
-		#self.text.pack(expand=1, fill=BOTH)
-			
 		self.text.config(state=DISABLED)
 		self.next_tag = 0
 
