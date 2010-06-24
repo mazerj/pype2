@@ -1,6 +1,6 @@
 #!/bin/sh
-#echo "Doing local install (/usr/local/pype2)"
-#echo -n "Type Control-C to abort or return to continue NOW..."
-#read x
-#env PYPEDIR=/usr/local/pype2 sudo ./build $*
-env PYPEDIR=/usr/local/pype2 ./build $*
+if [ "$*" == "" ]; then
+  env PYPEDIR=/usr/local/pype2 ./build install wrapper
+else
+  env PYPEDIR=/usr/local/pype2 ./build $*
+fi

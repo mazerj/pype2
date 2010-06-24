@@ -6,16 +6,25 @@
 ###   read xxx
 ### fi
 
-export PYTHONVER=$(./pydetect -v)
-export PYTHONFULLVER=$(./pydetect -vv)
-export PYTHONEXE=$(./pydetect -f)
-export PYTHONPREFIX=$(./pydetect -p)
-
-export WHO=`/usr/bin/whoami`
-
 if [ "$1" = "-dir" ]; then
   export PYPEDIR=$2
   shift; shift
 fi
+
+if [ "$PYPEDIR" = "" ]; then
+  echo "set PYPEDIR first"
+  exit 0
+fi
+
+export PYTHONVER=$(./pydetect -v)
+export PYTHONFULLVER=$(./pydetect -vv)
+export PYTHONEXE=$(./pydetect -f)
+export PYTHONPREFIX=$(./pydetect -p)
+export PYPEDIR
+
+export WHO=`/usr/bin/whoami`
+
+
+printenv
 
 /usr/bin/make -f Buildfile $*
