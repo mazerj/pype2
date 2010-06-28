@@ -34,17 +34,15 @@ def bounce(app):
 
 	# cancel candy if it's running..
 	if app._candy:
-		app._sbut1.config(state=NORMAL)
-		app._sbut2.config(state=NORMAL)
-		app.udpy.stop(command=None)
+		app._realstart.config(state=NORMAL)
+		app._tmpstart.config(state=NORMAL)
 
 		app._candy = 0
 		app.udpy_note('')
 		return
 	else:
-		app._sbut1.config(state=DISABLED)
-		app._sbut2.config(state=DISABLED)
-		app.udpy.stop(command=lambda app=app: bounce(app))
+		app._realstart.config(state=DISABLED)
+		app._tmpstart.config(state=DISABLED)
 
 		app._candy = 1
 		app.console.clear()
@@ -97,17 +95,15 @@ def slideshow(app):
 
 	# cancel candy if it's running..
 	if app._candy:
-		app._sbut1.config(state=NORMAL)
-		app._sbut2.config(state=NORMAL)
-		app.udpy.stop(command=None)
+		app._realstart.config(state=NORMAL)
+		app._tmpstart.config(state=NORMAL)
 
 		app._candy = 0
 		app.udpy_note('')
 		return
 	else:
-		app._sbut1.config(state=DISABLED)
-		app._sbut2.config(state=DISABLED)
-		app.udpy.stop(command=lambda app=app: slideshow(app))
+		app._realstart.config(state=DISABLED)
+		app._tmpstart.config(state=DISABLED)
 
 		try:
 			f = open(pype.pyperc('candy.lst'), 'r')

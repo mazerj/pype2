@@ -865,15 +865,21 @@ class PypeApp:
 		c2pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c2pane.pack(expand=0, fill=X, side=TOP)
 
-		self._sbut1 = Button(c2pane, text="start",
-							 command=self.__start, bg='light green')
-		self._sbut1.pack(expand=0, fill=X, side=TOP, pady=2)
-		self.balloon.bind(self._sbut1, 'save data to file')
+		self._realstart = Button(c2pane, text="start",
+								 command=self.__start, bg='light green')
+		self._realstart.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(self._realstart, 'save data to file')
 
-		self._sbut2 = Button(c2pane, text="temp",
-							 command=self.__starttmp, bg='light green')
-		self._sbut2.pack(expand=0, fill=X, side=TOP, pady=2)
-		self.balloon.bind(self._sbut2, "save to temp file (ie, don't save)")
+		self._tmpstart = Button(c2pane, text="temp",
+								command=self.__starttmp, bg='light green')
+		self._tmpstart.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(self._tmpstart, "save to temp file (ie, don't save)")
+		
+		self._stop = Button(c2pane, text="stop",
+							   command=self.__start_helper, bg='red',
+							   state=DISABLED)
+		self._stop.pack(expand=0, fill=X, side=TOP, pady=2)
+		self.balloon.bind(self._stop, "stop run at end of trial")
 
 		c3pane = Frame(f, borderwidth=3, relief=RIDGE)
 		c3pane.pack(expand=0, fill=X, side=TOP)
@@ -1973,11 +1979,13 @@ class PypeApp:
 	def set_startfn(self, fn):
 		self.startfn = fn
 		if self.startfn:
-			self._sbut1.config(state=DISABLED)
-			self._sbut2.config(state=DISABLED)
+			self._realstart.config(state=DISABLED)
+			self._tmpstart.config(state=DISABLED)
+			self._stop.config(state=NORMAL)
 		else:
-			self._sbut1.config(state=NORMAL)
-			self._sbut2.config(state=NORMAL)
+			self._realstart.config(state=NORMAL)
+			self._tmpstart.config(state=NORMAL)
+			self._stop.config(state=DISABLED)
 
 	def __start(self):
 		self.__start_helper(temp=None)
@@ -1986,111 +1994,109 @@ class PypeApp:
 		self.__start_helper(temp=1)
 
 	def __start_helper(self, temp=None):
+		if not self.startfn:
+			self.tk.bell()
+			return
+
 		self.__savestate()
-
-		if self.startfn:
-			if not self.running:
-				self._loadmenu.disableall()
-				self._button_bounce.config(state=DISABLED)
-				self._button_slideshow.config(state=DISABLED)
-				if int(self.rig_common.query('testing')):
-					if ask("pype", "testing mode ok?", ("yes", "no")) == 1:
-						return
-				if temp:
-					if self.sub_common.queryv('save_tmp'):
-						fname = './%s.tmp' % self.uname
-						if posixpath.exists(fname):
-							posix.unlink(fname)
-					else:
-						fname = '/dev/null'
-					self.record_selectfile(fname)
+		if not self.running:
+			self._loadmenu.disableall()
+			self._button_bounce.config(state=DISABLED)
+			self._button_slideshow.config(state=DISABLED)
+			self._realstart.config(state=DISABLED)
+			self._tmpstart.config(state=DISABLED)
+			self._stop.config(state=NORMAL)
+			
+			if int(self.rig_common.query('testing')):
+				if ask("pype", "testing mode ok?", ("yes", "no")) == 1:
+					return
+			if temp:
+				if self.sub_common.queryv('save_tmp'):
+					fname = './%s.tmp' % self.uname
+					if posixpath.exists(fname):
+						posix.unlink(fname)
 				else:
-					if self.record_selectfile() is None:
-						Logger('pype: run aborted\n')
-						return
+					fname = '/dev/null'
+				self.record_selectfile(fname)
+			else:
+				if self.record_selectfile() is None:
+					Logger('pype: run aborted\n')
+					return
 
-				# If elog is in use, then at the end of each run insert
-				# (or update, since force=1) data on this file in the
-				# sql database.
-				# Do this at the START of the run so it can be seen right
-				# away..
-				if self.use_elog and not temp:
-					import elogapi
-					(ok, ecode) = elogapi.AddDatafile(
-						self._exper,
-						self.sub_common.queryv('full_subject'),
-						self.uname,
-						self.record_file,
-						self.task_name,
-						force=1)
-					if not ok:
-						warn('Warning (elog)', ecode)
-					#del self._exper
+			# If elog is in use, then at the end of each run insert
+			# (or update, since force=1) data on this file in the
+			# sql database.
+			# Do this at the START of the run so it can be seen right
+			# away..
+			if self.use_elog and not temp:
+				import elogapi
+				(ok, ecode) = elogapi.AddDatafile(
+					self._exper,
+					self.sub_common.queryv('full_subject'),
+					self.uname,
+					self.record_file,
+					self.task_name,
+					force=1)
+				if not ok:
+					warn('Warning (elog)', ecode)
+				#del self._exper
 
-				if self.xdacq == 'plexon':
-					warn('xdacq', "start the plexon now. I'll wait.", wait=1)
-				elif self.xdacq == 'tdt':
-					# start new block in current tank, this includes resting the
-					# trial counter..
-					(server, tank, block) = self.tdt.newblock(record=1)
-					Logger('pype: tdt data = %s %s\n' % (tank, block))
+			if self.xdacq == 'plexon':
+				warn('xdacq', "start the plexon now. I'll wait.", wait=1)
+			elif self.xdacq == 'tdt':
+				# start new block in current tank, this includes resting the
+				# trial counter..
+				(server, tank, block) = self.tdt.newblock(record=1)
+				Logger('pype: tdt data = %s %s\n' % (tank, block))
 
-				self._sbut1.config(text='stop', bg="red")
-				self._sbut2.config(text='stop', bg="red")
-				self.udpy.stop(command=self.__start_helper)
-				self._allowabort = 1
+			self._allowabort = 1
 
-				self.console.clear()
+			self.console.clear()
 
-				# clear/reset result stack at the start of the run..
-				self.set_result()
+			# clear/reset result stack at the start of the run..
+			self.set_result()
+
+			try:
+				# make sure graphic display is visible
+				if self.psych: self.fb.show()
+				# clear block state before starting a run
+				self.__runstats_update(clear=1)
 
 				try:
-					# make sure graphic display is visible
-					if self.psych: self.fb.show()
-					# clear block state before starting a run
-					self.__runstats_update(clear=1)
+					# call task-specific start function.
+					self.startfn(self)
+				except:
+					get_traceback(1)
+					# some error occured within the task code
+					_goto_error('Runtime Error')
+			finally:
+				# either there was an error OR the task
+				# completed normally, ensure proper cleanup
+				# gets done:
+				dacq_set_pri(0)
+				dacq_set_mypri(0)
+				dacq_set_rt(0)
+				self.idlefb()
+				self._allowabort = 0
+				
+				self._realstart.config(state=NORMAL)
+				self._tmpstart.config(state=NORMAL)
+				self._button_bounce.config(state=NORMAL)
+				self._button_slideshow.config(state=NORMAL)
+				self._loadmenu.enableall()
+				
+				if self.psych:
+					self.fb.hide()
 
-					try:
-						# call task-specific start function.
-						self.startfn(self)
-					except:
-						get_traceback(1)
-						# some error occured within the task code
-						_goto_error('Runtime Error')
-				finally:
-					# either there was an error OR the task
-					# completed normally, ensure proper cleanup
-					# gets done:
-					dacq_set_pri(0)
-					dacq_set_mypri(0)
-					dacq_set_rt(0)
-					self.idlefb()
-					self._allowabort = 0
-					self._sbut1.config(text='start',
-									   bg="light green", state=NORMAL)
-					self._sbut2.config(text='temp',
-									   bg="light green", state=NORMAL)
-					self._button_bounce.config(state=NORMAL)
-					self._button_slideshow.config(state=NORMAL)
-					self._loadmenu.enableall()
-					if self.psych:
-						self.fb.hide()
+			if self.xdacq == 'plexon':
+				warn('xdacq', 'Stop the plexon NOW', wait=0)
+			elif self.xdacq == 'tdt':
+				# recording's done -- direct output back to TempBlk
+				self.tdt.newblock(record=0)
 
-				if self.xdacq == 'plexon':
-					warn('xdacq', 'Stop the plexon NOW', wait=0)
-				elif self.xdacq == 'tdt':
-					# recording's done -- direct output back to TempBlk
-					self.tdt.newblock(record=0)
-
-			else:
-				self._sbut1.config(state=DISABLED)
-				self._sbut2.config(state=DISABLED)
-				self.udpy.stop(command=None)
-				self.running = 0
-				self.udpy.eye_clear()
 		else:
-			self.tk.bell()
+			self.running = 0
+			self.udpy.eye_clear()
 
 	def shutdown(self):
 		"""

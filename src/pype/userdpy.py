@@ -40,6 +40,14 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
   - BLOCKED is gone -- computed automatically from syncinfo..
   
+- Mon Jun 28 13:35:12 2010 mazer
+
+  - Removed menubar at top in favor of dropdown menus (saves screen space).
+    One single dropdown menu off Button-1 now (Button-2 for task-specific
+	menu, if needed).
+
+  - This means Pmw is no longer required here.. everything's simplified
+
 """
 
 __author__   = '$Author$'
@@ -55,7 +63,6 @@ import cPickle
 import string
 from Tkinter import *
 import tkSimpleDialog
-import Pmw
 
 from pype import *
 from guitools import *
@@ -95,8 +102,8 @@ class UserDisplay:
 			self.master = master
 		else:
 			self.master = Toplevel()
-			self.master.title('UserDisplay')
-			self.master.iconname('UserDisplay')
+			self.master.title('pype:udpy')
+			self.master.iconname('updy')
 			if sys.platform == 'darwin':
 				self.master.geometry('-0+20')
 			else:
@@ -112,86 +119,13 @@ class UserDisplay:
 		# for debugging purposes...
 		self.callback = callback
 
-		f = Frame(self.frame)
-		f.pack(expand=1, fill=X, side=TOP)
-
-		mb = Pmw.MenuBar(f)
-		mb.pack(side=LEFT, expand=0, fill=X)
-		mb.addmenu('Fidmarks', '', '')
-		mb.addmenuitem('Fidmarks', 'command',
-					   label='Clear all marks (C)', command=self._clearfidmarks)
-		mb.addmenuitem('Fidmarks', 'command',
-					   label='Save (s)', command=self.savefidmarks)
-		mb.addmenuitem('Fidmarks', 'command',
-					   label='Load (l)', command=self.loadfidmarks)
-		mb.addmenuitem('Fidmarks', 'command',
-					   label='View (v)', command=self._showfidmarks)
-		mb.addmenuitem('Fidmarks', 'separator')
-		mb.addmenuitem('Fidmarks', 'command', state=DISABLED,
-					   label='set (f)')
-		mb.addmenuitem('Fidmarks', 'command', state=DISABLED,
-					   label='clear closest (c)')
-
-		mb.addmenu('Box', '', '')
-		mb.addmenuitem('Box', 'command',
-					   label='Enter box position', command=self.manualbox)
-		
-		mb.addmenu('Eyecal', '', '')
-		mb.addmenuitem('Eyecal', 'command',
-					   label='Clear all points', command=self.clearpoints)
-		mb.addmenuitem('Eyecal', 'separator')
-		mb.addmenuitem('Eyecal', 'command',
-					   label='Load .pts file',
-					   command=lambda s=self: s.loadpoints(merge=None))
-		mb.addmenuitem('Eyecal', 'command',
-					   label='Merge .pts file',
-					   command=lambda s=self: s.loadpoints(merge=1))
-		mb.addmenuitem('Eyecal', 'command',
-					   label='Save .pts file', command=self.savepoints)
-		mb.addmenuitem('Eyecal', 'separator')
-		mb.addmenuitem('Eyecal', 'command',
-					   label='Load ascii file',
-					   command=lambda s=self: s.loadpoints_ascii(merge=None))
-		mb.addmenuitem('Eyecal', 'command',
-					   label='Merge ascii file',
-					   command=lambda s=self: s.loadpoints_ascii(merge=1))
-		mb.addmenuitem('Eyecal', 'separator')
-		mb.addmenuitem('Eyecal', 'command', state=DISABLED,
-					   label='set (.)')
-		mb.addmenuitem('Eyecal', 'command', state=DISABLED,
-					   label='clear closest (,)')		
-
-		mb.addmenu('Display', '', '')
+		# tkinter vars for linking GUI to python vars:
 		self._photomode_tvar = IntVar()
 		self._photomode_tvar.set(0)		# photo mode starts up OFF!!
 		self._photomode = self._photomode_tvar.get()
-		mb.addmenuitem('Display', 'checkbutton',
-					   label='Photo mode', command=self._phototoggle,
-					   variable=self._photomode_tvar)
-
-		mb.addmenuitem('Display', 'command',
-					   label='clear trace',
-					   command=lambda s=self: s.eye_clear())
-
-		mb.addmenu('Help', '', '')
-		mb.addmenuitem('Help', 'command',
-					   label='show shortcuts', command=self.help)
-
-
 		self.gridinterval = pix_per_dva
-		Label(f, text="%d pix/div" % self.gridinterval).pack(side=RIGHT)
-
-		self._info = Label(f, text='', fg='red')
-		self._info.pack(side=RIGHT, padx=20)
-	
-		self.xypos = Label(f, text="")
-		self.xypos.pack(expand=0, side=RIGHT)
-		self._mouse_motion(ev=None)
-
-		self._stopbutton = Button(f, bg='red', fg='white', text='STOP')
-		self._stopbutton.pack(expand=0, side=LEFT)
-		self._stopbutton.forget()
 		
+	
 		self._canvas = Canvas(self.frame)
 		self._canvas.pack()
 		self._canvas.configure(width=cwidth, height=cheight)
@@ -201,22 +135,59 @@ class UserDisplay:
 		self.xoffset = 0
 		self.yoffset = 0
 
-		self.popup = Menu(self._canvas, tearoff=0)
+		self._xypos = self._canvas.create_text(2, cheight, fill='red', anchor=SW)
+		self._mouse_motion(ev=None)
 
-		self.popup.add_command(label="Fixspot here",
-							   command=self._fixset)
-		self.popup.add_command(label="Set fixspot to (0,0)",
-							   command=self._fixzero)
-		self.popup.add_command(label="Enter fixspot coords",
-							   command=self._fixxy)
-		self.popup.add_command(label="Set a box corner (/)",
-							   command=self.setbox)
-		self.popup.add_command(label="Clear box",
-							   command=self.clearbox)
-		self.popup.add_separator()
-		self.popup.add_command(label="close")
+ 		self._info = self._canvas.create_text(2, 2, fill='red', anchor=NW)
 
-		self._canvas.bind("<Button-3>", self.do_popup)
+		p = Menu(self._canvas, tearoff=0)
+
+		m = Menu(self._canvas, tearoff=0)
+		m.add_command(label="Set fixspot here", command=self._fixset)
+		m.add_command(label="Set fixspot to (0,0)", command=self._fixzero)
+		m.add_command(label="Enter fixspot coords", command=self._fixxy)
+		m.add_cascade(label='Fixspot', menu=m)
+		
+		m = Menu(self._canvas, tearoff=0)
+		m.add_command(label='Clear all marks (C)', command=self._clearfidmarks)
+		m.add_command(label='Save (s)', command=self.savefidmarks)
+		m.add_command(label='Load (l)', command=self.loadfidmarks)
+		m.add_command(label='View (v)', command=self._showfidmarks)
+		m.add_command(label='clear closest (c)')
+		p.add_cascade(label='Fiduciary Marks', menu=m)
+
+		m = Menu(self._canvas, tearoff=0)
+		m.add_command(label="Set a box corner (/)", command=self.setbox)
+		m.add_command(label="Clear box", command=self.clearbox)
+		m.add_command(label='Enter box position', command=self.manualbox)
+		p.add_cascade(label='Box', menu=m)
+		
+		m = Menu(self._canvas, tearoff=0)
+		m.add_command(label='Clear all points', command=self.clearpoints)
+		m.add_command(label='Load .pts file',
+					   command=lambda s=self: s.loadpoints(merge=None))
+		m.add_command(label='Merge .pts file',
+					   command=lambda s=self: s.loadpoints(merge=1))
+		m.add_command(label='Save .pts file', command=self.savepoints)
+		m.add_command(label='Load ascii file',
+					  command=lambda s=self: s.loadpoints_ascii(merge=None))
+		m.add_command(label='Merge ascii file',
+					  command=lambda s=self: s.loadpoints_ascii(merge=1))
+		m.add_command(label='set (.)', state=DISABLED)
+		m.add_command(label='clear closest (,)', state=DISABLED)
+		p.add_cascade(label='Tracker calibration', menu=m)
+
+		m = Menu(self._canvas, tearoff=0)
+		m.add_checkbutton(label='Photo mode', command=self._phototoggle,
+						  variable=self._photomode_tvar)
+		m.add_checkbutton(label='clear trace',
+						  command=lambda s=self: s.eye_clear())
+		p.add_cascade(label='Display Options', menu=m)
+
+		m = Menu(self._canvas, tearoff=0)
+		m.add_command(label='show shortcuts', command=self.help)
+		p.add_cascade(label='Help', menu=m)
+		self._canvas.bind("<Button-1>", lambda ev,p=p,s=self: s._dopopup(ev,p))
 
 		self._canvas.bind("<Motion>", self._mouse_motion)
 		self._canvas.bind("<Enter>", self._mouse_enter)
@@ -263,7 +234,7 @@ class UserDisplay:
 		self.set_taskpopup()
 
 	def info(self, msg=''):
-		self._info.configure(text=msg)
+		self._canvas.itemconfigure(self._info, text=msg)
 
 	def showhide(self):
 		if self.visible:
@@ -272,14 +243,6 @@ class UserDisplay:
 		else:
 			self.master.deiconify()
 			self.visible = 1
-
-	def stop(self, command=None):
-		if command:
-			self._stopbutton.configure(command=command)
-			self._stopbutton.pack()
-		else:
-			self._stopbutton.forget()
-			self._stopbutton.configure(command=None)
 
 	def note(self, msg):
 		if msg is None or len(msg) == 0:
@@ -719,12 +682,14 @@ class UserDisplay:
 		else:
 			(self.mousex, self.mousey) = self.can2fb(ev.x, ev.y)
 			(x, y, fx, fy) = (self.mousex, self.mousey, self.fix_x, self.fix_y)
-		if self.xypos:
+		if self._xypos:
 			if fx or fy:
-				s = "abs=[%4d,%4d]  rel=[%4d,%4d]" % (x, y, x-fx, y-fy)
+				s = "[%d ppd] abs=[%d,%d]  rel=[%d,%d]" % \
+					(self.gridinterval, x, y, x-fx, y-fy)
 			else:
-				s = "[%4d,%4d]" % (x, y)
-			self.xypos.configure(text=s)
+				s = "[%d ppd] [%d,%d]" % \
+					(self.gridinterval, x, y)
+			self._canvas.itemconfigure(self._xypos, text=s)
 
 	def _mouse_enter(self, ev):
 		self._canvas.focus_set()
@@ -1091,29 +1056,20 @@ class UserDisplay:
 		if s:
 			s = string.split(s, ',')
 			if len(s) == 2:
-				self._fixset(x=int(s[0]), y=int(s[1]))
+				self._fixset(x=int(s[0]), y=inta(s[1]))
+
+	def _dopopup(self, event, popupwin):
+		popupwin.tk_popup(event.x_root, event.y_root)
+
 
 	def set_taskpopup(self, menu=None):
 		if menu is None:
-			self.taskpopup = Menu(self._canvas, tearoff=0)
-			self.taskpopup.add_command(label="No taskpopup")
-			self.taskpopup.add_separator()
-			self.taskpopup.add_command(label="close")
+			menu = Menu(self._canvas, tearoff=0)
+			menu.add_command(label="no task-specific menu")
 		else:
 			self.taskpopup = menu
-		self._canvas.bind("<Button-2>", self.do_taskpopup)
-
-	def do_taskpopup(self, event):
-		try:
-			self.taskpopup.tk_popup(event.x_root, event.y_root)
-		finally:
-			self.taskpopup.grab_release()
-
-	def do_popup(self, event):
-		try:
-			self.popup.tk_popup(event.x_root, event.y_root)
-		finally:
-			self.popup.grab_release()
+		self._canvas.bind("<Button-2>", \
+						  lambda ev,p=menu,s=self: s._dopopup(ev,p))
 
 class FID:
 	def __init__(self, file=None):
