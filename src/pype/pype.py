@@ -438,6 +438,7 @@ class PypeApp:
 
 		# check to see if ~/.pyperc or $PYPERC is accessible
 		# by the user before going any further:
+		statefile = self.__get_statefile_name(accesscheck=0)
 		try:
 			statefile = self.__get_statefile_name(accesscheck=1)
 		except IOError:
@@ -1170,9 +1171,8 @@ class PypeApp:
 
 		root_drop()
 		if self.config.iget('NO_AUDIO'):
-			from beep import _Beeper
-			_Beeper(disable=1)
 			# disable the beep subsystem:
+			beep(disable=1)
 			Logger('pype: audio disabled by user config\n')
 		else:
 			if self.config.get('AUDIODRIVER'):
@@ -1182,7 +1182,7 @@ class PypeApp:
 			else:
 				# default for linux...
 				audiodriver = 'alsa'
-			beep(driver=audiodriver)
+			beep()
 		root_take()
 
 		self.init_framebuffer()
