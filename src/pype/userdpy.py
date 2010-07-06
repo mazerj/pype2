@@ -142,13 +142,13 @@ class UserDisplay:
 
 		p = Menu(self._canvas, tearoff=0)
 
-		m = Menu(self._canvas, tearoff=0)
+		m = Menu(p, tearoff=0)
 		m.add_command(label="Set fixspot here", command=self._fixset)
 		m.add_command(label="Set fixspot to (0,0)", command=self._fixzero)
 		m.add_command(label="Enter fixspot coords", command=self._fixxy)
-		m.add_cascade(label='Fixspot', menu=m)
+		p.add_cascade(label='Fixspot', menu=m)
 		
-		m = Menu(self._canvas, tearoff=0)
+		m = Menu(p, tearoff=0)
 		m.add_command(label='Clear all marks (C)', command=self._clearfidmarks)
 		m.add_command(label='Save (s)', command=self.savefidmarks)
 		m.add_command(label='Load (l)', command=self.loadfidmarks)
@@ -156,13 +156,13 @@ class UserDisplay:
 		m.add_command(label='clear closest (c)')
 		p.add_cascade(label='Fiduciary Marks', menu=m)
 
-		m = Menu(self._canvas, tearoff=0)
+		m = Menu(p, tearoff=0)
 		m.add_command(label="Set a box corner (/)", command=self.setbox)
 		m.add_command(label="Clear box", command=self.clearbox)
 		m.add_command(label='Enter box position', command=self.manualbox)
 		p.add_cascade(label='Box', menu=m)
 		
-		m = Menu(self._canvas, tearoff=0)
+		m = Menu(p, tearoff=0)
 		m.add_command(label='Clear all points', command=self.clearpoints)
 		m.add_command(label='Load .pts file',
 					   command=lambda s=self: s.loadpoints(merge=None))
@@ -177,23 +177,25 @@ class UserDisplay:
 		m.add_command(label='clear closest (,)', state=DISABLED)
 		p.add_cascade(label='Tracker calibration', menu=m)
 
-		m = Menu(self._canvas, tearoff=0)
+		m = Menu(p, tearoff=0)
 		m.add_checkbutton(label='Photo mode', command=self._phototoggle,
 						  variable=self._photomode_tvar)
 		m.add_checkbutton(label='clear trace',
 						  command=lambda s=self: s.eye_clear())
 		p.add_cascade(label='Display Options', menu=m)
 
-		m = Menu(self._canvas, tearoff=0)
+		m = Menu(p, tearoff=0)
 		m.add_command(label='show shortcuts', command=self.help)
 		p.add_cascade(label='Help', menu=m)
+		
 		self._canvas.bind("<Button-1>", lambda ev,p=p,s=self: s._dopopup(ev,p))
-
 		self._canvas.bind("<Motion>", self._mouse_motion)
 		self._canvas.bind("<Enter>", self._mouse_enter)
 		self._canvas.bind("<Leave>", self._mouse_leave)
 		self._canvas.bind("<KeyPress>", self._key)
+		
 		self._canvas.pack(expand=0)
+		
 		self._iconlist = []
 		self._displaylist_icons = []
 		self._fid_list = []
