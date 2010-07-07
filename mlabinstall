@@ -1,6 +1,6 @@
 #!/bin/sh
-if [ "$*" == "" ]; then
-  env PYPEDIR=/auto/share/pype2/`uname -m` ./build install wrapper
+if [ "$*" = "" ]; then
+    sudo env PYPEDIR=/auto/share/pype2/`uname -m` ./build install wrapper
 else
-  env PYPEDIR=/auto/share/pype2/`uname -m` ./build $*
+    sudo env PYPEDIR=/auto/share/pype2/`uname -m` ./build $*
 fi
