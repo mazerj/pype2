@@ -1160,7 +1160,7 @@ class PypeApp:
 		self.flip_sw2 = self.config.iget('FLIP_SW2')
 
 		# beep with each reward?
-		self.reward_beep = self.config.iget('REWARD_BEEP'):
+		self.reward_beep = self.config.iget('REWARD_BEEP')
 
 		# NOTE:
 		# Framebuffer initialization will give up root access
