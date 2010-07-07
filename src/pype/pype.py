@@ -2411,7 +2411,7 @@ class PypeApp:
 		else:
 			raise GuiOnlyFunction, "dropvar"
 
-	def reward(self, multiplier=1.0, ms=None):
+	def reward(self, dobeep=1, multiplier=1.0, ms=None):
 		"""
 		Deliver a squirt of juice based on the dropsize slider and
 		the current state of the reward schedule settings
@@ -2446,7 +2446,7 @@ class PypeApp:
 				t = normal(mean=ms, sigma=sigma)
 				if (t > minreward) and (t < maxreward):
 					break
-			if self.reward_beep:
+			if dobeep and self.reward_beep:
 				beep(1000, 40)
 			if not self.config.iget('DACQ_TESTMODE'):
 				thread.start_new_thread(self.__reward_finisher, (t,))
@@ -2454,7 +2454,7 @@ class PypeApp:
 				self.console.writenl("[ran-reward=%dms]" % t, color='black')
 			actual_reward_size = t
 		else:
-			if self.reward_beep:
+			if dobeep and self.reward_beep:
 				beep(1000, 100)
 			if not self.config.iget('DACQ_TESTMODE'):
 				self.juice_drip(ms)
