@@ -47,7 +47,7 @@ TDEVACC = 'TDevAcc'
 TTANK   = 'TTank'
 
 PORT    = 10000							# default inital TCP port 
-DEBUG   = 1								# debug mode?
+DEBUG   = 0								# debug mode?
 
 # OpenEx run modes:
 IDLE    = 0								# dsp completely idle

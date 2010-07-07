@@ -25,13 +25,13 @@ JUICESWITCH	(0|1)	if 1, then sw1 acts as switch to drain juice tank (when not ru
 MONH		(#)	monitor height in cm
 MONW		(#)	monitor width in cm
 MON_ID		(str)	identifier string for monitor (brand etc)
-NO_AUDIO	(0|1)	if 1, audio is disabled
 PLEXHOST	(str)	IP # or name of machine running PlexNet
 PLEXPORT	(#)	port # for PlexNet
 PPORT		(hex#)	port # for parallel port controller (cage trainer); should start with 0x
 PUPILXTALK	(#,#)	lumiance-position cross talk correction for eyelink
 REWARD_BEEP	(0|1)	beep on each reward
 SDLDPY		(str)	display to use for graphics -- typically ":0.0"
+SOUND		(0|1)	sound on/off (default is on)
 SPLASH		(0|1)	display splash screen
 SWAP_XY		(0|1)	swap x and y channels on eyetracker
 SYNCLEVEL	(#)	intensity (0-255) of sync pulse signal

@@ -29,7 +29,13 @@ class _Beeper:
 		
 		if _Beeper._doinit:
 			if pygame.mixer.get_init() is None:
-				pygame.mixer.init()
+				try:
+					pygame.mixer.init()
+				except:
+					Logger('beep: no audio device available -- check perms\n')
+					_Beeper._doinit = 0
+					_Beeper._disabled = 1
+					return
 				pygame.sndarray.use_arraytype('numeric')
 			(_Beeper._dafreq, _Beeper._bits, _Beeper._chans) = \
 							  pygame.mixer.get_init()
@@ -113,7 +119,29 @@ def beep(freq=-1, msdur=-1, vol=0.5, risefall=20, wait=1, play=1, disable=None):
 		_Beeper()._beep(freq, msdur, vol=vol, risefall=risefall,
 						wait=wait, play=play)
 
+def warble(base, t, volume=1, fmper=25, driver=None):
+	"""Make a nice warbling sound - cheapo FM
+	
+	**base** - base frequency
+	
+	**t** - duration in ms
+	
+	**volume** - floating point volume (0-1)
+	
+	**fmper** - period of modulation frequency in ms
+	
+	"""
+
+	et = 0
+	while et < t:
+		beep(base, fmper, volume, wait=0)
+		beep(1.10*base, fmper, volume, wait=0)
+		et = et + (2 * fmper)
+		
+
 if  __name__ == '__main__':
 	beep()
-	beep(1000, 100, 1, 1)
+	#beep(1000, 100, 1, 1)
+	warble(1000, 100)
+	warble(500, 100)
 	pygame.mixer.quit()

@@ -533,10 +533,6 @@ class PypeApp:
 		self._eyetrace = 0
 		self.taskidle = None
 
-		#Thu Jun 25 16:07:42 2009 mazer OBSOLETE:
-		#self.trialstats = {}
-		#self.trial_clear()
-
 		self.tk = Tk()
 		self.tk.resizable(0, 0)
 
@@ -602,6 +598,10 @@ class PypeApp:
 		mb.addmenuitem('File', 'separator')
 		mb.addmenuitem('File', 'command',
 					   label='Save state', command=self.__savestate)
+		mb.addmenuitem('File', 'separator')
+		mb.addmenuitem('File', 'command',
+					   label='Drain juice', command=self.drain)
+		mb.addmenuitem('File', 'separator')
 		mb.addmenuitem('File', 'command',
 					   label='Quit', command=self.shutdown)
 
@@ -895,7 +895,7 @@ class PypeApp:
 		self.balloon.bind(b, "give reward (same as F4)")
 
 		b = Button(c3pane, text="beep",
-				   command=lambda s=self: s.warningbeep(1))
+				   command=self.warn_run_start)
 		b.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(b, "play start sound w/o starting")
 
@@ -1091,15 +1091,10 @@ class PypeApp:
 		self._status.grid(row=1, column=0, columnspan=3, sticky=W+E)
 		self.balloon.bind(self._status, 'plain old status line')
 
-		self.led(0)
+		self.__led(0)
 
 		# make sure we're root, if possible
 		root_take()
-
-		check = self.config.get('ISCAN_DEV')
-		if check and len(check) == 0:
-			warn('Error', \
-				 'ISCAN_DEV in config is obsolete, change to EYETRACKER_DEV')
 
 		# EYELINK_OPTS can be defined in the pyperc config file and should
 		# contained a colon-delimited list of commands to be sent to the
@@ -1164,26 +1159,28 @@ class PypeApp:
 		self.flip_sw1 = self.config.iget('FLIP_SW1')
 		self.flip_sw2 = self.config.iget('FLIP_SW2')
 
+		# beep with each reward?
+		self.reward_beep = self.config.iget('REWARD_BEEP'):
+
 		# NOTE:
 		# Framebuffer initialization will give up root access
 		# automatically.. so make sure you start the dacq process
 		# first (see above).
 
-		root_drop()
-		if self.config.iget('NO_AUDIO'):
-			# disable the beep subsystem:
-			beep(disable=1)
-			Logger('pype: audio disabled by user config\n')
-		else:
-			if self.config.get('AUDIODRIVER'):
-				audiodriver = self.config.get('AUDIODRIVER')
-			elif sys.platform == 'darwin':
-				audiodriver = 'sndmgr'
+		try:
+			root_drop()
+			if not self.config.iget('SOUND'):
+				beep(disable=1)
+				Logger('pype: audio disabled by user config\n')
 			else:
-				# default for linux...
-				audiodriver = 'alsa'
-			beep()
-		root_take()
+				if self.config.get('AUDIODRIVER'):
+					audiodriver = self.config.get('AUDIODRIVER')
+				elif sys.platform == 'darwin':
+					audiodriver = 'sndmgr'
+				# otherwise, let pygame.mixer figure it out
+				beep()
+		finally:
+			root_take()
 
 		self.init_framebuffer()
 
@@ -1361,7 +1358,7 @@ class PypeApp:
 		"""
 		if not (running is -1):	self.running = running
 		if not (paused is -1):	self.paused = paused
-		if not (led is -1):		self.led(led)
+		if not (led is -1):		self.__led(led)
 
 	def drawledbar(self):
 		x = ("[ ]", "[*]")
@@ -1925,67 +1922,27 @@ class PypeApp:
 			'----------------------------------'), '\n')
 		self.statsw.configure(text=s)
 
-	def query_ncorrect(self):
-		return self.__runstats['ncorrect']
-	
-	def query_nerror(self):
-		return self.__runstats['nerror']
-	
-	def query_ntrials(self):
-		# note: UI's and ABORTs don't count as trials
-		return self.__runstats['ncorrect'] + self.__runstats['nerror']
+	def __led(self, state):
+		if self.tk:
+			if state == 0:
+				self.userinfo.configure(bg='#ffc0cb')
+			elif state == 1:
+				self.userinfo.configure(bg='#c0ffcb')
+			elif state == 2:
+				self.userinfo.configure(bg='#c0cbff')
+			else:
+				self.userinfo.configure(bg='white')
 
-	def OBSOLETE_trial_ui(self, uimax=None):
-		"""This trial was un-initiated.."""
-		if uimax is None:
-			uimax = self.sub_common.queryv('uimax')
-			trialstats['uicount'] = self.trialstats['uicount'] + 1
-		if uimax and (self.trialstats['uicount']  > uimax):
-			warn('Warning',
-				 'UI Count exceeded.\nTime: %s\nPlease intervene.\n' %
-				 Timestamp(), wait=1)
-			self.trialstats['uicount'] = 0
-
-	def OBSOLETE_trial_clear(self):
-		# runset stats
-		self.trialstats['trialnum'] = 0	# number of total trial
-		self.trialstats['ntrials'] = 0	# number of real/iniated trial
-		self.trialstats['ncorrect'] = 0	# number correct (out of ntrials)
-		self.trialstats['uicount'] = 0	# number UI trials
-
-	def OBSOLETE_trial_new(self):
-		"""Starting a new trial..."""
-		self.trialstats['trialnum'] = self.trialstats['trialnum'] + 1
-
-	def OBSOLETE_trial_correct(self, correct):
-		"""This trial was correct..."""
-		if correct:
-			self.trialstats['ncorrect'] = self.trialstats['ncorrect'] + 1
-		self.trialstats['ntrials'] = self.trialstats['ntrials'] + 1
-		self.trialstats['uicount'] = 0
-
-	def new_cell(self):
-		try:
-			n = int(self.sub_common.queryv('cell'))
-			n = n + 1
-			self.sub_common.set('cell', "%d" % n)
-		except ValueError:
-			warn('Warning', "cell field is non-numeric, can't increment.")
-
-	def set_fxfy(self):
-		self.sub_common.set('fix_x', "%d" % self.udpy.fix_x)
-		self.sub_common.set('fix_y', "%d" % self.udpy.fix_y)
-
-	def set_startfn(self, fn):
-		self.startfn = fn
-		if self.startfn:
-			self._realstart.config(state=DISABLED)
-			self._tmpstart.config(state=DISABLED)
-			self._stop.config(state=NORMAL)
+	def __warn(self, start=1):
+		if start:
+			for n in range(3):
+				beep(1000, 100)
+				beep(0, 10)
 		else:
-			self._realstart.config(state=NORMAL)
-			self._tmpstart.config(state=NORMAL)
-			self._stop.config(state=DISABLED)
+			beep(1000, 100)
+			beep(0, 10)
+			beep(500, 100)
+			beep(0, 10)
 
 	def __start(self):
 		self.__start_helper(temp=None)
@@ -2098,6 +2055,39 @@ class PypeApp:
 			self.running = 0
 			self.udpy.eye_clear()
 
+	def query_ncorrect(self):
+		return self.__runstats['ncorrect']
+	
+	def query_nerror(self):
+		return self.__runstats['nerror']
+	
+	def query_ntrials(self):
+		# note: UI's and ABORTs don't count as trials
+		return self.__runstats['ncorrect'] + self.__runstats['nerror']
+
+	def new_cell(self):
+		try:
+			n = int(self.sub_common.queryv('cell'))
+			n = n + 1
+			self.sub_common.set('cell', "%d" % n)
+		except ValueError:
+			warn('Warning', "cell field is non-numeric, can't increment.")
+
+	def set_fxfy(self):
+		self.sub_common.set('fix_x', "%d" % self.udpy.fix_x)
+		self.sub_common.set('fix_y', "%d" % self.udpy.fix_y)
+
+	def set_startfn(self, fn):
+		self.startfn = fn
+		if self.startfn:
+			self._realstart.config(state=DISABLED)
+			self._tmpstart.config(state=DISABLED)
+			self._stop.config(state=NORMAL)
+		else:
+			self._realstart.config(state=NORMAL)
+			self._tmpstart.config(state=NORMAL)
+			self._stop.config(state=DISABLED)
+
 	def shutdown(self):
 		"""
 		*Internal* (should never be called by user/application directly)
@@ -2195,11 +2185,6 @@ class PypeApp:
 		self.eyeset()
 		self.encode(EYESHIFT)
 
-	def drain(self):
-		if not self.running:
-			warn('Warning',
-				 "I'm sorry Ben, but I can't do that (drain juice).", wait=0)
-
 	def idlefn(self, ms=None, update=1, toplevel=None, fast=None):
 		"""Idle function -- call me to kill time.
 
@@ -2283,17 +2268,11 @@ class PypeApp:
 					pass
 				else:
 					print "<pygame key code: %d>" % ks
-			if c == 'F1':
-				if not self.running:
-					self.juice_on()
-					w = warn('Warning', "Juicer is OPEN!!!")
-					self.juice_off()
-			elif c == 'F3' or c == 'Escape':
+			if c == 'Escape':
 				if self._allowabort:
-					self.status('[UserAbort]')
+					self.console.writenl("[esc]", color='red')
 					raise UserAbort
 			elif c == 'F4':
-				self.console.writenl("F4", color='red')
 				self.reward()
 			elif c == 'F5':
 				if self.running:
@@ -2341,6 +2320,13 @@ class PypeApp:
 			while t.ms() < ms:
 				self.idlefn()
 
+	def drain(self):
+		"""open solenoid"""
+		if not self.running:
+			self.juice_on()
+			w = warn('Warning', "Juicer is OPEN!!!")
+			self.juice_off()
+
 	def history(self, c=None, init=0):
 		"""
 		Maintains a 'history stack' ala cortex.  Cortex did do somethings
@@ -2369,87 +2355,47 @@ class PypeApp:
 			else:
 				self._hist.config(text='')
 
-	def alarm(self):
-		for i in range(1):
-			for f in range(1000, 3000, 1000):
-				beep(f, 10)
-			for f in range(3000, 1000, -1000):
-				beep(f, 10)
-
-	def warningbeep(self, start=1):
-		if start:
-			for n in range(3):
-				beep(1000, 100)
-				beep(0, 10)
-		else:
-			beep(1000, 100)
-			beep(0, 10)
-			beep(500, 100)
-			beep(0, 10)
-
 	def warn_run_start(self):
-		self.warningbeep(1)
-
+		self.__warn(start=1)
+	
 	def warn_run_stop(self):
-		self.warningbeep(0)
+		self.__warn(start=0)
 
-	def warn_trial_correct(self):
+	def warn_trial_correct(self, flash=None):
 		"""
 		Currently a NOP, but could be used for positive feedback.
 
 		"""
-		warble(3*440, 100)
+		warble(1000, 100)
+		if flash:
+			self.fb.clear((0, 255, 0), flip=1)
+			self.idlefn(flash)
+			self.fb.clear((1, 1, 1), flip=1)
 		pass
 
-	def warn_trial_incorrect(self, flash=1000):
+	def warn_trial_incorrect(self, flash=None):
 		"""
 		Beep and possibly flash screen red for a short time.
 
 		"""
-		warble(440, 100)
+		warble(500, 100, wait=0)
 		if flash:
 			self.fb.clear((255, 0, 0), flip=1)
 			self.idlefn(flash)
 			self.fb.clear((1, 1, 1), flip=1)
 
-	def led(self, state):
-		if self.tk:
-			if state == 0:
-				self.userinfo.configure(bg='#ffc0cb')
-			elif state == 1:
-				self.userinfo.configure(bg='#c0ffcb')
-			elif state == 2:
-				self.userinfo.configure(bg='#c0cbff')
-			else:
-				self.userinfo.configure(bg='white')
-
-	def OBSOLETE_nreps(self):
-		"""Query the number of repetitions (slider value)"""
-		if self.tk:
-			return self.sub_common.queryv('nreps')
-		else:
-			raise GuiOnlyFunction, "nreps"
-
-	def OBSOLETE_notdone(self, repnum):
-		"""Continue running or abort/done?"""
-		nreps = self.nreps()
-		if self.running and (nreps == 0 or repnum < nreps):
-			return 1
-		else:
-			return 0
-
 	def runstate(self, state=1):
 		if state:
 			self.paused = 0
 			self.running = 1
-			self.led(1)
-			self.warningbeep(1)
+			self.__warn(start=1)
+			self.__led(1)
 		else:
 			self.running = 0
-			self.warningbeep(0)
+			self.__warn(start=0)
 			self.record_done()
-			self.led(0)
-			self.repinfo()				# clear rep num display
+			self.repinfo()
+			self.__led(0)
 
 	def dropsize(self):
 		"""Query the dropsize (in ms; from slider)"""
@@ -2465,7 +2411,7 @@ class PypeApp:
 		else:
 			raise GuiOnlyFunction, "dropvar"
 
-	def reward(self, multiplier=1.0, dobeep=1, ms=None):
+	def reward(self, multiplier=1.0, ms=None):
 		"""
 		Deliver a squirt of juice based on the dropsize slider and
 		the current state of the reward schedule settings
@@ -2480,7 +2426,7 @@ class PypeApp:
 
 		# becasue the distribution is normal, very small and very
 		# large numbers can (rarely) come up, so you MUST clip the
-		# distribution to avoid pype locking up in app.__reward2()...
+		# distribution to avoid pype locking up in app.__reward_finisher()...
 
 		if ms is None:
 			ms = int(round(multiplier * float(self.dropsize())))
@@ -2492,11 +2438,6 @@ class PypeApp:
 		if ms == 0:
 			return
 
-		if not self.config.iget('REWARD_BEEP'):
-			# Mon Aug  8 09:58:39 2005 mazer
-			# NO_REWARD_BEEP overrides everything else
-			dobeep = 0
-
 		maxreward = self.sub_common.queryv('maxreward')
 		minreward = self.sub_common.queryv('minreward')
 
@@ -2505,15 +2446,15 @@ class PypeApp:
 				t = normal(mean=ms, sigma=sigma)
 				if (t > minreward) and (t < maxreward):
 					break
-			if dobeep:
-				beep(440, 40)
+			if self.reward_beep:
+				beep(1000, 40)
 			if not self.config.iget('DACQ_TESTMODE'):
-				thread.start_new_thread(self.__reward2, (t,))
+				thread.start_new_thread(self.__reward_finisher, (t,))
 			if self.tk:
 				self.console.writenl("[ran-reward=%dms]" % t, color='black')
 			actual_reward_size = t
 		else:
-			if dobeep:
+			if self.reward_beep:
 				beep(1000, 100)
 			if not self.config.iget('DACQ_TESTMODE'):
 				self.juice_drip(ms)
@@ -2529,7 +2470,7 @@ class PypeApp:
 
 		return actual_reward_size
 
-	def __reward2(self, t):
+	def __reward_finisher(self, t):
 		"""
 		This is ONLY to be called from inside reward(), not a user-visble
 		function. The point is to call juice_drip() in a separate thread

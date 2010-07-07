@@ -25,6 +25,4 @@ export PYPEDIR
 export WHO=`/usr/bin/whoami`
 
 
-printenv
-
 /usr/bin/make -f Buildfile $*

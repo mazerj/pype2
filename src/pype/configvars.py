@@ -59,7 +59,7 @@ def defaults(srcfile):
     c.set('JUICESWITCH', '1')           # if 1, SW1 opens/closes solenoid
     c.set('REWARD_BEEP', '1')           # beep when giving rewards?
     c.set('DACQ_TESTMODE', '0')         # testing mode for DAQ cards
-    c.set('NO_AUDIO', '0')              # disable audio?
+    c.set('SOUND', '1')                 # access to sound card?
     
     c.set('USB_JS_DEV',	'')             # enable USB joystick -- device file
 
