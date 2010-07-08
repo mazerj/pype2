@@ -1319,6 +1319,7 @@ class Sprite(_ImageBase):
 		**returns** - PhotoImage represenation of the sprite's pixels.
 
 		"""
+		
 		if alpha:
 			im = self.im.convert()
 			im.set_alpha(alpha)
@@ -1412,9 +1413,13 @@ class Sprite(_ImageBase):
 			if color or n == 0:
 				m = uniform(1, 255, shape=(self.w, self.h))
 				if not thresh is None:
-					m = where(greater(m, thresh*255), 255, 1)
+					m = where(greater(m, thresh*255),
+							  255, 1).astype(UnsignedInt8)
 			self.array[:,:,n] = m[::].astype(UnsignedInt8)
-		
+		# for some reason starting with lucid (10.04LTS) you need
+		# to explicitly set alpha here. This means you need to make
+		# sure to apply alpha masks AFTER you do a noise fill!
+		self.alpha[::] = 255
 
 	def circlefill(self, color, r=None, x=None, y=None, width=0):
 		"""Draw *filled* circle in sprite
