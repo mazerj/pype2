@@ -11,7 +11,7 @@ from guitools import *
 
 import cPickle
 import glob
-import tdt2 as tdt
+import tdt
 
 #from pype import *
 import pypedebug
