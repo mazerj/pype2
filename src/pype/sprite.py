@@ -1186,6 +1186,7 @@ class Sprite(_ImageBase):
 			# load image data from file
 			self.im = pygame.image.load(fname).convert(32, SURFFLAG)
 			self.userdict = {}
+			setalpha = 0
 		elif image:
 			# make a copy of the source sprite/image
 			try:
@@ -1196,11 +1197,13 @@ class Sprite(_ImageBase):
 				# pygame image/surface
 				self.im = image.convert(32, SURFFLAG)
 				self.userdict = {}
+			setalpha = 0
 		else:
 			# new image from scratch
 			# image/sprites should have 32 bits (RGBA)
 			self.im = pygame.Surface((width, height), flags=SURFFLAG, depth=32)
 			self.userdict = {}
+			setalpha = 1
 
 		if ALPHAMASKS:
 			self.im = self.im.convert(ALPHAMASKS)
@@ -1254,6 +1257,10 @@ class Sprite(_ImageBase):
 		self.alpha = _SurfArrayAccess(self.im,
 									  get=pygame.surfarray.array_alpha,
 									  set=pygame.surfarray.pixels_alpha)
+
+		# this is to fix a Lucid problem, not tracked down now..
+		if setalpha:
+			self.alpha[::] = 255
 
 	def __del__(self):
 		"""INTERNAL

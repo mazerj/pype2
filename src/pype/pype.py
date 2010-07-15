@@ -877,7 +877,7 @@ class PypeApp:
 		self.balloon.bind(self._tmpstart, "save to temp file (ie, don't save)")
 		
 		self._stop = Button(c2pane, text="stop",
-							   command=self.__start_helper, bg='red',
+							   command=self.__start_helper, fg='black',
 							   state=DISABLED)
 		self._stop.pack(expand=0, fill=X, side=TOP, pady=2)
 		self.balloon.bind(self._stop, "stop run at end of trial")
@@ -1962,7 +1962,7 @@ class PypeApp:
 			self._button_slideshow.config(state=DISABLED)
 			self._realstart.config(state=DISABLED)
 			self._tmpstart.config(state=DISABLED)
-			self._stop.config(state=NORMAL)
+			self._stop.config(state=NORMAL, fg='red')
 			
 			if int(self.rig_common.query('testing')):
 				if ask("pype", "testing mode ok?", ("yes", "no")) == 1:
@@ -2036,6 +2036,7 @@ class PypeApp:
 				self.idlefb()
 				self._allowabort = 0
 				
+				self._stop.config(state=DISABLED, fg='black')
 				self._realstart.config(state=NORMAL)
 				self._tmpstart.config(state=NORMAL)
 				self._button_bounce.config(state=NORMAL)
@@ -2052,6 +2053,7 @@ class PypeApp:
 				self.tdt.newblock(record=0)
 
 		else:
+			self._stop.config(state=DISABLED, fg='black')
 			self.running = 0
 			self.udpy.eye_clear()
 
@@ -2082,11 +2084,11 @@ class PypeApp:
 		if self.startfn:
 			self._realstart.config(state=DISABLED)
 			self._tmpstart.config(state=DISABLED)
-			self._stop.config(state=NORMAL)
+			#self._stop.config(state=NORMAL)
 		else:
 			self._realstart.config(state=NORMAL)
 			self._tmpstart.config(state=NORMAL)
-			self._stop.config(state=DISABLED)
+			#self._stop.config(state=DISABLED)
 
 	def shutdown(self):
 		"""
