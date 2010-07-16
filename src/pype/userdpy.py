@@ -48,6 +48,12 @@ Author -- James A. Mazer (james.mazer@yale.edu)
 
   - This means Pmw is no longer required here.. everything's simplified
 
+- Fri Jul 16 10:58:31 2010 mazer
+
+  - changed menu button to button-3 instead of button-1 to allow clicking
+    button-1 to raise the interface window!
+
+
 """
 
 __author__   = '$Author$'
@@ -188,7 +194,7 @@ class UserDisplay:
 		m.add_command(label='show shortcuts', command=self.help)
 		p.add_cascade(label='Help', menu=m)
 		
-		self._canvas.bind("<Button-1>", lambda ev,p=p,s=self: s._dopopup(ev,p))
+		self._canvas.bind("<Button-3>", lambda ev,p=p,s=self: s._dopopup(ev,p))
 		self._canvas.bind("<Motion>", self._mouse_motion)
 		self._canvas.bind("<Enter>", self._mouse_enter)
 		self._canvas.bind("<Leave>", self._mouse_leave)
