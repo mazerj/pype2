@@ -112,6 +112,12 @@ static int comedi_init()
     pci_das08 = 1;
   }
 
+  if (strcmp(comedi_get_board_name(comedi_dev), "das08") == 0) {
+    // see notes below about DAC settling times in ad_in()
+    fprintf(stderr, "%s: das08 detected, 'delaying' input\n", progname);
+    pci_das08 = 1;
+  }
+
   // find which comedi subdevices correspond the the facilities we need
   analog_in  = comedi_find_subdevice_by_type(comedi_dev,COMEDI_SUBD_AI,0);
   if (analog_in == -1) {
