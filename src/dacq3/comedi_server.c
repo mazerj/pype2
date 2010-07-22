@@ -22,6 +22,11 @@
 **
 ** Tue May  5 15:58:44 2009 mazer 
 **   joystick junk moved into separate JS device in das_common.c
+**
+** Thu Jul 22 12:06:45 2010 mazer 
+**   - looks like only das08 now is really pci-das08.. so pci-das08->das08
+**   - moreover, looks like driver name changed, so for the best..
+**   - also fixed some "signed" to "unsigned" that were probably always wrong..
 */
 
 #include <sys/types.h>
@@ -51,7 +56,7 @@ static int dummymode = 0;
 
 #include "das_common.h"
 
-static int pci_das08 = 0;	/* board is pci-das08? */
+static int das08 = 0;		/* board is das08? (was pci-das08)*/
 
 static char *comedi_devname = "/dev/comedi0";
 static comedi_t *comedi_dev;	/* main handle to comedi lib */
@@ -82,7 +87,7 @@ static int analog_range;
 	
 static int comedi_init()
 {
-  char *devname;
+  const char *devname;
   comedi_range *r;
   int n;
 
@@ -99,23 +104,13 @@ static int comedi_init()
     fprintf(stderr, "%s: 8255 disabled.\n", progname);
     use8255 = 0;
   } else if (strncmp(devname, "das08", 5) == 0) {
-    fprintf(stderr, "%s: 8255 disabled.\n", progname);
     use8255 = 0;
+    das08 = 1;
+    fprintf(stderr, "%s: 8255 disabled.\n", progname);
+    fprintf(stderr, "%s: detected das08 -- will used delayed input\n", progname);
   } else {
     fprintf(stderr, "%s: 8255 enabled.\n", progname);
     use8255 = 1;
-  }
-
-  if (strcmp(comedi_get_board_name(comedi_dev), "pci-das08") == 0) {
-    // see notes below about DAC settling times in ad_in()
-    fprintf(stderr, "%s: pci-das08 detected, 'delaying' input\n", progname);
-    pci_das08 = 1;
-  }
-
-  if (strcmp(comedi_get_board_name(comedi_dev), "das08") == 0) {
-    // see notes below about DAC settling times in ad_in()
-    fprintf(stderr, "%s: das08 detected, 'delaying' input\n", progname);
-    pci_das08 = 1;
   }
 
   // find which comedi subdevices correspond the the facilities we need
@@ -193,7 +188,7 @@ static int ad_in(int chan)
     return(0);
   } else {
     // need to set aref correctly: either AREF_GROUND or AREF_COMMON
-    if (pci_das08) {
+    if (das08) {
       // das08 is screwy -- needs time for multiplexer to settle:
       success = comedi_data_read_delayed(comedi_dev,analog_in,
 					 chan,analog_range,AREF_GROUND,
@@ -217,7 +212,8 @@ static int ad_in(int chan)
 
 static void dig_in()
 {
-  int i, success, bits, last;
+  int i, success, last;
+  unsigned int bits;
 
   if (dummymode) {
     // just lock these down -- polarities are
@@ -254,7 +250,7 @@ static void dig_in()
 
 static void dig_out()
 {
-  int bits = 0;
+  unsigned int bits = 0;
   int i, success;
 
   if (dummymode) {

@@ -38,14 +38,11 @@ __date__     = '$Date$'
 __revision__ = '$Revision$'
 __id__       = '$Id$'
 
-_debug = 0
-_show_pypedir = 0
-_showimports = 0
-
-
+__debug = 0
+__show_pypedir = 0
+__show_imports = 0
 
 import sys
-from platform import python_version
 import posixpath
 import os
 import glob
@@ -96,10 +93,10 @@ for a in sys.argv:
     if a[:2] == 's=':
         os.environ['SUBJECT'] = a[2:]
     elif a == '--dir':
-        _show_pypedir = 1
+        __show_pypedir = 1
     elif a == '--debug':
-        _debug = 1
-        _showimports = 1
+        __debug = 1
+        __show_imports = 1
         os.environ['PYPEDEBUG'] = "1"
     else:
         av.append(a)
@@ -111,7 +108,7 @@ if not os.environ.has_key('PYPEDIR'):
     sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
                      os.environ['PYPEDIR'])
 
-if _show_pypedir:
+if __show_pypedir:
     print os.environ['PYPEDIR']
     sys.exit(0)
 
@@ -173,10 +170,10 @@ for d in glob.glob(pyperc('Tasks/*')):
 # lastly, add current directory to allow local overrides!
 _addpath('.')
 
-if _showimports:
+if __show_imports:
     importer(report=1)
     
-if _debug:
+if __debug:
     sys.stderr.write('-- Search Path -------------\n')
     for d in sys.path:
         if len(d) and (not d in _original_path):
@@ -188,7 +185,6 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
     #   - could be either as script or for interactive session
     if len(sys.argv) == 2:
         # no command line args (beyond -s) -- startup an interactive session
-        print dir(platform)
         sys.stdout.write('[pype ishell (python %s)]\n' % python_version())
         code.interact(banner='')
     else:
