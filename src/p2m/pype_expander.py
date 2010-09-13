@@ -143,12 +143,14 @@ def writeVector(fp, objname, name, v, format):
 		# empty vector
 		fp.write("%s.%s=[];" % (objname, name));
 	else:
-		vs = Numeric.array(v, 'd').tostring()
-		if len(vs)/len(v) == 8:
-			# 8 bytes/item is correct, otherwise we're on some hardware
+		vs = Numeric.array(v, 'd')
+		if vs.itemsize() == 8:
+			# 8 bytes/item is correct, otherwise there's some
+			# difference between the cpu-arch for the data writing
+			# and data extracting/reading machines.
 			tmp = mktemp()
 			t = open(tmp,'w');
-			t.write(Numeric.array(v, 'd').tostring())
+			t.write(vs.tostring())
 			t.close()
 		
 			fp.write("fid=fopen('%s','r');\n" % tmp)

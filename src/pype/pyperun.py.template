@@ -185,7 +185,8 @@ if len(sys.argv) > 1 and sys.argv[1] == '-s':
     #   - could be either as script or for interactive session
     if len(sys.argv) == 2:
         # no command line args (beyond -s) -- startup an interactive session
-        sys.stdout.write('[pype ishell (python %s)]\n' % python_version())
+        sys.stdout.write('[pype interactive shell (python %d.%d.%d)]\n' % \
+                         sys.version_info[0:3])
         code.interact(banner='')
     else:
         # with command line args -- run as script:
