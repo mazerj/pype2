@@ -315,6 +315,10 @@ Thu Jan  7 17:31:33 2010 mazer
 - At the same time changed s0 (ttl spike channel) and p0 (photo diode
   channel) to be a list (should have been all along) to avoid problems
   in the future.
+
+Mon Oct 11 17:26:32 2010 mazer
+
+- eyebuf_t is now in US, now MS 
   
 """
 
@@ -587,8 +591,6 @@ class PypeApp:
 					   label='Toggle user display view',
 					   command=self.udpy_showhide)
 		mb.addmenuitem('File', 'separator')
-		mb.addmenuitem('File', 'command',
-					   label='Keyboard debugger', command=self.keyboard)
 		mb.addmenuitem('File', 'command',
 					   label='Graphics info',
 					   command=lambda s=self: s.fb.printinfo())
@@ -1226,9 +1228,8 @@ class PypeApp:
 		self.allow_ints = 0
 		# make sure bar touches don't cause interupts
 		dacq_bar_genint(0)
-		# configure the handlers
+		# configure the handler
 		signal.signal(signal.SIGUSR1, self.int_handler)
-		signal.signal(signal.SIGUSR2, self.debug_handler)
 		# now ready to receive interupts, but they won't come
 		# through until you do in your task:
 		#   (app/self).allow_ints = 1
@@ -2600,12 +2601,6 @@ class PypeApp:
 		else:
 			pass
 
-	def debug_handler(self, signal, frame):
-		"""This is for catching SIGUSR2's for debugging.."""
-		sys.stderr.write('\n------------------------------Recieved SIGUSR2:\n')
-		traceback.print_stack(frame)
-		keyboard()
-
 	def bardown(self):
 		if self.pport:
 			return pp_bar()
@@ -2950,7 +2945,7 @@ class PypeApp:
 		s0 = zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i)
+			t[i] = dacq_adbuf_t(i) / 1000.0
 			s0[i] = dacq_adbuf_c3(i)
 
 		spike_thresh = int(self.rig_common.queryv('spike_thresh'))
@@ -2979,7 +2974,7 @@ class PypeApp:
 		y = zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i)
+			t[i] = 0.5 + dacq_adbuf_t(i) / 1000.0
 			x[i] = dacq_adbuf_x(i)
 			y[i] = dacq_adbuf_y(i)
 
@@ -2995,7 +2990,7 @@ class PypeApp:
 		p = zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i)
+			t[i] = 0.5 + dacq_adbuf_t(i) / 1000.0
 			p[i] = dacq_adbuf_c2(i)
 
 		return (t, p)
@@ -3028,7 +3023,7 @@ class PypeApp:
 		self.eyetrace(0)
 
 		n = dacq_adbuf_size()
-		self.eyebuf_t = zeros(n)
+		self.eyebuf_t = zeros(n, 'f')
 		self.eyebuf_x = zeros(n)
 		self.eyebuf_y = zeros(n)
 		self.eyebuf_pa = zeros(n)
@@ -3060,7 +3055,8 @@ class PypeApp:
 				c4 = None
 
 			for i in range(0,n):
-				self.eyebuf_t[i] = dacq_adbuf_t(i)
+				# convert integer times in 'us', float times in 'ms'
+				self.eyebuf_t[i] = dacq_adbuf_t(i) / 1000.0
 				self.eyebuf_x[i] = dacq_adbuf_x(i)
 				self.eyebuf_y[i] = dacq_adbuf_y(i)
 				self.eyebuf_pa[i] = dacq_adbuf_pa(i)

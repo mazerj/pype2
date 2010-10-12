@@ -40,6 +40,18 @@ function r = p2mLoad(fname, plexchan, verbose)
 %
 %Tue Jun  2 10:17:23 2009 mazer 
 %  added automatic call to p2mNoFalseSpikes
+%
+%Tue Oct 12 10:25:17 2010 mazer 
+%  Added automatic downsampling for new oversampled timebase.
+%  comedi_server now samples >1khz and saves timestamps is
+%  microsecs instead of millisecs. p2mLoad() now uses interp1
+%  to downsample to a fixed 1khz base when oversampling is
+%  detected.
+%
+%  Also, added a warning when duplicated timestamps are
+%  detected in eyet!
+
+if ~exist('verbose', 'var'), verbose = 1; end
 
 if ~ischar(fname)
   % if it's not a char, then assume it's an already loaded
@@ -50,12 +62,6 @@ if ~ischar(fname)
   end
   return
 end
-
-if ~exist('verbose', 'var')
-  verbose = 1;
-end
-
-
 
 % expand wildcard, if any..
 flist = p2m_dir(fname);
@@ -97,7 +103,6 @@ if strcmp(fname0, fname) == 0
     fprintf('loading: %s\n', fname);
   end
 end
-  
 
 if fname(end-3:end) == '.p2m'
   if gz
@@ -133,6 +138,51 @@ end
 if exist('plexchan', 'var') && ~isempty(plexchan)
   r = p2mSelect(r, plexchan);
 end
+
+% check for duplicate eyet values:
+dups = 0;
+for n = 1:length(r.rec)
+  if length(unique(r.rec(n).eyet)) ~= length(r.rec(n).eyet)
+    fprintf('warning: file contains dup eyet values (rec=%d)\n', n);
+    dups = 1;
+    break
+  end
+end
+
+% check for oversampling (eyet > 1khz; no duplicates) 
+% and downsample to 1khz (1ms sampling interval).
+if ~dups
+  % w/matlab7 NaN's are not allowed in Y for interp1:
+  %% warning('off');
+  for n = 1:length(r.rec)
+    if min(diff(r.rec(n).eyet)) < 1
+      r.rec(n).oeyet = r.rec(n).eyet;
+      r.rec(n).orealt = r.rec(n).realt;
+      r.rec(n).oeyex = r.rec(n).eyex;
+      r.rec(n).oeyey = r.rec(n).eyey;
+      r.rec(n).oeyep = r.rec(n).eyep;
+      r.rec(n).oraw_photo = r.rec(n).raw_photo;
+      r.rec(n).oraw_spike = r.rec(n).raw_spike;
+      
+      r.rec(n).eyet = (round(r.rec(n).oeyet(1)):1:round(r.rec(n).oeyet(end)))';
+      r.rec(n).realt = NaN;
+      r.rec(n).eyex = interp1(r.rec(n).oeyet, r.rec(n).oeyex, ...
+                               r.rec(n).eyet);
+      r.rec(n).eyey = interp1(r.rec(n).oeyet, r.rec(n).oeyey, ...
+                               r.rec(n).eyet);
+      r.rec(n).eyep = interp1(r.rec(n).oeyet, r.rec(n).oeyep, ...
+                               r.rec(n).eyet);
+      r.rec(n).raw_photo = interp1(r.rec(n).oeyet, r.rec(n).oraw_photo, ...
+                               r.rec(n).eyet);
+      r.rec(n).raw_spike = interp1(r.rec(n).oeyet, r.rec(n).oraw_spike, ...
+                               r.rec(n).eyet); 
+    end
+  end
+  %%warning('on');
+end
+  
+  
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 

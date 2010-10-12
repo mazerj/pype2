@@ -333,10 +333,10 @@ class PypeRecord:
 			# all pype files (may be [] if not collected)
 			self.events = self.rec[2]
 			self.eyet = Numeric.array(self.rec[3], 'f') # ms
+			self.realt = Numeric.array(self.rec[3], 'f') # ms
 			dt = diff(self.eyet)
 			if sum(Numeric.where(Numeric.less(dt, 0), 1, 0)) > 0:
 				raise PypedataTimeError
-			self.realt = Numeric.array(self.rec[3], 'f') # ms
 			self.eyex = Numeric.array(self.rec[4], 'f') # dva
 			self.eyey = Numeric.array(self.rec[5], 'f') # dva
 			if lag > 0:
@@ -423,8 +423,6 @@ class PypeRecord:
 			self.photo_times = self.photo_times - self.t0
 			self.spike_times = self.spike_times - self.t0
 
-			
-
 			# Sun Dec  4 10:08:01 2005 mazer -- NOTE:
 			# not necessary to align -- it's already been
 			# done by the PlexNet.py module (START code is
@@ -433,7 +431,6 @@ class PypeRecord:
 			# that trigger event)
 			#
 			# self.plex_times = self.plex_times - self.t0
-				
 
 			self.events = align_events(self.events, self.t0)
 
