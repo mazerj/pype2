@@ -318,7 +318,12 @@ Thu Jan  7 17:31:33 2010 mazer
 
 Mon Oct 11 17:26:32 2010 mazer
 
-- eyebuf_t is now in US, now MS 
+- eyebuf_t is now in US, now MS
+
+Fri Oct 15 13:20:53 2010 mazer
+
+- variety of changes to support the new command-line interface (vs.
+  magic env vars) to comedi_server and the dacq() function
   
 """
 
@@ -1108,35 +1113,25 @@ class PypeApp:
 		eyelink_opts = self.config.get('EYELINK_OPTS')
 		if len(eyelink_opts) > 0:
 			eyelink_opts = eyelink_opts + ':'
-
-		eyelink_opts = eyelink_opts + 'pupil_crosstalk_fixup = %s' % \
+		eyelink_opts = eyelink_opts + 'pupil_crosstalk_fixup=%s' % \
 					   self.config.get('PUPILXTALK')
 		eyelink_opts = eyelink_opts + ':active_eye=both'
-		eyelink_opts = eyelink_opts + ':link_sample_data = PUPIL,AREA'
+		eyelink_opts = eyelink_opts + ':link_sample_data=PUPIL,AREA'
 		# Mon Jan 16 14:05:46 2006 mazer
 		#  was: ':heuristic_filter = OFF'
 		#  now: ':heuristic_filter = 0 0'
 		# this will turn off the filter for both LINK and FILE data
 		# streams (from Sol).
-		eyelink_opts = eyelink_opts + ':heuristic_filter = 0 0'
-		eyelink_opts = eyelink_opts + ':pup_size_diameter = NO'
+		eyelink_opts = eyelink_opts + ':heuristic_filter=0 0'
+		eyelink_opts = eyelink_opts + ':pup_size_diameter=NO'
 
-		os.environ['XX_EYELINK_OPTS'] = eyelink_opts
-		os.environ['XX_EYELINK_CAMERA'] = self.config.get('EYELINK_CAMERA')
-		if self.config.iget('SWAP_XY'):
-			os.environ['XX_SWAP_XY'] = '1'
-
-		# possibly have the dacq module initialize a usb joystick device
-		if len(self.config.get('USB_JS_DEV')) > 0:
-			os.environ['XX_USBJS'] = self.config.get('USB_JS_DEV')
-
-		os.environ['XX_ARANGE'] = self.config.get('ARANGE')
-
-		dacq_start(1,
-				   self.config.iget('DACQ_TESTMODE'),
-				   self.config.get('EYETRACKER'),
-				   self.config.get('DACQ_SERVER'),
-				   self.config.get('EYETRACKER_DEV'))
+		dacq_start('comedi_server',
+				   '--tracker=%s' % self.config.get('EYETRACKER'),
+				   '--port=%s' % self.config.get('EYETRACKER_DEV'),
+				   '--elopt="%s"' % eyelink_opts,
+				   '--elcam=%s' % self.config.get('EYELINK_CAMERA'),
+				   '--swapxy=%d' % self.config.iget('SWAP_XY'),
+				   '--usbjs=%s' % self.config.get('USB_JS_DEV'))
 		
 		self.drawledbar()
 		self.dacq_going = 1
@@ -1185,7 +1180,7 @@ class PypeApp:
 			root_take()
 
 		self.init_framebuffer()
-
+		
 		# this must be defered until sync spot info is computed..
 		self.udpy.drawaxis()
 

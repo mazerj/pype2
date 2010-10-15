@@ -2,8 +2,6 @@ Config file options as of 07-Dec-2005
 -------------------------------------
 
 AUDIODRIVER	(str)	name of pygame SDL_AUDIODRIVER
-DACQ_SERVER	(str)	name of data acquisition server
-DACQ_TESTMODE	(0|1)	if true, then dacq runs in test mode (w/o connecting to hardware)
 DEBUG		(0|1)	enables debug mode
 DPYBITS		(#)	number of display bits (typically 24 or 32)
 DPYH		(#)	display height in pixels
@@ -51,3 +49,9 @@ TTANKDIR	(str)	directory for ttanks (overrides pypefile)
  Note: TTANKHOST/DIR are useful when the data get stored directly
        to a local disk, but later moved to a new location for
        permanent storage (like a RAID).
+
+
+No longer used:
+--------------------------------------
+DACQ_SERVER	(str)	name of data acquisition server
+DACQ_TESTMODE	(0|1)	if true, then dacq runs in test mode (w/o connecting to hardware)

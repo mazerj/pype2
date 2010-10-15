@@ -178,6 +178,11 @@
 **   internally timestamps are now in us instead of ms, so we need to be
 **   careful about this.. dacq_ts handles the division correctly, rounding
 **   to nearest ms, but adbuf_t returns us for increases precision..
+**
+** Fri Oct 15 11:17:58 2010 mazer 
+**   new version of dacq_start -- simplified and uses new command line
+**   args (instead of ENV vars with XX_ prefix) to pass arguments into
+**   comedi_server.
 */
 
 #include <sys/types.h>
@@ -210,7 +215,7 @@
 #define EYE_Y 1
 
 static DACQINFO *dacq_data = NULL;
-static pid_t dacq_server_pid = -1;
+static pid_t server_pid = -1;
 static int semid = -1;
 
 static void dacq_sigchld_handler(int signum)
@@ -221,7 +226,7 @@ static void dacq_sigchld_handler(int signum)
   tflag = dacq_data->terminate;
   UNLOCK(semid);
 
-  if ((e = kill(dacq_server_pid, 0)) < 0) {
+  if ((e = kill(server_pid, 0)) < 0) {
     fprintf(stderr, "dacq: server probably gone root, not monitoring\n");
     return;			/* don't bother reseting handler.. */
   } else if (e == 0) {
@@ -229,8 +234,8 @@ static void dacq_sigchld_handler(int signum)
     /* fprintf(stderr, "dacq: some other child died.\n"); */
   } else if (! tflag) {
     /* dacq process did exit, but it was unexpected */
-    fprintf(stderr, "dacq: dacq_server (%d) died prematurely.\n",
-	    dacq_server_pid);
+    fprintf(stderr, "dacq: server (%d) died prematurely.\n",
+	    server_pid);
     exit(1);
   } else {
     /* dacq process did exit, but it was supposed to!! */
@@ -239,20 +244,91 @@ static void dacq_sigchld_handler(int signum)
   signal(SIGCHLD, dacq_sigchld_handler);
 }
 
-int dacq_start(int boot, int testmode, char *tracker_type,
-	       char *dacq_server, char *trakdev)
+static void shm_init()
 {
-  int shmid, ii;
+  int i, ii;
 
-  if ((shmid =
-       shmget((key_t)SHMKEY, sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
+  for (i = 0; i < NDIGIN; i++) {
+    dacq_data->din[i] = 0;
+    dacq_data->din_changes[i] = 0;
+    dacq_data->din_intmask[i] = 0;
+  }
+  
+  for (i = 0; i < NDIGOUT; i++) {
+    dacq_data->dout[i] = 0;
+  }
+  
+  dacq_data->dout_strobe = 0;
+  
+  for (i = 0; i < NADC; i++) {
+    dacq_data->adc[i] = 0;
+  }
+  
+  dacq_data->eye_xgain = 1.0;
+  dacq_data->eye_ygain = 1.0;
+  dacq_data->eye_xoff = 0;
+  dacq_data->eye_yoff = 0;
+  
+  for (i = 0; i < NFIXWIN; i++) {
+    dacq_data->fixwin[i].active = 0;
+    dacq_data->fixwin[i].genint = 0;
+  }
+  
+  for (i = 0; i < NJOYBUT; i++) {
+    dacq_data->js[i] = 0;
+  }
+  dacq_data->js_x = 0;
+  dacq_data->js_y = 0;
+  dacq_data->js_enabled = 0;
+  
+  dacq_data->adbuf_on = 0;
+  dacq_data->adbuf_ptr = 0;
+  dacq_data->adbuf_overflow = 0;
+  for (i = 0; i < ADBUFLEN; i++) {
+    dacq_data->adbuf_t[i] = 0;
+    dacq_data->adbuf_x[i] = 0;
+    dacq_data->adbuf_y[i] = 0;
+    for (ii=0; ii < NADC; ii++) {
+      dacq_data->adbufs[ii][i] = 0;
+    }
+  }
+  
+  for (i = 0; i < NDAC; i++) {
+    dacq_data->dac[i] = 0;
+  }
+  
+  dacq_data->dac_strobe = 0;
+  
+  dacq_data->timestamp = 0;
+  dacq_data->terminate = 0;
+  dacq_data->das_ready = 0;
+  
+  dacq_data->eye_smooth = 0;
+  dacq_data->eye_x = 0;
+  dacq_data->eye_y = 0;
+  
+  dacq_data->dacq_pri = 0;
+  
+  dacq_data->fixbreak_tau = 5;
+  
+  /* alarm timer (same units as timestamp); 0 for no alarm */
+  dacq_data->alarm_time = 0;
+}
+
+
+int dacq_start(char *server, char *tracker, char *port, char *elopt,
+	       char *elcam, char *swapxy, char *usbjs)
+{
+  int shmid, i;
+
+  if ((shmid = shmget((key_t)SHMKEY, sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
     if (errno == EINVAL) {
       fprintf(stderr, "dacq_start: Shared memory buffer's changed sizes!\n");
       fprintf(stderr, "            Run pypekill, then try pype again.\n");
       return(0);
     } else {
       perror("shmget");
-      fprintf(stderr, "dacq_start: %d kernel compiled with SHM/IPC?\n", errno);
+      fprintf(stderr, "dacq_start: kernel compiled with SHM/IPC?\n");
       return(0);
     }
   }
@@ -275,123 +351,21 @@ int dacq_start(int boot, int testmode, char *tracker_type,
     }
   }
 
-  /* don't need to LOCK/UNLOCK until child processes are
-   * running ... so don't bother here..
-   */
-
-  if (boot) {
-    int i;
-
-    for (i = 0; i < NDIGIN; i++) {
-      dacq_data->din[i] = 0;
-      dacq_data->din_changes[i] = 0;
-      dacq_data->din_intmask[i] = 0;
-    }
-
-    for (i = 0; i < NDIGOUT; i++) {
-      dacq_data->dout[i] = 0;
-    }
-
-    dacq_data->dout_strobe = 0;
-
-    for (i = 0; i < NADC; i++) {
-      dacq_data->adc[i] = 0;
-    }
-
-    dacq_data->eye_xgain = 1.0;
-    dacq_data->eye_ygain = 1.0;
-    dacq_data->eye_xoff = 0;
-    dacq_data->eye_yoff = 0;
-
-    for (i = 0; i < NFIXWIN; i++) {
-      dacq_data->fixwin[i].active = 0;
-      dacq_data->fixwin[i].genint = 0;
-    }
-
-    for (i = 0; i < NJOYBUT; i++) {
-      dacq_data->js[i] = 0;
-    }
-    dacq_data->js_x = 0;
-    dacq_data->js_y = 0;
-    dacq_data->js_enabled = 0;
-
-    dacq_data->adbuf_on = 0;
-    dacq_data->adbuf_ptr = 0;
-    dacq_data->adbuf_overflow = 0;
-    for (i = 0; i < ADBUFLEN; i++) {
-      dacq_data->adbuf_t[i] = 0;
-      dacq_data->adbuf_x[i] = 0;
-      dacq_data->adbuf_y[i] = 0;
-      for (ii=0; ii < NADC; ii++) {
-	dacq_data->adbufs[ii][i] = 0;
-      }
-    }
-
-    for (i = 0; i < NDAC; i++) {
-      dacq_data->dac[i] = 0;
-    }
-
-    dacq_data->dac_strobe = 0;
-
-    dacq_data->timestamp = 0;
-    dacq_data->terminate = 0;
-    dacq_data->das_ready = 0;
-
-    dacq_data->eye_smooth = 0;
-    dacq_data->eye_x = 0;
-    dacq_data->eye_y = 0;
-
-    dacq_data->dacq_pri = 0;
-
-    dacq_data->fixbreak_tau = 5;
-
-    /* alarm timer (same units as timestamp); 0 for no alarm */
-    dacq_data->alarm_time = 0;
-
-    if (testmode) {
-      dacq_data->din[2] = 1;
-      dacq_data->din[3] = 1;
-      fprintf(stderr, "dacq: testmode = 1 (no sub process!)\n");
-    } else {
-      signal(SIGCHLD, dacq_sigchld_handler);
-
-      fprintf(stderr, "dacq: testmode = 0\n");
-      fprintf(stderr, "dacq: tracker_type = %s\n", tracker_type);
-      fprintf(stderr, "dacq: dacq_server = %s\n", dacq_server);
-
-      if ((dacq_server_pid = fork()) == 0) {
-	/* child process execs the dacq_server */
-
-	if (strcmp(tracker_type, "ISCAN") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting iscan\n");
-	  execlp(dacq_server, dacq_server, "-iscan", trakdev, NULL);
-	} else if (strcmp(tracker_type, "EYELINK") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
-	  execlp(dacq_server, dacq_server, "-eyelink", trakdev, NULL);
-	} else if (strcmp(tracker_type, "ANALOG") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting analog\n");
-	  execlp(dacq_server, dacq_server, NULL);
-	} else if (strcmp(tracker_type, "EYEJOY") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting eyelink\n");
-	  execlp(dacq_server, dacq_server, "-eyejoy", NULL);
-	} else if (strcmp(tracker_type, "NONE") == 0) {
-	  //fprintf(stderr, "dacqmodule: starting w/o tracker\n");
-	  execlp(dacq_server, dacq_server, "-notracker", NULL);
-	}
-
-	perror(dacq_server);
-	exit(1);
-      } else {
-
-	/* parent waits for server to become ready */
-	do {
-	  LOCK(semid);
-	  i = dacq_data->das_ready;
-	  UNLOCK(semid);
-	  usleep(100);
-	  } while (i == 0);
-      }
-    }
+  shm_init();			/* initialize shm block */
+  signal(SIGCHLD, dacq_sigchld_handler);
+  if ((server_pid = fork()) == 0) {
+    /* child becomes dac subsystem server */
+    execlp(server, server, tracker, port, elopt, elcam, swapxy, usbjs, NULL);
+    perror(server);
+    exit(1);
+  } else {
+    /* parent waits for server to become ready */
+    do {
+      LOCK(semid);
+      i = dacq_data->das_ready;
+      UNLOCK(semid);
+      usleep(100);
+    } while (i == 0);
   }
   return(1);
 }
@@ -400,12 +374,12 @@ void dacq_stop(void)
 {
   int status;
 
-  if (dacq_server_pid >= 0) {
+  if (server_pid >= 0) {
     fprintf(stderr, "dacq_stop: waiting for server shutdown\n");
     LOCK(semid);
     dacq_data->terminate = 1;
     UNLOCK(semid);
-    waitpid(dacq_server_pid, &status, 0);
+    waitpid(server_pid, &status, 0);
   }
 }
 

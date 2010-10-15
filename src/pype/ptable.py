@@ -517,6 +517,20 @@ def _unpack_slot(slot):
 
 	return (name, default, validate, descr, runlock)
 
+# helper functions for creating rows in the parameter table:
+
+# standard slot/row:
+def slot(name, default=None, val=None, info=None, lockonrun=None):
+	return (name, default, val, info, lockonrun)
+
+# dropdown choice list:
+def pick(name, default=None, choices=None, info=None, lockonrun=None):
+	return (name, default, val, info, lockonrun)
+
+# title/section-delimiter
+def title(name):
+	return (name, None, None, None, None)
+
 class ParamTable:
 	def __init__(self, parent, table, file=None, altfile=None,
 				 decorate=1, locks=1):
@@ -997,11 +1011,12 @@ if __name__ == '__main__':
 	exitButton = Button(root, text = 'Exit', command = root.destroy)
 	exitButton.pack(side = 'bottom')
 	p = ParamTable(root,
-				   (('a', '500+-10%', is_param),
-					('l', '', is_list),
-					('b', '3', None),
-					('choice', 1, ('yes', 'no')),
-					('c', '4', None)), file='foobar')
+				   (title('test'),
+					slot('a', default='500+-10%', val=is_param),
+					slot('l', default='', val=is_list),
+					slot('b', default='3', val=None),
+					slot('choice', default=1, val=('yes', 'no')),
+					slot('c', default='4', val=None)), file='foobar')
 	p.load('foobar')
 	root.mainloop()
 else:

@@ -26,8 +26,8 @@
 **   must be caught and handled..
 */
 
-extern int dacq_start(int boot, int testmode, char *tracker_type,
-		      char *dacq_server, char *trakdev);
+extern int dacq_start(char *server, char *tracker, char *port, char *elopt,
+		      char *elcam, char *swapxy, char *usbjs);
 extern void dacq_stop(void);
 extern int dacq_release(void);
 

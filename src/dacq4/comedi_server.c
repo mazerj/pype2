@@ -107,6 +107,8 @@
 **   - changed private XXxxx env vars to XX_xxxx
 **
 **************************************************************************
+** New 'merged' comedi_server notes follow (22-SEP-2010):
+**************************************************************************
 **
 ** Wed Sep 22 12:12:25 2010 mazer 
 **   - merged das_common.[ch], iscan.c & eyelink.c directly into this
@@ -116,6 +118,10 @@
 **   - Changed timestamp to return timestamps in microsecs (us) instead
 **     of ms. SHM buffer adbuf_t values are now in us and need to be
 **     divided by 1000 to make things compatible.
+**
+** Fri Oct 15 09:42:32 2010 mazer 
+**   - pruned all hidden getenv() args in favor of proper command line arguments
+**   
 */
 
 #include <sys/types.h>
@@ -137,6 +143,7 @@
 #include <signal.h>
 #include <math.h>
 #include <comedilib.h>
+#include <getopt.h>
 
 #define __USE_GNU 1
 #include <sched.h>		/* need __USE_GNU=1 to get CPU_* macros */
@@ -161,13 +168,13 @@
 #define INSIDE		1	/* fixwin status flags */
 #define OUTSIDE		0
 
-
+/* covert internal time ticks (currently us) to ms for export to pype */
 #define TICK2MS(ts)	((unsigned long)(0.5 + (ts) / 1e3))
 
 static char	*progname = NULL;
 static DACQINFO *dacq_data = NULL;
 static int	mem_locked = 0;
-static int	dummymode = 0;
+static int	gotdacq = 0;
 static int	semid;
 static double	arange;
 static int	usbjs_dev;
@@ -180,10 +187,7 @@ static int	dig_io = -1;	/* combined digital I/O subdevice */
 static int	dig_i = -1;	/* digital IN only subdevice (ISA) */
 static int	dig_o = -1;	/* digital OUT only subdevice (ISA)*/
 static int	analog_range;
-static char *_tmodes[] = {
-  "ANALOG", "ISCAN", "EYELINK", "EYEJOY", "NONE"
-};
-static int	tracker_mode = ANALOG;
+static int	itracker = ANALOG;
 static int	semid = -1;
 static int	swap_xy = 0;
 static int	iscan_x, iscan_y, iscan_p;
@@ -274,9 +278,9 @@ void iscan_read()
   }
 }
 
-void eyelink_init(char *ip_address)
+void eyelink_init(char *ip_address, char *el_opts, char *el_cam)
 {
-  char *p, *q, *opts, buf[100];
+  char *p, *q, buf[100];
   extern char *__progname;
   char *saved;
   FILE *fp;
@@ -302,20 +306,20 @@ void eyelink_init(char *ip_address)
    * echoing to the console..  This variable is setup by pype before
    * dacq_start() gets called..
    */
-  opts = getenv("XX_EYELINK_OPTS");
-  for (q = p = opts; *p; p++) {
-    if (*p == ':') {
-      *p = 0;
-      eyecmd_printf(q);
-      fprintf(stderr, "%s: eyelink_opt=<%s>\n", progname, q);
-      *p = ':';
-      q = p + 1;
+  if (el_opts != NULL) {
+    for (q = p = el_opts; *p; p++) {
+      if (*p == ':') {
+	*p = 0;
+	eyecmd_printf(q);
+	fprintf(stderr, "%s: eyelink_opt=<%s>\n", progname, q);
+	*p = ':';
+	q = p + 1;
+      }
     }
   }
 
   /* this should be "0" or "1", default to 1 */
-  p = getenv("XX_EYELINK_CAMERA");
-  if (p == NULL || sscanf(p, "%d", &eyelink_camera) != 1) {
+  if (el_cam == NULL || sscanf(el_cam, "%d", &eyelink_camera) != 1) {
     eyelink_camera = 1;
   }
   sprintf(buf, "eyelink_camera = %d", eyelink_camera);
@@ -337,21 +341,11 @@ void eyelink_init(char *ip_address)
     }
   }
 
-  // start recording & tell EL to send samples but
-  // not events through link
-  p = getenv("EYELINK_FILE");
-  if (p != NULL) {
-    open_data_file(p);
-    if (start_recording(1,1,1,0)) {
-      fprintf(stderr, "%s/eyelink_init: can't start recording\n", progname);
-      return;
-    }
-    fprintf(stderr, "%s/eyelink_init: saving data to '%s'\n", progname, p);
-  } else {
-    if (start_recording(0,0,1,0)) {
-      fprintf(stderr, "%s/eyelink_init: can't start recording\n", progname);
-      return;
-    }
+  // start recording eyelink data
+  // tell eyelink to send samples, but not 'events' through link
+  if (start_recording(0,0,1,0)) {
+    fprintf(stderr, "%s/eyelink_init: can't start recording\n", progname);
+    return;
   }
 
   if (eyelink_wait_for_block_start(10,1,0)==0) {
@@ -360,29 +354,15 @@ void eyelink_init(char *ip_address)
   }
 
   fprintf(stderr, "%s/eyelink_init: connected ok\n", progname);
-  tracker_mode = EYELINK;
+  itracker = EYELINK;
 }
 
 void eyelink_halt()
 {
-  char *p;
-
-  if (tracker_mode == EYELINK) {
+  if (itracker == EYELINK) {
     stop_recording();
     set_offline_mode();
-    tracker_mode = ANALOG;
-
-    p = getenv("EYELINK_FILE");
-    if (p != NULL) {
-      pump_delay(500);
-      eyecmd_printf("close_data_file");
-      fprintf(stderr, "%s/eyelink_halt: requesting '%s'\n", progname, p);
-      if (receive_data_file(p, p, 0) > 1) {
-	fprintf(stderr, "%s/eyelink_halt: received.\n", progname);
-      } else {
-	fprintf(stderr, "%s/eyelink_halt: error receiving.\n", progname);
-      }
-    }
+    itracker = ANALOG;
   }
 }
 
@@ -515,7 +495,7 @@ int ad_in(int chan)
   lsampl_t sample;
   int success;
 
-  if (dummymode) {
+  if (gotdacq) {
     return(0);
   } else {
     // need to set aref correctly: either AREF_GROUND or AREF_COMMON
@@ -546,7 +526,7 @@ void dig_in()
   int i, success, last;
   unsigned int bits;
 
-  if (dummymode) {
+  if (gotdacq) {
     // just lock these down -- polarities are
     // from the old taks -- hardcoded to work in NAF...
     LOCK(semid);
@@ -584,7 +564,7 @@ void dig_out()
   unsigned int bits = 0;
   int i, success;
 
-  if (dummymode) {
+  if (gotdacq) {
     return;
   } else {
     for (i = 0; i < 8 && i < NDIGOUT; i++) {
@@ -624,12 +604,13 @@ int mainloop_init()
   int shmid;
 
   if (comedi_init()) {
-    dummymode = 0;
+    gotdacq = 0;
+    fprintf(stderr, "%s: comedi initialized.\n", progname);
   } else {
-    fprintf(stderr, "%s: falling back to dummymode\n", progname);
-    dummymode = 1;
+    fprintf(stderr, "%s: no dacq mode.\n", progname);
+    gotdacq = 1;
   }
-  fprintf(stderr, "%s: comedi initialized.\n", progname);
+
   if (dig_io >= 0) {
     fprintf(stderr, "%s: dig_io=subdev #%d\n", progname, dig_io);
   }
@@ -693,7 +674,7 @@ void iscan_init(char *dev)
   }
   v24SetParameters(iscan_port, V24_B115200, V24_8BIT, V24_NONE);
 
-  tracker_mode = ISCAN;
+  itracker = ISCAN;
   fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
 }
 
@@ -798,9 +779,6 @@ void mainloop(void)
   locktocore(0);		/* lock process to core 0 */
   timestamp(1);			/* initialize the timestamp to 0 */
 
-  fprintf(stderr, "%s: tracker_mode=%s (%d)\n", progname,
-	  _tmodes[tracker_mode], tracker_mode);
-
   /* signal client we're ready */
   LOCK(semid);
   dacq_data->das_ready = 1;
@@ -821,7 +799,7 @@ void mainloop(void)
     for (i = 0; i < NADC; i++) {
       dacq_data->adc[i] = ad_in(i);
     }
-    if (tracker_mode == ISCAN) {
+    if (itracker == ISCAN) {
       iscan_read();
     }
 
@@ -847,7 +825,7 @@ void mainloop(void)
 
     /* finally, handle eye tracker */
 
-    switch (tracker_mode)
+    switch (itracker)
       {
       case NONE:
 	x = y = pa = 0;
@@ -1022,22 +1000,14 @@ void mainloop(void)
 	
 	LOCK(semid);
 	if (z < dacq_data->fixwin[i].rad2) {
-	  /*
-	   * eye is now INSIDE the fixation window -- stop counting
-	   * transient breaks
-	   */
+	  // eye in fixwin -- stop counting transient breaks
 	  dacq_data->fixwin[i].state = INSIDE;
 	  dacq_data->fixwin[i].fcount = 0;
 	} else {
-	  /*
-	   * eye is outside the fixation window, but could be shot noise..
-	   */
+	  // eye outside fixwin -- could be shot noise.
 	  if (dacq_data->fixwin[i].state == INSIDE) {
-	    /*
-	     * eye was inside last sample, so the break just happened
-	     * reset the break counter and start counting # samples
-	     * outside fixation window
-	     */
+	    // eye was inside last time, so recent fixbreak -- reset
+	    // timer and start timing period outside
 	    dacq_data->fixwin[i].fcount = 1;
 	    dacq_data->fixwin[i].nout = 0;
 	  }
@@ -1045,17 +1015,14 @@ void mainloop(void)
 	  if (dacq_data->fixwin[i].fcount) {
 	    dacq_data->fixwin[i].nout += 1;
 	    if (dacq_data->fixwin[i].nout > dacq_data->fixbreak_tau) {
-	      /* number of samples the eye's been out of the window
-	       * has exceeded the limit defined by fixbreak_tau, count
-	       * this as a real fixation break.
-	       */
+	      // # samps outside exceeds fixbreak_tau --> real fixbreak!
 	      if (dacq_data->fixwin[i].broke == 0) {
-		/* stash time if it's the first break */
+		// save break time
 		dacq_data->fixwin[i].break_time =  dacq_data->timestamp;
 	      }
 	      dacq_data->fixwin[i].broke = 1;
 	      if (dacq_data->fixwin[i].genint) {
-		/* send interupt to parent */
+		// alert parent process
 		dacq_data->int_class = INT_FIXWIN;
 		dacq_data->int_arg = 0;
 		dacq_data->fixwin[i].genint = 0;
@@ -1089,7 +1056,7 @@ void mainloop(void)
     UNLOCK(semid);
   } while (! k);
 
-  fprintf(stderr, "%s: terminate signaled\n", progname);
+  fprintf(stderr, "%s: terminate signal received\n", progname);
   iscan_halt();
   eyelink_halt();
   if (usbjs_dev >= 0) {
@@ -1104,13 +1071,68 @@ void mainloop(void)
 
 int main(int ac, char **av)
 {
+  int i, c, option_index = 0;
+  double f;
   char *p;
+  char *elopts = NULL;
+  char *elcam = NULL;
+  char *port = NULL;
+  char *tracker = "none";
+  char *usbjs = NULL;
+
+  static struct option long_options[] =
+    {
+      {"tracker", required_argument, 0, 't'}, /* tracker mode */
+      {"port",    optional_argument, 0, 'p'}, /* dev file or ip num */
+      {"elopts",  optional_argument, 0, 'e'}, /* eyelink options */
+      {"elcam",   optional_argument, 0, 'c'}, /* eyelink camera (0/1) */
+      {"usbjs",   optional_argument, 0, 'j'}, /* dev file for usbjs */
+      {"swapxy",  optional_argument, 0, 's'}, /* swap xy channels? */
+      {"arange",  optional_argument, 0, 'a'}, /* set dacq analog range */
+      {0, 0, 0, 0}
+    };
 
   p = rindex(av[0], '/');
   progname = p ? (p + 1) : av[0];
-
   fprintf(stderr, "%s: dacq4/comedi_server -- unified single dacq system\n",
 	  progname);
+
+  while ((c = getopt_long(ac, av, "t:p:e:c:j:s:a:",
+			  long_options, &option_index)) != -1) {
+    switch (c)
+      {
+      case 't':
+	tracker = strcpy((char*)malloc(strlen(optarg)+1), optarg);
+	break;
+      case 'p':
+	port = strcpy((char*)malloc(strlen(optarg)+1), optarg);
+	break;
+      case 'e':
+	elopts = strcpy((char*)malloc(strlen(optarg)+1), optarg);
+	break;
+      case 'c':
+	elcam = strcpy((char*)malloc(strlen(optarg)+1), optarg);
+	break;
+      case 'j':
+	usbjs = strcpy((char*)malloc(strlen(optarg)+1), optarg);
+	break;
+      case 's':
+	if (sscanf(optarg, "%d", &i) == 1) {
+	  swap_xy = i;
+	  if (swap_xy) {
+	    fprintf(stderr, "%s: swapping X and Y\n", progname);
+	  }
+	}
+	break;
+      case 'a':
+	if (sscanf(optarg, "%lf", &f) == 1) {
+	  arange = f;
+	}
+	break;
+      default:
+	abort();
+      }
+  }
 
   if ((semid = psem_init(SEMKEY)) < 0) {
     ERROR("psem_init");
@@ -1118,42 +1140,27 @@ int main(int ac, char **av)
     exit(1);
   }
 
-  // get requested analog input range for comedi device (+- ARANGE volts)
-  if ((p = getenv("XX_ARANGE")) != NULL) {
-    double d;
-    if (sscanf(p, "%lf", &d) == 1) {
-      arange = d;
-    }
-  }
-
   mainloop_init();
-  fprintf(stderr, "%s: initted\n", progname);
 
-  if (av[1] && (strcmp(av[1], "-iscan") == 0)) {
-    iscan_init(av[2]);
-  } else if (av[1] && (strcmp(av[1], "-eyelink") == 0)) {
-    eyelink_init(av[2]);
-  } else if (av[1] && (strcmp(av[1], "-eyejoy") == 0)) {
-    tracker_mode = EYEJOY;
-  } else if (av[1] && (strcmp(av[1], "-notracker") == 0)) {
-    tracker_mode = NONE;
-    fprintf(stderr, "%s: no tracker mode\n", progname);
+  if (strcasecmp(tracker, "iscan") == 0) {
+    iscan_init(port);
+  } else if (strcasecmp(tracker, "eyelink") == 0) {
+    eyelink_init(port, elopts, elcam);
+  } else if (strcasecmp(tracker, "eyejoy") == 0) {
+    itracker = EYEJOY;
+  } else if (strcasecmp(tracker, "none") == 0) {
+    itracker = NONE;
   }
 
-  if (getenv("XX_SWAP_XY")) {
-    /* this option is useful ONLY if the camera is rotated, like with
-     * the original software release for the eyelink ELCL...
-     */
-    swap_xy = 1;
-    fprintf(stderr, "%s: swapping X and Y\n", progname);
-  }
+  fprintf(stderr, "%s: tracker=%s (%d)\n", progname, tracker, itracker);
+  fprintf(stderr, "%s: initialized\n", progname);
 
-  if ((p = getenv("XX_USBJS")) != NULL) {
-    usbjs_dev = usbjs_init(p);
+  if (usbjs != NULL && strlen(usbjs) > 0) {
+    usbjs_dev = usbjs_init(usbjs);
     if (usbjs_dev < 0) {
-      fprintf(stderr, "%s: can't open joystick %s\n", progname, p);
+      fprintf(stderr, "%s: can't open joystick %s\n", progname, usbjs);
     } else {
-      fprintf(stderr, "%s: joystick at %s configured\n", progname, p);
+      fprintf(stderr, "%s: joystick at %s configured\n", progname, usbjs);
       LOCK(semid);
       dacq_data->js_enabled = 1;
       UNLOCK(semid);
