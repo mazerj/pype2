@@ -24,6 +24,9 @@
 **   added dacq_bar_genint(int b) -- if you set this, then
 **   each bar transition will generate a SIGUSR1 interuprt that
 **   must be caught and handled..
+**
+** Wed Oct 20 15:40:26 2010 mazer 
+**   dacq_adbuf_t() returns double instead of unsigned long
 */
 
 extern int dacq_start(char *server, char *tracker, char *port, char *elopt,
@@ -65,7 +68,7 @@ extern int dacq_adbuf_toggle(int on);
 extern void dacq_adbuf_clear();
 
 extern int dacq_adbuf_size();
-extern unsigned long dacq_adbuf_t(int ix);
+extern double dacq_adbuf_t(int ix);
 extern int dacq_adbuf_x(int ix);
 extern int dacq_adbuf_y(int ix);
 extern int dacq_adbuf_pa(int ix);

@@ -122,6 +122,11 @@
 ** Fri Oct 15 09:42:32 2010 mazer 
 **   - pruned all hidden getenv() args in favor of proper command line arguments
 **   
+** Wed Oct 20 15:37:43 2010 mazer 
+**   - changed timestamp() to return a double instead of an unsigned long
+**   - adbuf_t (see dacqinfo.h) also changed to double, along with
+**     dacq:dacq_adbuf_t(), which now returns a double instead of an
+**     unsigned long
 */
 
 #include <sys/types.h>
@@ -167,9 +172,6 @@
 
 #define INSIDE		1	/* fixwin status flags */
 #define OUTSIDE		0
-
-/* covert internal time ticks (currently us) to ms for export to pype */
-#define TICK2MS(ts)	((unsigned long)(0.5 + (ts) / 1e3))
 
 static char	*progname = NULL;
 static DACQINFO *dacq_data = NULL;
@@ -678,18 +680,16 @@ void iscan_init(char *dev)
   fprintf(stderr, "%s: opened iscan_port (%s)\n", progname, dev);
 }
 
-unsigned long timestamp(int init) /* return elapsed time in us */
+double timestamp(int init) /* return elapsed time in us */
 {
   static struct timespec ti[2];	/* initial and current times */
-  static unsigned long eus;	/* elapsed time in microsecs */
 
   if (init) {
     clock_gettime(CLOCK_MONOTONIC, &ti[0]);
   }
   clock_gettime(CLOCK_MONOTONIC, &ti[1]);
-  eus = 1.0e6 * (ti[1].tv_sec - ti[0].tv_sec) +
-    (ti[1].tv_nsec - ti[0].tv_nsec) / 1.0e3;
-  return(eus);
+  return((1.0e6  * (ti[1].tv_sec - ti[0].tv_sec)) +
+	 (1.0e-3 * (ti[1].tv_nsec - ti[0].tv_nsec)));
 }
 
 static int locktocore(int corenum)
@@ -735,7 +735,7 @@ void mainloop(void)
   register int i, ii, lastpri, setpri;
   register float x, y, z, pa, tmp, calx, caly;
   float tx, ty, tp;
-  unsigned long ts;
+  double ts;
   unsigned int eyelink_t;
   int eyelink_new;
   int k;
@@ -794,7 +794,7 @@ void mainloop(void)
       ERROR("clock_nanosleep");
       fprintf(stderr, "nanosleep came up short, ignoring\n");
     }
-    ts = timestamp(0);
+    ts = timestamp(0);		/* in 'us' */
     /* now quickly sample all the converters just once */
     for (i = 0; i < NADC; i++) {
       dacq_data->adc[i] = ad_in(i);
@@ -931,14 +931,12 @@ void mainloop(void)
     }
 
     LOCK(semid);
-    dacq_data->timestamp = TICK2MS(ts);
+    dacq_data->timestamp = (unsigned long) (0.5 + ts / 1000.0); /* in 'ms' */
     k = dacq_data->adbuf_on;
 
     /* check alarm status */
     if (dacq_data->alarm_time && dacq_data->timestamp < dacq_data->alarm_time) {
-      /* alarm set and expired -- clean and send interupt to
-       * client (ie, parent)
-       */
+      // alarm set and expired -- clear and send interupt to pype
       dacq_data->alarm_time = 0;
       dacq_data->int_class = INT_ALARM;
       dacq_data->int_arg = 0;

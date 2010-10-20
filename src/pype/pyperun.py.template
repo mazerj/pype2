@@ -116,11 +116,15 @@ if not os.environ.has_key('HOME'):
 	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
 	sys.exit(1)
 
-# add $PYPEDIR.{pype,Taks,Modules} to python search path
+
 _original_path = sys.path[::]
-pd = os.environ['PYPEDIR']+'/'
-for d in ['pype', 'Tasks', 'Modules']:
-    _addpath(pd + d)
+
+_addpath(os.environ['PYPEDIR']+ '/pype')
+# Wed Oct 20 14:08:42 2010 mazer
+# by fiat: no system tasks anymore
+#_addpath(os.environ['PYPEDIR']+ '/Tasks')
+#_addpath(os.environ['PYPEDIR']+ '/Modules')
+    
 
 # Fri Dec 13 17:12:22 2002 mazer
 #  -- add $PYPEDIR/lib onto LD_LIBRARY_PATH

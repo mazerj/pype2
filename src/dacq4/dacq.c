@@ -183,6 +183,9 @@
 **   new version of dacq_start -- simplified and uses new command line
 **   args (instead of ENV vars with XX_ prefix) to pass arguments into
 **   comedi_server.
+**
+** Wed Oct 20 15:39:17 2010 mazer 
+**   dacq_adbuf_t() returns double instead of unsigned long
 */
 
 #include <sys/types.h>
@@ -285,7 +288,7 @@ static void shm_init()
   dacq_data->adbuf_ptr = 0;
   dacq_data->adbuf_overflow = 0;
   for (i = 0; i < ADBUFLEN; i++) {
-    dacq_data->adbuf_t[i] = 0;
+    dacq_data->adbuf_t[i] = 0.0;
     dacq_data->adbuf_x[i] = 0;
     dacq_data->adbuf_y[i] = 0;
     for (ii=0; ii < NADC; ii++) {
@@ -695,7 +698,7 @@ void dacq_adbuf_clear()
   dacq_data->adbuf_ptr = 0;		/* reset pointer beginning */
   dacq_data->adbuf_overflow = 0;	/* reset overflow flag */
   for (i = 0; i < ADBUFLEN; i++) {	/* clear buffers. */
-    dacq_data->adbuf_t[i] = 0;
+    dacq_data->adbuf_t[i] = 0.0;
     dacq_data->adbuf_x[i] = 0;
     dacq_data->adbuf_y[i] = 0;
     for (ii=0; ii < NADC; ii++) {
@@ -715,14 +718,14 @@ int dacq_adbuf_size()
   return(i);
 }
 
-unsigned long dacq_adbuf_t(int ix) /* 10/12/2010: adbuf_t now in US! */
+double dacq_adbuf_t(int ix) /* 10/12/2010: adbuf_t now in US! */
 {
-  unsigned long i;
+  double f;
 
   LOCK(semid);
-  i = dacq_data->adbuf_t[ix];
+  f = dacq_data->adbuf_t[ix];
   UNLOCK(semid);
-  return(i);
+  return(f);
 }
 
 int dacq_adbuf_x(int ix)

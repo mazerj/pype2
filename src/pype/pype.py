@@ -1488,13 +1488,12 @@ class PypeApp:
 		return d
 
 	def make_taskmenu(self, menubar):
-		self.add_tasks(menubar, 'system', pypedir('Tasks'))
 		self.add_tasks(menubar, '~pyperc', pyperc('Tasks'))
+		
 		files = glob.glob(pyperc('Tasks/*'))
 		for d in files:
 			m = posixpath.basename(d)
-			# Tue Jan  4 11:50:19 2005 mazer
-			#   skip names starting with an underscores (ie, disabled)
+			# Tue Jan  4 11:50:19 2005 mazer -- skip _* dirs (disabled)
 			if os.path.isdir(d) and not (m[0] == '_'):
 				self.add_tasks(menubar, "~"+m, d)
 		self.add_tasks(menubar, 'cwd', '.')
@@ -1514,49 +1513,49 @@ class PypeApp:
 						   "      Terminal directory names must be unique;\n" +
 						   "      skipped duplicates\n")
 
-	def add_tasks(self, menubar, dropname, dirname):
-		if dirname[-1] == '/':
-			g = glob.glob(dirname+'*.py')
+	def istask(self, filename):
+		tasktype, taskdescr = self.__pypefile_type(filename)
+		#if (tasktype is 'task') or (tasktype is None):
+		if tasktype is 'task':
+			return 1, taskdescr
 		else:
-			g = glob.glob(dirname+'/*.py')
+			return 0, None
 
+	def add_tasks(self, menubar, menulabel, dirname):
 		tasks = []
 		taskdescrs = {}
-		for i in range(len(g)):
-			# check each "task" to see if it's task or support file
-			# based on !TASK! tag in header
-			tasktype, taskdescr = self.__pypefile_type(g[i])
-			if tasktype is 'task' or tasktype is None:
-				x = posixpath.basename(g[i])
-				tasks.append(x[:-3])
-				if len(taskdescr) > 0:
-					taskdescrs[tasks[-1]] = '  <%s>' % taskdescr
+		
+		if not dirname[-1] is '/':
+			dirname = dirname + '/'
+		filelist = glob.glob(dirname + '*.py')
+
+		for fname in filelist:
+			istask, descr = self.istask(fname)
+			if istask:
+				tasks.append(posixpath.basename(fname)[:-3])
+				if len(descr):
+					taskdescrs[tasks[-1]] = ' [%s]' % taskdescr
 				else:
 					taskdescrs[tasks[-1]] = ''
-
 		if len(tasks) == 0:
 			return
-		else:
-			_addpath(dirname, atend=1)
-			
 
-		dname = dirname
-		if dname is '.': dname = 'current dir'
-		
+		# this is needed for pype to find non-task files in the dir
+		_addpath(dirname, atend=1)
+
 		tasks.sort()
-		menubar.addmenu(dropname, '', '')
-		menubar.addmenuitem(dropname, 'command', label=dname, foreground='blue')
-		menubar.addmenuitem(dropname, 'separator')
-		for i in range(0, len(tasks)):
-			menubar.addmenuitem(dropname, 'command',
-								label=tasks[i] + taskdescrs[tasks[i]],
-								command=lambda s=self,t=tasks[i],d=dirname: \
-								s.newloadtask(t, d))
-		menubar.addmenuitem(dropname, 'separator')
-		menubar.addmenuitem(dropname, 'command', label='Reload current',
+		menubar.addmenu(menulabel, '', '')
+		menubar.addmenuitem(menulabel, 'command',
+							label=dirname, foreground='grey')
+		menubar.addmenuitem(menulabel, 'command', label='Reload task',
 							command=self.newloadtask)
-		
-
+		menubar.addmenuitem(menulabel, 'separator')
+		for t in tasks:
+			menubar.addmenuitem(menulabel, 'command',
+								label=t+taskdescrs[t],
+								command=\
+								lambda s=self,t=t,d=dirname: s.newloadtask(t, d))
+			
 	def unloadtask(self):
 		if self.taskmod:
 			try:
@@ -1583,7 +1582,7 @@ class PypeApp:
 
 		if taskname is None:
 			if self.task_name is None:
-				warn('Error', "Nothing loaded to reload")
+				#warn('Error', "Nothing loaded to reload")
 				return None
 			taskname = self.task_name
 			dir = self.task_dir
@@ -2936,7 +2935,7 @@ class PypeApp:
 
 		"""
 		n = dacq_adbuf_size()
-		t = zeros(n)
+		t = zeros(n, 'f')
 		s0 = zeros(n)
 
 		for i in range(0,n):
@@ -2964,12 +2963,12 @@ class PypeApp:
 
 		"""
 		n = dacq_adbuf_size()
-		t = zeros(n)
+		t = zeros(n, 'f')
 		x = zeros(n)
 		y = zeros(n)
 
 		for i in range(0,n):
-			t[i] = 0.5 + dacq_adbuf_t(i) / 1000.0
+			t[i] = dacq_adbuf_t(i) / 1000.0
 			x[i] = dacq_adbuf_x(i)
 			y[i] = dacq_adbuf_y(i)
 
@@ -2981,11 +2980,11 @@ class PypeApp:
 
 		"""
 		n = dacq_adbuf_size()
-		t = zeros(n)
+		t = zeros(n, 'f')
 		p = zeros(n)
 
 		for i in range(0,n):
-			t[i] = 0.5 + dacq_adbuf_t(i) / 1000.0
+			t[i] = dacq_adbuf_t(i) / 1000.0
 			p[i] = dacq_adbuf_c2(i)
 
 		return (t, p)
@@ -3028,45 +3027,26 @@ class PypeApp:
 		# be careful here -- if you're trying to look at the photodiode
 		# signals, you'd better not set fast_tmp=1...
 		if not fast_tmp or self.show_eyetraces.get():
-			if self.rig_common.queryv('save_chn_0'):
-				c0 = zeros(n, Numeric.Int32)
-			else:
-				c0 = None
-			if self.rig_common.queryv('save_chn_1'):
-				c1 = zeros(n, Numeric.Int32)
-			else:
-				c1 = None
-			if self.rig_common.queryv('save_chn_2'):
-				c2 = zeros(n, Numeric.Int32)
-			else:
-				c2 = None
-			if self.rig_common.queryv('save_chn_3'):
-				c3 = zeros(n, Numeric.Int32)
-			else:
-				c3 = None
-			if self.rig_common.queryv('save_chn_4'):
-				c4 = zeros(n, Numeric.Int32)
-			else:
-				c4 = None
+			(c0, c1, c2, c3, c4) = [None] * 5
+			if self.rig_common.queryv('save_chn_0'): c0 = zeros(n, Numeric.Int32)
+			if self.rig_common.queryv('save_chn_1'): c1 = zeros(n, Numeric.Int32)
+			if self.rig_common.queryv('save_chn_2'): c2 = zeros(n, Numeric.Int32)
+			if self.rig_common.queryv('save_chn_3'): c3 = zeros(n, Numeric.Int32)
+			if self.rig_common.queryv('save_chn_4'): c4 = zeros(n, Numeric.Int32)
 
 			for i in range(0,n):
-				# convert integer times in 'us', float times in 'ms'
+				# convert adbuf_t in 'us' --> 'ms' in datafile (floating point)
 				self.eyebuf_t[i] = dacq_adbuf_t(i) / 1000.0
 				self.eyebuf_x[i] = dacq_adbuf_x(i)
 				self.eyebuf_y[i] = dacq_adbuf_y(i)
 				self.eyebuf_pa[i] = dacq_adbuf_pa(i)
 				p0[i] = dacq_adbuf_c2(i)
 				s0[i] = dacq_adbuf_c3(i)
-				if not c0 is None:
-					c0[i] = dacq_adbuf_c0(i)
-				if not c1 is None:
-					c1[i] = dacq_adbuf_c1(i)
-				if not c2 is None:
-					c2[i] = dacq_adbuf_c2(i)
-				if not c3 is None:
-					c3[i] = dacq_adbuf_c3(i)
-				if not c4 is None:
-					c4[i] = dacq_adbuf_c4(i)
+				if not c0 is None: c0[i] = dacq_adbuf_c0(i)
+				if not c1 is None: c1[i] = dacq_adbuf_c1(i)
+				if not c2 is None: c2[i] = dacq_adbuf_c2(i)
+				if not c3 is None: c3[i] = dacq_adbuf_c3(i)
+				if not c4 is None: c4[i] = dacq_adbuf_c4(i)
 
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
@@ -3084,8 +3064,7 @@ class PypeApp:
 			self.plotEyetraces(self.eyebuf_t,
 							   x=self.eyebuf_x / norm,
 							   y=self.eyebuf_y / norm,
-							   others=((p0, 'photos'),
-									   (s0, 'spikes')),
+							   others=((p0, 'photos'), (s0, 'spikes')),
 							   raster=self.spike_times)
 
 		self.udpy.info("[%dspks %dsyncs]" %
@@ -3930,6 +3909,11 @@ def _addpath(d, atend=None):
         sys.path = sys.path + [d]
     else:
         sys.path = [d] + sys.path
+
+	if atend:
+		print "addpath: %s:..." % d
+	else:
+		print "addpath: ...:%s" % d
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

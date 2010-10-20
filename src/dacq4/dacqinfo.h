@@ -31,6 +31,9 @@
 ** Tue Nov 28 16:58:07 2006 mazer 
 **   added support for a ms-resolution alarm that sends interupts
 **   the client/parent process
+**  
+** Wed Oct 20 15:40:02 2010 mazer 
+**  adbuf_t changed from unsigned long -> double
 */
 
 #define SHMKEY	0xDA01
@@ -97,7 +100,7 @@ typedef struct {
   unsigned int	adbuf_ptr;	/* current point in ring buffers */
   unsigned int	adbuf_overflow;	/* overflow flag (INDICATES ERROR!!) */
 
-  unsigned long adbuf_t[ADBUFLEN];	/* timestamps (us) */
+  double	adbuf_t[ADBUFLEN];	/* timestamps (us) */
   int		adbuf_x[ADBUFLEN];	/* eye x position trace */
   int		adbuf_y[ADBUFLEN];	/* eye y position trace */
   int		adbuf_pa[ADBUFLEN];	/* pupil area, if available */
