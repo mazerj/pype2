@@ -3048,6 +3048,11 @@ class PypeApp:
 				if not c3 is None: c3[i] = dacq_adbuf_c3(i)
 				if not c4 is None: c4[i] = dacq_adbuf_c4(i)
 
+			for i in range(1, n):
+				if self.eyebuf_t[i-1] == self.eyebuf_t[i]:
+					warn('dacq', "duplicate timestamp!")
+					break
+
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
 		self.photo_times = _find_ttl(self.eyebuf_t, p0,

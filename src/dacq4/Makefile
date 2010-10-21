@@ -38,9 +38,8 @@ comedi_server: comedi_server.o $(COMEDI_SERVER_OBJS)
 
 dacq.c: dacq.h
 
-dacq.i: dacq.h
-	@echo %module dacq >dacq.i
-	@cat dacq.h >>dacq.i
+dacq.i: dacq.h dacq.i.pre
+	@cat dacq.i.pre dacq.h >dacq.i
 	@echo "Made dacq.i"
 
 dacq_wrap.c: dacq.i

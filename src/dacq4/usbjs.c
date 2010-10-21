@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <unistd.h>
 // #include <sys/capability.h>
 
 #include "usbjs.h"
