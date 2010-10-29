@@ -354,10 +354,11 @@ import thread
 from types import *
 from Tkinter import *
 try:
-	import Pmw
+	from Pmw import *
 except ImportError:
-	Pmw = None
-
+	sys.stderr.write('missing `Pmw` package.\n' % __name__)
+	sys.exit(1)
+	
 try:
 	from Numeric import *
 except ImportError:
@@ -377,6 +378,7 @@ from events import *
 from guitools import *
 from dacq import *
 from pypeerrors import *
+
 from candy import bounce, slideshow
 import PlexHeaders, PlexNet, pype2tdt
 from info import print_version_info
@@ -390,15 +392,6 @@ if not prand.validate():
 	sys.stderr.write('Invalid Mersenne Twister implmentation!!!!\n')
 	sys.exit(1)
 
-def pypeapp():
-	"""
-	In case you don't have the application handle -- you can use
-	pypeapp() to retrieve it from a global store. This usually
-	means you're doing something the wrong way. Consider yourself
-	warned
-	"""
-	return PypeApp.__handle
-
 class PypeApp:
 	"""Pype Application Class.
 
@@ -409,8 +402,6 @@ class PypeApp:
 	The PypeApp class has methods & instance variables for just about
 	everything a user would want to do.
 	"""
-
-	__handle = None
 
 	def __init__(self, psych=0):
 		"""
@@ -433,17 +424,8 @@ class PypeApp:
 		collision.
 		"""
 
-		# need Pmw (python megawidgets Tkinter addon) for gui
-		if Pmw is None:
-			sys.stderr.write('%s: missing `Pmw` package\n' % __name__)
-			raise FatalPypeError
-
 		# no console window to start with..
 		self.conwin = None
-
-		# save handle for this instance as a pseudo-global (this
-		# is really just for the functions in helper.py
-		PypeApp.__handle = self
 
 		# check to see if ~/.pyperc or $PYPERC is accessible
 		# by the user before going any further:
@@ -1954,6 +1936,7 @@ class PypeApp:
 
 		self.__savestate()
 		if not self.running:
+			dacq_clockreset()			# reset clock -- avoid overruns??
 			self._loadmenu.disableall()
 			self._button_bounce.config(state=DISABLED)
 			self._button_slideshow.config(state=DISABLED)
@@ -3053,13 +3036,17 @@ class PypeApp:
 			# around.
 
 			ndups = 0
+			offset = -1
 			for i in range(1, n):
 				if self.eyebuf_t[i-1] == self.eyebuf_t[i]:
 					ndups = ndups + 1
+					if offset < 0: offset = i
 			if ndups > 0:
-				for i in range(1, 100):
+				for i in range(max(0, offset-10),
+							   min(offset+10, len(self.eyebuf_t))):
 					print i, self.eyebuf_t[i], ; print_adbuf_t(i); print ""
-				if ask('dacq', '%d duplicate timestamp(s)' % ndups,
+				if ask('dacq', '%d/%d duplicate timestamp(s)' % \
+					   (ndups,len(self.eyebuf_t)),
 					   ['Continue', 'Keyboard (debug)']) == 1:
 					keyboard()
 					
@@ -3074,11 +3061,7 @@ class PypeApp:
 									  spike_thresh, spike_polarity)
 
 		if self.show_eyetraces.get():
-			norm = 1
-			#norm = self.pix_per_dva
-			self.plotEyetraces(self.eyebuf_t,
-							   x=self.eyebuf_x / norm,
-							   y=self.eyebuf_y / norm,
+			self.plotEyetraces(self.eyebuf_t, x=self.eyebuf_x, y=self.eyebuf_y,
 							   others=((p0, 'photos'), (s0, 'spikes')),
 							   raster=self.spike_times)
 
