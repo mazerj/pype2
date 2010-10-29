@@ -355,7 +355,7 @@ from types import *
 from Tkinter import *
 try:
 	from Pmw import *
-except ImportError:
+except ImportError		:
 	sys.stderr.write('missing `Pmw` package.\n' % __name__)
 	sys.exit(1)
 	
@@ -391,6 +391,152 @@ import prand
 if not prand.validate():
 	sys.stderr.write('Invalid Mersenne Twister implmentation!!!!\n')
 	sys.exit(1)
+
+# parameter table declarations
+PAR_COMMON = (
+	ptitle('Session Data'),
+	pslot('training', 0, is_boolean,
+		  'training mode (#0000 files)'),
+	pslot('subject', '', is_any,
+		  'subject id (prefix/partial)'),
+	pslot('full_subject', '', is_any,
+		  'full (unique) subject name'),
+	pslot('owner', '', is_any,
+		  'datafile owner'),
+	pslot('cell', '', is_any,
+		  'unique (per subj) cell id #'),
+	pslot('acute', '0', is_bool,
+		  'acute experiment'),
+	pslot('save_tmp', '1', is_bool,
+		  '0 to write to /dev/null'),
+	pslot('fast_tmp', '1', is_bool,
+		  'super fast tmp mode'),
+	
+	ptitle('Fixation Window Params'),	# global, but handled by task
+	pslot('win_size', '50', is_int,
+		  'fixwin radius (pix)'),
+	pslot('win_scale', '0.0', is_float,
+		  'additive ecc. adj for win_size (rad-pixels/ecc-pixels)'),
+	pslot('vbias', 	'1.0', is_float,
+		  'fixwin vertical elongation factor (1.0=none)'),
+	ptitle('Recording Info'),
+	pslot('site.well', '', 	is_any,
+		  'well number'),
+	pslot('site.probe', '', is_any,
+		  'probe location'),
+	pslot('site.depth', '', is_any,
+		  'electrode depth (um)'),
+			
+	ptitle('Reward Params'),
+	pslot('dropsize', '100', is_int,
+		  'mean drop size in ms (for continuous flow systems)'),
+	pslot('dropvar', '10', is_int,
+		  'reward variance (sigma^2)'),
+	pslot('maxreward', '500', is_gteq_zero,
+		  'maximum reward duration (hard limit)'),
+	pslot('minreward', '0', is_gteq_zero,
+		  'minimum reward duration (hard limit)'),
+
+	ptitle('Pype Blocking Params'), 	# global, but handled by pype itself
+	pslot('max_trials', '0', is_int,
+		  'trials before stopping (0 for no limit)'),
+	pslot('max_correct', '0', is_int,
+		  'correct trials before stopping (0 for no limit)'),
+	pslot('max_ui', '0', is_int,
+		  'sequential UIs before stopping (0 for no limit)'),
+
+	ptitle('Fixspot/Screen Appearance'),
+	pslot('fix_size', '2', is_int,
+		  'fixspot radius (pix)'),
+	pslot('fix_ring', '10', is_int,
+		  'blank zone radius around fixspot (pix)'),
+	pslot('fix_x', '0', is_int,
+		  'default X pos of fixspot (pix)'),
+	pslot('fix_y', '0', is_int,
+		  'default Y pos of fixspot (pix)'),
+	pslot('bg', '80', is_gray,
+		  'default screen background'),
+
+	ptitle('Timing Params'),
+	pslot('maxrt', '600', is_int,
+		  'maximum allowed reaction time (ms)'),
+	pslot('iti', '4000+-20%', is_iparam,
+		  'inter-trial interval (ms)'),
+	pslot('timeout', '10000+-20%', is_iparam,
+		  'penalty timeout for errors (ms)'),
+	pslot('uitimeout', '20000+-20%', is_iparam,
+		  'uninitiated trial timeout (ms)'),
+			
+	ptitle('Eye Candy Params'),
+	pslot('show_noise', 1, is_boolean,
+		  'noise background during slides'),
+	)
+
+PAR_RIG = (
+	ptitle('Run Modes'),
+	pslot('testing', 0, is_boolean),
+	
+	ptitle('DACQ Params'),
+	pslot('fixbreak_tau', '5', is_int,
+		  '# samples before fixbreak counts;'
+		  ' press I-Tracker:UPDATE to take effect'),
+	pslot('eye_smooth', '3', is_int,
+		  'running avg len to smooth eye traces;'
+		  ' press I-Tracker:UPDATE to take effect'),
+	pslot('dacq_pri', '-10', is_int,
+		  'priority of DACQ process pslot (<0 higher)'), 
+	pslot('rt_sched', '0', 	is_bool,
+		  'try to use rt_scheduler'),
+	pslot('fb_pri', '-10', is_int,
+		  'priority of the framebuffer process pslot (<0 higher)'), 
+	pslot('photo_thresh', '500', 	is_int,
+		  'threshold for photodiode detection'),
+	pslot('photo_polarity', '1', is_int,
+		  'sign of threshold for photodiode detection'),
+	pslot('spike_thresh', '500', is_int,
+		  'threshold for spike detection'),
+	pslot('spike_polarity', '1', is_int,
+		  'sign of threshold for spike detection'),
+	pslot('save_chn_0', '0', is_int),
+	pslot('save_chn_1', '0', is_int),
+	pslot('save_chn_2', '0', is_int),
+	pslot('save_chn_3', '0', is_int),
+	pslot('save_chn_4', '0', is_int),
+
+	ptitle('Monitor Info (set in Config file)'),
+	pslot_ro('mon_id', '', is_any,
+			 'monitor id string'),
+	pslot_ro('viewdist', '0', is_float,
+			 'viewing distance (cm)'),
+	pslot_ro('mon_width', '0', is_float,
+			 'monitor width (cm)'),
+	pslot_ro('mon_height', '0', is_float,
+			 'monitor height (cm)'),
+	pslot_ro('mon_dpyw', '0', is_int,
+			 'monitor width (pix)'),
+	pslot_ro('mon_dpyh', '0', is_int,
+			 'monitor height (pix)'),
+	pslot_ro('mon_h_ppd', '0', is_float,
+			 'horizontal pixels_per_deg'),
+	pslot_ro('mon_v_ppd', '0', is_float,
+			 'vertical pixels_per_deg'),
+	pslot_ro('mon_ppd', '0', is_float,
+			 'overall/mean pixels_per_deg'),
+	pslot_ro('mon_fps', '0', is_float,
+			 'monitor frame rate (verified)'),
+
+	ptitle('Eye Tracker Info (set in Config file)'),
+	pslot_ro('eyetracker', '', is_any,
+			 'eye tracker device'),
+	pslot_ro('eyefreq', '', is_int,
+			 'eye tracker sampling frequency'),
+	pslot_ro('eyelag', '0', is_int,
+			 'eye tracker lag (if any)'),
+
+	ptitle('Internal Only -- don\'t change'),
+	pslot_ro('note_x', '0', is_int, 'userdpy'),
+	pslot_ro('note_y', '0', is_int, 'userdpy'),
+	)
 
 class PypeApp:
 	"""Pype Application Class.
@@ -443,19 +589,20 @@ class PypeApp:
 		# Load user/host-specific config data and set appropriate
 		# defaults for missing values.
 
-		cfgfile = pype_hostconfigfile()
-		Logger("pype: loading config from '%s'\n" % cfgfile)
-		self.config = pype_hostconfig()
+		cfile = _hostconfigfile()
+		self.config = configvars.defaults(cfile)
+		Logger("pype: config loaded from '%s'\n" % cfile)
 
 		# you can set debug mode by:
 		#   - running with --debug argument
 		#   - setenv PYPEDEBUG=1
 		#   - setting DEBUG: 1 in the Config.$HOST file
 		if os.environ.has_key('PYPEDEBUG'):
-			Logger("pype: running in debug mode")
-			self.config.set('DEBUG', '1', override=1)
+			self.config.iset('DEBUG', 1, override=1)
+			
 		debug(self.config.iget('DEBUG'))
 		if debug():
+			Logger("pype: running in debug mode")
 			sys.stderr.write('config settings:\n')
 			self.config.show(sys.stderr)
 
@@ -478,21 +625,15 @@ class PypeApp:
 
 		# these MUST be set from now on..
 		monw = self.config.fget('MONW', -1)
-		if monw < 0:
-			Logger('pype: set MONW in Config file\n')
-			raise FatalPypeError
 		monh = self.config.fget('MONH', -1)
-		if monh < 0:
-			Logger('pype: set MONH in Config file\n')
-			raise FatalPypeError
 		viewdist = self.config.fget('VIEWDIST', -1)
-		if viewdist < 0:
-			Logger('pype: set VIEWDIST in Config file\n')
+		self.config.set('MON_ID', 'notset')
+		if sys.platform == 'darwin':
+			self.config.set('AUDIODRIVER', 'sndmgr')
+		
+		if monw < 0 or monh < 0 or viewdist < 0:
+			Logger('pype: set MONW, MONW & VIEWDIST in Config file \n')
 			raise FatalPypeError
-
-		mon_id = self.config.get('MON_ID', '')
-		if len(mon_id) == 0:
-			Logger('pype: warning -- MON_ID field in Config file unset.\n')
 
 		state = self.__readstate()
 		if state is None:
@@ -522,22 +663,15 @@ class PypeApp:
 		self.tk.resizable(0, 0)
 
 		import im_left, im_right, im_up, im_down
-		self.icons = {}
-		self.icons['left'] = im_left.left
-		self.icons['right'] = im_right.right
-		self.icons['up'] = im_up.up
-		self.icons['down'] = im_down.down
+		self.icons = {'left':im_left.left, 'right':im_right.right,
+					  'up':im_up.up, 'down':im_down.down }
 
 		if self.config.iget('SPLASH'):
 			splash()
 
-		if sys.platform == 'darwin':
-			self.tk.geometry("+0+20")
-		else:
-			self.tk.geometry("+0+0")
-		self.tk.title('Pype')
+		self.tk.title('pype')
 		self.tk.protocol("WM_DELETE_WINDOW", self.shutdown)
-
+		self.tk.geometry("+0+20")
 		Pmw.initialise(self.tk, useTkOptionDb=1)
 
 		self.conwin = ConsoleWindow()
@@ -672,66 +806,8 @@ class PypeApp:
 
 		sub_common = DockWindow(checkbutton=b, title='subj/cell')
 		self.sub_common = ParamTable(sub_common,
-		(
-			("Session Data", None, None),
-			("training",	0,	 is_boolean,	"training mode (#0000 files)"),
-			("subject",		"",  is_any,		"subject id (prefix/partial)"),
-			("full_subject", "", is_any,		"full (unique) subject name"),
-			("owner",		"",  is_any,		"datafile owner"),
-			("cell",		"",  is_any,		"unique (per subj) cell id #"),
-			("acute",		"0", is_bool,		"acute experiment"),
-			("save_tmp",	"1", is_bool,		"0 to write to /dev/null"),
-			("fast_tmp",	"1", is_bool,		"super fast tmp mode"),
-
-			("Fixation Window Params", None, None),
-			# these are global params, but should be handled by tasks:
-			("win_size",	"50",  is_int,		"default fixwin radius (pix)"),
-			("win_scale",	"0.0", is_float,	"additive eccentricity adjustment for win_size (rad-pixels/ecc-pixels)"),
-			("vbias",	    "1.0", is_float,	"fixwin vertical elongation factor (1.0=none)"),
-			
-			("Recording Info", None, None),
-			("site.well",	"", is_any,			"well number"),
-			("site.probe",	"", is_any,			"probe location"),
-			("site.depth",	"", is_any,			"electrode depth (um)"),
-			
-			("Reward Params", None, None),
-			("dropsize",	"100", is_int,		"mean drop size in ms (for continuous flow systems)"),
-			("dropvar",		"10", is_int,		"reward variance (sigma^2)"),
-			("maxreward",	"500", is_gteq_zero,"maximum reward duration (hard limit)"),
-			("minreward",	"0", is_gteq_zero,	"minimum reward duration (hard limit)"),
-
-			("Pype Blocking Params", None, None),
-			# these are handled automatically by pype!
-			("max_trials",	"0",   is_int,		"trials before stopping (0 for no limit)"),
-			("max_correct",	"0",   is_int,		"correct trials before stopping (0 for no limit)"),
-			("max_ui",		"0",   is_int,		"sequential UI's before stopping (0 for no limit)"),
-
-			#("Task Blocking Params", None, None),
-			# global, but handled by task -- soon to go away
-			#("uimax",		"3",   is_int, "maximum # conseq. UI trial's before halting"),
-			#("nreps",		"100", is_int, "number of blocks per rep"),
-			#("blocksize",	"100", is_int, "number of trials per block"),
-
-			("Fixation and Appearence", None, None),
-			("fix_size",	"2", is_int, "size of fixspot (radius in pixels)"),
-			("fix_ring",	"10", is_int, "size of annular ring around fixspot for ++visibility"),
-			("fix_x",		"0", is_int, "default X position of fixspot (pix)"),
-			("fix_y",		"0", is_int, "default Y position of fixspot (pix)"),
-			#("win_size",	"20", is_int, "default fixation window size (radius in pixels)"),
-			#("win_scale",	"0.0053", is_float, "multiplier to scale win_size w/eccentricity (gain/pix"),
-			("bg",			"80", is_gray, "default background color of screen"),
-
-			("Timing Params", None, None),
-			("abortafter",	"2000", is_int, "not sure?"),
-			("maxrt",		"600", is_int, "maximum allowed reaction time (ms)"),
-			("iti",			"4000+-20%", is_iparam, "inter-trial interval (ms)"),
-			("timeout",		"10000+-20%", is_iparam, "penalty timeout for errors (ms)"),
-			("uitimeout",	"20000+-20%", is_iparam, "uninitiated trial timeout (ms)"),
-			
-			("Eye Candy Params", None, None),
-			("show_noise", 1, is_boolean, 'noise background during slides'),
-			), file='subject.par', altfile='common-%s.par' % hostname)
-
+									 PAR_COMMON, file='subject.par',
+									 altfile='common-%s.par' % hostname)
 		if self.use_elog:
 			# the cell field (exper in elog database) is not
 			# user setable in elog mode!
@@ -747,66 +823,8 @@ class PypeApp:
 		rig_common = DockWindow(checkbutton=b,
 								title='rig (%s)' % hostname)
 		self.rig_common = ParamTable(rig_common,
-		(
-			("Run Modes", None, None),
-			("testing",		0,				is_boolean),
-
-			("Monitor Info", None, None),
-			("mon_id",		"n/a",			is_any, "", -1),
-			("viewdist",	"37",			is_float, "", -1),
-			("mon_width",	"0",			is_float, "", -1),
-			("mon_height",	"0",			is_float, "", -1),
-			("mon_dpyw",	"0",			is_int, "", -1),
-			("mon_dpyh",	"0",			is_int, "", -1),
-			("mon_h_ppd",	"10",			is_float, "", -1),
-			("mon_v_ppd",	"10",			is_float, "", -1),
-			("mon_ppd",		"10",			is_float, "", -1),
-			("mon_fps",		"0",			is_float, "", -1),
-
-			("Eye Tracker Info", None, None),
-			("eyetracker",	"",				is_any, "", -1),
-			("eyefreq",		"",				is_int),
-			("eyelag",		"0",			is_int, "", -1),
-			("plotskip",	"1",			is_int,
-			 "number points to skip when plotting for speed"),
-			("plotall",		"1",			is_bool,
-			 "if set, then also plot spikes & photodiode traces"),
-
-			("UserDpy Settings", None, None),
-			("note_x",		"0",			is_int, "", -1),
-			("note_y",		"0",			is_int, "", -1),
-
-			("DACQ Params", None, None),
-			("fixbreak_tau",	"5",		is_int,
-			 "# 1khz samples outside fixwin it counts as break -- UPDATE to take effect"),
-			("eye_smooth",		"3",		is_int,
-			 "length of running average used to smooth eye traces -- UPDATE to take effect"),
-			("dacq_pri",		"-10",		is_int,
-			 "priority of DACQ process (nice value)"),
-			("rt_sched",		"0",		is_bool,
-			 "boolean: try to use rt_scheduler??"),
-			("fb_pri",			"-10",		is_int,
-			 "priority of the framebuffer process (nice value)"),
-			("photo_thresh",	"500",		is_int,
-			 "threshold for photodiode detection"),
-			("photo_polarity",	"1",		is_int,
-			 "sign of threshold for photodiode detection"),
-			("spike_thresh",	"500",		is_int,
-			 "threshold for spike detection"),
-			("spike_polarity",	"1",		is_int,
-			 "sign of threshold for spike detection"),
-			("save_chn_0",		"0",		is_int,
-			 "analog horizontal eye pos (coil only)"),
-			("save_chn_1",		"0",		is_int,
-			 "analog vertical eye pos (coil only)"),
-			("save_chn_2",		"0",		is_int,
-			 "analog photodiode signal (redundant!)"),
-			("save_chn_3",		"0",		is_int,
-			 "analog TTL psike signal (redundant!)"),
-			("save_chn_4",		"0",		is_int,
-			 "un used analog channel"),
-		), file='rig-%s.par' % hostname,
-		   altfile='common-%s.par' % hostname)
+									 PAR_RIG, file='rig-%s.par' % hostname,
+									 altfile='common-%s.par' % hostname)
 
 		# JAM 07-feb-2003: Compute ppd values based on current setup.
 		# Then place these in the rig menu automatically.
@@ -1147,7 +1165,6 @@ class PypeApp:
 		# Framebuffer initialization will give up root access
 		# automatically.. so make sure you start the dacq process
 		# first (see above).
-
 		try:
 			root_drop()
 			if not self.config.iget('SOUND'):
@@ -1156,9 +1173,6 @@ class PypeApp:
 			else:
 				if self.config.get('AUDIODRIVER'):
 					audiodriver = self.config.get('AUDIODRIVER')
-				elif sys.platform == 'darwin':
-					audiodriver = 'sndmgr'
-				# otherwise, let pygame.mixer figure it out
 				beep()
 		finally:
 			root_take()
@@ -3332,12 +3346,9 @@ class PypeApp:
 		if len(t) > 0:
 			# works even if _eyetrace_window is None
 			oldgraph = iplot.attach(self._eyetrace_window)
+			skip = 1
 
-			skip = int(self.rig_common.queryv('plotskip'))
-			if skip < 1:
-				skip = 1
-
-			all = int(self.rig_common.queryv('plotall'))
+			all = 1
 			if not all:
 				# we must be in a hurry, so don't plot everything...
 				others = ()
@@ -3397,7 +3408,7 @@ class PypeApp:
 		for n in range(0, len(Sprite.__list__)):
 			Logger('%d: "%s"\n' % (n, sprite.Sprite.__list__[n]))
 
-def pype_hostconfigfile():
+def _hostconfigfile():
 	"""
 	Return Read host-specfic Config file.
 	Config file lives in $(PYPERC)/Config.{HOST_NAME}
@@ -3406,25 +3417,12 @@ def pype_hostconfigfile():
 	h = string.split(socket.gethostname(), '.')[0]
 	return pyperc('Config.%s' % h)
 
-def pype_hostconfig():
-	"""
-	Read host-specific config file into a Config
-	object and return the object (looks like a
-	dictionary).
-
-	"""
-	cfile = pype_hostconfigfile()
-	return configvars.defaults(cfile)
-
-	#return Config(pype_hostconfigfile())
-
-
 def _CanOnlyBeOne():
 	"""Count number of pype programs currently running.
 
 	Try to figure out if there are already pype processes running
 	(actually look for any processes attached to the standard shared
-	memory segment (id: 0xDA01). This is ugle, slow and a hack. **BUT**
+	memory segment (id: 0xDA01). This is ugly, slow and a hack. **BUT**
 	it does the job and prevents you from killing your own pype
 	process by accident when collecting data...
 

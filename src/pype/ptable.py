@@ -520,15 +520,18 @@ def _unpack_slot(slot):
 # helper functions for creating rows in the parameter table:
 
 # standard slot/row:
-def slot(name, default=None, val=None, info=None, lockonrun=None):
+def pslot(name, default=None, val=None, info='', lockonrun=None):
 	return (name, default, val, info, lockonrun)
 
+def pslot_ro(name, default=None, val=None, info=''):
+	return (name, default, val, info, _KEEPLOCKED)
+
 # dropdown choice list:
-def pick(name, default=None, choices=None, info=None, lockonrun=None):
+def plist(name, default=None, choices=None, info='', lockonrun=None):
 	return (name, default, val, info, lockonrun)
 
 # title/section-delimiter
-def title(name):
+def ptitle(name):
 	return (name, None, None, None, None)
 
 class ParamTable:
