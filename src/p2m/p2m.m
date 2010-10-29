@@ -8,7 +8,8 @@ function pf = p2m(pypefile, oldpf)
 %
 %  INPUT
 %    pypefile = string containing name (full path) of original pype
-%		data file.
+%		data file. If pypefile contains wildcards, iterate
+%               over the entire list of files (can't mix with oldpf!)
 %
 %    oldpf = previously extracted PF structure or name of p2m file.
 %            data in pypefile will be converted, extracted and tacked
@@ -31,11 +32,27 @@ function pf = p2m(pypefile, oldpf)
 %   added support to appending new data to existing p2m structure. If you
 %   pass in an old data struct, only the new data will be converted and
 %   appended to the existing data.
+%
+% Fri Oct 22 12:54:54 2010 mazer 
+%   added wildcard support -- pypefile can contain wildcards and each
+%   file will get p2m'd
 %  
 
 if nargin == 0
   p2mHelp()
   return
+end
+
+files = p2m_dir(pypefile);
+if length(files) > 1
+  if exist('oldpf', 'var')
+    error('Can''t mix wildcards with oldpf');
+  end
+  for n = 1:length(files)
+    fprintf('converting: %s\n', files{n});
+    p2m(files{n});
+  end
+  return;
 end
 
 if ~exist('oldpf', 'var')

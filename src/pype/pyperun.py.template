@@ -31,6 +31,9 @@ Mon Sep 18 10:00:05 2006 mazer
     PYPEPATH      colon-delimited search path
     SUBJECT       subject id (for subject-specific config files)
 
+Fri Oct 22 09:34:47 2010 mazer
+  Added --config option
+
 """
 
 __author__   = '$Author$'
@@ -39,8 +42,12 @@ __revision__ = '$Revision$'
 __id__       = '$Id$'
 
 __debug = 0
+__show_help = 0
 __show_pypedir = 0
 __show_imports = 0
+__show_config = 0
+__show_version = 0
+__psych_mode = 0
 
 import sys
 import posixpath
@@ -98,46 +105,62 @@ for a in sys.argv:
         __debug = 1
         __show_imports = 1
         os.environ['PYPEDEBUG'] = "1"
+    elif a == '--config':
+        __show_config = 1
+    elif a == '--help':
+        __show_help = 1
+    elif a == '--version' or a == '-v':
+        __show_version = 1
+    elif a == '--psych' or a == '-p':
+        __psych_mode = 1
     else:
         av.append(a)
 sys.argv = av
 
-
-if not os.environ.has_key('PYPEDIR'):
-    os.environ['PYPEDIR'] = "%%PYPEDIR%%"
-    sys.stderr.write('Warning: $PYPEDIR unset, using "%s".\n' % \
-                     os.environ['PYPEDIR'])
-
-if __show_pypedir:
-    print os.environ['PYPEDIR']
+if __show_help:
+    print """\
+pypenv/pype options:
+  --version|-v   show version info
+  --dir          show value of PYPEDIR and exit
+  --config       show list of config vars
+  --debug        set DEBUG mode (or use env var DEBUG)
+  --help         this message
+  --psych|-p     psychophysics mode (start with framebuffer hidden)
+  -s             start in interactive mode (ie, run pypenv)
+  -s <script>    run specified script
+  s=<subject-id> run withsubject-d to specified value (or use env var SUBJECT)
+  <task>         load task on start\
+    """
     sys.exit(0)
 
 if not os.environ.has_key('HOME'):
 	sys.stderr.write('%s: please set $HOME and restart\n' % sys.argv[0])
 	sys.exit(1)
+if not os.environ.has_key('PYPEDIR'):
+    pd = "%%PYPEDIR%%"
+    os.environ['PYPEDIR'] = pd
+    sys.stderr.write('Warning: no $PYPEDIR; using "%s".\n' % pd)
 
 
 _original_path = sys.path[::]
-
-_addpath(os.environ['PYPEDIR']+ '/pype')
-# Wed Oct 20 14:08:42 2010 mazer
-# by fiat: no system tasks anymore
-#_addpath(os.environ['PYPEDIR']+ '/Tasks')
-#_addpath(os.environ['PYPEDIR']+ '/Modules')
-    
-
-# Fri Dec 13 17:12:22 2002 mazer
-#  -- add $PYPEDIR/lib onto LD_LIBRARY_PATH
-#     to make sure DACQ modules can pickup the
-#     eyelink shared library file..
-
+_addpath(os.environ['PYPEDIR']+ '/pype', atend=0)
 if os.environ.has_key('LD_LIBRARY_PATH'):
+    # ensures pickup of Eyelink shared libraries
     os.environ['LD_LIBRARY_PATH'] = os.environ['PYPEDIR'] + '/lib:' + \
                                     os.environ['LD_LIBRARY_PATH']
-# now that $PYPEDIR is partially setup, pype and pype modules
-# should be importable...
 
-if len(sys.argv) > 2 and (sys.argv[2] == '-v' or sys.argv[2] == '--version'):
+##############################################################
+# From here on out pype modules are importable!
+##############################################################
+
+if __show_pypedir:
+    print os.environ['PYPEDIR']
+    sys.exit(0)
+if __show_config:
+    from configvars import defaults_info
+    print defaults_info()
+    sys.exit(0)
+if __show_version:
     from pypeversion import *
     print "pype version:", PypeVersion
     print "         svn:", __revision__
@@ -158,21 +181,21 @@ except ImportError:
     sys.stderr.write("file:%s line:%d --> %s\n" % (fname, line, evalue))
 	sys.exit(1)
 
-# add user-specified PYPEPATH directories (if any) -- colon deliminated
+# prefix user-specified PYPEPATH directories -- colon deliminated
 if os.environ.has_key('PYPEPATH'):
     for d in string.split(os.environ['PYPEPATH'], ':')[::-1]:
-        _addpath(d)
+        _addpath(d, atend=0)
 
-# add the ~/.pyperc directories to the python search path
+# prefix ~/.pyperc directories to the python search path
 for i in ['Tasks', 'Modules']:
-    _addpath(pyperc(i))
+    _addpath(pyperc(i), atend=0)
 
 for d in glob.glob(pyperc('Tasks/*')):
     if os.path.isdir(d):
-        _addpath(d)
+        _addpath(d, atend=0)
 
 # lastly, add current directory to allow local overrides!
-_addpath('.')
+_addpath('.', atend=0)
 
 if __show_imports:
     importer(report=1)
@@ -185,57 +208,45 @@ if __debug:
     sys.stderr.write('----------------------------\n')
 
 if len(sys.argv) > 1 and sys.argv[1] == '-s':
-    # Invoked with -s argument -- typially as pypenv
-    #   - could be either as script or for interactive session
+    # Invoked with -s argument (ie, pypenv):
+    #   -s script  --> run script non-interactively
+    #   -s         --> drop into interactive shell
     if len(sys.argv) == 2:
-        # no command line args (beyond -s) -- startup an interactive session
         sys.stdout.write('[pype interactive shell (python %d.%d.%d)]\n' % \
                          sys.version_info[0:3])
         code.interact(banner='')
     else:
-        # with command line args -- run as script:
-        #  - trim pyperun (this script) from sys.argv[] and then
-        #    call _run_script to replace '-s' with requested module
-        #    name, load and run.
+        # run specified script with remaining command line args
         sys.argv = sys.argv[2:]
         if _run_script(sys.argv[0]) == 0:
             sys.stderr.write("pyperun: can't find module '%s'\n" % sys.argv[0])
             sys.exit(1)
 else:
-    # Invoked as plain old 'pype' -- full gui interface startup
-    #  - make sure the subject directory exists
-    #  - check to see if in psychophysics mode (-p)
-    #  - and then startup the gui
+    # Invoked as plain old 'pype'; make sure subj dir exists and start gui
     if not posixpath.exists(subjectrc()):
         try:
             os.mkdir(subjectrc())
             os.chown(subjectrc(), os.getuid(), os.getgid())
+            sys.stderr.write("pyperun: made %s\n" % subjectrc())
         except OSError:
-            sys.stderr("Can't create subject directory!\n");
+            sys.stderr.write("pyperun: can't create %s\n" % subjectrc())
             sys.exit(1)
 
-    psych = 0
-    args = []
-    for a in sys.argv[1:]:
-        if a == '-p':
-            psych = 1      # psychophysics mode (withdraw framebuffer on start)
-        else:
-            args.append(a)
-
+    args = sys.argv[1:]
 	try:
-		app = PypeApp(psych=psych)
+		app = PypeApp(psych=__psych_mode)
 	except FatalPypeError:
+        sys.stderr.write("pyperun: fatal error starting gui\n")
 		sys.exit(1)
 
     if len(args) > 0:
-        taskname = posixpath.splitext(args[0])[0]
+        task = posixpath.splitext(args[0])[0]
 		try:
-			app.newloadtask(taskname)
+			app.newloadtask(task)
 		except ImportError:
-			sys.stderr.write("%s: can't load task '%s'\n" % \
-							 (sys.argv[0], taskname))
+			sys.stderr.write("%s: can't load task '%s'\n" % (sys.argv[0], task))
 			sys.exit(1)
-
+            
     while not app.terminate:
         app.idlefn(toplevel=1)
 	app.close()

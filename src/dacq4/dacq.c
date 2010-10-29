@@ -186,6 +186,10 @@
 **
 ** Wed Oct 20 15:39:17 2010 mazer 
 **   dacq_adbuf_t() returns double instead of unsigned long
+**
+** Thu Oct 21 15:18:27 2010 mazer 
+**   new: dacq_clockreset() -- tells comedi_server to reset the internal
+**   timestamp clock.
 */
 
 #include <sys/types.h>
@@ -316,6 +320,8 @@ static void shm_init()
   
   /* alarm timer (same units as timestamp); 0 for no alarm */
   dacq_data->alarm_time = 0;
+
+  dacq_data->clock_reset = 0;
 }
 
 
@@ -326,8 +332,8 @@ int dacq_start(char *server, char *tracker, char *port, char *elopt,
 
   if ((shmid = shmget((key_t)SHMKEY, sizeof(DACQINFO), 0666 | IPC_CREAT)) < 0) {
     if (errno == EINVAL) {
-      fprintf(stderr, "dacq_start: Shared memory buffer's changed sizes!\n");
-      fprintf(stderr, "            Run pypekill, then try pype again.\n");
+      fprintf(stderr, "dacq_start: SHM buffer's changed size.\n");
+      fprintf(stderr, "dacq_start: run pypekill and start again\n");
       return(0);
     } else {
       perror("shmget");
@@ -497,6 +503,32 @@ unsigned long dacq_ts(void)	/* this is timestamp to nearest MS */
   i = dacq_data->timestamp;
   UNLOCK(semid);
   return(i);
+}
+
+double dacq_usts(void)		/* us timestamp as double */
+{
+  double f;
+  LOCK(semid);
+  f = dacq_data->usts;
+  UNLOCK(semid);
+  return(f);
+}
+
+extern void dacq_clockreset(void)
+{
+  int i;
+
+  dacq_data->clock_reset = 1;
+  while (1) {
+    LOCK(semid);
+    i = dacq_data->clock_reset;
+    UNLOCK(semid);
+    if (i) {
+      break;
+    } else {
+      usleep(1);
+    }
+  }
 }
 
 int dacq_bar(void)
@@ -726,6 +758,16 @@ double dacq_adbuf_t(int ix) /* 10/12/2010: adbuf_t now in US! */
   f = dacq_data->adbuf_t[ix];
   UNLOCK(semid);
   return(f);
+}
+
+void print_adbuf_t(int ix)
+{
+  double f;
+
+  LOCK(semid);
+  f = dacq_data->adbuf_t[ix];
+  UNLOCK(semid);
+  fprintf(stderr, "%f", f);
 }
 
 int dacq_adbuf_x(int ix)

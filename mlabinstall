@@ -1,6 +1,7 @@
 #!/bin/sh
-if [ "$*" = "" ]; then
-    sudo env PYPEDIR=/auto/share/pype2/`uname -m` ./build install wrapper
-else
-    sudo env PYPEDIR=/auto/share/pype2/`uname -m` ./build $*
+args="clobber install wrapper"
+if [ ! "$*" = "" ]; then
+  args="$*"
 fi
+echo "running: ./build $args"
+sudo env PYPEDIR=/auto/share/pype2/`uname -m` ./build $args

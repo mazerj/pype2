@@ -34,6 +34,8 @@ extern int dacq_start(char *server, char *tracker, char *port, char *elopt,
 extern void dacq_stop(void);
 extern int dacq_release(void);
 
+extern void dacq_clockreset(void);
+
 extern int dacq_dig_in(int n);
 extern void dacq_dig_out(int n, int val);
 
@@ -43,9 +45,9 @@ extern int dacq_eye_y(void);
 extern int dacq_eye_params(double xgain, double ygain, int xoff, int yoff);
 extern int dacq_eye_read(int which);
 
-
 extern int dacq_ad_n(int n);
 extern unsigned long dacq_ts(void);
+extern double dacq_usts(void);
 
 extern int dacq_bar(void);
 extern int dacq_bar_transitions(int reset);
@@ -69,6 +71,7 @@ extern void dacq_adbuf_clear();
 
 extern int dacq_adbuf_size();
 extern double dacq_adbuf_t(int ix);
+extern void print_adbuf_t(int ix);
 extern int dacq_adbuf_x(int ix);
 extern int dacq_adbuf_y(int ix);
 extern int dacq_adbuf_pa(int ix);

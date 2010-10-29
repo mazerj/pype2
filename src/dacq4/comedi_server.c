@@ -683,13 +683,15 @@ void iscan_init(char *dev)
 double timestamp(int init) /* return elapsed time in us */
 {
   static struct timespec ti[2];	/* initial and current times */
+  static double ts;
 
   if (init) {
     clock_gettime(CLOCK_MONOTONIC, &ti[0]);
   }
   clock_gettime(CLOCK_MONOTONIC, &ti[1]);
-  return((1.0e6  * (ti[1].tv_sec - ti[0].tv_sec)) +
-	 (1.0e-3 * (ti[1].tv_nsec - ti[0].tv_nsec)));
+  ts = (1.0e6 * (double)(ti[1].tv_sec - ti[0].tv_sec)) +
+    (1.0e-3 * (double)(ti[1].tv_nsec - ti[0].tv_nsec));
+  return(ts);
 }
 
 static int locktocore(int corenum)
@@ -732,8 +734,8 @@ void resched(int rt)
 
 void mainloop(void)
 {
-  register int i, ii, lastpri, setpri;
-  register float x, y, z, pa, tmp, calx, caly;
+  int i, ii, lastpri, setpri;
+  float x, y, z, pa, calx, caly;
   float tx, ty, tp;
   double ts;
   unsigned int eyelink_t;
@@ -741,18 +743,19 @@ void mainloop(void)
   int k;
   int jsbut, jsnum, jsval;
   unsigned long jstime;
-  struct timespec sleep, remains;
-
-  register float sx=0, sy=0;
+  float sx, sy;
   int si, sn, last;
   float sbx[MAXSMOOTH], sby[MAXSMOOTH];
+  struct timespec sleep, remains;
 
   /*
    * calx/caly are the gain+offset adjusted eye position values
    * x/y are the raw values
+   * sx/sy are sums for smoothing
    */
   calx = caly = x = y = pa = -1;
   y = x = 0.0;
+  sx = sy = 0;
   for (si = 0; si < MAXSMOOTH; si++) {
     sbx[si] = sby[si] = 0.0;
   }
@@ -776,8 +779,12 @@ void mainloop(void)
     lastpri = 0;
   }
 
-  locktocore(0);		/* lock process to core 0 */
-  timestamp(1);			/* initialize the timestamp to 0 */
+  //locktocore(0);		/* lock process to core 0 */
+  timestamp(1);			/* initialize timestamp conouter to 0 */
+
+  /* set sleep time for 0.250 ms (in nanosecs) */
+  sleep.tv_sec = 0;
+  sleep.tv_nsec = 0.250 * 1e6;
 
   /* signal client we're ready */
   LOCK(semid);
@@ -785,46 +792,45 @@ void mainloop(void)
   fprintf(stderr, "%s: ready\n", progname);
   UNLOCK(semid);
 
-  /* set sleep time for 0.250 ms (in nanosecs) */
-  sleep.tv_sec = 0;
-  sleep.tv_nsec = 0.250 * 1e6;
-
   do {
+    LOCK(semid);
+    if (dacq_data->clock_reset) {
+      // this is basically a one-shot; client sets clock_reset to
+      // force clock reset on next iteration through mainloop
+      UNLOCK(semid);
+      timestamp(1);
+      LOCK(semid);
+      dacq_data->clock_reset = 0;
+    }
+    UNLOCK(semid);
+
     if (clock_nanosleep(CLOCK_MONOTONIC, 0, &sleep, &remains) != 0) {
       ERROR("clock_nanosleep");
       fprintf(stderr, "nanosleep came up short, ignoring\n");
     }
-    ts = timestamp(0);		/* in 'us' */
-    /* now quickly sample all the converters just once */
-    for (i = 0; i < NADC; i++) {
+    ts = timestamp(0);		// get time since start in 'us'
+
+    for (i=0; i<NADC; i++) {	// sample all converters fast as possible
       dacq_data->adc[i] = ad_in(i);
     }
-    if (itracker == ISCAN) {
+    if (itracker == ISCAN) {	// maybe read iscan from serial port..
       iscan_read();
     }
-
-    /* handle joystick, if enabled */
-    if (usbjs_dev > 0) {
+    if (usbjs_dev > 0) {	// joystick, only if enabled
       if (usbjs_query(usbjs_dev, &jsbut, &jsnum, &jsval, &jstime)) {
 	if (jsbut) {
-	  /* button press: jsnum is button number, jsval is up/down */
 	  if (jsnum < NJOYBUT) {
 	    LOCK(semid);
-	    dacq_data->js[jsnum] = jsval;
+	    dacq_data->js[jsnum] = jsval; // button # jsnum: up or down?
 	    UNLOCK(semid);
 	  }
 	} else if (jsbut == 0 && jsnum == 0) {
-	  /* x-axis motion, jsval indicates the current value */
-	  dacq_data->js_x = jsval;
+	  dacq_data->js_x = jsval; // x motion; jsval=current position */
 	} else if (jsbut == 0 && jsnum == 1) {
-	  /* y-axis motion, jsval indicates the current value */
-	  dacq_data->js_y = jsval;
+	  dacq_data->js_y = jsval; // y motion; jsval=current position */
 	}
       }
     }
-
-    /* finally, handle eye tracker */
-
     switch (itracker)
       {
       case NONE:
@@ -859,6 +865,7 @@ void mainloop(void)
       }
 
     if (swap_xy) {
+      int tmp;
       tmp = x; x = y; y = tmp;
     }
 
@@ -871,17 +878,12 @@ void mainloop(void)
     UNLOCK(semid);
 
     if (sn > 1) {
-      /* remove old point, add new point to smoothing sum */
-      sx = sx - sbx[si] + x;
+      sx = sx - sbx[si] + x;	/* pop old */
       sy = sy - sby[si] + y;
-
-      /* add new (unsmoothed data points) to smoothing buffer */
-      sbx[si] = x;
+      sbx[si] = x;		/* push new */
       sby[si] = y;
-      si = (si + 1) % sn;
-
-      /* calc smoothed point */
-      x = sx / sn;
+      si = (si + 1) % sn;	/* advance FIFO pointer */
+      x = sx / sn;		/* compute smoothed mean */
       y = sy / sn;
     }
 
@@ -932,6 +934,7 @@ void mainloop(void)
 
     LOCK(semid);
     dacq_data->timestamp = (unsigned long) (0.5 + ts / 1000.0); /* in 'ms' */
+    dacq_data->usts = ts;					/* us */
     k = dacq_data->adbuf_on;
 
     /* check alarm status */

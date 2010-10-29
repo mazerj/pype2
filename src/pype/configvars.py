@@ -25,7 +25,6 @@ __id__       = '$Id$'
 import os
 import config
 
-
 def defaults(srcfile):
 
     # load config directory from source file (usually Config.$HOSTNAME)
@@ -55,10 +54,7 @@ def defaults(srcfile):
     c.set('FLIP_SW1', '0')              # flip user switch 1 input polarity
     c.set('FLIP_SW2', '0')              # flip user switch 1 input polarity
     c.set('ENABLE_SW1', '1')            # enable/disable SW1
-    c.set('JUICEBUTTON', '1')           # if 1, SW1 triggers a *reward*
-    c.set('JUICESWITCH', '1')           # if 1, SW1 opens/closes solenoid
     c.set('REWARD_BEEP', '1')           # beep when giving rewards?
-    c.set('DACQ_TESTMODE', '0')         # testing mode for DAQ cards
     c.set('SOUND', '1')                 # access to sound card?
     
     c.set('USB_JS_DEV',	'')             # enable USB joystick -- device file
@@ -86,8 +82,6 @@ def defaults(srcfile):
                                         #  (None means autoconfig to lower right)
     c.set('SYNCLEVEL', '255')           # gray scale value of sync-on
     c.set('TESTPAT', None)              # filename for test pattern
-    
-
 
     if os.environ.has_key('DISPLAY'):   # display device for graphics
         c.set('SDLDPY', os.environ['DISPLAY'])
@@ -109,7 +103,7 @@ def defaults(srcfile):
     c.set('SWAP_XY', '0')               # swap X & Y on eye tracker
 
                                         # EYELINK SPECIFIC OPTIONS
-    c.set('PUPILXTALK', '0,-0.001')     # crosstalk adjustment between pupil
+    c.set('EYELINK_XTALK', '0,-0.001')  # crosstalk adjustment between pupil
                                         # position and size
     c.set('EYELINK_OPTS', '')           # any extra options to pass to API
     c.set('EYELINK_CAMERA',	'1')        # left or right camera (0, 1)
@@ -127,3 +121,63 @@ def defaults(srcfile):
                                         # machine running tdt.py server
 
     return c
+
+def defaults_info():
+	return """
+Sound & Video
+-------------
+FULLSCREEN      (0|1)   enable full screen mode
+DPYBITS         (#)     number of display bits (typically 24 or 32)
+DPYH            (#)     display height in pixels
+DPYW            (#)     display width in pixels
+GAMMA           (float) scalar gamma correction for monitor (luminance)
+MONH            (#)     monitor height in cm
+MONW            (#)     monitor width in cm
+MON_ID          (str)   identifier string for monitor (brand etc)
+VIEWDIST        (#)     viewing distance (eye to monitor) in cm
+AUDIODRIVER     (str)   name of pygame SDL_AUDIODRIVER
+REWARD_BEEP     (0|1)   beep on each reward
+SOUND           (0|1)   sound on/off (default is on)
+SYNCLEVEL       (#)     intensity (0-255) of sync pulse signal
+SYNCSIZE        (#)     size (pixels) of sync pulse sprite (width & height)
+SYNCX           (#)     x-location (pixels) of sync pulse sprite
+SYNCY           (#)     y-location (pixels) of sync pulse sprite
+
+Eye Tracking
+------------
+EYETRACKER      (str)   eyetracker device: ANALOG, ISCAN or EYELINK
+EYETRACKER_DEV  (str)   device file (IP # for eyelink)
+SWAP_XY         (0|1)   swap x and y channels on eyetracker
+EYELINK_CAMERA  (0,1)   left or right eyelink (EL2) camera to read
+EYELINK_OPTS    (str)   extra options for the eyelink API
+EYELINK_XTALK   (#,#)   luminance-position cross talk correction for eyelink
+
+Data Acquisition
+----------------
+FLIP_BAR        (0|1)   flip sign of monkey bar (sw0)
+FLIP_SW1        (0|1)   flip sign of user switch 1
+FLIP_SW2        (0|1)   flip sign of user switch 2
+ENABLE_SW1      (0|1)   enable switch 1 for manual rewards
+PPORT           (hex#)  parallel port (cage trainer); should start with 0x
+
+Remote Data Acquisition
+-----------------------
+PLEXHOST        (str)   IP # or name of machine running PlexNet
+PLEXPORT        (#)     port # for PlexNet
+TDTHOST         (str)   name or IP number of machine running tdt.py
+
+Other
+-----
+DEBUG           (0|1)   enables debug mode
+SPLASH          (0|1)   display splash screen
+
+Environment Vars (use setenv, not config file!)
+-----------------------------------------------
+TTANK           (0/1)   if 0, then forces skipping to TTANK queries
+TTANKSERVER     (str)   hostname for ttank server (overrides pypefile)
+TTANKDIR        (str)   directory for ttanks (overrides pypefile)
+
+Note: TTANKHOST/DIR are useful when the data get stored directly
+      to a local disk, but later moved to a new location for
+      permanent storage (like a RAID).
+"""

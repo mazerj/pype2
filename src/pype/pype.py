@@ -512,12 +512,6 @@ class PypeApp:
 		if len(mon_id) == 0:
 			Logger('pype: warning -- MON_ID field in Config file unset.\n')
 
-		# GFX_TESTMODE is now obsolete, replaced by FULLSCREEN
-		if self.config.iget('GFX_TESTMODE', default=-666) != -666:
-			Logger("pype: CONFIG ERROR: GFX_TESTMODE is obsolete" +
-				   "      Try FULLSCREEN instead.\n")
-			raise FatalPypeError
-
 		state = self.__readstate()
 		if state is None:
 			# no state file -- make sure tallycount's initialized..
@@ -622,6 +616,9 @@ class PypeApp:
 		mb.addmenuitem('Set', 'command',
 					   label='Toggle TRAINING mode',
 					   command=self.tog_training)
+		mb.addmenuitem('Set', 'command',
+					   label='show timestamps',
+					   command=debug_timestamp)
 
 		# make top-level menubar for task loaders that can be
 		# disabled when it's not safe to load new tasks...
@@ -1110,11 +1107,15 @@ class PypeApp:
 		# NOTE: No attempt is made to make sure the built in commands don't
 		# conflict with user commands.
 
+		if self.config.iget('PUPILXTALK', default=-666) != -666:
+			Logger("pype: change PUPILXTALK to EYELINK_XTALK in Config file\n")
+			raise FatalPypeError
+
 		eyelink_opts = self.config.get('EYELINK_OPTS')
 		if len(eyelink_opts) > 0:
 			eyelink_opts = eyelink_opts + ':'
 		eyelink_opts = eyelink_opts + 'pupil_crosstalk_fixup=%s' % \
-					   self.config.get('PUPILXTALK')
+					   self.config.get('EYELINK_XTALK')
 		eyelink_opts = eyelink_opts + ':active_eye=both'
 		eyelink_opts = eyelink_opts + ':link_sample_data=PUPIL,AREA'
 		# Mon Jan 16 14:05:46 2006 mazer
@@ -1125,13 +1126,14 @@ class PypeApp:
 		eyelink_opts = eyelink_opts + ':heuristic_filter=0 0'
 		eyelink_opts = eyelink_opts + ':pup_size_diameter=NO'
 
-		dacq_start('comedi_server',
-				   '--tracker=%s' % self.config.get('EYETRACKER'),
-				   '--port=%s' % self.config.get('EYETRACKER_DEV'),
-				   '--elopt="%s"' % eyelink_opts,
-				   '--elcam=%s' % self.config.get('EYELINK_CAMERA'),
-				   '--swapxy=%d' % self.config.iget('SWAP_XY'),
-				   '--usbjs=%s' % self.config.get('USB_JS_DEV'))
+		if not dacq_start('comedi_server',
+						  '--tracker=%s' % self.config.get('EYETRACKER'),
+						  '--port=%s' % self.config.get('EYETRACKER_DEV'),
+						  '--elopt="%s"' % eyelink_opts,
+						  '--elcam=%s' % self.config.get('EYELINK_CAMERA'),
+						  '--swapxy=%d' % self.config.iget('SWAP_XY'),
+						  '--usbjs=%s' % self.config.get('USB_JS_DEV')):
+			raise FatalPypeError
 		
 		self.drawledbar()
 		self.dacq_going = 1
@@ -1168,7 +1170,7 @@ class PypeApp:
 			root_drop()
 			if not self.config.iget('SOUND'):
 				beep(disable=1)
-				Logger('pype: audio disabled by user config\n')
+				Logger('pype: audio disabled in config file.\n')
 			else:
 				if self.config.get('AUDIODRIVER'):
 					audiodriver = self.config.get('AUDIODRIVER')
@@ -2445,16 +2447,14 @@ class PypeApp:
 					break
 			if dobeep and self.reward_beep:
 				beep(1000, 40)
-			if not self.config.iget('DACQ_TESTMODE'):
-				thread.start_new_thread(self.__reward_finisher, (t,))
+			thread.start_new_thread(self.__reward_finisher, (t,))
 			if self.tk:
 				self.console.writenl("[ran-reward=%dms]" % t, color='black')
 			actual_reward_size = t
 		else:
 			if dobeep and self.reward_beep:
 				beep(1000, 100)
-			if not self.config.iget('DACQ_TESTMODE'):
-				self.juice_drip(ms)
+			self.juice_drip(ms)
 			if self.tk:
 				self.console.writenl("[reward=%dms]" % ms, color='black')
 			actual_reward_size = ms
@@ -2493,9 +2493,9 @@ class PypeApp:
 
 	def juice_drip(self, ms):
 		if self.pport:
-			pp_juice_drip(int(0.5+ms))
+			pp_juice_drip(int(round(ms)))
 		else:
-			dacq_juice_drip(int(0.5+ms))
+			dacq_juice_drip(int(round(ms)))
 
 	def barchanges(self, reset=None):
 		"""
@@ -2630,9 +2630,7 @@ class PypeApp:
 		if self.flip_sw1 < 0:
 			return 0
 	
-		if self.config.iget('DACQ_TESTMODE'):
-			return 0
-		elif self.pport:
+		if self.pport:
 			return pp_sw1()
 		else:
 			if self.flip_sw1:
@@ -2644,9 +2642,8 @@ class PypeApp:
 		# if FLIP_SW2 < 0, disable switch 2 (for das08 problems)
 		if self.flip_sw1 < 0:
 			return 0
-		if self.config.iget('DACQ_TESTMODE'):
-			return 0
-		elif self.pport:
+
+		if self.pport:
 			return pp_sw2()
 		else:
 			if self.flip_sw2:
@@ -2781,6 +2778,9 @@ class PypeApp:
 			# to real time for the duration of the trial
 			dacq_set_rt(1)
 
+		# reset internal timestamp clock back to zero
+		#dacq_clockreset()
+
 		self.record_buffer = []
 
 		# Thu Oct 23 15:51:34 2008 mazer
@@ -2852,21 +2852,20 @@ class PypeApp:
 	def record_state(self, state):
 		"""Enable or disable plexon recording state"""
 
-		if not self.config.iget('DACQ_TESTMODE'):
-			try:
-				l = self._last_recstate
-			except:
-				self._last_recstate = dacq_ts()
-
-			if self.xdacq is 'plexon':
-				warn = 1
-				while (dacq_ts() - self._last_recstate) < 250:
-					if warn:
-						sys.stderr.write('warning: short ITI, stalling\n')
-						warn = 0
-			# this is causing a wedge!!!
-			dacq_dig_out(2, state)
+		try:
+			l = self._last_recstate
+		except:
 			self._last_recstate = dacq_ts()
+
+		if self.xdacq is 'plexon':
+			warn = 1
+			while (dacq_ts() - self._last_recstate) < 250:
+				if warn:
+					sys.stderr.write('warning: short ITI, stalling\n')
+					warn = 0
+		# this is causing a wedge!!!
+		dacq_dig_out(2, state)
+		self._last_recstate = dacq_ts()
 		if state:
 			self.record_led.configure(fg='blue')
 		else:
@@ -2874,8 +2873,7 @@ class PypeApp:
 
 	def plexon_psth_trigger(self, state):
 		"""change state on the plexon PSTH trigger input line"""
-		if not self.config.iget('DACQ_TESTMODE'):
-			dacq_dig_out(1, state)
+		dacq_dig_out(1, state)
 
 	def eyetrace(self, on):
 		"""
@@ -2939,13 +2937,13 @@ class PypeApp:
 		s0 = zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i) / 1000.0
+			t[i] = round(dacq_adbuf_t(i) / 1000.0, 3)
 			s0[i] = dacq_adbuf_c3(i)
 
 		spike_thresh = int(self.rig_common.queryv('spike_thresh'))
 		spike_polarity = int(self.rig_common.queryv('spike_polarity'))
-
 		spike_times = _find_ttl(t, s0, spike_thresh, spike_polarity)
+		
 		return spike_times
 
 	def get_eyepos_now(self):
@@ -2968,7 +2966,7 @@ class PypeApp:
 		y = zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i) / 1000.0
+			t[i] = round(dacq_adbuf_t(i) / 1000.0, 3)
 			x[i] = dacq_adbuf_x(i)
 			y[i] = dacq_adbuf_y(i)
 
@@ -2984,7 +2982,7 @@ class PypeApp:
 		p = zeros(n)
 
 		for i in range(0,n):
-			t[i] = dacq_adbuf_t(i) / 1000.0
+			t[i] = round(dacq_adbuf_t(i) / 1000.0, 3)
 			p[i] = dacq_adbuf_c2(i)
 
 		return (t, p)
@@ -3035,8 +3033,9 @@ class PypeApp:
 			if self.rig_common.queryv('save_chn_4'): c4 = zeros(n, Numeric.Int32)
 
 			for i in range(0,n):
-				# convert adbuf_t in 'us' --> 'ms' in datafile (floating point)
-				self.eyebuf_t[i] = dacq_adbuf_t(i) / 1000.0
+				# convert dacq_adbuf_t() in 'us' to 'ms' for saving
+				# nb: it's a float, so full us-precision is still there!
+				self.eyebuf_t[i] = round(dacq_adbuf_t(i) / 1000.0, 3)
 				self.eyebuf_x[i] = dacq_adbuf_x(i)
 				self.eyebuf_y[i] = dacq_adbuf_y(i)
 				self.eyebuf_pa[i] = dacq_adbuf_pa(i)
@@ -3048,11 +3047,22 @@ class PypeApp:
 				if not c3 is None: c3[i] = dacq_adbuf_c3(i)
 				if not c4 is None: c4[i] = dacq_adbuf_c4(i)
 
+			# Thu Oct 21 14:38:49 2010 mazer
+			# look for duplicates in the time stream -- this means
+			# something's wrong with comedi_server or passing doubles
+			# around.
+
+			ndups = 0
 			for i in range(1, n):
 				if self.eyebuf_t[i-1] == self.eyebuf_t[i]:
-					warn('dacq', "duplicate timestamp!")
-					break
-
+					ndups = ndups + 1
+			if ndups > 0:
+				for i in range(1, 100):
+					print i, self.eyebuf_t[i], ; print_adbuf_t(i); print ""
+				if ask('dacq', '%d duplicate timestamp(s)' % ndups,
+					   ['Continue', 'Keyboard (debug)']) == 1:
+					keyboard()
+					
 		photo_thresh = int(self.rig_common.queryv('photo_thresh'))
 		photo_polarity = int(self.rig_common.queryv('photo_polarity'))
 		self.photo_times = _find_ttl(self.eyebuf_t, p0,
@@ -3613,16 +3623,12 @@ class FixWin:
 		"""Check to see if eye is inside fixwin.
 
 		"""
-		if self.app and self.app.config.iget('DACQ_TESTMODE'):
-			return 1
 		return dacq_fixwin_state(0)
 
 	def broke(self):
 		"""Check to see if eye moved out of window, since acquired.
 
 		"""
-		if self.app and self.app.config.iget('DACQ_TESTMODE'):
-			return 0
 		return dacq_fixwin_broke(0)
 
 	def break_time(self):
@@ -3883,7 +3889,7 @@ def _get_plexon_events(plex, fc=40000):
 					# drain rest of tank, then return
 				else:
 					# use fc (sample freq in hz) to convert timestmaps to ms
-					events.append((int(0.5 + float(ts - zero_ts) / fc * 1000.0),
+					events.append((int(round(float(ts - zero_ts) / fc * 1000.0)),
 								   Channel, Unit))
 
 	return events
@@ -3915,10 +3921,13 @@ def _addpath(d, atend=None):
     else:
         sys.path = [d] + sys.path
 
-	if atend:
-		print "addpath: %s:..." % d
-	else:
-		print "addpath: ...:%s" % d
+def debug_timestamp():
+	ts = dacq_ts()
+	usts = dacq_usts()
+	print "  ts:", ts, type(ts)
+	print "usts:", usts, type(usts)
+	ts = int(round(usts/1000.0))
+	print "[ts]:", ts, type(ts)
 
 if __name__ == '__main__':
 	sys.stderr.write('%s should never be loaded as main.\n' % __file__)

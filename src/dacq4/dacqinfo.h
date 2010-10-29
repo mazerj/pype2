@@ -91,6 +91,8 @@ typedef struct {
   unsigned long timestamp;	/* timestamp of last update (ms resolution) */
   int	terminate;		/* set flag to force termination */
   int	das_ready;		/* sync flag -- when true, dacq proc ready */
+  int	clock_reset;		/* set to force reset of int. timestamp clock */
+  double usts;			/* raw time stamp in us as double */
 
   /* used only once.. */
   int	dacq_pri;
