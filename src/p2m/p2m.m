@@ -132,7 +132,10 @@ else
   % merge in the old data for return 
   if ~isempty(oldpf)
     for n = 1:length(oldpf.rec)
-      pf.rec(n) = oldpf.rec(n);
+      flist = fieldnames(oldpf.rec(n));
+      for k = 1:length(flist)
+        pf.rec(n).(flist{k}) = oldpf.rec(n).(flist{k});
+      end
     end
   end
 end
